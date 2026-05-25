@@ -1,4 +1,5 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { useState } from "react";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   Building2,
   ClipboardList,
@@ -11,7 +12,7 @@ import {
   Users,
   X,
 } from "lucide-react";
-import { useState } from "react";
+import { removeToken } from "../services/auth";
 
 const navItems = [
   { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
@@ -25,6 +26,12 @@ const navItems = [
 
 export function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    removeToken();
+    navigate("/login");
+  }
 
   return (
     <main className="min-h-screen bg-soft text-dark">
@@ -103,7 +110,10 @@ export function AdminLayout() {
             </div>
           </div>
 
-          <button className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+          <button
+            onClick={handleLogout}
+            className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+          >
             <LogOut size={16} />
             Logout
           </button>

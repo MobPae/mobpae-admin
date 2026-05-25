@@ -1,4 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AdminLayout } from "./layouts/AdminLayout";
 import { DashboardPage } from "./pages/DashboardPage";
 import { DisbursalsPage } from "./pages/DisbursalsPage";
@@ -8,14 +9,27 @@ import { EnquiriesPage } from "./pages/EnquiriesPage";
 import { LoginPage } from "./pages/LoginPage";
 import { RepaymentsPage } from "./pages/RepaymentsPage";
 import { RequestsPage } from "./pages/RequestsPage";
+import { isLoggedIn } from "./services/auth";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<LoginPage />} />
+        <Route
+          path="/login"
+          element={
+            isLoggedIn() ? <Navigate to="/dashboard" replace /> : <LoginPage />
+          }
+        />
 
-        <Route path="/" element={<AdminLayout />}>
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="employers" element={<EmployersPage />} />
