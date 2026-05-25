@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import {
+  Building2,
   ChevronLeft,
   ChevronRight,
   Mail,
@@ -27,6 +28,7 @@ export function EnquiriesPage() {
   const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState("");
+  const [convertingId, setConvertingId] = useState("");
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -66,6 +68,32 @@ export function EnquiriesPage() {
       alert("Unable to update status");
     } finally {
       setUpdatingId("");
+    }
+  }
+
+  async function approveEnquiry(id: string) {
+    const confirmApprove = window.confirm(
+      "Approve this enquiry and create employer?"
+    );
+
+    if (!confirmApprove) return;
+
+    setConvertingId(id);
+
+    try {
+      await api.post(`/employers/from-enquiry/${id}`);
+
+      setEnquiries((current) =>
+        current.map((item) =>
+          item.id === id ? { ...item, status: "CLOSED" } : item
+        )
+      );
+
+      alert("Employer created successfully");
+    } catch {
+      alert("Unable to approve enquiry. Employer may already exist.");
+    } finally {
+      setConvertingId("");
     }
   }
 
@@ -152,7 +180,7 @@ export function EnquiriesPage() {
       {!loading && !error && (
         <section className="overflow-hidden rounded-[1.5rem] bg-white shadow-soft">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[1000px] text-left text-sm">
+            <table className="w-full min-w-[1150px] text-left text-sm">
               <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                 <tr>
                   <th className="px-5 py-4">Contact</th>
@@ -162,6 +190,7 @@ export function EnquiriesPage() {
                   <th className="px-5 py-4">Message</th>
                   <th className="px-5 py-4">Status</th>
                   <th className="px-5 py-4">Date</th>
+                  <th className="px-5 py-4">Action</th>
                 </tr>
               </thead>
 
@@ -217,13 +246,26 @@ export function EnquiriesPage() {
                         ? new Date(item.createdAt).toLocaleDateString()
                         : "-"}
                     </td>
+
+                    <td className="px-5 py-4">
+                      <button
+                        onClick={() => approveEnquiry(item.id)}
+                        disabled={
+                          convertingId === item.id || item.status === "CLOSED"
+                        }
+                        className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-bold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+                      >
+                        <Building2 size={14} />
+                        {convertingId === item.id ? "Approving..." : "Approve"}
+                      </button>
+                    </td>
                   </tr>
                 ))}
 
                 {paginatedEnquiries.length === 0 && (
                   <tr>
                     <td
-                      colSpan={7}
+                      colSpan={8}
                       className="px-5 py-10 text-center text-slate-500"
                     >
                       No enquiries found.

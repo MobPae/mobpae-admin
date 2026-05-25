@@ -107,7 +107,7 @@ export function EmployersPage() {
                 <tr>
                   <th className="px-5 py-4">Company</th>
                   <th className="px-5 py-4">Contact Details</th>
-                  <th className="px-5 py-4">Employees</th>
+                  <th className="px-5 py-4">Employees Added</th>
                   <th className="px-5 py-4">App Activation</th>
                   <th className="px-5 py-4">Status</th>
                   <th className="px-5 py-4">Created</th>
