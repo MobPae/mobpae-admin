@@ -4,13 +4,12 @@ import { api } from "../services/api";
 
 type Employer = {
   id: string;
-  companyName?: string;
-  name?: string;
-  contactName?: string;
-  email?: string;
-  phone?: string;
-  employeeCount?: number;
+  companyName: string;
+  companyEmail?: string;
+  companyPhone?: string;
   status?: string;
+  appActivationRequired?: boolean;
+  employees?: unknown[];
   createdAt?: string;
 };
 
@@ -48,7 +47,8 @@ export function EmployersPage() {
 
   const filteredEmployers = employers.filter((item) => {
     const value =
-      `${item.companyName} ${item.name} ${item.contactName} ${item.email} ${item.phone}`.toLowerCase();
+      `${item.companyName} ${item.companyEmail} ${item.companyPhone}`.toLowerCase();
+
     return value.includes(search.toLowerCase());
   });
 
@@ -81,7 +81,7 @@ export function EmployersPage() {
           <input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search by company, contact, email or phone..."
+            placeholder="Search by company, email or phone..."
             className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-sm outline-none focus:border-primary focus:bg-white focus:ring-4 focus:ring-blue-50"
           />
         </div>
@@ -106,9 +106,9 @@ export function EmployersPage() {
               <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                 <tr>
                   <th className="px-5 py-4">Company</th>
-                  <th className="px-5 py-4">Contact Person</th>
                   <th className="px-5 py-4">Contact Details</th>
                   <th className="px-5 py-4">Employees</th>
+                  <th className="px-5 py-4">App Activation</th>
                   <th className="px-5 py-4">Status</th>
                   <th className="px-5 py-4">Created</th>
                 </tr>
@@ -123,33 +123,45 @@ export function EmployersPage() {
                           <Building2 size={18} />
                         </span>
                         <span className="font-semibold text-slate-800">
-                          {item.companyName || item.name || "-"}
+                          {item.companyName || "-"}
                         </span>
                       </div>
                     </td>
 
-                    <td className="px-5 py-4 text-slate-600">
-                      {item.contactName || "-"}
-                    </td>
-
                     <td className="px-5 py-4">
                       <div className="grid gap-1 text-slate-600">
-                        {item.email && (
+                        {item.companyEmail && (
                           <span className="inline-flex items-center gap-2">
-                            <Mail size={14} /> {item.email}
+                            <Mail size={14} /> {item.companyEmail}
                           </span>
                         )}
-                        {item.phone && (
+
+                        {item.companyPhone && (
                           <span className="inline-flex items-center gap-2">
-                            <Phone size={14} /> {item.phone}
+                            <Phone size={14} /> {item.companyPhone}
                           </span>
                         )}
-                        {!item.email && !item.phone && "-"}
+
+                        {!item.companyEmail && !item.companyPhone && "-"}
                       </div>
                     </td>
 
                     <td className="px-5 py-4 text-slate-600">
-                      {item.employeeCount || 0}
+                      {item.employees?.length || 0}
+                    </td>
+
+                    <td className="px-5 py-4">
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-bold ${
+                          item.appActivationRequired
+                            ? "bg-amber-50 text-amber-700"
+                            : "bg-emerald-50 text-emerald-700"
+                        }`}
+                      >
+                        {item.appActivationRequired
+                          ? "Required"
+                          : "Not Required"}
+                      </span>
                     </td>
 
                     <td className="px-5 py-4">
