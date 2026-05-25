@@ -1,6 +1,59 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { ArrowRight, LockKeyhole, ShieldCheck } from "lucide-react";
+import { api } from "../services/api";
+import { saveToken } from "../services/auth";
 
 export function LoginPage() {
+  const navigate = useNavigate();
+
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  function updateField(event: React.ChangeEvent<HTMLInputElement>) {
+    setForm({ ...form, [event.target.name]: event.target.value });
+    setError("");
+  }
+
+  async function handleLogin(event: React.FormEvent) {
+    event.preventDefault();
+
+    if (!form.email.trim() || !form.password.trim()) {
+      setError("Email and password are required");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await api.post("/auth/login", form);
+
+      const token =
+        response.data?.accessToken ||
+        response.data?.token ||
+        response.data?.data?.accessToken ||
+        response.data?.data?.token;
+
+      if (!token) {
+        setError("Login successful, but token was not found in response");
+        return;
+      }
+
+      saveToken(token);
+      navigate("/dashboard");
+    } catch {
+      setError("Invalid email or password");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 px-6 py-10 text-white">
       <div className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-6xl items-center justify-center">
@@ -52,12 +105,15 @@ export function LoginPage() {
               </p>
             </div>
 
-            <form className="mt-8 grid gap-5">
+            <form onSubmit={handleLogin} className="mt-8 grid gap-5">
               <div>
                 <label className="mb-2 block text-sm font-semibold text-slate-700">
                   Email
                 </label>
                 <input
+                  name="email"
+                  value={form.email}
+                  onChange={updateField}
                   type="email"
                   placeholder="admin@mobpae.com"
                   className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-primary focus:bg-white focus:ring-4 focus:ring-blue-50"
@@ -69,17 +125,27 @@ export function LoginPage() {
                   Password
                 </label>
                 <input
+                  name="password"
+                  value={form.password}
+                  onChange={updateField}
                   type="password"
                   placeholder="Enter password"
                   className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-primary focus:bg-white focus:ring-4 focus:ring-blue-50"
                 />
               </div>
 
+              {error && (
+                <p className="rounded-2xl border border-red-100 bg-red-50 p-4 text-sm font-semibold text-red-700">
+                  {error}
+                </p>
+              )}
+
               <button
-                type="button"
-                className="mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3.5 font-semibold text-white shadow-soft transition hover:-translate-y-0.5 hover:bg-blue-700"
+                disabled={loading}
+                className="mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3.5 font-semibold text-white shadow-soft transition hover:-translate-y-0.5 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Login <ArrowRight size={18} />
+                {loading ? "Logging in..." : "Login"}
+                {!loading && <ArrowRight size={18} />}
               </button>
             </form>
 
