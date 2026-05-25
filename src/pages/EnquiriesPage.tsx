@@ -1,23 +1,35 @@
 import { useEffect, useState } from "react";
-import { Mail, Phone, RefreshCcw, Search } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Mail,
+  Phone,
+  RefreshCcw,
+  Search,
+} from "lucide-react";
 import { api } from "../services/api";
 
 type Enquiry = {
   id: string;
-  name: string;
+  contactName: string;
   companyName?: string;
   email: string;
   phone?: string;
+  employeeCount?: number;
   message?: string;
   status?: string;
   createdAt?: string;
 };
 
+const PAGE_SIZE = 10;
+
 export function EnquiriesPage() {
   const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [updatingId, setUpdatingId] = useState("");
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
 
   async function fetchEnquiries() {
     setLoading(true);
@@ -25,11 +37,14 @@ export function EnquiriesPage() {
 
     try {
       const response = await api.get("/enquiries");
+
       const data =
+        response.data?.data?.data ||
         response.data?.data?.items ||
         response.data?.data ||
         response.data ||
         [];
+
       setEnquiries(Array.isArray(data) ? data : []);
     } catch {
       setError("Unable to load enquiries");
@@ -38,15 +53,54 @@ export function EnquiriesPage() {
     }
   }
 
+  async function updateStatus(id: string, status: string) {
+    setUpdatingId(id);
+
+    try {
+      await api.patch(`/enquiries/${id}/status`, { status });
+
+      setEnquiries((current) =>
+        current.map((item) => (item.id === id ? { ...item, status } : item))
+      );
+    } catch {
+      alert("Unable to update status");
+    } finally {
+      setUpdatingId("");
+    }
+  }
+
   useEffect(() => {
     fetchEnquiries();
   }, []);
 
+  useEffect(() => {
+    setPage(1);
+  }, [search]);
+
   const filteredEnquiries = enquiries.filter((item) => {
     const value =
-      `${item.name} ${item.companyName} ${item.email} ${item.phone}`.toLowerCase();
+      `${item.contactName} ${item.companyName} ${item.email} ${item.phone}`.toLowerCase();
+
     return value.includes(search.toLowerCase());
   });
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredEnquiries.length / PAGE_SIZE)
+  );
+  const startIndex = (page - 1) * PAGE_SIZE;
+  const paginatedEnquiries = filteredEnquiries.slice(
+    startIndex,
+    startIndex + PAGE_SIZE
+  );
+
+  function goPrevious() {
+    setPage((current) => Math.max(1, current - 1));
+  }
+
+  function goNext() {
+    setPage((current) => Math.min(totalPages, current + 1));
+  }
 
   return (
     <div className="space-y-6">
@@ -77,7 +131,7 @@ export function EnquiriesPage() {
           <input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search by name, company, email or phone..."
+            placeholder="Search by contact, company, email or phone..."
             className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-sm outline-none focus:border-primary focus:bg-white focus:ring-4 focus:ring-blue-50"
           />
         </div>
@@ -98,12 +152,13 @@ export function EnquiriesPage() {
       {!loading && !error && (
         <section className="overflow-hidden rounded-[1.5rem] bg-white shadow-soft">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[900px] text-left text-sm">
+            <table className="w-full min-w-[1000px] text-left text-sm">
               <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                 <tr>
-                  <th className="px-5 py-4">Name</th>
-                  <th className="px-5 py-4">Company</th>
                   <th className="px-5 py-4">Contact</th>
+                  <th className="px-5 py-4">Company</th>
+                  <th className="px-5 py-4">Employee Count</th>
+                  <th className="px-5 py-4">Details</th>
                   <th className="px-5 py-4">Message</th>
                   <th className="px-5 py-4">Status</th>
                   <th className="px-5 py-4">Date</th>
@@ -111,14 +166,20 @@ export function EnquiriesPage() {
               </thead>
 
               <tbody className="divide-y divide-slate-100">
-                {filteredEnquiries.map((item) => (
+                {paginatedEnquiries.map((item) => (
                   <tr key={item.id} className="hover:bg-slate-50">
                     <td className="px-5 py-4 font-semibold text-slate-800">
-                      {item.name}
+                      {item.contactName}
                     </td>
+
                     <td className="px-5 py-4 text-slate-600">
                       {item.companyName || "-"}
                     </td>
+
+                    <td className="px-5 py-4 text-slate-600">
+                      {item.employeeCount || "-"}
+                    </td>
+
                     <td className="px-5 py-4">
                       <div className="grid gap-1 text-slate-600">
                         <span className="inline-flex items-center gap-2">
@@ -131,14 +192,26 @@ export function EnquiriesPage() {
                         )}
                       </div>
                     </td>
+
                     <td className="max-w-xs px-5 py-4 text-slate-600">
                       {item.message || "-"}
                     </td>
+
                     <td className="px-5 py-4">
-                      <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-primary">
-                        {item.status || "NEW"}
-                      </span>
+                      <select
+                        value={item.status || "NEW"}
+                        disabled={updatingId === item.id}
+                        onChange={(event) =>
+                          updateStatus(item.id, event.target.value)
+                        }
+                        className="rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-bold text-primary outline-none disabled:opacity-60"
+                      >
+                        <option value="NEW">NEW</option>
+                        <option value="CONTACTED">CONTACTED</option>
+                        <option value="CLOSED">CLOSED</option>
+                      </select>
                     </td>
+
                     <td className="px-5 py-4 text-slate-500">
                       {item.createdAt
                         ? new Date(item.createdAt).toLocaleDateString()
@@ -147,10 +220,10 @@ export function EnquiriesPage() {
                   </tr>
                 ))}
 
-                {filteredEnquiries.length === 0 && (
+                {paginatedEnquiries.length === 0 && (
                   <tr>
                     <td
-                      colSpan={6}
+                      colSpan={7}
                       className="px-5 py-10 text-center text-slate-500"
                     >
                       No enquiries found.
@@ -159,6 +232,38 @@ export function EnquiriesPage() {
                 )}
               </tbody>
             </table>
+          </div>
+
+          <div className="flex flex-col gap-3 border-t border-slate-100 px-5 py-4 text-sm text-slate-600 md:flex-row md:items-center md:justify-between">
+            <p>
+              Showing {filteredEnquiries.length === 0 ? 0 : startIndex + 1}-
+              {Math.min(startIndex + PAGE_SIZE, filteredEnquiries.length)} of{" "}
+              {filteredEnquiries.length}
+            </p>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={goPrevious}
+                disabled={page === 1}
+                className="inline-flex items-center gap-1 rounded-full border border-slate-200 px-3 py-2 font-semibold disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <ChevronLeft size={16} />
+                Previous
+              </button>
+
+              <span className="rounded-full bg-slate-100 px-3 py-2 font-semibold">
+                Page {page} of {totalPages}
+              </span>
+
+              <button
+                onClick={goNext}
+                disabled={page === totalPages}
+                className="inline-flex items-center gap-1 rounded-full border border-slate-200 px-3 py-2 font-semibold disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Next
+                <ChevronRight size={16} />
+              </button>
+            </div>
           </div>
         </section>
       )}
