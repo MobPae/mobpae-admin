@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   Building2,
   ClipboardList,
@@ -16,17 +16,28 @@ import { removeToken } from "../services/auth";
 
 const navItems = [
   { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+  { label: "Enquiries", path: "/enquiries", icon: HelpCircle },
   { label: "Employers", path: "/employers", icon: Building2 },
   { label: "Employees", path: "/employees", icon: Users },
   { label: "Requests", path: "/requests", icon: ClipboardList },
   { label: "Disbursals", path: "/disbursals", icon: CreditCard },
   { label: "Repayments", path: "/repayments", icon: ReceiptIndianRupee },
-  { label: "Enquiries", path: "/enquiries", icon: HelpCircle },
 ];
 
 export function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const currentPage = useMemo(() => {
+    const active = navItems.find(
+      (item) =>
+        location.pathname === item.path ||
+        location.pathname.startsWith(`${item.path}/`)
+    );
+
+    return active?.label || "Admin Console";
+  }, [location.pathname]);
 
   function handleLogout() {
     removeToken();
@@ -40,12 +51,14 @@ export function AdminLayout() {
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex h-16 items-center justify-between border-b border-slate-200 px-6">
+        <div className="flex h-20 items-center justify-between border-b border-slate-200 px-6">
           <div>
-            <p className="text-xl font-bold">
+            <p className="text-2xl font-black tracking-tight">
               Mob<span className="text-primary">Pae</span>
             </p>
-            <p className="text-xs font-medium text-slate-500">Admin Console</p>
+            <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
+              Admin Console
+            </p>
           </div>
 
           <button
@@ -57,7 +70,7 @@ export function AdminLayout() {
           </button>
         </div>
 
-        <nav className="grid gap-2 p-4">
+        <nav className="grid gap-1 p-4">
           {navItems.map((item) => {
             const Icon = item.icon;
 
@@ -67,19 +80,32 @@ export function AdminLayout() {
                 to={item.path}
                 onClick={() => setSidebarOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+                  `group flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold transition ${
                     isActive
-                      ? "bg-blue-50 text-primary"
-                      : "text-slate-600 hover:bg-slate-50 hover:text-dark"
+                      ? "bg-primary text-white shadow-sm"
+                      : "text-slate-600 hover:bg-slate-50 hover:text-slate-950"
                   }`
                 }
               >
-                <Icon size={18} />
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/15">
+                  <Icon size={18} />
+                </span>
                 {item.label}
               </NavLink>
             );
           })}
         </nav>
+
+        <div className="absolute bottom-0 left-0 right-0 border-t border-slate-100 p-4">
+          <div className="rounded-2xl bg-slate-50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+              Current Module
+            </p>
+            <p className="mt-1 text-sm font-bold text-slate-800">
+              {currentPage}
+            </p>
+          </div>
+        </div>
       </aside>
 
       {sidebarOpen && (
@@ -92,7 +118,7 @@ export function AdminLayout() {
       )}
 
       <section className="lg:pl-72">
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200 bg-white/85 px-4 backdrop-blur md:px-6">
+        <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-slate-200 bg-white/85 px-4 backdrop-blur md:px-6">
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -106,13 +132,15 @@ export function AdminLayout() {
               <p className="text-sm font-semibold text-slate-500">
                 Welcome back
               </p>
-              <h1 className="text-lg font-bold">MobPae Admin</h1>
+              <h1 className="text-xl font-black text-slate-950">
+                {currentPage}
+              </h1>
             </div>
           </div>
 
           <button
             onClick={handleLogout}
-            className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50"
           >
             <LogOut size={16} />
             Logout
