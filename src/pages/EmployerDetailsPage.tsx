@@ -3,11 +3,14 @@ import {
   ArrowLeft,
   Building2,
   Calendar,
+  Edit3,
   Loader2,
   Mail,
   Phone,
+  Save,
   ShieldCheck,
   Users,
+  X,
 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { api } from "../services/api";
@@ -31,12 +34,48 @@ type Employer = {
   createdAt?: string;
 };
 
+type EmployerForm = {
+  companyName: string;
+  companyPhone: string;
+  gstNumber: string;
+  panNumber: string;
+  cinNumber: string;
+  registeredAddress: string;
+  validationNotes: string;
+  appActivationRequired: boolean;
+};
+
 export function EmployerDetailsPage() {
   const { id } = useParams();
   const [employer, setEmployer] = useState<Employer | null>(null);
+  const [form, setForm] = useState<EmployerForm>({
+    companyName: "",
+    companyPhone: "",
+    gstNumber: "",
+    panNumber: "",
+    cinNumber: "",
+    registeredAddress: "",
+    validationNotes: "",
+    appActivationRequired: true,
+  });
   const [loading, setLoading] = useState(true);
   const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [editing, setEditing] = useState(false);
   const [error, setError] = useState("");
+
+  function syncForm(data: Employer) {
+    setForm({
+      companyName: data.companyName || "",
+      companyPhone: data.companyPhone || "",
+      gstNumber: data.gstNumber || "",
+      panNumber: data.panNumber || "",
+      cinNumber: data.cinNumber || "",
+      registeredAddress: data.registeredAddress || "",
+      validationNotes: data.validationNotes || "",
+      appActivationRequired: data.appActivationRequired ?? true,
+    });
+  }
 
   async function fetchEmployer() {
     setLoading(true);
@@ -44,7 +83,10 @@ export function EmployerDetailsPage() {
 
     try {
       const response = await api.get(`/employers/${id}`);
-      setEmployer(response.data?.data || response.data);
+      const data = response.data?.data || response.data;
+
+      setEmployer(data);
+      syncForm(data);
     } catch {
       setError("Unable to load employer details");
     } finally {
@@ -68,12 +110,48 @@ export function EmployerDetailsPage() {
         status,
       });
 
-      setEmployer(response.data?.data || response.data);
+      const updated = response.data?.data || response.data;
+      setEmployer((current) => ({ ...(current as Employer), ...updated }));
     } catch {
       alert("Unable to update employer status");
     } finally {
       setUpdatingStatus(false);
     }
+  }
+
+  async function saveEmployer() {
+    if (!employer) return;
+
+    setSaving(true);
+
+    try {
+      const response = await api.patch(`/employers/${employer.id}`, {
+        companyName: form.companyName,
+        companyPhone: form.companyPhone || null,
+        gstNumber: form.gstNumber || null,
+        panNumber: form.panNumber || null,
+        cinNumber: form.cinNumber || null,
+        registeredAddress: form.registeredAddress || null,
+        validationNotes: form.validationNotes || null,
+        appActivationRequired: form.appActivationRequired,
+      });
+
+      const updated = response.data?.data || response.data;
+
+      setEmployer((current) => ({ ...(current as Employer), ...updated }));
+      syncForm({ ...(employer as Employer), ...updated });
+      setEditing(false);
+      alert("Employer updated successfully");
+    } catch {
+      alert("Unable to update employer details");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function cancelEdit() {
+    if (employer) syncForm(employer);
+    setEditing(false);
   }
 
   useEffect(() => {
@@ -126,7 +204,41 @@ export function EmployerDetailsPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            {!editing ? (
+              <button
+                onClick={() => setEditing(true)}
+                className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50"
+              >
+                <Edit3 size={14} />
+                Edit Details
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={saveEmployer}
+                  disabled={saving}
+                  className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-bold text-white hover:bg-blue-700 disabled:opacity-60"
+                >
+                  {saving ? (
+                    <Loader2 className="animate-spin" size={14} />
+                  ) : (
+                    <Save size={14} />
+                  )}
+                  {saving ? "Saving..." : "Save"}
+                </button>
+
+                <button
+                  onClick={cancelEdit}
+                  disabled={saving}
+                  className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+                >
+                  <X size={14} />
+                  Cancel
+                </button>
+              </>
+            )}
+
             <select
               value={status}
               disabled={updatingStatus}
@@ -189,23 +301,78 @@ export function EmployerDetailsPage() {
           <h3 className="text-lg font-bold">Company Information</h3>
 
           <div className="mt-5 grid gap-4 text-sm">
-            <Info label="Company Name" value={employer.companyName} />
-            <Info label="GST Number" value={employer.gstNumber || "-"} />
-            <Info label="PAN Number" value={employer.panNumber || "-"} />
-            <Info label="CIN Number" value={employer.cinNumber || "-"} />
-            <Info
-              label="Registered Address"
-              value={employer.registeredAddress || "-"}
-            />
-            <Info
-              label="Validation Notes"
-              value={employer.validationNotes || "-"}
-            />
+            {editing ? (
+              <>
+                <Field
+                  label="Company Name"
+                  value={form.companyName}
+                  onChange={(value) =>
+                    setForm((current) => ({ ...current, companyName: value }))
+                  }
+                />
+                <Field
+                  label="GST Number"
+                  value={form.gstNumber}
+                  onChange={(value) =>
+                    setForm((current) => ({ ...current, gstNumber: value }))
+                  }
+                />
+                <Field
+                  label="PAN Number"
+                  value={form.panNumber}
+                  onChange={(value) =>
+                    setForm((current) => ({ ...current, panNumber: value }))
+                  }
+                />
+                <Field
+                  label="CIN Number"
+                  value={form.cinNumber}
+                  onChange={(value) =>
+                    setForm((current) => ({ ...current, cinNumber: value }))
+                  }
+                />
+                <TextArea
+                  label="Registered Address"
+                  value={form.registeredAddress}
+                  onChange={(value) =>
+                    setForm((current) => ({
+                      ...current,
+                      registeredAddress: value,
+                    }))
+                  }
+                />
+                <TextArea
+                  label="Validation Notes"
+                  value={form.validationNotes}
+                  onChange={(value) =>
+                    setForm((current) => ({
+                      ...current,
+                      validationNotes: value,
+                    }))
+                  }
+                />
+              </>
+            ) : (
+              <>
+                <Info label="Company Name" value={employer.companyName} />
+                <Info label="GST Number" value={employer.gstNumber || "-"} />
+                <Info label="PAN Number" value={employer.panNumber || "-"} />
+                <Info label="CIN Number" value={employer.cinNumber || "-"} />
+                <Info
+                  label="Registered Address"
+                  value={employer.registeredAddress || "-"}
+                />
+                <Info
+                  label="Validation Notes"
+                  value={employer.validationNotes || "-"}
+                />
+              </>
+            )}
           </div>
         </div>
 
         <div className="rounded-[1.5rem] bg-white p-6 shadow-soft">
-          <h3 className="text-lg font-bold">Contact Details</h3>
+          <h3 className="text-lg font-bold">Contact & Activation</h3>
 
           <div className="mt-5 grid gap-4 text-sm">
             <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-4">
@@ -218,15 +385,59 @@ export function EmployerDetailsPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-4">
-              <Phone size={18} className="text-primary" />
-              <div>
-                <p className="text-xs font-semibold text-slate-500">Phone</p>
-                <p className="font-semibold text-slate-800">
-                  {employer.companyPhone || "-"}
-                </p>
-              </div>
-            </div>
+            {editing ? (
+              <>
+                <Field
+                  label="Phone"
+                  value={form.companyPhone}
+                  onChange={(value) =>
+                    setForm((current) => ({ ...current, companyPhone: value }))
+                  }
+                />
+
+                <label className="flex items-center justify-between rounded-2xl bg-slate-50 p-4">
+                  <span>
+                    <span className="block text-xs font-semibold text-slate-500">
+                      App Activation Required
+                    </span>
+                    <span className="block text-sm font-semibold text-slate-800">
+                      Enable if employees need app activation
+                    </span>
+                  </span>
+
+                  <input
+                    type="checkbox"
+                    checked={form.appActivationRequired}
+                    onChange={(event) =>
+                      setForm((current) => ({
+                        ...current,
+                        appActivationRequired: event.target.checked,
+                      }))
+                    }
+                    className="h-5 w-5"
+                  />
+                </label>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-4">
+                  <Phone size={18} className="text-primary" />
+                  <div>
+                    <p className="text-xs font-semibold text-slate-500">
+                      Phone
+                    </p>
+                    <p className="font-semibold text-slate-800">
+                      {employer.companyPhone || "-"}
+                    </p>
+                  </div>
+                </div>
+
+                <Info
+                  label="App Activation Required"
+                  value={employer.appActivationRequired ? "Yes" : "No"}
+                />
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -240,5 +451,48 @@ function Info({ label, value }: { label: string; value: string }) {
       <p className="text-xs font-semibold text-slate-500">{label}</p>
       <p className="mt-1 font-semibold text-slate-800">{value}</p>
     </div>
+  );
+}
+
+function Field({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <label className="block rounded-2xl bg-slate-50 p-4">
+      <span className="text-xs font-semibold text-slate-500">{label}</span>
+      <input
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 outline-none focus:border-primary"
+      />
+    </label>
+  );
+}
+
+function TextArea({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <label className="block rounded-2xl bg-slate-50 p-4">
+      <span className="text-xs font-semibold text-slate-500">{label}</span>
+      <textarea
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        rows={3}
+        className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 outline-none focus:border-primary"
+      />
+    </label>
   );
 }
