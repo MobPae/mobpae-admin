@@ -7,6 +7,7 @@ import {
   RefreshCcw,
   Search,
   User,
+  X,
   XCircle,
 } from "lucide-react";
 import { api } from "../services/api";
@@ -14,6 +15,12 @@ import { api } from "../services/api";
 type RequestStatus = "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
 type DisbursalStatus = "PENDING" | "DISBURSED" | "FAILED";
 type RepaymentStatus = "PENDING" | "PAID" | "OVERDUE";
+
+type ModalAction =
+  | "APPROVE_REQUEST"
+  | "REJECT_REQUEST"
+  | "DISBURSE_PAYMENT"
+  | "FAIL_DISBURSAL";
 
 type AdvanceRequest = {
   id: string;
@@ -54,6 +61,12 @@ type AdvanceRequest = {
   } | null;
 };
 
+type ActionModalState = {
+  open: boolean;
+  action: ModalAction | null;
+  request: AdvanceRequest | null;
+};
+
 export function RequestsPage() {
   const [requests, setRequests] = useState<AdvanceRequest[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,6 +76,15 @@ export function RequestsPage() {
     "ALL"
   );
   const [error, setError] = useState("");
+
+  const [modal, setModal] = useState<ActionModalState>({
+    open: false,
+    action: null,
+    request: null,
+  });
+
+  const [remarks, setRemarks] = useState("");
+  const [transactionRef, setTransactionRef] = useState("");
 
   async function fetchRequests() {
     setLoading(true);
@@ -86,79 +108,87 @@ export function RequestsPage() {
     }
   }
 
-  async function updateRequestStatus(
-    request: AdvanceRequest,
-    status: "APPROVED" | "REJECTED"
-  ) {
-    const remarks =
-      status === "REJECTED"
-        ? window.prompt("Enter rejection remarks") || ""
-        : window.prompt("Enter approval remarks (optional)") || "";
+  function openActionModal(action: ModalAction, request: AdvanceRequest) {
+    setModal({
+      open: true,
+      action,
+      request,
+    });
+    setRemarks("");
+    setTransactionRef("");
+  }
 
-    if (status === "REJECTED" && !remarks.trim()) {
+  function closeActionModal() {
+    if (updatingId) return;
+
+    setModal({
+      open: false,
+      action: null,
+      request: null,
+    });
+    setRemarks("");
+    setTransactionRef("");
+  }
+
+  async function submitAction() {
+    if (!modal.request || !modal.action) return;
+
+    if (modal.action === "REJECT_REQUEST" && !remarks.trim()) {
       alert("Rejection remarks are required");
       return;
     }
 
-    const confirmUpdate = window.confirm(
-      `${status === "APPROVED" ? "Approve" : "Reject"} this request?`
-    );
-
-    if (!confirmUpdate) return;
-
-    setUpdatingId(request.id);
-
-    try {
-      await api.patch(`/advance-requests/${request.id}/status`, {
-        status,
-        employerRemarks: remarks,
-      });
-
-      await fetchRequests();
-    } catch {
-      alert(`Unable to ${status.toLowerCase()} request`);
-    } finally {
-      setUpdatingId("");
-    }
-  }
-
-  async function updateDisbursalStatus(
-    request: AdvanceRequest,
-    status: "DISBURSED" | "FAILED"
-  ) {
-    if (!request.disbursal?.id) {
-      alert("Disbursal is not created yet. Approve the request first.");
-      return;
-    }
-
-    const transactionRef =
-      status === "DISBURSED"
-        ? window.prompt("Enter transaction reference") || ""
-        : "";
-
-    if (status === "DISBURSED" && !transactionRef.trim()) {
+    if (modal.action === "DISBURSE_PAYMENT" && !transactionRef.trim()) {
       alert("Transaction reference is required");
       return;
     }
 
-    const adminRemarks = window.prompt("Enter admin remarks (optional)") || "";
-
-    const confirmUpdate = window.confirm(`Mark disbursal as ${status}?`);
-
-    if (!confirmUpdate) return;
-
-    setUpdatingId(request.id);
+    setUpdatingId(modal.request.id);
 
     try {
-      await api.patch(`/disbursals/${request.disbursal.id}/status`, {
-        status,
-        transactionRef,
-        adminRemarks,
-      });
+      if (modal.action === "APPROVE_REQUEST") {
+        await api.patch(`/advance-requests/${modal.request.id}/status`, {
+          status: "APPROVED",
+          employerRemarks: remarks,
+        });
+      }
 
+      if (modal.action === "REJECT_REQUEST") {
+        await api.patch(`/advance-requests/${modal.request.id}/status`, {
+          status: "REJECTED",
+          employerRemarks: remarks,
+        });
+      }
+
+      if (modal.action === "DISBURSE_PAYMENT") {
+        if (!modal.request.disbursal?.id) {
+          alert("Disbursal is not created yet. Approve the request first.");
+          return;
+        }
+
+        await api.patch(`/disbursals/${modal.request.disbursal.id}/status`, {
+          status: "DISBURSED",
+          transactionRef,
+          adminRemarks: remarks,
+        });
+      }
+
+      if (modal.action === "FAIL_DISBURSAL") {
+        if (!modal.request.disbursal?.id) {
+          alert("Disbursal is not created yet. Approve the request first.");
+          return;
+        }
+
+        await api.patch(`/disbursals/${modal.request.disbursal.id}/status`, {
+          status: "FAILED",
+          adminRemarks: remarks,
+        });
+      }
+
+      closeActionModal();
       await fetchRequests();
     } catch {
-      alert(`Unable to mark disbursal as ${status.toLowerCase()}`);
+      alert("Unable to complete this action");
     } finally {
       setUpdatingId("");
     }
@@ -432,7 +462,7 @@ export function RequestsPage() {
                               <>
                                 <button
                                   onClick={() =>
-                                    updateRequestStatus(request, "APPROVED")
+                                    openActionModal("APPROVE_REQUEST", request)
                                   }
                                   className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-700"
                                 >
@@ -442,7 +472,7 @@ export function RequestsPage() {
 
                                 <button
                                   onClick={() =>
-                                    updateRequestStatus(request, "REJECTED")
+                                    openActionModal("REJECT_REQUEST", request)
                                   }
                                   className="inline-flex items-center gap-1 rounded-full bg-red-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-red-700"
                                 >
@@ -457,9 +487,9 @@ export function RequestsPage() {
                                 <>
                                   <button
                                     onClick={() =>
-                                      updateDisbursalStatus(
-                                        request,
-                                        "DISBURSED"
+                                      openActionModal(
+                                        "DISBURSE_PAYMENT",
+                                        request
                                       )
                                     }
                                     className="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-xs font-bold text-white hover:bg-blue-700"
@@ -469,7 +499,7 @@ export function RequestsPage() {
 
                                   <button
                                     onClick={() =>
-                                      updateDisbursalStatus(request, "FAILED")
+                                      openActionModal("FAIL_DISBURSAL", request)
                                     }
                                     className="inline-flex items-center gap-1 rounded-full border border-red-200 px-3 py-1.5 text-xs font-bold text-red-700 hover:bg-red-50"
                                   >
@@ -506,6 +536,20 @@ export function RequestsPage() {
           </div>
         </section>
       )}
+
+      {modal.open && (
+        <ActionModal
+          modal={modal}
+          remarks={remarks}
+          transactionRef={transactionRef}
+          updating={Boolean(updatingId)}
+          onClose={closeActionModal}
+          onSubmit={submitAction}
+          onRemarksChange={setRemarks}
+          onTransactionRefChange={setTransactionRef}
+          formatAmount={formatAmount}
+        />
+      )}
     </div>
   );
 }
@@ -515,6 +559,170 @@ function SummaryCard({ label, value }: { label: string; value: number }) {
     <div className="rounded-[1.5rem] bg-white p-5 shadow-soft">
       <p className="text-sm text-slate-500">{label}</p>
       <h3 className="mt-2 text-2xl font-bold text-slate-900">{value}</h3>
+    </div>
+  );
+}
+
+function ActionModal({
+  modal,
+  remarks,
+  transactionRef,
+  updating,
+  onClose,
+  onSubmit,
+  onRemarksChange,
+  onTransactionRefChange,
+  formatAmount,
+}: {
+  modal: ActionModalState;
+  remarks: string;
+  transactionRef: string;
+  updating: boolean;
+  onClose: () => void;
+  onSubmit: () => void;
+  onRemarksChange: (value: string) => void;
+  onTransactionRefChange: (value: string) => void;
+  formatAmount: (value?: number) => string;
+}) {
+  const action = modal.action;
+  const request = modal.request;
+
+  if (!action || !request) return null;
+
+  const config = {
+    APPROVE_REQUEST: {
+      title: "Approve Advance Request",
+      description:
+        "Add optional approval remarks before approving this request.",
+      buttonText: "Approve Request",
+      buttonClass: "bg-emerald-600 hover:bg-emerald-700",
+      showTransactionRef: false,
+      remarksLabel: "Approval Remarks",
+      remarksRequired: false,
+    },
+    REJECT_REQUEST: {
+      title: "Reject Advance Request",
+      description: "Rejection remarks are required for audit and tracking.",
+      buttonText: "Reject Request",
+      buttonClass: "bg-red-600 hover:bg-red-700",
+      showTransactionRef: false,
+      remarksLabel: "Rejection Remarks",
+      remarksRequired: true,
+    },
+    DISBURSE_PAYMENT: {
+      title: "Mark Payment as Disbursed",
+      description: "Enter transaction reference after payment is completed.",
+      buttonText: "Mark Disbursed",
+      buttonClass: "bg-primary hover:bg-blue-700",
+      showTransactionRef: true,
+      remarksLabel: "Admin Remarks",
+      remarksRequired: false,
+    },
+    FAIL_DISBURSAL: {
+      title: "Mark Disbursal as Failed",
+      description: "Add remarks explaining why this disbursal failed.",
+      buttonText: "Mark Failed",
+      buttonClass: "bg-red-600 hover:bg-red-700",
+      showTransactionRef: false,
+      remarksLabel: "Admin Remarks",
+      remarksRequired: false,
+    },
+  }[action];
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4">
+      <div className="w-full max-w-lg rounded-[2rem] bg-white p-6 shadow-2xl">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h3 className="text-xl font-bold text-slate-900">{config.title}</h3>
+            <p className="mt-1 text-sm text-slate-500">{config.description}</p>
+          </div>
+
+          <button
+            onClick={onClose}
+            disabled={updating}
+            className="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-50"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="mt-5 rounded-2xl bg-slate-50 p-4">
+          <p className="text-xs font-semibold uppercase text-slate-500">
+            Request Summary
+          </p>
+
+          <div className="mt-3 grid gap-2 text-sm">
+            <div className="flex justify-between gap-4">
+              <span className="text-slate-500">Employee</span>
+              <span className="font-semibold text-slate-900">
+                {request.employee?.name || "-"}
+              </span>
+            </div>
+
+            <div className="flex justify-between gap-4">
+              <span className="text-slate-500">Employer</span>
+              <span className="font-semibold text-slate-900">
+                {request.employer?.companyName || "-"}
+              </span>
+            </div>
+
+            <div className="flex justify-between gap-4">
+              <span className="text-slate-500">Amount</span>
+              <span className="font-semibold text-slate-900">
+                {formatAmount(request.amount)}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {config.showTransactionRef && (
+          <label className="mt-5 block">
+            <span className="text-sm font-semibold text-slate-700">
+              Transaction Reference <span className="text-red-500">*</span>
+            </span>
+            <input
+              value={transactionRef}
+              onChange={(event) => onTransactionRefChange(event.target.value)}
+              placeholder="Enter UTR / transaction ID"
+              className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-primary focus:bg-white focus:ring-4 focus:ring-blue-50"
+            />
+          </label>
+        )}
+
+        <label className="mt-5 block">
+          <span className="text-sm font-semibold text-slate-700">
+            {config.remarksLabel}{" "}
+            {config.remarksRequired && <span className="text-red-500">*</span>}
+          </span>
+          <textarea
+            value={remarks}
+            onChange={(event) => onRemarksChange(event.target.value)}
+            rows={4}
+            placeholder="Enter remarks"
+            className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-primary focus:bg-white focus:ring-4 focus:ring-blue-50"
+          />
+        </label>
+
+        <div className="mt-6 flex justify-end gap-3">
+          <button
+            onClick={onClose}
+            disabled={updating}
+            className="rounded-full border border-slate-200 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+          >
+            Cancel
+          </button>
+
+          <button
+            onClick={onSubmit}
+            disabled={updating}
+            className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold text-white disabled:opacity-60 ${config.buttonClass}`}
+          >
+            {updating && <Loader2 className="animate-spin" size={16} />}
+            {updating ? "Processing..." : config.buttonText}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
