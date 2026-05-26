@@ -7,6 +7,7 @@ import {
   RefreshCcw,
   Search,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { api } from "../services/api";
 
 type EmployerStatus = "ACTIVE" | "INACTIVE" | "PAUSED" | "DISCONTINUED";
@@ -180,9 +181,13 @@ export function EmployersPage() {
                           <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-primary">
                             <Building2 size={18} />
                           </span>
-                          <span className="font-semibold text-slate-800">
+
+                          <Link
+                            to={`/employers/${item.id}`}
+                            className="font-semibold text-slate-800 hover:text-primary"
+                          >
                             {item.companyName || "-"}
-                          </span>
+                          </Link>
                         </div>
                       </td>
 

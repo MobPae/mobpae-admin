@@ -10,6 +10,7 @@ import { LoginPage } from "./pages/LoginPage";
 import { RepaymentsPage } from "./pages/RepaymentsPage";
 import { RequestsPage } from "./pages/RequestsPage";
 import { isLoggedIn } from "./services/auth";
+import { EmployerDetailsPage } from "./pages/EmployerDetailsPage";
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
           <Route path="disbursals" element={<DisbursalsPage />} />
           <Route path="repayments" element={<RepaymentsPage />} />
           <Route path="enquiries" element={<EnquiriesPage />} />
+          <Route path="/employers/:id" element={<EmployerDetailsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
