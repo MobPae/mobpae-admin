@@ -11,6 +11,7 @@ import { RepaymentsPage } from "./pages/RepaymentsPage";
 import { RequestsPage } from "./pages/RequestsPage";
 import { isLoggedIn } from "./services/auth";
 import { EmployerDetailsPage } from "./pages/EmployerDetailsPage";
+import { RequestDetailsPage } from "./pages/RequestDetailsPage";
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
           <Route path="employers" element={<EmployersPage />} />
           <Route path="employees" element={<EmployeesPage />} />
           <Route path="requests" element={<RequestsPage />} />
+          <Route path="/requests/:id" element={<RequestDetailsPage />} />
           <Route path="disbursals" element={<DisbursalsPage />} />
           <Route path="repayments" element={<RepaymentsPage />} />
           <Route path="enquiries" element={<EnquiriesPage />} />

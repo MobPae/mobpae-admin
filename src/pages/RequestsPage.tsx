@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Building2,
   CheckCircle2,
@@ -458,6 +459,12 @@ export function RequestsPage() {
                           />
                         ) : (
                           <div className="flex flex-wrap gap-2">
+                            <Link
+                              to={`/requests/${request.id}`}
+                              className="inline-flex items-center gap-1 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50"
+                            >
+                              View
+                            </Link>
                             {request.status === "PENDING" && (
                               <>
                                 <button
