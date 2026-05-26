@@ -1,14 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
   Building2,
   Calendar,
   Edit3,
+  IndianRupee,
   Loader2,
   Mail,
   Phone,
   Save,
+  Search,
   ShieldCheck,
+  UserCheck,
   Users,
   X,
 } from "lucide-react";
@@ -16,6 +19,19 @@ import { Link, useParams } from "react-router-dom";
 import { api } from "../services/api";
 
 type EmployerStatus = "ACTIVE" | "INACTIVE" | "PAUSED" | "DISCONTINUED";
+
+type Employee = {
+  id: string;
+  employeeCode?: string;
+  name: string;
+  email: string;
+  phone?: string | null;
+  salaryInHand?: number;
+  preApprovedLimit?: number;
+  appActivationStatus?: string;
+  isActive?: boolean;
+  createdAt?: string;
+};
 
 type Employer = {
   id: string;
@@ -29,7 +45,7 @@ type Employer = {
   cinNumber?: string | null;
   registeredAddress?: string | null;
   validationNotes?: string | null;
-  employees?: unknown[];
+  employees?: Employee[];
   advanceRequests?: unknown[];
   createdAt?: string;
 };
@@ -47,6 +63,7 @@ type EmployerForm = {
 
 export function EmployerDetailsPage() {
   const { id } = useParams();
+
   const [employer, setEmployer] = useState<Employer | null>(null);
   const [form, setForm] = useState<EmployerForm>({
     companyName: "",
@@ -58,10 +75,12 @@ export function EmployerDetailsPage() {
     validationNotes: "",
     appActivationRequired: true,
   });
+
   const [loading, setLoading] = useState(true);
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [saving, setSaving] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [employeeSearch, setEmployeeSearch] = useState("");
   const [error, setError] = useState("");
 
   function syncForm(data: Employer) {
@@ -100,7 +119,6 @@ export function EmployerDetailsPage() {
     const confirmUpdate = window.confirm(
       `Change employer status to ${status}?`
     );
-
     if (!confirmUpdate) return;
 
     setUpdatingStatus(true);
@@ -154,9 +172,80 @@ export function EmployerDetailsPage() {
     setEditing(false);
   }
 
+  function formatAmount(value?: number) {
+    if (!value) return "-";
+
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0,
+    }).format(value);
+  }
+
+  function getStatusClass(status?: EmployerStatus) {
+    switch (status) {
+      case "ACTIVE":
+        return "bg-emerald-50 text-emerald-700 border-emerald-100";
+      case "INACTIVE":
+        return "bg-slate-50 text-slate-700 border-slate-200";
+      case "PAUSED":
+        return "bg-amber-50 text-amber-700 border-amber-100";
+      case "DISCONTINUED":
+        return "bg-red-50 text-red-700 border-red-100";
+      default:
+        return "bg-slate-50 text-slate-700 border-slate-200";
+    }
+  }
+
+  function getActivationClass(status?: string) {
+    const value = status?.toUpperCase();
+
+    if (value === "ACTIVE" || value === "ACTIVATED") {
+      return "bg-emerald-50 text-emerald-700";
+    }
+
+    if (value === "PENDING") {
+      return "bg-amber-50 text-amber-700";
+    }
+
+    if (value === "BLOCKED" || value === "INACTIVE") {
+      return "bg-red-50 text-red-700";
+    }
+
+    return "bg-slate-100 text-slate-700";
+  }
+
   useEffect(() => {
     fetchEmployer();
   }, [id]);
+
+  const employees = employer?.employees || [];
+
+  const filteredEmployees = useMemo(() => {
+    const keyword = employeeSearch.toLowerCase().trim();
+
+    if (!keyword) return employees;
+
+    return employees.filter((employee) => {
+      const value =
+        `${employee.name} ${employee.email} ${employee.phone} ${employee.employeeCode} ${employee.appActivationStatus}`.toLowerCase();
+
+      return value.includes(keyword);
+    });
+  }, [employees, employeeSearch]);
+
+  const activeEmployees = employees.filter(
+    (employee) =>
+      employee.isActive ||
+      employee.appActivationStatus === "ACTIVE" ||
+      employee.appActivationStatus === "ACTIVATED"
+  ).length;
+
+  const pendingActivations = employees.filter(
+    (employee) =>
+      employee.appActivationStatus === "PENDING" ||
+      !employee.appActivationStatus
+  ).length;
 
   if (loading) {
     return (
@@ -187,20 +276,38 @@ export function EmployerDetailsPage() {
       </Link>
 
       <section className="rounded-[2rem] bg-white p-6 shadow-soft">
-        <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
           <div className="flex gap-4">
             <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-primary">
               <Building2 size={24} />
             </span>
 
             <div>
-              <p className="text-sm font-semibold text-primary">Employer</p>
-              <h2 className="mt-1 text-2xl font-bold text-slate-900">
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="text-sm font-semibold text-primary">Employer</p>
+                <span
+                  className={`rounded-full border px-3 py-1 text-xs font-bold ${getStatusClass(
+                    status
+                  )}`}
+                >
+                  {status}
+                </span>
+              </div>
+
+              <h2 className="mt-2 text-2xl font-bold text-slate-900">
                 {employer.companyName}
               </h2>
-              <p className="mt-1 text-sm text-slate-500">
-                Company ID: {employer.id}
-              </p>
+
+              <div className="mt-2 flex flex-wrap gap-4 text-sm text-slate-500">
+                <span>{employer.companyEmail || "-"}</span>
+                <span>{employer.companyPhone || "-"}</span>
+                <span>
+                  Created:{" "}
+                  {employer.createdAt
+                    ? new Date(employer.createdAt).toLocaleDateString()
+                    : "-"}
+                </span>
+              </div>
             </div>
           </div>
 
@@ -261,38 +368,124 @@ export function EmployerDetailsPage() {
       </section>
 
       <section className="grid gap-4 md:grid-cols-4">
-        <div className="rounded-[1.5rem] bg-white p-5 shadow-soft">
-          <Users className="text-primary" size={22} />
-          <p className="mt-4 text-sm text-slate-500">Employees Added</p>
-          <h3 className="mt-1 text-2xl font-bold">
-            {employer.employees?.length || 0}
-          </h3>
+        <SummaryCard
+          icon={<Users size={22} />}
+          label="Total Employees"
+          value={employees.length}
+        />
+        <SummaryCard
+          icon={<UserCheck size={22} />}
+          label="Active Employees"
+          value={activeEmployees}
+        />
+        <SummaryCard
+          icon={<ShieldCheck size={22} />}
+          label="Pending Activations"
+          value={pendingActivations}
+        />
+        <SummaryCard
+          icon={<IndianRupee size={22} />}
+          label="Advance Requests"
+          value={employer.advanceRequests?.length || 0}
+        />
+      </section>
+
+      <section className="overflow-hidden rounded-[1.5rem] bg-white shadow-soft">
+        <div className="flex flex-col gap-4 border-b border-slate-100 px-6 py-5 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <h3 className="text-xl font-bold text-slate-900">Employees</h3>
+            <p className="mt-1 text-sm text-slate-500">
+              Read-only employee list for admin review.
+            </p>
+          </div>
+
+          <div className="relative w-full lg:w-80">
+            <Search
+              className="absolute left-4 top-3.5 text-slate-400"
+              size={17}
+            />
+            <input
+              value={employeeSearch}
+              onChange={(event) => setEmployeeSearch(event.target.value)}
+              placeholder="Search employee..."
+              className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-sm outline-none focus:border-primary focus:bg-white focus:ring-4 focus:ring-blue-50"
+            />
+          </div>
         </div>
 
-        <div className="rounded-[1.5rem] bg-white p-5 shadow-soft">
-          <ShieldCheck className="text-primary" size={22} />
-          <p className="mt-4 text-sm text-slate-500">App Activation</p>
-          <h3 className="mt-1 text-lg font-bold">
-            {employer.appActivationRequired ? "Required" : "Not Required"}
-          </h3>
-        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[980px] text-left text-sm">
+            <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+              <tr>
+                <th className="px-5 py-4">Employee</th>
+                <th className="px-5 py-4">Activation</th>
+                <th className="px-5 py-4">Salary In Hand</th>
+                <th className="px-5 py-4">Pre-approved Limit</th>
+                <th className="px-5 py-4">Contact</th>
+                <th className="px-5 py-4">Employee Code</th>
+              </tr>
+            </thead>
 
-        <div className="rounded-[1.5rem] bg-white p-5 shadow-soft">
-          <Calendar className="text-primary" size={22} />
-          <p className="mt-4 text-sm text-slate-500">Created</p>
-          <h3 className="mt-1 text-lg font-bold">
-            {employer.createdAt
-              ? new Date(employer.createdAt).toLocaleDateString()
-              : "-"}
-          </h3>
-        </div>
+            <tbody className="divide-y divide-slate-100">
+              {filteredEmployees.map((employee) => (
+                <tr key={employee.id} className="hover:bg-slate-50">
+                  <td className="px-5 py-4">
+                    <div>
+                      <p className="font-semibold text-slate-900">
+                        {employee.name || "-"}
+                      </p>
+                      <p className="mt-1 text-xs text-slate-500">
+                        Added:{" "}
+                        {employee.createdAt
+                          ? new Date(employee.createdAt).toLocaleDateString()
+                          : "-"}
+                      </p>
+                    </div>
+                  </td>
 
-        <div className="rounded-[1.5rem] bg-white p-5 shadow-soft">
-          <Building2 className="text-primary" size={22} />
-          <p className="mt-4 text-sm text-slate-500">Advance Requests</p>
-          <h3 className="mt-1 text-2xl font-bold">
-            {employer.advanceRequests?.length || 0}
-          </h3>
+                  <td className="px-5 py-4">
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-bold ${getActivationClass(
+                        employee.appActivationStatus
+                      )}`}
+                    >
+                      {employee.appActivationStatus || "PENDING"}
+                    </span>
+                  </td>
+
+                  <td className="px-5 py-4 font-bold text-slate-800">
+                    {formatAmount(employee.salaryInHand)}
+                  </td>
+
+                  <td className="px-5 py-4 font-bold text-slate-800">
+                    {formatAmount(employee.preApprovedLimit)}
+                  </td>
+
+                  <td className="px-5 py-4">
+                    <div className="grid gap-1 text-slate-600">
+                      <span>{employee.email || "-"}</span>
+                      <span>{employee.phone || "-"}</span>
+                    </div>
+                  </td>
+
+                  <td className="px-5 py-4 text-slate-600">
+                    {employee.employeeCode || "-"}
+                  </td>
+                </tr>
+              ))}
+
+              {filteredEmployees.length === 0 && (
+                <tr>
+                  <td
+                    colSpan={6}
+                    className="px-5 py-12 text-center text-slate-500"
+                  >
+                    No employees found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </section>
 
@@ -441,6 +634,26 @@ export function EmployerDetailsPage() {
           </div>
         </div>
       </section>
+    </div>
+  );
+}
+
+function SummaryCard({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: number;
+}) {
+  return (
+    <div className="rounded-[1.5rem] bg-white p-5 shadow-soft">
+      <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-primary">
+        {icon}
+      </div>
+      <p className="mt-4 text-sm text-slate-500">{label}</p>
+      <h3 className="mt-1 text-2xl font-bold text-slate-900">{value}</h3>
     </div>
   );
 }
