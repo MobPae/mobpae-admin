@@ -12,6 +12,7 @@ import { RequestsPage } from "./pages/RequestsPage";
 import { isLoggedIn } from "./services/auth";
 import { EmployerDetailsPage } from "./pages/EmployerDetailsPage";
 import { RequestDetailsPage } from "./pages/RequestDetailsPage";
+import { RepaymentDetailsPage } from "./pages/RepaymentDetailsPage";
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
           <Route path="/requests/:id" element={<RequestDetailsPage />} />
           <Route path="disbursals" element={<DisbursalsPage />} />
           <Route path="repayments" element={<RepaymentsPage />} />
+          <Route path="/repayments/:id" element={<RepaymentDetailsPage />} />
           <Route path="enquiries" element={<EnquiriesPage />} />
           <Route path="/employers/:id" element={<EmployerDetailsPage />} />
         </Route>

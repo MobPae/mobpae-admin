@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import {
+  AlertTriangle,
   Building2,
   CheckCircle2,
   IndianRupee,
@@ -8,7 +10,6 @@ import {
   Search,
   User,
   X,
-  AlertTriangle,
 } from "lucide-react";
 import { api } from "../services/api";
 
@@ -95,22 +96,13 @@ export function RepaymentsPage() {
   }
 
   function openActionModal(action: ModalAction, repayment: Repayment) {
-    setModal({
-      open: true,
-      action,
-      repayment,
-    });
+    setModal({ open: true, action, repayment });
     setPaymentRef("");
   }
 
   function closeActionModal() {
     if (updatingId) return;
-
-    setModal({
-      open: false,
-      action: null,
-      repayment: null,
-    });
+    setModal({ open: false, action: null, repayment: null });
     setPaymentRef("");
   }
 
@@ -148,11 +140,10 @@ export function RepaymentsPage() {
       const value =
         `${repayment.advanceRequest?.employee?.name} ${repayment.advanceRequest?.employee?.email} ${repayment.advanceRequest?.employer?.companyName} ${repayment.status} ${repayment.paymentRef}`.toLowerCase();
 
-      const matchesSearch = value.includes(search.toLowerCase());
-      const matchesStatus =
-        statusFilter === "ALL" || repayment.status === statusFilter;
-
-      return matchesSearch && matchesStatus;
+      return (
+        value.includes(search.toLowerCase()) &&
+        (statusFilter === "ALL" || repayment.status === statusFilter)
+      );
     });
   }, [repayments, search, statusFilter]);
 
@@ -279,7 +270,7 @@ export function RepaymentsPage() {
       {!loading && !error && (
         <section className="overflow-hidden rounded-[1.5rem] bg-white shadow-soft">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[1120px] text-left text-sm">
+            <table className="w-full min-w-[1180px] text-left text-sm">
               <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                 <tr>
                   <th className="px-5 py-4">Employee</th>
@@ -304,7 +295,6 @@ export function RepaymentsPage() {
                           <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-primary">
                             <User size={18} />
                           </span>
-
                           <div>
                             <p className="font-semibold text-slate-900">
                               {repayment.advanceRequest?.employee?.name || "-"}
@@ -321,7 +311,6 @@ export function RepaymentsPage() {
                           <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-100 text-slate-600">
                             <Building2 size={18} />
                           </span>
-
                           <div>
                             <p className="font-semibold text-slate-800">
                               {repayment.advanceRequest?.employer
@@ -378,6 +367,13 @@ export function RepaymentsPage() {
                           />
                         ) : (
                           <div className="flex flex-wrap gap-2">
+                            <Link
+                              to={`/repayments/${repayment.id}`}
+                              className="inline-flex items-center gap-1 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50"
+                            >
+                              View
+                            </Link>
+
                             {repayment.status !== "PAID" && (
                               <button
                                 onClick={() =>
@@ -400,12 +396,6 @@ export function RepaymentsPage() {
                                 <AlertTriangle size={14} />
                                 Overdue
                               </button>
-                            )}
-
-                            {repayment.status === "PAID" && (
-                              <span className="text-xs font-semibold text-slate-400">
-                                No action
-                              </span>
                             )}
                           </div>
                         )}
