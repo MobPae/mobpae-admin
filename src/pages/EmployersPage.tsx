@@ -1,21 +1,38 @@
 import { useEffect, useState } from "react";
-import { Building2, Mail, Phone, RefreshCcw, Search } from "lucide-react";
+import {
+  Building2,
+  Loader2,
+  Mail,
+  Phone,
+  RefreshCcw,
+  Search,
+} from "lucide-react";
 import { api } from "../services/api";
+
+type EmployerStatus = "ACTIVE" | "INACTIVE" | "PAUSED" | "DISCONTINUED";
 
 type Employer = {
   id: string;
   companyName: string;
   companyEmail?: string;
   companyPhone?: string;
-  status?: string;
+  status?: EmployerStatus;
   appActivationRequired?: boolean;
   employees?: unknown[];
   createdAt?: string;
 };
 
+const STATUS_OPTIONS: EmployerStatus[] = [
+  "ACTIVE",
+  "INACTIVE",
+  "PAUSED",
+  "DISCONTINUED",
+];
+
 export function EmployersPage() {
   const [employers, setEmployers] = useState<Employer[]>([]);
   const [loading, setLoading] = useState(true);
+  const [updatingId, setUpdatingId] = useState("");
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
 
@@ -41,16 +58,53 @@ export function EmployersPage() {
     }
   }
 
+  async function updateEmployerStatus(id: string, status: EmployerStatus) {
+    const confirmUpdate = window.confirm(
+      `Change employer status to ${status}?`
+    );
+
+    if (!confirmUpdate) return;
+
+    setUpdatingId(id);
+
+    try {
+      await api.patch(`/employers/${id}/status`, { status });
+
+      setEmployers((current) =>
+        current.map((item) => (item.id === id ? { ...item, status } : item))
+      );
+    } catch {
+      alert("Unable to update employer status");
+    } finally {
+      setUpdatingId("");
+    }
+  }
+
   useEffect(() => {
     fetchEmployers();
   }, []);
 
   const filteredEmployers = employers.filter((item) => {
     const value =
-      `${item.companyName} ${item.companyEmail} ${item.companyPhone}`.toLowerCase();
+      `${item.companyName} ${item.companyEmail} ${item.companyPhone} ${item.status}`.toLowerCase();
 
     return value.includes(search.toLowerCase());
   });
+
+  function getStatusClass(status?: EmployerStatus) {
+    switch (status) {
+      case "ACTIVE":
+        return "bg-emerald-50 text-emerald-700 border-emerald-100";
+      case "INACTIVE":
+        return "bg-slate-50 text-slate-700 border-slate-200";
+      case "PAUSED":
+        return "bg-amber-50 text-amber-700 border-amber-100";
+      case "DISCONTINUED":
+        return "bg-red-50 text-red-700 border-red-100";
+      default:
+        return "bg-slate-50 text-slate-700 border-slate-200";
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -59,7 +113,7 @@ export function EmployersPage() {
           <p className="text-sm font-semibold text-primary">Employers</p>
           <h2 className="mt-2 text-2xl font-bold">Employer Management</h2>
           <p className="mt-1 text-sm text-slate-500">
-            View companies onboarded or created in MobPae.
+            Manage approved employers and control their service status.
           </p>
         </div>
 
@@ -81,7 +135,7 @@ export function EmployersPage() {
           <input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search by company, email or phone..."
+            placeholder="Search by company, email, phone or status..."
             className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-sm outline-none focus:border-primary focus:bg-white focus:ring-4 focus:ring-blue-50"
           />
         </div>
@@ -102,81 +156,111 @@ export function EmployersPage() {
       {!loading && !error && (
         <section className="overflow-hidden rounded-[1.5rem] bg-white shadow-soft">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[900px] text-left text-sm">
+            <table className="w-full min-w-[980px] text-left text-sm">
               <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                 <tr>
                   <th className="px-5 py-4">Company</th>
                   <th className="px-5 py-4">Contact Details</th>
                   <th className="px-5 py-4">Employees Added</th>
                   <th className="px-5 py-4">App Activation</th>
-                  <th className="px-5 py-4">Status</th>
+                  <th className="px-5 py-4">Service Status</th>
                   <th className="px-5 py-4">Created</th>
                 </tr>
               </thead>
 
               <tbody className="divide-y divide-slate-100">
-                {filteredEmployers.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-50">
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-3">
-                        <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-primary">
-                          <Building2 size={18} />
-                        </span>
-                        <span className="font-semibold text-slate-800">
-                          {item.companyName || "-"}
-                        </span>
-                      </div>
-                    </td>
+                {filteredEmployers.map((item) => {
+                  const status = item.status || "ACTIVE";
+                  const isUpdating = updatingId === item.id;
 
-                    <td className="px-5 py-4">
-                      <div className="grid gap-1 text-slate-600">
-                        {item.companyEmail && (
-                          <span className="inline-flex items-center gap-2">
-                            <Mail size={14} /> {item.companyEmail}
+                  return (
+                    <tr key={item.id} className="hover:bg-slate-50">
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-3">
+                          <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-primary">
+                            <Building2 size={18} />
                           </span>
-                        )}
-
-                        {item.companyPhone && (
-                          <span className="inline-flex items-center gap-2">
-                            <Phone size={14} /> {item.companyPhone}
+                          <span className="font-semibold text-slate-800">
+                            {item.companyName || "-"}
                           </span>
-                        )}
+                        </div>
+                      </td>
 
-                        {!item.companyEmail && !item.companyPhone && "-"}
-                      </div>
-                    </td>
+                      <td className="px-5 py-4">
+                        <div className="grid gap-1 text-slate-600">
+                          {item.companyEmail && (
+                            <span className="inline-flex items-center gap-2">
+                              <Mail size={14} /> {item.companyEmail}
+                            </span>
+                          )}
 
-                    <td className="px-5 py-4 text-slate-600">
-                      {item.employees?.length || 0}
-                    </td>
+                          {item.companyPhone && (
+                            <span className="inline-flex items-center gap-2">
+                              <Phone size={14} /> {item.companyPhone}
+                            </span>
+                          )}
 
-                    <td className="px-5 py-4">
-                      <span
-                        className={`rounded-full px-3 py-1 text-xs font-bold ${
-                          item.appActivationRequired
-                            ? "bg-amber-50 text-amber-700"
-                            : "bg-emerald-50 text-emerald-700"
-                        }`}
-                      >
-                        {item.appActivationRequired
-                          ? "Required"
-                          : "Not Required"}
-                      </span>
-                    </td>
+                          {!item.companyEmail && !item.companyPhone && "-"}
+                        </div>
+                      </td>
 
-                    <td className="px-5 py-4">
-                      <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-primary">
-                        {item.status || "ACTIVE"}
-                      </span>
-                    </td>
+                      <td className="px-5 py-4 text-slate-600">
+                        {item.employees?.length || 0}
+                      </td>
 
-                    <td className="px-5 py-4 text-slate-500">
-                      {item.createdAt
-                        ? new Date(item.createdAt).toLocaleDateString()
-                        : "-"}
-                    </td>
-                  </tr>
-                ))}
+                      <td className="px-5 py-4">
+                        <span
+                          className={`rounded-full px-3 py-1 text-xs font-bold ${
+                            item.appActivationRequired
+                              ? "bg-amber-50 text-amber-700"
+                              : "bg-emerald-50 text-emerald-700"
+                          }`}
+                        >
+                          {item.appActivationRequired
+                            ? "Required"
+                            : "Not Required"}
+                        </span>
+                      </td>
+
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-2">
+                          <select
+                            value={status}
+                            disabled={isUpdating}
+                            onChange={(event) =>
+                              updateEmployerStatus(
+                                item.id,
+                                event.target.value as EmployerStatus
+                              )
+                            }
+                            className={`rounded-full border px-3 py-1 text-xs font-bold outline-none disabled:cursor-not-allowed disabled:opacity-70 ${getStatusClass(
+                              status
+                            )}`}
+                          >
+                            {STATUS_OPTIONS.map((option) => (
+                              <option key={option} value={option}>
+                                {option}
+                              </option>
+                            ))}
+                          </select>
+
+                          {isUpdating && (
+                            <Loader2
+                              className="animate-spin text-primary"
+                              size={16}
+                            />
+                          )}
+                        </div>
+                      </td>
+
+                      <td className="px-5 py-4 text-slate-500">
+                        {item.createdAt
+                          ? new Date(item.createdAt).toLocaleDateString()
+                          : "-"}
+                      </td>
+                    </tr>
+                  );
+                })}
 
                 {filteredEmployers.length === 0 && (
                   <tr>
