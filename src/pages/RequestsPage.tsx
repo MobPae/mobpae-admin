@@ -2,14 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Building2,
-  CheckCircle2,
   IndianRupee,
   Loader2,
   RefreshCcw,
   Search,
   User,
   X,
-  XCircle,
 } from "lucide-react";
 import { api } from "../services/api";
 
@@ -18,10 +16,9 @@ type DisbursalStatus = "PENDING" | "DISBURSED" | "FAILED";
 type RepaymentStatus = "PENDING" | "PAID" | "OVERDUE";
 
 type ModalAction =
-  | "APPROVE_REQUEST"
-  | "REJECT_REQUEST"
   | "DISBURSE_PAYMENT"
-  | "FAIL_DISBURSAL";
+  | "FAIL_DISBURSAL"
+  | "MARK_REPAYMENT_PAID";
 
 type AdvanceRequest = {
   id: string;
@@ -134,36 +131,22 @@ export function RequestsPage() {
   async function submitAction() {
     if (!modal.request || !modal.action) return;
 
-    if (modal.action === "REJECT_REQUEST" && !remarks.trim()) {
-      alert("Rejection remarks are required");
+    if (modal.action === "DISBURSE_PAYMENT" && !transactionRef.trim()) {
+      alert("Transaction reference is required");
       return;
     }
 
-    if (modal.action === "DISBURSE_PAYMENT" && !transactionRef.trim()) {
-      alert("Transaction reference is required");
+    if (modal.action === "MARK_REPAYMENT_PAID" && !transactionRef.trim()) {
+      alert("Payment reference is required");
       return;
     }
 
     setUpdatingId(modal.request.id);
 
     try {
-      if (modal.action === "APPROVE_REQUEST") {
-        await api.patch(`/advance-requests/${modal.request.id}/status`, {
-          status: "APPROVED",
-          employerRemarks: remarks,
-        });
-      }
-
-      if (modal.action === "REJECT_REQUEST") {
-        await api.patch(`/advance-requests/${modal.request.id}/status`, {
-          status: "REJECTED",
-          employerRemarks: remarks,
-        });
-      }
-
       if (modal.action === "DISBURSE_PAYMENT") {
         if (!modal.request.disbursal?.id) {
-          alert("Disbursal is not created yet. Approve the request first.");
+          alert("Disbursal is not created yet.");
           return;
         }
 
@@ -176,13 +159,25 @@ export function RequestsPage() {
 
       if (modal.action === "FAIL_DISBURSAL") {
         if (!modal.request.disbursal?.id) {
-          alert("Disbursal is not created yet. Approve the request first.");
+          alert("Disbursal is not created yet.");
           return;
         }
 
         await api.patch(`/disbursals/${modal.request.disbursal.id}/status`, {
           status: "FAILED",
           adminRemarks: remarks,
+        });
+      }
+
+      if (modal.action === "MARK_REPAYMENT_PAID") {
+        if (!modal.request.repayment?.id) {
+          alert("Repayment is not created yet.");
+          return;
+        }
+
+        await api.patch(`/repayments/${modal.request.repayment.id}/status`, {
+          status: "PAID",
+          paymentRef: transactionRef,
         });
       }
 
@@ -205,7 +200,6 @@ export function RequestsPage() {
         `${request.employee?.name} ${request.employee?.email} ${request.employer?.companyName} ${request.status} ${request.disbursal?.status} ${request.repayment?.status}`.toLowerCase();
 
       const matchesSearch = value.includes(search.toLowerCase());
-
       const matchesStatus =
         statusFilter === "ALL" || request.status === statusFilter;
 
@@ -283,8 +277,7 @@ export function RequestsPage() {
             Advance Request Management
           </h2>
           <p className="mt-1 text-sm text-slate-500">
-            Review salary advance requests, approve or reject them, and mark
-            payment disbursal status.
+            Track employer approvals, disbursals, and repayments.
           </p>
         </div>
 
@@ -299,8 +292,8 @@ export function RequestsPage() {
 
       <section className="grid gap-4 md:grid-cols-4">
         <SummaryCard label="Total Requests" value={summary.total} />
-        <SummaryCard label="Pending Review" value={summary.pending} />
-        <SummaryCard label="Approved" value={summary.approved} />
+        <SummaryCard label="Pending Employer" value={summary.pending} />
+        <SummaryCard label="Employer Approved" value={summary.approved} />
         <SummaryCard label="Disbursed" value={summary.disbursed} />
       </section>
 
@@ -327,8 +320,8 @@ export function RequestsPage() {
             className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700 outline-none focus:border-primary focus:bg-white focus:ring-4 focus:ring-blue-50"
           >
             <option value="ALL">All Status</option>
-            <option value="PENDING">Pending</option>
-            <option value="APPROVED">Approved</option>
+            <option value="PENDING">Pending Employer</option>
+            <option value="APPROVED">Employer Approved</option>
             <option value="REJECTED">Rejected</option>
             <option value="CANCELLED">Cancelled</option>
           </select>
@@ -357,7 +350,7 @@ export function RequestsPage() {
                   <th className="px-5 py-4">Employer</th>
                   <th className="px-5 py-4">Amount</th>
                   <th className="px-5 py-4">Month</th>
-                  <th className="px-5 py-4">Request Status</th>
+                  <th className="px-5 py-4">Employer Approval</th>
                   <th className="px-5 py-4">Disbursal</th>
                   <th className="px-5 py-4">Repayment</th>
                   <th className="px-5 py-4">Actions</th>
@@ -465,28 +458,11 @@ export function RequestsPage() {
                             >
                               View
                             </Link>
-                            {request.status === "PENDING" && (
-                              <>
-                                <button
-                                  onClick={() =>
-                                    openActionModal("APPROVE_REQUEST", request)
-                                  }
-                                  className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-700"
-                                >
-                                  <CheckCircle2 size={14} />
-                                  Approve
-                                </button>
 
-                                <button
-                                  onClick={() =>
-                                    openActionModal("REJECT_REQUEST", request)
-                                  }
-                                  className="inline-flex items-center gap-1 rounded-full bg-red-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-red-700"
-                                >
-                                  <XCircle size={14} />
-                                  Reject
-                                </button>
-                              </>
+                            {request.status === "PENDING" && (
+                              <span className="text-xs font-semibold text-slate-400">
+                                Waiting for employer approval
+                              </span>
                             )}
 
                             {request.status === "APPROVED" &&
@@ -510,13 +486,36 @@ export function RequestsPage() {
                                     }
                                     className="inline-flex items-center gap-1 rounded-full border border-red-200 px-3 py-1.5 text-xs font-bold text-red-700 hover:bg-red-50"
                                   >
-                                    Failed
+                                    Reject Disbursal
                                   </button>
                                 </>
                               )}
 
+                            {request.disbursal?.status === "DISBURSED" &&
+                              request.repayment?.status === "PENDING" && (
+                                <button
+                                  onClick={() =>
+                                    openActionModal(
+                                      "MARK_REPAYMENT_PAID",
+                                      request
+                                    )
+                                  }
+                                  className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-700"
+                                >
+                                  Mark Paid
+                                </button>
+                              )}
+
+                            {request.repayment?.status === "PAID" && (
+                              <span className="text-xs font-semibold text-slate-400">
+                                Completed
+                              </span>
+                            )}
+
                             {request.status !== "PENDING" &&
-                              request.disbursal?.status !== "PENDING" && (
+                              request.disbursal?.status !== "PENDING" &&
+                              request.repayment?.status !== "PENDING" &&
+                              request.repayment?.status !== "PAID" && (
                                 <span className="text-xs font-semibold text-slate-400">
                                   No action
                                 </span>
@@ -597,25 +596,6 @@ function ActionModal({
   if (!action || !request) return null;
 
   const config = {
-    APPROVE_REQUEST: {
-      title: "Approve Advance Request",
-      description:
-        "Add optional approval remarks before approving this request.",
-      buttonText: "Approve Request",
-      buttonClass: "bg-emerald-600 hover:bg-emerald-700",
-      showTransactionRef: false,
-      remarksLabel: "Approval Remarks",
-      remarksRequired: false,
-    },
-    REJECT_REQUEST: {
-      title: "Reject Advance Request",
-      description: "Rejection remarks are required for audit and tracking.",
-      buttonText: "Reject Request",
-      buttonClass: "bg-red-600 hover:bg-red-700",
-      showTransactionRef: false,
-      remarksLabel: "Rejection Remarks",
-      remarksRequired: true,
-    },
     DISBURSE_PAYMENT: {
       title: "Mark Payment as Disbursed",
       description: "Enter transaction reference after payment is completed.",
@@ -626,11 +606,20 @@ function ActionModal({
       remarksRequired: false,
     },
     FAIL_DISBURSAL: {
-      title: "Mark Disbursal as Failed",
-      description: "Add remarks explaining why this disbursal failed.",
-      buttonText: "Mark Failed",
+      title: "Reject Disbursal",
+      description: "Add remarks explaining why this disbursal was rejected.",
+      buttonText: "Reject Disbursal",
       buttonClass: "bg-red-600 hover:bg-red-700",
       showTransactionRef: false,
+      remarksLabel: "Admin Remarks",
+      remarksRequired: false,
+    },
+    MARK_REPAYMENT_PAID: {
+      title: "Mark Repayment as Paid",
+      description: "Enter payment reference after repayment is received.",
+      buttonText: "Mark Paid",
+      buttonClass: "bg-emerald-600 hover:bg-emerald-700",
+      showTransactionRef: true,
       remarksLabel: "Admin Remarks",
       remarksRequired: false,
     },
@@ -686,12 +675,19 @@ function ActionModal({
         {config.showTransactionRef && (
           <label className="mt-5 block">
             <span className="text-sm font-semibold text-slate-700">
-              Transaction Reference <span className="text-red-500">*</span>
+              {action === "MARK_REPAYMENT_PAID"
+                ? "Payment Reference"
+                : "Transaction Reference"}{" "}
+              <span className="text-red-500">*</span>
             </span>
             <input
               value={transactionRef}
               onChange={(event) => onTransactionRefChange(event.target.value)}
-              placeholder="Enter UTR / transaction ID"
+              placeholder={
+                action === "MARK_REPAYMENT_PAID"
+                  ? "Enter payment reference"
+                  : "Enter UTR / transaction ID"
+              }
               className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-primary focus:bg-white focus:ring-4 focus:ring-blue-50"
             />
           </label>
