@@ -1,3 +1,5 @@
+import AdminLayout from "./layouts/AdminLayout";
+
 export default function App() {
-  return <h1>MobPae Admin</h1>;
+  return <AdminLayout />;
 }
