@@ -1,10 +1,42 @@
-import { useState } from "react";
 import LoginFeature from "../components/auth/LoginFeature";
 import { Eye, EyeOff } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { login } from "../services/authService";
+import { useEffect, useState } from "react";
+import { getToken, setToken } from "../utils/auth";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
+  const navigate = useNavigate();
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      setLoading(true);
+      setError("");
+
+      const response = await login(email, password);
+
+      setToken(response.accessToken);
+
+      navigate("/");
+    } catch {
+      setError("Invalid email or password");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (getToken()) {
+      navigate("/");
+    }
+  }, [navigate]);
   return (
     <div className="h-screen overflow-hidden flex bg-slate-100">
       {/* LEFT PANEL */}
@@ -103,7 +135,7 @@ export default function LoginPage() {
               Sign in to continue to MobPae Admin Portal.
             </p>
 
-            <form className="mt-10 space-y-6">
+            <form onSubmit={handleLogin} className="mt-10 space-y-6">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
                   Email Address
@@ -111,22 +143,11 @@ export default function LoginPage() {
 
                 <input
                   type="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="admin@mobpae.com"
-                  className="
-                    w-full
-                    h-14
-                    px-5
-                    bg-slate-50
-                    text-base
-                    rounded-2xl
-                    border
-                    border-slate-200
-                    focus:border-blue-500
-                    focus:ring-4
-                    focus:ring-blue-100
-                    outline-none
-                    transition-all
-                  "
+                  className="w-full h-14 px-5 bg-slate-50 text-base rounded-2xl border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all"
                 />
               </div>
 
@@ -138,6 +159,9 @@ export default function LoginPage() {
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter password"
                     className="
                       w-full
@@ -180,25 +204,33 @@ export default function LoginPage() {
                 </button>
               </div>
 
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-2xl px-4 py-3">
+                  {error}
+                </div>
+              )}
+
               <button
                 type="submit"
+                disabled={loading}
                 className="
-                  w-full
-                  h-14
-                  rounded-2xl
-                  bg-gradient-to-r
-                  from-blue-600
-                  to-blue-700
-                  text-white
-                  text-base
-                  font-semibold
-                  shadow-lg
-                  shadow-blue-500/25
-                  hover:scale-[1.01]
-                  transition-all
-                "
+                w-full
+                h-14
+                rounded-2xl
+                bg-gradient-to-r
+                from-blue-600
+                to-blue-700
+                text-white
+                text-base
+                font-semibold
+                shadow-lg
+                shadow-blue-500/25
+                hover:scale-[1.01]
+                transition-all
+                disabled:opacity-70
+                disabled:cursor-not-allowed"
               >
-                Sign In
+                {loading ? "Signing In..." : "Sign In"}
               </button>
 
               <div className="flex justify-center gap-3 mt-4 text-xs text-slate-500">
