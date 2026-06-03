@@ -2,58 +2,60 @@ import { Clock3, CheckCircle2, XCircle, Building2 } from "lucide-react";
 
 const stats = [
   {
-    title: "Pending",
+    title: "Total Enquiries",
+    value: 22,
+    icon: Building2,
+    bg: "bg-blue-600",
+  },
+  {
+    title: "New Requests",
     value: 12,
     icon: Clock3,
-    color: "text-amber-600",
-    bg: "bg-amber-50",
+    bg: "bg-amber-500",
   },
   {
     title: "Approved",
     value: 8,
     icon: CheckCircle2,
-    color: "text-green-600",
-    bg: "bg-green-50",
+    bg: "bg-green-600",
   },
   {
     title: "Rejected",
     value: 2,
     icon: XCircle,
-    color: "text-red-600",
-    bg: "bg-red-50",
-  },
-  {
-    title: "Total",
-    value: 22,
-    icon: Building2,
-    color: "text-blue-600",
-    bg: "bg-blue-50",
+    bg: "bg-red-600",
   },
 ];
 
 export default function EmployerStats() {
   return (
-    <div className="grid grid-cols-4 gap-6">
+    <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
       {stats.map((stat) => {
         const Icon = stat.icon;
 
         return (
           <div
             key={stat.title}
-            className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm"
+            className={`
+              ${stat.bg}
+              rounded-2xl
+              px-5
+              py-4
+              text-white
+              min-h-[92px]
+              flex
+              items-center
+              justify-between
+            `}
           >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-slate-500 text-sm">{stat.title}</p>
+            <div>
+              <p className="text-xs font-medium text-white/80">{stat.title}</p>
 
-                <h2 className="text-3xl font-bold mt-2">{stat.value}</h2>
-              </div>
+              <h2 className="text-2xl font-semibold mt-1">{stat.value}</h2>
+            </div>
 
-              <div
-                className={`w-12 h-12 rounded-xl flex items-center justify-center ${stat.bg}`}
-              >
-                <Icon size={22} className={stat.color} />
-              </div>
+            <div className="opacity-80">
+              <Icon size={24} />
             </div>
           </div>
         );

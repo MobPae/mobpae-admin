@@ -7,24 +7,14 @@ import {
   CheckCircle,
   XCircle,
 } from "lucide-react";
-
 import { approveEmployerEnquiry } from "../../services/employerEnquiryService";
+import type { EmployerEnquiry } from "../../types/employer-enquiry";
 
 interface EmployerDetailsDrawerProps {
   open: boolean;
   onClose: () => void;
   onApproved?: () => void;
-  employer: {
-    id: string;
-    companyName: string;
-    contactPerson: string;
-    email: string;
-    phone: string;
-    employeeCount: number;
-    status: string;
-    createdAt: string;
-    updatedAt?: string;
-  } | null;
+  employer: EmployerEnquiry | null;
 }
 
 export default function EmployerDetailsDrawer({

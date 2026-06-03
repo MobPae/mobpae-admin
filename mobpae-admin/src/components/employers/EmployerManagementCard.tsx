@@ -1,20 +1,24 @@
-import { Mail, User, ChevronRight } from "lucide-react";
+import { Mail, User, ChevronRight, Building2 } from "lucide-react";
 
-interface EmployerCardProps {
+interface EmployerManagementCardProps {
   companyName: string;
+  companyCode: string;
   contactPerson: string;
   email: string;
+  payrollDate: number;
   status: string;
   onView: () => void;
 }
 
-export default function EmployerCard({
+export default function EmployerManagementCard({
   companyName,
+  companyCode,
   contactPerson,
   email,
+  payrollDate,
   status,
   onView,
-}: EmployerCardProps) {
+}: EmployerManagementCardProps) {
   const companyInitial = companyName.charAt(0);
 
   return (
@@ -24,7 +28,7 @@ export default function EmployerCard({
         border
         border-slate-200
         rounded-3xl
-        p-4
+        p-5
         shadow-sm
         hover:shadow-lg
         hover:-translate-y-1
@@ -36,7 +40,18 @@ export default function EmployerCard({
       <div className="flex justify-between items-start">
         <div className="flex gap-4">
           <div
-            className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center font-semibold text-sm
+            className="
+              w-12
+              h-12
+              rounded-xl
+              bg-gradient-to-br
+              from-blue-500
+              to-indigo-600
+              text-white
+              flex
+              items-center
+              justify-center
+              font-semibold
             "
           >
             {companyInitial}
@@ -47,30 +62,30 @@ export default function EmployerCard({
               {companyName}
             </h3>
 
-            <p className="text-xs text-slate-500">Technology Services</p>
+            <p className="text-xs text-slate-500 mt-1">Code: {companyCode}</p>
           </div>
         </div>
 
         <span
-          className={`px-3 py-1 rounded-full text-xs text-xs ${
-            status === "APPROVED"
+          className={`px-3 py-1 rounded-full text-xs font-medium ${
+            status === "ACTIVE"
               ? "bg-green-100 text-green-700"
-              : "bg-amber-100 text-amber-700"
+              : "bg-red-100 text-red-700"
           }`}
         >
-          {status === "APPROVED" ? "Approved" : "Pending Review"}
+          {status}
         </span>
       </div>
 
-      {/* Contact Section */}
-      <div className="mt-4 space-y-3">
+      {/* Content */}
+      <div className="mt-5 space-y-3">
         <div className="flex items-start gap-3">
           <User size={18} className="text-slate-400 mt-0.5" />
 
           <div>
             <p className="text-slate-900 font-medium">{contactPerson}</p>
 
-            <p className="text-sm text-slate-500">Founder & HR Admin</p>
+            <p className="text-sm text-slate-500">Primary Contact</p>
           </div>
         </div>
 
@@ -79,24 +94,16 @@ export default function EmployerCard({
 
           <p className="text-slate-600">{email}</p>
         </div>
+
+        <div className="flex items-start gap-3">
+          <Building2 size={18} className="text-slate-400 mt-0.5" />
+
+          <p className="text-slate-600">Payroll Date: {payrollDate}</p>
+        </div>
       </div>
 
       {/* Footer */}
-      <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-        <div className="flex gap-8">
-          <div>
-            <p className="text-[11px] font-medium text-slate-400">Employees</p>
-
-            <p className="font-semibold">250</p>
-          </div>
-
-          <div>
-            <p className="text-[11px] font-medium text-slate-400">Requested</p>
-
-            <p className="font-semibold">Today</p>
-          </div>
-        </div>
-
+      <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-end">
         <button
           onClick={onView}
           className="
@@ -113,7 +120,7 @@ export default function EmployerCard({
             hover:bg-slate-50
           "
         >
-          Review
+          View Details
           <ChevronRight size={16} />
         </button>
       </div>

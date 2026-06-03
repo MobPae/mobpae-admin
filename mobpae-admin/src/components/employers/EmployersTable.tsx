@@ -1,14 +1,26 @@
-import type { EmployerEnquiry } from "../../types/employer-enquiry";
-
-interface EmployerEnquiriesTableProps {
-  enquiries: EmployerEnquiry[];
-  onView: (employer: EmployerEnquiry) => void;
+interface Employer {
+  id: string;
+  companyName: string;
+  companyCode: string;
+  contactPerson: string;
+  email: string;
+  phone: string;
+  payrollDate: number;
+  payrollCutoffDate: number;
+  status: string;
+  createdAt: string;
+  updatedAt?: string;
 }
 
-export default function EmployerEnquiriesTable({
-  enquiries,
+interface EmployersTableProps {
+  employers: Employer[];
+  onView: (employer: Employer) => void;
+}
+
+export default function EmployersTable({
+  employers,
   onView,
-}: EmployerEnquiriesTableProps) {
+}: EmployersTableProps) {
   return (
     <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
       <div className="overflow-x-auto">
@@ -20,11 +32,15 @@ export default function EmployerEnquiriesTable({
               </th>
 
               <th className="px-6 py-4 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                Company Code
+              </th>
+
+              <th className="px-6 py-4 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                 Contact
               </th>
 
               <th className="px-6 py-4 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                Employees
+                Payroll
               </th>
 
               <th className="px-6 py-4 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">
@@ -32,7 +48,7 @@ export default function EmployerEnquiriesTable({
               </th>
 
               <th className="px-6 py-4 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                Requested
+                Updated
               </th>
 
               <th className="px-6 py-4 text-right text-[11px] font-semibold uppercase tracking-wider text-slate-500">
@@ -42,9 +58,9 @@ export default function EmployerEnquiriesTable({
           </thead>
 
           <tbody>
-            {enquiries.map((enquiry, index) => (
+            {employers.map((employer, index) => (
               <tr
-                key={enquiry.id}
+                key={employer.id}
                 className={`
                   border-b
                   border-slate-100
@@ -53,6 +69,7 @@ export default function EmployerEnquiriesTable({
                   ${index % 2 === 0 ? "bg-white" : "bg-slate-50/30"}
                 `}
               >
+                {/* Company */}
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
                     <div
@@ -71,60 +88,65 @@ export default function EmployerEnquiriesTable({
                         font-semibold
                       "
                     >
-                      {enquiry.companyName.charAt(0)}
+                      {employer.companyName.charAt(0)}
                     </div>
 
                     <div>
                       <p className="text-sm font-medium text-slate-900">
-                        {enquiry.companyName}
+                        {employer.companyName}
                       </p>
 
-                      <p className="text-xs text-slate-500">{enquiry.email}</p>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        {employer.email}
+                      </p>
                     </div>
                   </div>
                 </td>
 
+                {/* Company Code */}
+                <td className="px-6 py-4">
+                  <span className="inline-flex px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-700 text-xs font-medium">
+                    {employer.companyCode}
+                  </span>
+                </td>
+
+                {/* Contact */}
                 <td className="px-6 py-4">
                   <div>
                     <p className="text-sm font-medium text-slate-800">
-                      {enquiry.contactPerson}
+                      {employer.contactPerson}
                     </p>
 
-                    <p className="text-xs text-slate-500">{enquiry.phone}</p>
+                    <p className="text-xs text-slate-500">Primary Contact</p>
                   </div>
                 </td>
 
+                {/* Payroll */}
                 <td className="px-6 py-4">
                   <span className="inline-flex px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 text-xs font-medium">
-                    {enquiry.employeeCount} Employees
+                    {employer.payrollDate}th
                   </span>
                 </td>
 
+                {/* Status */}
                 <td className="px-6 py-4">
                   <span
-                    className={`
-                      inline-flex
-                      px-2.5
-                      py-1
-                      rounded-full
-                      text-xs
-                      font-medium
-                      ${
-                        enquiry.status === "NEW"
-                          ? "bg-blue-50 text-blue-700"
-                          : enquiry.status === "APPROVED"
-                          ? "bg-green-50 text-green-700"
-                          : "bg-red-50 text-red-700"
-                      }
-                    `}
+                    className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${
+                      employer.status === "ACTIVE"
+                        ? "bg-green-50 text-green-700"
+                        : "bg-red-50 text-red-700"
+                    }`}
                   >
-                    {enquiry.status}
+                    {employer.status === "ACTIVE" ? "Active" : "Inactive"}
                   </span>
                 </td>
 
+                {/* Updated */}
                 <td className="px-6 py-4">
                   <span className="inline-flex px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 text-xs">
-                    {new Date(enquiry.createdAt).toLocaleDateString("en-IN", {
+                    {new Date(
+                      employer.updatedAt || employer.createdAt
+                    ).toLocaleDateString("en-IN", {
                       day: "2-digit",
                       month: "short",
                       year: "numeric",
@@ -132,17 +154,19 @@ export default function EmployerEnquiriesTable({
                   </span>
                 </td>
 
+                {/* Action */}
                 <td className="px-6 py-4 text-right">
                   <button
-                    onClick={() => onView(enquiry)}
+                    onClick={() => onView(employer)}
                     className="
                       text-blue-600
                       text-sm
                       font-medium
                       hover:text-blue-700
+                      transition-colors
                     "
                   >
-                    Review →
+                    View →
                   </button>
                 </td>
               </tr>
