@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Building2,
   User,
@@ -7,9 +8,12 @@ import {
   XCircle,
 } from "lucide-react";
 
+import { approveEmployerEnquiry } from "../../services/employerEnquiryService";
+
 interface EmployerDetailsDrawerProps {
   open: boolean;
   onClose: () => void;
+  onApproved?: () => void;
   employer: {
     id: string;
     companyName: string;
@@ -26,18 +30,50 @@ interface EmployerDetailsDrawerProps {
 export default function EmployerDetailsDrawer({
   open,
   onClose,
+  onApproved,
   employer,
 }: EmployerDetailsDrawerProps) {
+  const [companyCode, setCompanyCode] = useState("");
+  const [payrollDate, setPayrollDate] = useState("");
+  const [payrollCutoffDate, setPayrollCutoffDate] = useState("");
+
+  const [approving, setApproving] = useState(false);
+
   if (!open || !employer) return null;
+
+  const handleApprove = async () => {
+    if (!companyCode || !payrollDate || !payrollCutoffDate) {
+      alert("Please fill all approval fields");
+      return;
+    }
+
+    try {
+      setApproving(true);
+
+      await approveEmployerEnquiry(employer.id, {
+        companyCode,
+        payrollDate: Number(payrollDate),
+        payrollCutoffDate: Number(payrollCutoffDate),
+      });
+
+      alert("Employer approved successfully");
+
+      onApproved?.();
+      onClose();
+    } catch (error) {
+      console.error(error);
+
+      alert("Failed to approve employer");
+    } finally {
+      setApproving(false);
+    }
+  };
 
   return (
     <>
-      {/* Backdrop */}
       <div className="fixed inset-0 bg-black/30 z-40" onClick={onClose} />
 
-      {/* Drawer */}
       <div className="fixed top-0 right-0 h-full w-[620px] bg-slate-50 shadow-xl z-50 flex flex-col">
-        {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto">
           <div className="p-6">
             {/* Header */}
@@ -195,10 +231,61 @@ export default function EmployerDetailsDrawer({
                 </div>
               </div>
             </div>
+
+            {/* Approval Configuration */}
+            {employer.status !== "APPROVED" && (
+              <div className="mt-5 bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+                <h3 className="text-[14px] font-semibold text-slate-900 mb-4">
+                  Approval Configuration
+                </h3>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs text-slate-500 mb-2">
+                      Company Code
+                    </label>
+
+                    <input
+                      value={companyCode}
+                      onChange={(e) => setCompanyCode(e.target.value)}
+                      placeholder="ABC001"
+                      className="w-full border border-slate-200 rounded-xl px-4 py-3"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs text-slate-500 mb-2">
+                      Payroll Date
+                    </label>
+
+                    <input
+                      type="number"
+                      value={payrollDate}
+                      onChange={(e) => setPayrollDate(e.target.value)}
+                      placeholder="30"
+                      className="w-full border border-slate-200 rounded-xl px-4 py-3"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs text-slate-500 mb-2">
+                      Payroll Cutoff Date
+                    </label>
+
+                    <input
+                      type="number"
+                      value={payrollCutoffDate}
+                      onChange={(e) => setPayrollCutoffDate(e.target.value)}
+                      placeholder="25"
+                      className="w-full border border-slate-200 rounded-xl px-4 py-3"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Footer */}
         <div className="border-t border-slate-200 bg-white p-4">
           <div className="flex gap-3">
             <button className="w-40 border border-red-200 text-red-600 py-3 rounded-xl font-medium hover:bg-red-50 flex items-center justify-center gap-2">
@@ -206,10 +293,29 @@ export default function EmployerDetailsDrawer({
               Reject
             </button>
 
-            <button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-medium flex items-center justify-center gap-2">
-              <CheckCircle size={18} />
-              Approve Employer
-            </button>
+            {employer.status !== "APPROVED" && (
+              <button
+                onClick={handleApprove}
+                disabled={approving}
+                className="
+                  flex-1
+                  bg-blue-600
+                  hover:bg-blue-700
+                  text-white
+                  py-3
+                  rounded-xl
+                  font-medium
+                  flex
+                  items-center
+                  justify-center
+                  gap-2
+                  disabled:opacity-60
+                "
+              >
+                <CheckCircle size={18} />
+                {approving ? "Approving..." : "Approve Employer"}
+              </button>
+            )}
           </div>
         </div>
       </div>

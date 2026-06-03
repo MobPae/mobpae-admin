@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-
 import EmployerStats from "../components/employer-enquiries/EmployerStats";
 import EmployerFilters from "../components/employer-enquiries/EmployerFilters";
 import EmployerCard from "../components/employer-enquiries/EmployerCard";
@@ -30,18 +29,19 @@ export default function EmployerEnquiriesPage() {
   const [selectedEmployer, setSelectedEmployer] =
     useState<EmployerEnquiry | null>(null);
 
-  useEffect(() => {
-    async function loadEnquiries() {
-      try {
-        const data = await getEmployerEnquiries();
-        setEnquiries(data);
-      } catch (error) {
-        console.error("Failed to load employer enquiries", error);
-      } finally {
-        setLoading(false);
-      }
-    }
+  const loadEnquiries = async () => {
+    try {
+      const data = await getEmployerEnquiries();
 
+      setEnquiries(data);
+    } catch (error) {
+      console.error("Failed to load employer enquiries", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     loadEnquiries();
   }, []);
 
@@ -124,6 +124,7 @@ export default function EmployerEnquiriesPage() {
           setDrawerOpen(false);
           setSelectedEmployer(null);
         }}
+        onApproved={loadEnquiries}
       />
     </div>
   );

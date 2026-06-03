@@ -15,3 +15,32 @@ export async function getEmployerEnquiries() {
 
   return response.json();
 }
+
+export async function approveEmployerEnquiry(
+  enquiryId: string,
+  payload: {
+    companyCode: string;
+    payrollDate: number;
+    payrollCutoffDate: number;
+  }
+) {
+  const token = localStorage.getItem("accessToken");
+
+  const response = await fetch(
+    `${API_BASE_URL}/employer-enquiries/${enquiryId}/approve`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to approve employer");
+  }
+
+  return response.json();
+}
