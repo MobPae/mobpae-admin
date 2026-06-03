@@ -41,7 +41,7 @@ export default function Sidebar({ activePage, onMenuClick }: SidebarProps) {
   );
 
   return (
-    <aside className="w-72 bg-[#081028] text-white flex flex-col">
+    <aside className="w-72 h-screen bg-[#081028] text-white flex flex-col shrink-0">
       {/* Logo */}
       <div className="px-6 py-5 border-b border-slate-800">
         <h1 className="text-2xl font-bold tracking-tight">MobPae</h1>
@@ -50,7 +50,7 @@ export default function Sidebar({ activePage, onMenuClick }: SidebarProps) {
       </div>
 
       {/* Menu */}
-      <div className="flex-1 px-3 py-4">
+      <div className="flex-1 overflow-y-auto px-3 py-4">
         <SidebarSection title="Overview">
           <MenuItem label="Dashboard" icon={LayoutDashboard} page="dashboard" />
         </SidebarSection>
@@ -93,7 +93,7 @@ export default function Sidebar({ activePage, onMenuClick }: SidebarProps) {
       </div>
 
       {/* User Profile */}
-      <div className="border-t border-slate-800 p-3">
+      <div className="border-t border-slate-800 p-4 shrink-0">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-full bg-slate-700 flex items-center justify-center font-semibold">
             A

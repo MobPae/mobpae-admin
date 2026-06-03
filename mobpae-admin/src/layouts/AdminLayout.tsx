@@ -6,9 +6,9 @@ import Sidebar from "../components/layout/Sidebar";
 import DashboardPage from "../pages/DashboardPage";
 import EmployerEnquiriesPage from "../pages/EmployerEnquiriesPage";
 import EmployersPage from "../pages/EmployersPage";
+import EmployeesPage from "../pages/EmployeesPage";
 
 export default function AdminLayout() {
-  // const [activePage, setActivePage] = useState("dashboard");
   const [activePage, setActivePage] = useState(
     localStorage.getItem("admin_active_page") || "dashboard"
   );
@@ -19,7 +19,7 @@ export default function AdminLayout() {
   };
 
   return (
-    <div className="h-screen flex bg-slate-50">
+    <div className="h-screen overflow-hidden flex bg-slate-50">
       <Sidebar activePage={activePage} onMenuClick={handleMenuClick} />
 
       <div className="flex-1 flex flex-col">
@@ -29,6 +29,7 @@ export default function AdminLayout() {
           {activePage === "dashboard" && <DashboardPage />}
           {activePage === "employer-enquiries" && <EmployerEnquiriesPage />}
           {activePage === "employers" && <EmployersPage />}
+          {activePage === "employees" && <EmployeesPage />}
         </main>
       </div>
     </div>
