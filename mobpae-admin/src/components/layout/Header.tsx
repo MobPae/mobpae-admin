@@ -1,11 +1,17 @@
-import { Bell, Search } from "lucide-react";
+import { Bell, LogOut, Search } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { removeToken } from "../../utils/auth";
 
 export default function Header() {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    removeToken();
+    navigate("/login");
+  };
+
   return (
     <header className="h-16 bg-white border-b border-slate-200 px-8 flex items-center justify-end">
-      {/* Right Side */}
-
-      {/* Actions */}
       <div className="flex items-center gap-4">
         {/* Search */}
         <div className="relative">
@@ -47,7 +53,7 @@ export default function Header() {
         </button>
 
         {/* Profile */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 border-l border-slate-200 pl-4">
           <div
             className="
               w-10
@@ -70,6 +76,28 @@ export default function Header() {
             <p className="text-xs text-slate-500">Super Admin</p>
           </div>
         </div>
+
+        {/* Logout */}
+        <button
+          onClick={handleLogout}
+          className="
+            h-10
+            px-4
+            rounded-xl
+            border
+            border-slate-200
+            text-slate-600
+            hover:bg-slate-50
+            flex
+            items-center
+            gap-2
+            text-sm
+            font-medium
+          "
+        >
+          <LogOut size={16} />
+          Logout
+        </button>
       </div>
     </header>
   );
