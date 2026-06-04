@@ -12,6 +12,7 @@ import DisbursalsPage from "../pages/DisbursalsPage";
 import RepaymentsPage from "../pages/RepaymentsPage";
 import KycVerificationPage from "../pages/KycVerificationPage";
 import BankVerificationPage from "../pages/BankVerificationPage";
+import SettingsPage from "../pages/SettingsPage";
 
 export default function AdminLayout() {
   const [activePage, setActivePage] = useState(
@@ -40,6 +41,7 @@ export default function AdminLayout() {
           {activePage === "repayments" && <RepaymentsPage />}
           {activePage === "kyc" && <KycVerificationPage />}
           {activePage === "bank" && <BankVerificationPage />}
+          {activePage === "settings" && <SettingsPage />}
         </main>
       </div>
     </div>

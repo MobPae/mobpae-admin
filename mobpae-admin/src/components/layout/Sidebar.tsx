@@ -7,7 +7,6 @@ import {
   Wallet,
   CreditCard,
   Settings,
-  ShieldCheck,
 } from "lucide-react";
 
 import SidebarSection from "./SidebarSection";
@@ -29,7 +28,7 @@ export default function Sidebar({ activePage, onMenuClick }: SidebarProps) {
   }) => (
     <button
       onClick={() => onMenuClick(page)}
-      className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all text-[14px] font-medium ${
+      className={`w-full flex items-center gap-2.5 px-4 py-3 rounded-xl transition-all text-[12px] font-medium ${
         activePage === page
           ? "bg-blue-600 text-white shadow-md"
           : "text-slate-300 hover:bg-slate-800 hover:text-white"
@@ -86,8 +85,6 @@ export default function Sidebar({ activePage, onMenuClick }: SidebarProps) {
         </SidebarSection>
 
         <SidebarSection title="Settings">
-          <MenuItem label="Users & Roles" icon={ShieldCheck} page="users" />
-
           <MenuItem label="Settings" icon={Settings} page="settings" />
         </SidebarSection>
       </div>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Search, Users, UserCheck, Clock3, Ban } from "lucide-react";
+import { Search } from "lucide-react";
 
 import { getEmployees } from "../services/employeeService";
 
@@ -54,21 +54,6 @@ export default function EmployeesPage() {
 
     return matchesSearch && matchesStatus && matchesEmployer;
   });
-
-  const totalEmployees = employees.length;
-
-  const activeEmployees = employees.filter(
-    (employee) => employee.status === "ACTIVE"
-  ).length;
-
-  const pendingEmployees = employees.filter(
-    (employee) => employee.status === "PENDING"
-  ).length;
-
-  const blockedEmployees = employees.filter(
-    (employee) =>
-      employee.status === "BLOCKED" || employee.status === "INACTIVE"
-  ).length;
 
   if (loading) {
     return (
@@ -180,42 +165,6 @@ export default function EmployeesPage() {
 
       {/* Table */}
       <EmployeesTable employees={filteredEmployees} />
-    </div>
-  );
-}
-
-function StatCard({
-  title,
-  value,
-  icon: Icon,
-  color,
-}: {
-  title: string;
-  value: number;
-  icon: React.ElementType;
-  color: string;
-}) {
-  return (
-    <div
-      className={`
-        ${color}
-        rounded-2xl
-        px-5
-        py-4
-        text-white
-        min-h-[92px]
-        flex
-        items-center
-        justify-between
-      `}
-    >
-      <div>
-        <p className="text-xs font-medium text-white/80">{title}</p>
-
-        <h2 className="text-2xl font-semibold mt-1">{value}</h2>
-      </div>
-
-      <Icon size={24} className="opacity-80" />
     </div>
   );
 }
