@@ -90,35 +90,6 @@ export default function EmployeesPage() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-        <StatCard
-          title="Employees"
-          value={totalEmployees}
-          icon={Users}
-          color="bg-blue-600"
-        />
-
-        <StatCard
-          title="Active"
-          value={activeEmployees}
-          icon={UserCheck}
-          color="bg-green-600"
-        />
-
-        <StatCard
-          title="Pending"
-          value={pendingEmployees}
-          icon={Clock3}
-          color="bg-amber-500"
-        />
-
-        <StatCard
-          title="Blocked"
-          value={blockedEmployees}
-          icon={Ban}
-          color="bg-red-600"
-        />
-      </div>
 
       {/* Search & Filters */}
       {/* Search & Filters */}

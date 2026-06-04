@@ -1,0 +1,164 @@
+import { IndianRupee, ArrowRight } from "lucide-react";
+
+export default function RecentSalaryRequests() {
+  const requests = [
+    {
+      employee: {
+        name: "Amit Kumar",
+        code: "EMP001",
+        employer: "XYZ Industries",
+      },
+      amount: "₹10,000",
+      status: "SUBMITTED",
+      requestedAt: "5 mins ago",
+    },
+    {
+      employee: {
+        name: "Rahul Sharma",
+        code: "EMP002",
+        employer: "ABC Technologies",
+      },
+      amount: "₹15,000",
+      status: "APPROVED",
+      requestedAt: "15 mins ago",
+    },
+    {
+      employee: {
+        name: "Priya Patel",
+        code: "EMP003",
+        employer: "PQR Solutions",
+      },
+      amount: "₹8,000",
+      status: "DISBURSED",
+      requestedAt: "30 mins ago",
+    },
+    {
+      employee: {
+        name: "Vikram Singh",
+        code: "EMP004",
+        employer: "Infosys",
+      },
+      amount: "₹20,000",
+      status: "REPAID",
+      requestedAt: "1 hour ago",
+    },
+  ];
+
+  const getStatusClass = (status: string) => {
+    switch (status) {
+      case "SUBMITTED":
+        return "bg-amber-100 text-amber-700";
+
+      case "APPROVED":
+        return "bg-blue-100 text-blue-700";
+
+      case "DISBURSED":
+        return "bg-green-100 text-green-700";
+
+      case "REPAID":
+        return "bg-emerald-100 text-emerald-700";
+
+      default:
+        return "bg-slate-100 text-slate-700";
+    }
+  };
+
+  return (
+    <div className="col-span-6 bg-white border border-slate-200 rounded-3xl shadow-sm">
+      {/* Header */}
+      <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+        <div>
+          <h3 className="text-base font-semibold text-slate-900">
+            Recent Salary Requests
+          </h3>
+
+          <p className="text-xs text-slate-500 mt-1">
+            Latest employee advance requests
+          </p>
+        </div>
+
+        <button className="text-xs font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1">
+          View All
+          <ArrowRight size={12} />
+        </button>
+      </div>
+
+      {/* Rows */}
+      <div className="divide-y divide-slate-100">
+        {requests.slice(0, 3).map((request, index) => (
+          <div
+            key={index}
+            className="
+                px-6
+                py-4
+                flex
+                items-center
+                justify-between
+                hover:bg-slate-50
+                transition-all
+              "
+          >
+            {/* Employee */}
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-xs font-semibold text-slate-700">
+                {request.employee.name
+                  .split(" ")
+                  .map((word) => word[0])
+                  .join("")}
+              </div>
+
+              <div>
+                <p className="text-sm font-medium text-slate-900">
+                  {request.employee.name}
+                </p>
+
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-[11px] text-slate-500">
+                    {request.employee.code}
+                  </span>
+
+                  <span className="w-1 h-1 rounded-full bg-slate-300" />
+
+                  <span className="text-[11px] text-slate-500">
+                    {request.employee.employer}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Amount + Status */}
+            <div className="flex items-center gap-5">
+              <div className="text-right">
+                <div className="flex items-center justify-end gap-1">
+                  <IndianRupee size={12} className="text-slate-500" />
+
+                  <span className="text-sm font-semibold text-slate-900">
+                    {request.amount.replace("₹", "")}
+                  </span>
+                </div>
+
+                <span className="text-[11px] text-slate-500">
+                  {request.requestedAt}
+                </span>
+              </div>
+
+              <span
+                className={`
+                    px-2.5
+                    py-1
+                    rounded-full
+                    text-[11px]
+                    font-medium
+                    whitespace-nowrap
+                    ${getStatusClass(request.status)}
+                  `}
+              >
+                {request.status}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

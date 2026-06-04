@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
 
-import EmployerStats from "../components/employer-enquiries/EmployerStats";
 import EmployerEnquiriesTable from "../components/employer-enquiries/EmployerEnquiriesTable";
 import EmployerDetailsDrawer from "../components/employer-enquiries/EmployerDetailsDrawer";
 import type { EmployerEnquiry } from "../types/employer-enquiry";
 import { getEmployerEnquiries } from "../services/employerEnquiryService";
+import SystemOverview from "../components/dashboard/SystemOverview";
 
 export default function EmployerEnquiriesPage() {
   const [loading, setLoading] = useState(true);
@@ -73,7 +73,7 @@ export default function EmployerEnquiriesPage() {
       </div>
 
       {/* Stats */}
-      <EmployerStats />
+      <SystemOverview />
 
       {/* Search & Filters */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
