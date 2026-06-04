@@ -9,6 +9,7 @@ import EmployersPage from "../pages/EmployersPage";
 import EmployeesPage from "../pages/EmployeesPage";
 import SalaryRequestsPage from "../pages/SalaryRequestsPage";
 import DisbursalsPage from "../pages/DisbursalsPage";
+import RepaymentsPage from "../pages/RepaymentsPage";
 
 export default function AdminLayout() {
   const [activePage, setActivePage] = useState(
@@ -34,6 +35,7 @@ export default function AdminLayout() {
           {activePage === "employees" && <EmployeesPage />}
           {activePage === "salary-requests" && <SalaryRequestsPage />}
           {activePage === "disbursals" && <DisbursalsPage />}
+          {activePage === "repayments" && <RepaymentsPage />}
         </main>
       </div>
     </div>
