@@ -1,10 +1,13 @@
 const API_BASE_URL = "http://localhost:3000";
 
-export async function getPendingKycDocuments() {
+export type KycStatusFilter = "PENDING" | "VERIFIED" | "REJECTED" | "ALL";
+
+export async function getKycDocuments(status: KycStatusFilter = "PENDING") {
   const token = localStorage.getItem("accessToken");
+  const query = status === "ALL" ? "" : `?status=${status}`;
 
   try {
-    const response = await fetch(`${API_BASE_URL}/kyc-documents/pending`, {
+    const response = await fetch(`${API_BASE_URL}/kyc-documents${query}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -18,6 +21,10 @@ export async function getPendingKycDocuments() {
   } catch {
     return [];
   }
+}
+
+export function getPendingKycDocuments() {
+  return getKycDocuments("PENDING");
 }
 
 async function updateKycStatus(documentId: string, action: "verify" | "reject") {
