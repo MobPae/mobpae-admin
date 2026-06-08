@@ -21,19 +21,21 @@ export default function KycVerificationPage() {
     null
   );
 
-  useEffect(() => {
-    async function loadDocuments() {
-      try {
-        const data = await getPendingKycDocuments();
+  async function loadDocuments() {
+    setLoading(true);
 
-        setDocuments(data || []);
-      } catch (error) {
-        console.error("Failed to load KYC documents", error);
-      } finally {
-        setLoading(false);
-      }
+    try {
+      const data = await getPendingKycDocuments();
+
+      setDocuments(data || []);
+    } catch (error) {
+      console.error("Failed to load KYC documents", error);
+    } finally {
+      setLoading(false);
     }
+  }
 
+  useEffect(() => {
     loadDocuments();
   }, []);
 
@@ -124,6 +126,11 @@ export default function KycVerificationPage() {
         onClose={() => {
           setDrawerOpen(false);
           setSelectedDocument(null);
+        }}
+        onCompleted={() => {
+          setDrawerOpen(false);
+          setSelectedDocument(null);
+          loadDocuments();
         }}
       />
     </div>
