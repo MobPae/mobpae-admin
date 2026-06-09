@@ -23,19 +23,19 @@ export default function SalaryRequestsPage() {
     null
   );
 
-  useEffect(() => {
-    async function loadRequests() {
-      try {
-        const data = await getSalaryRequests();
+  async function loadRequests() {
+    try {
+      const data = await getSalaryRequests();
 
-        setRequests(data || []);
-      } catch (error) {
-        console.error("Failed to load salary requests", error);
-      } finally {
-        setLoading(false);
-      }
+      setRequests(data || []);
+    } catch (error) {
+      console.error("Failed to load salary requests", error);
+    } finally {
+      setLoading(false);
     }
+  }
 
+  useEffect(() => {
     loadRequests();
   }, []);
 
@@ -130,20 +130,31 @@ export default function SalaryRequestsPage() {
           </button>
 
           <button
-            onClick={() => setStatusFilter("APPROVED")}
+            onClick={() => setStatusFilter("EMPLOYER_APPROVED")}
             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-              statusFilter === "APPROVED"
+              statusFilter === "EMPLOYER_APPROVED"
                 ? "bg-green-600 text-white"
                 : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
             }`}
           >
-            Approved
+            Employer Approved
           </button>
 
           <button
-            onClick={() => setStatusFilter("REJECTED")}
+            onClick={() => setStatusFilter("READY_FOR_DISBURSAL")}
             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-              statusFilter === "REJECTED"
+              statusFilter === "READY_FOR_DISBURSAL"
+                ? "bg-blue-600 text-white"
+                : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
+            }`}
+          >
+            Ready
+          </button>
+
+          <button
+            onClick={() => setStatusFilter("EMPLOYER_REJECTED")}
+            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+              statusFilter === "EMPLOYER_REJECTED"
                 ? "bg-red-600 text-white"
                 : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
             }`}
@@ -178,6 +189,11 @@ export default function SalaryRequestsPage() {
       <SalaryRequestDrawer
         open={drawerOpen}
         request={selectedRequest}
+        onCompleted={async () => {
+          await loadRequests();
+          setDrawerOpen(false);
+          setSelectedRequest(null);
+        }}
         onClose={() => {
           setDrawerOpen(false);
           setSelectedRequest(null);

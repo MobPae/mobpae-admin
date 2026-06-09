@@ -90,10 +90,11 @@ export default function SalaryRequestsTable({
                 <td className="px-6 py-4">
                   <span
                     className={`px-2.5 py-1 rounded-full text-[11px] font-medium ${
-                      request.status === "APPROVED" ||
+                      request.status === "EMPLOYER_APPROVED" ||
+                      request.status === "READY_FOR_DISBURSAL" ||
                       request.status === "REPAID"
                         ? "bg-green-100 text-green-700"
-                        : request.status === "REJECTED"
+                        : request.status === "EMPLOYER_REJECTED"
                         ? "bg-red-100 text-red-700"
                         : request.status === "DISBURSED"
                         ? "bg-blue-100 text-blue-700"
