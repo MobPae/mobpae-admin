@@ -1,21 +1,22 @@
-const API_BASE_URL = "http://localhost:3000";
+import api from "../lib/axios";
+import type { Disbursal } from "../types/disbursal";
 
-export async function getDisbursals() {
-  const token = localStorage.getItem("accessToken");
+export async function getDisbursals(): Promise<Disbursal[]> {
+  const response = await api.get<Disbursal[]>("/disbursals");
+  return response.data;
+}
 
-  try {
-    const response = await fetch(`${API_BASE_URL}/disbursals`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+export async function getDisbursal(disbursalId: string): Promise<Disbursal> {
+  const response = await api.get<Disbursal>(`/disbursals/${disbursalId}`);
+  return response.data;
+}
 
-    if (!response.ok) {
-      return [];
-    }
+export async function createDisbursal(salaryRequestId: string): Promise<Disbursal> {
+  const response = await api.post<Disbursal>("/disbursals", { salaryRequestId });
+  return response.data;
+}
 
-    return response.json();
-  } catch {
-    return [];
-  }
+export async function processDisbursal(disbursalId: string): Promise<Disbursal> {
+  const response = await api.post<Disbursal>(`/disbursals/${disbursalId}/disburse`);
+  return response.data;
 }

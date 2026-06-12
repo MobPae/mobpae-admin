@@ -120,16 +120,14 @@ export default function EmployeesTable({ employees }: EmployeesTableProps) {
                   <div className="flex flex-col gap-1">
                     <span
                       className={`inline-flex w-fit px-2.5 py-1 rounded-full text-[11px] font-medium ${
-                        employee.status === "ACTIVE"
+                        employee.employmentStatus === "ACTIVE"
                           ? "bg-green-100 text-green-700"
-                          : employee.status === "PENDING"
-                          ? "bg-amber-100 text-amber-700"
                           : "bg-red-100 text-red-700"
                       }`}
                     >
-                      {employee.status === "ACTIVE"
+                      {employee.employmentStatus === "ACTIVE"
                         ? "Active"
-                        : employee.status}
+                        : "Inactive"}
                     </span>
 
                     {employee.employer.status === "SUSPENDED" && (

@@ -1,23 +1,27 @@
+export type RepaymentStatus = "SCHEDULED" | "PAID" | "OVERDUE";
+
 export interface Repayment {
   id: string;
-
-  amount: number;
-
-  status: string;
-
+  salaryRequestId: string;
+  principalAmount: string;
+  totalAmount: string;
+  interestAmount: string;
+  interestRate: string;
+  interestDays: number;
   dueDate: string;
-
-  paidAt?: string;
-
+  paidDate: string | null;
+  status: RepaymentStatus;
+  remarks: string | null;
+  createdAt: string;
+  updatedAt: string;
   salaryRequest: {
     id: string;
-
+    amount: string;
     employee: {
       id: string;
       employeeCode: string;
       name: string;
       email: string;
-
       employer: {
         id: string;
         companyName: string;

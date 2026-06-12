@@ -1,27 +1,23 @@
-export type Employee = {
+export type EmploymentStatus = "ACTIVE" | "INACTIVE";
+
+export interface Employee {
   id: string;
-  userId: string;
+  userId: string | null;
   employerId: string;
-
   employeeCode: string;
-
   name: string;
   email: string;
   phone: string;
-
   salaryInHand: string;
-
   joiningDate: string | null;
-
-  status: string;
-
+  employmentStatus: EmploymentStatus;
+  appActivated: boolean;
   createdAt: string;
   updatedAt: string;
-
   employer: {
     id: string;
     companyName: string;
     companyCode: string;
     status: string;
   };
-};
+}

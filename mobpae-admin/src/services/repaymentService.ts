@@ -1,21 +1,12 @@
-const API_BASE_URL = "http://localhost:3000";
+import api from "../lib/axios";
+import type { Repayment } from "../types/repayment";
 
-export async function getRepayments() {
-  const token = localStorage.getItem("accessToken");
+export async function getRepayments(): Promise<Repayment[]> {
+  const response = await api.get<Repayment[]>("/repayments");
+  return response.data;
+}
 
-  try {
-    const response = await fetch(`${API_BASE_URL}/repayments`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      return [];
-    }
-
-    return response.json();
-  } catch {
-    return [];
-  }
+export async function getRepayment(repaymentId: string): Promise<Repayment> {
+  const response = await api.get<Repayment>(`/repayments/${repaymentId}`);
+  return response.data;
 }

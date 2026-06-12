@@ -93,7 +93,7 @@ export default function RepaymentsTable({ repayments, onView }: Props) {
 
                 <td className="px-6 py-4">
                   <span className="text-sm font-semibold text-slate-900">
-                    ₹{Number(repayment.amount).toLocaleString()}
+                    ₹{Number(repayment.totalAmount).toLocaleString()}
                   </span>
                 </td>
 

@@ -1,53 +1,22 @@
-const API_BASE_URL = "http://localhost:3000";
+import api from "../lib/axios";
+import type { KycDocument } from "../types/kyc";
 
 export type KycStatusFilter = "PENDING" | "VERIFIED" | "REJECTED" | "ALL";
 
-export async function getKycDocuments(status: KycStatusFilter = "PENDING") {
-  const token = localStorage.getItem("accessToken");
-  const query = status === "ALL" ? "" : `?status=${status}`;
-
-  try {
-    const response = await fetch(`${API_BASE_URL}/kyc-documents${query}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      return [];
-    }
-
-    return response.json();
-  } catch {
-    return [];
-  }
+export async function getKycDocuments(status: KycStatusFilter = "PENDING"): Promise<KycDocument[]> {
+  const params = status !== "ALL" ? { status } : {};
+  const response = await api.get<KycDocument[]>("/kyc-documents", { params });
+  return response.data;
 }
 
-export function getPendingKycDocuments() {
+export function getPendingKycDocuments(): Promise<KycDocument[]> {
   return getKycDocuments("PENDING");
 }
 
-async function updateKycStatus(documentId: string, action: "verify" | "reject") {
-  const token = localStorage.getItem("accessToken");
-
-  const response = await fetch(`${API_BASE_URL}/kyc-documents/${documentId}/${action}`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to ${action} KYC document`);
-  }
-
-  return response.json();
+export async function verifyKycDocument(documentId: string): Promise<void> {
+  await api.post(`/kyc-documents/${documentId}/verify`);
 }
 
-export function verifyKycDocument(documentId: string) {
-  return updateKycStatus(documentId, "verify");
-}
-
-export function rejectKycDocument(documentId: string) {
-  return updateKycStatus(documentId, "reject");
+export async function rejectKycDocument(documentId: string): Promise<void> {
+  await api.post(`/kyc-documents/${documentId}/reject`);
 }

@@ -47,7 +47,7 @@ export default function EmployeesPage() {
         .includes(searchTerm.toLowerCase());
 
     const matchesStatus =
-      statusFilter === "ALL" || employee.status === statusFilter;
+      statusFilter === "ALL" || employee.employmentStatus === statusFilter;
 
     const matchesEmployer =
       selectedEmployer === "ALL" || employee.employer.id === selectedEmployer;
@@ -150,15 +150,9 @@ export default function EmployeesPage() {
           />
 
           <FilterPill
-            active={statusFilter === "PENDING"}
-            label="Pending"
-            onClick={() => setStatusFilter("PENDING")}
-          />
-
-          <FilterPill
-            active={statusFilter === "BLOCKED"}
-            label="Blocked"
-            onClick={() => setStatusFilter("BLOCKED")}
+            active={statusFilter === "INACTIVE"}
+            label="Inactive"
+            onClick={() => setStatusFilter("INACTIVE")}
           />
         </div>
       </div>

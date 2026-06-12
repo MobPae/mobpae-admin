@@ -1,12 +1,9 @@
-export interface BankAccount {
+export interface SalaryLimit {
   id: string;
   employeeId: string;
-  accountHolderName: string;
-  accountNumber: string;
-  ifscCode: string;
-  bankName: string | null;
-  upiId: string | null;
-  verified: boolean;
+  approvedLimit: string;
+  maxRequestsPerCycle: number;
+  cooldownDays: number;
   createdAt: string;
   updatedAt: string;
   employee: {
@@ -14,12 +11,10 @@ export interface BankAccount {
     employeeCode: string;
     name: string;
     email: string;
-    employmentStatus: string;
     employer: {
       id: string;
       companyName: string;
       companyCode: string;
-      status: string;
     };
   };
 }

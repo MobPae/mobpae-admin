@@ -1,104 +1,100 @@
+import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
   Building2,
+  UserCircle2,
   Users,
   FileCheck,
   Landmark,
   Wallet,
-  CreditCard,
+  ArrowDownCircle,
+  RefreshCcw,
   Settings,
 } from "lucide-react";
 
 import SidebarSection from "./SidebarSection";
 
-interface SidebarProps {
-  activePage: string;
-  onMenuClick: (page: string) => void;
+interface NavItemProps {
+  label: string;
+  icon: React.ElementType;
+  to: string;
 }
 
-export default function Sidebar({ activePage, onMenuClick }: SidebarProps) {
-  const MenuItem = ({
-    label,
-    icon: Icon,
-    page,
-  }: {
-    label: string;
-    icon: React.ElementType;
-    page: string;
-  }) => (
-    <button
-      onClick={() => onMenuClick(page)}
-      className={`w-full flex items-center gap-2.5 px-4 py-3 rounded-xl transition-all text-[12px] font-medium ${
-        activePage === page
-          ? "bg-blue-600 text-white shadow-md"
-          : "text-slate-300 hover:bg-slate-800 hover:text-white"
-      }`}
-    >
-      <Icon size={18} />
-      <span>{label}</span>
-    </button>
-  );
-
+function NavItem({ label, icon: Icon, to }: NavItemProps) {
   return (
-    <aside className="w-72 h-screen bg-[#081028] text-white flex flex-col shrink-0">
-      {/* Logo */}
-      <div className="px-6 py-5 border-b border-slate-800">
-        <h1 className="text-2xl font-bold tracking-tight">MobPae</h1>
+    <NavLink
+      to={to}
+      className={({ isActive }) =>
+        `w-full flex items-center gap-2.5 px-4 py-2.5 rounded-xl transition-all text-[12px] font-medium ${
+          isActive
+            ? "bg-blue-600 text-white shadow-md"
+            : "text-slate-300 hover:bg-slate-800 hover:text-white"
+        }`
+      }
+    >
+      <Icon size={16} />
+      <span>{label}</span>
+    </NavLink>
+  );
+}
 
-        <p className="text-sm text-slate-400 mt-1">Admin Portal</p>
+export default function Sidebar() {
+  return (
+    <aside className="w-64 h-screen bg-[#081028] text-white flex flex-col shrink-0">
+      {/* Logo */}
+      <div className="px-5 py-5 border-b border-slate-800">
+        <h1 className="text-xl font-bold tracking-tight">MobPae</h1>
+        <p className="text-xs text-slate-400 mt-0.5">Admin Portal</p>
       </div>
 
-      {/* Menu */}
-      <div className="flex-1 overflow-y-auto px-3 py-4">
+      {/* Navigation */}
+      <div className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
         <SidebarSection title="Overview">
-          <MenuItem label="Dashboard" icon={LayoutDashboard} page="dashboard" />
+          <NavItem label="Dashboard" icon={LayoutDashboard} to="/dashboard" />
         </SidebarSection>
 
         <SidebarSection title="Operations">
-          <MenuItem
+          <NavItem
             label="Employer Onboarding"
             icon={Building2}
-            page="employer-enquiries"
+            to="/employer-enquiries"
           />
-
-          <MenuItem label="Employers" icon={Building2} page="employers" />
-
-          <MenuItem label="Employees" icon={Users} page="employees" />
+          <NavItem label="Employers" icon={UserCircle2} to="/employers" />
+          <NavItem label="Employees" icon={Users} to="/employees" />
         </SidebarSection>
 
         <SidebarSection title="Finance">
-          <MenuItem
+          <NavItem
             label="Salary Requests"
             icon={Wallet}
-            page="salary-requests"
+            to="/salary-requests"
           />
-
-          <MenuItem label="Disbursements" icon={CreditCard} page="disbursals" />
-
-          <MenuItem label="Repayments" icon={CreditCard} page="repayments" />
+          <NavItem label="Disbursals" icon={ArrowDownCircle} to="/disbursals" />
+          <NavItem label="Repayments" icon={RefreshCcw} to="/repayments" />
         </SidebarSection>
 
         <SidebarSection title="Compliance">
-          <MenuItem label="KYC Verification" icon={FileCheck} page="kyc" />
-
-          <MenuItem label="Bank Verification" icon={Landmark} page="bank" />
+          <NavItem label="KYC Verification" icon={FileCheck} to="/kyc" />
+          <NavItem
+            label="Bank Verification"
+            icon={Landmark}
+            to="/bank-verification"
+          />
         </SidebarSection>
 
-        <SidebarSection title="Settings">
-          <MenuItem label="Settings" icon={Settings} page="settings" />
+        <SidebarSection title="System">
+          <NavItem label="Settings" icon={Settings} to="/settings" />
         </SidebarSection>
       </div>
 
       {/* User Profile */}
       <div className="border-t border-slate-800 p-4 shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-slate-700 flex items-center justify-center font-semibold">
+          <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-semibold">
             A
           </div>
-
           <div>
             <p className="text-sm font-medium">Admin User</p>
-
             <p className="text-xs text-slate-400">Super Admin</p>
           </div>
         </div>
