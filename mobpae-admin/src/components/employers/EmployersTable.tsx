@@ -1,178 +1,118 @@
-interface Employer {
-  id: string;
-  companyName: string;
-  companyCode: string;
-  contactPerson: string;
-  email: string;
-  phone: string;
-  payrollDate: number;
-  payrollCutoffDate: number;
-  status: string;
-  createdAt: string;
-  updatedAt?: string;
-}
+import type { Employer, EmployerStatus, EmployerRiskStatus } from "../../types/employer";
 
-interface EmployersTableProps {
+interface Props {
   employers: Employer[];
-  onView: (employer: Employer) => void;
+  selectedId: string | null;
+  onSelect: (employer: Employer) => void;
 }
 
-export default function EmployersTable({
-  employers,
-  onView,
-}: EmployersTableProps) {
+const STATUS_BADGE: Record<EmployerStatus, string> = {
+  ACTIVE: "bg-green-50 text-green-700",
+  PENDING: "bg-amber-50 text-amber-700",
+  APPROVED: "bg-blue-50 text-blue-700",
+  REJECTED: "bg-red-50 text-red-600",
+  SUSPENDED: "bg-red-50 text-red-600",
+};
+
+const STATUS_LABEL: Record<EmployerStatus, string> = {
+  ACTIVE: "Active",
+  PENDING: "Pending",
+  APPROVED: "Approved",
+  REJECTED: "Rejected",
+  SUSPENDED: "Suspended",
+};
+
+const RISK_BADGE: Record<EmployerRiskStatus, string> = {
+  GOOD: "bg-green-50 text-green-700",
+  WARNING: "bg-amber-50 text-amber-700",
+  BLOCKED: "bg-red-50 text-red-600",
+};
+
+export default function EmployersTable({ employers, selectedId, onSelect }: Props) {
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="bg-slate-50 border-b border-slate-200">
-              <th className="px-6 py-4 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                Company
-              </th>
+    <div className="bg-white border border-slate-100 rounded-lg overflow-hidden">
+      {/* Header */}
+      <div className="grid grid-cols-[20px_1fr_90px_130px_80px_70px_64px_64px] gap-0 px-4 py-2.5 bg-slate-50/60 border-b border-slate-100">
+        {["", "Company", "Code", "Contact", "Payroll", "Risk", "Status", ""].map((h, i) => (
+          <span key={i} className="text-[10px] font-[500] uppercase tracking-[0.05em] text-slate-400">
+            {h}
+          </span>
+        ))}
+      </div>
 
-              <th className="px-6 py-4 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                Company Code
-              </th>
+      {/* Rows */}
+      <div>
+        {employers.map((emp) => {
+          const isSelected = selectedId === emp.id;
+          return (
+            <div
+              key={emp.id}
+              onClick={() => onSelect(emp)}
+              className={`grid grid-cols-[20px_1fr_90px_130px_80px_70px_64px_64px] gap-0 px-4 py-3 border-b border-slate-50 last:border-0 items-center cursor-pointer transition-colors ${
+                isSelected ? "bg-slate-50" : "hover:bg-slate-50/40"
+              }`}
+            >
+              {/* Selection dot */}
+              <div className={`w-[5px] h-[5px] rounded-full transition-colors ${isSelected ? "bg-blue-500" : "bg-transparent"}`} />
 
-              <th className="px-6 py-4 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                Contact
-              </th>
+              {/* Company */}
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-slate-700 to-slate-900 text-white flex items-center justify-center text-[11px] font-[600] flex-shrink-0">
+                  {emp.companyName.charAt(0).toUpperCase()}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[12px] font-[500] text-slate-800 leading-none truncate">{emp.companyName}</p>
+                  <p className="text-[11px] text-slate-400 mt-0.5 leading-none truncate">{emp.email}</p>
+                </div>
+              </div>
 
-              <th className="px-6 py-4 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                Payroll
-              </th>
+              {/* Code */}
+              <div>
+                <span className="inline-flex h-[18px] px-1.5 rounded-[3px] items-center text-[10px] font-[500] bg-slate-100 text-slate-600 font-mono">
+                  {emp.companyCode}
+                </span>
+              </div>
 
-              <th className="px-6 py-4 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                Status
-              </th>
+              {/* Contact */}
+              <div className="min-w-0">
+                <p className="text-[12px] font-[500] text-slate-700 leading-none truncate">{emp.contactPerson}</p>
+                <p className="text-[11px] text-slate-400 mt-0.5 leading-none">{emp.phone}</p>
+              </div>
 
-              <th className="px-6 py-4 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                Updated
-              </th>
+              {/* Payroll */}
+              <div>
+                <p className="text-[12px] text-slate-700 leading-none">{emp.payrollDate}th</p>
+                <p className="text-[10px] text-slate-400 mt-0.5 leading-none">cutoff {emp.payrollCutoffDate}th</p>
+              </div>
 
-              <th className="px-6 py-4 text-right text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                Action
-              </th>
-            </tr>
-          </thead>
+              {/* Risk */}
+              <div>
+                <span className={`inline-flex h-[18px] px-1.5 rounded-[3px] items-center text-[10px] font-[500] ${RISK_BADGE[emp.riskStatus]}`}>
+                  {emp.riskStatus}
+                </span>
+              </div>
 
-          <tbody>
-            {employers.map((employer, index) => (
-              <tr
-                key={employer.id}
-                className={`
-                  border-b
-                  border-slate-100
-                  hover:bg-slate-50
-                  transition-colors
-                  ${index % 2 === 0 ? "bg-white" : "bg-slate-50/30"}
-                `}
-              >
-                {/* Company */}
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="
-                        w-8
-                        h-8
-                        rounded-lg
-                        bg-gradient-to-br
-                        from-blue-500
-                        to-indigo-600
-                        text-white
-                        flex
-                        items-center
-                        justify-center
-                        text-xs
-                        font-semibold
-                      "
-                    >
-                      {employer.companyName.charAt(0)}
-                    </div>
+              {/* Status */}
+              <div>
+                <span className={`inline-flex h-[18px] px-1.5 rounded-[3px] items-center text-[10px] font-[500] ${STATUS_BADGE[emp.status]}`}>
+                  {STATUS_LABEL[emp.status]}
+                </span>
+              </div>
 
-                    <div>
-                      <p className="text-sm font-medium text-slate-900">
-                        {employer.companyName}
-                      </p>
+              {/* Action */}
+              <div className="text-right">
+                <span className="text-[11px] text-slate-400">{isSelected ? "Close" : "Manage →"}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
 
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        {employer.email}
-                      </p>
-                    </div>
-                  </div>
-                </td>
-
-                {/* Company Code */}
-                <td className="px-6 py-4">
-                  <span className="inline-flex px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-700 text-xs font-medium">
-                    {employer.companyCode}
-                  </span>
-                </td>
-
-                {/* Contact */}
-                <td className="px-6 py-4">
-                  <div>
-                    <p className="text-sm font-medium text-slate-800">
-                      {employer.contactPerson}
-                    </p>
-
-                    <p className="text-xs text-slate-500">Primary Contact</p>
-                  </div>
-                </td>
-
-                {/* Payroll */}
-                <td className="px-6 py-4">
-                  <span className="inline-flex px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 text-xs font-medium">
-                    {employer.payrollDate}th
-                  </span>
-                </td>
-
-                {/* Status */}
-                <td className="px-6 py-4">
-                  <span
-                    className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${
-                      employer.status === "ACTIVE"
-                        ? "bg-green-50 text-green-700"
-                        : "bg-red-50 text-red-700"
-                    }`}
-                  >
-                    {employer.status === "ACTIVE" ? "Active" : "Inactive"}
-                  </span>
-                </td>
-
-                {/* Updated */}
-                <td className="px-6 py-4">
-                  <span className="inline-flex px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 text-xs">
-                    {new Date(
-                      employer.updatedAt || employer.createdAt
-                    ).toLocaleDateString("en-IN", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </span>
-                </td>
-
-                {/* Action */}
-                <td className="px-6 py-4 text-right">
-                  <button
-                    onClick={() => onView(employer)}
-                    className="
-                      text-blue-600
-                      text-sm
-                      font-medium
-                      hover:text-blue-700
-                      transition-colors
-                    "
-                  >
-                    View →
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {/* Footer */}
+      <div className="px-4 py-2.5 border-t border-slate-100 bg-slate-50/40">
+        <p className="text-[10px] text-slate-400">
+          {employers.length} {employers.length === 1 ? "employer" : "employers"}
+        </p>
       </div>
     </div>
   );

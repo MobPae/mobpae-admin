@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { Building2, Users, FileText, ArrowDownCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { getAdminDashboard } from "../services/dashboardService";
-import StatCard from "../components/dashboard/StatCard";
-import ActionQueue from "../components/dashboard/ActionQueue";
+import { getSalaryRequests } from "../services/salaryRequestService";
 import type { AdminDashboard } from "../types/dashboard";
+import type { SalaryRequest } from "../types/salary-request";
 
-const EMPTY: AdminDashboard = {
+const EMPTY_DASHBOARD: AdminDashboard = {
   totalEmployers: 0,
   activeEmployers: 0,
   totalEmployees: 0,
@@ -15,23 +15,89 @@ const EMPTY: AdminDashboard = {
   activeRepayments: 0,
 };
 
+const EMPTY_REQUESTS: SalaryRequest[] = [];
+
+function statusBadge(status: SalaryRequest["status"]): string {
+  switch (status) {
+    case "SUBMITTED": return "bg-amber-50 text-amber-700";
+    case "EMPLOYER_APPROVED": return "bg-blue-50 text-blue-700";
+    case "READY_FOR_DISBURSAL": return "bg-indigo-50 text-indigo-700";
+    case "DISBURSED": return "bg-green-50 text-green-700";
+    case "EMPLOYER_REJECTED": return "bg-red-50 text-red-600";
+    case "REPAYMENT_SCHEDULED": return "bg-violet-50 text-violet-700";
+    case "REPAID": return "bg-slate-100 text-slate-500";
+  }
+}
+
+function statusLabel(status: SalaryRequest["status"]): string {
+  switch (status) {
+    case "SUBMITTED": return "Submitted";
+    case "EMPLOYER_APPROVED": return "Approved";
+    case "READY_FOR_DISBURSAL": return "Ready";
+    case "DISBURSED": return "Disbursed";
+    case "EMPLOYER_REJECTED": return "Rejected";
+    case "REPAYMENT_SCHEDULED": return "Repayment";
+    case "REPAID": return "Repaid";
+  }
+}
+
+function formatAmount(raw: string): string {
+  const n = parseFloat(raw);
+  return isNaN(n) ? raw : `₹${n.toLocaleString("en-IN")}`;
+}
+
+function timeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  return `${days}d ago`;
+}
+
 export default function DashboardPage() {
-  const { data, isLoading, isError } = useQuery({
+  const navigate = useNavigate();
+
+  const { data: dashboard, isLoading: dashLoading } = useQuery({
     queryKey: ["dashboard", "admin"],
     queryFn: getAdminDashboard,
   });
 
-  const d = data ?? EMPTY;
+  const { data: salaryRequests, isLoading: srLoading } = useQuery({
+    queryKey: ["salary-requests"],
+    queryFn: getSalaryRequests,
+  });
+
+  const d = dashboard ?? EMPTY_DASHBOARD;
+  const recentRequests = (salaryRequests ?? EMPTY_REQUESTS)
+    .slice()
+    .sort((a, b) => new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime())
+    .slice(0, 5);
+
+  const kpis = [
+    { label: "Active employers", value: d.activeEmployers, sub: `${d.totalEmployers} total`, accent: false },
+    { label: "Total employees", value: d.totalEmployees.toLocaleString("en-IN"), sub: "across all orgs", accent: false },
+    { label: "Pending requests", value: d.pendingSalaryRequests, sub: "awaiting review", accent: d.pendingSalaryRequests > 0 },
+    { label: "Pending disbursals", value: d.pendingDisbursals, sub: "ready to process", accent: d.pendingDisbursals > 0 },
+    { label: "KYC pending", value: d.pendingKycDocuments, sub: "docs in queue", accent: d.pendingKycDocuments > 0 },
+    { label: "Active repayments", value: d.activeRepayments, sub: "in progress", accent: false },
+  ];
+
+  const actionItems = [
+    { label: "Salary requests", sub: "Awaiting review", count: d.pendingSalaryRequests, color: "bg-amber-400", to: "/salary-requests" },
+    { label: "KYC documents", sub: "Pending verification", count: d.pendingKycDocuments, color: "bg-blue-400", to: "/kyc" },
+    { label: "Disbursals", sub: "Ready to process", count: d.pendingDisbursals, color: "bg-indigo-400", to: "/disbursals" },
+    { label: "Active repayments", sub: "In progress", count: d.activeRepayments, color: "bg-slate-400", to: "/repayments" },
+  ];
 
   return (
-    <div className="p-6 space-y-5">
-      {/* Header */}
-      <div className="flex items-start justify-between">
+    <div className="p-5 space-y-4">
+      {/* Page header */}
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[22px] font-[700] tracking-tight text-slate-900">
-            Dashboard
-          </h1>
-          <p className="text-[13px] text-slate-500 mt-0.5">
+          <h1 className="text-[15px] font-[500] text-slate-900 leading-none">Dashboard</h1>
+          <p className="text-[11px] text-slate-400 mt-1.5">
             {new Date().toLocaleDateString("en-IN", {
               weekday: "long",
               day: "numeric",
@@ -40,55 +106,146 @@ export default function DashboardPage() {
             })}
           </p>
         </div>
-      </div>
-
-      {isError && (
-        <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3">
-          Could not load dashboard data. Check that the backend is running.
+        <div className="flex items-center gap-1.5 h-6 px-2.5 rounded-md bg-green-50 border border-green-100">
+          <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+          <span className="text-[11px] text-green-700 font-[500]">Live</span>
         </div>
-      )}
-
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-        <StatCard
-          label="Active Employers"
-          value={d.activeEmployers}
-          sublabel={`${d.totalEmployers} total registered`}
-          icon={Building2}
-          iconBg="bg-blue-50"
-          iconColor="text-blue-600"
-          loading={isLoading}
-        />
-        <StatCard
-          label="Total Employees"
-          value={d.totalEmployees.toLocaleString("en-IN")}
-          icon={Users}
-          iconBg="bg-slate-100"
-          iconColor="text-slate-600"
-          loading={isLoading}
-        />
-        <StatCard
-          label="Pending Requests"
-          value={d.pendingSalaryRequests}
-          sublabel="Awaiting approval"
-          icon={FileText}
-          iconBg="bg-amber-50"
-          iconColor="text-amber-600"
-          loading={isLoading}
-        />
-        <StatCard
-          label="Pending Disbursals"
-          value={d.pendingDisbursals}
-          sublabel="Ready to process"
-          icon={ArrowDownCircle}
-          iconBg="bg-green-50"
-          iconColor="text-green-600"
-          loading={isLoading}
-        />
       </div>
 
-      {/* Action Queue */}
-      <ActionQueue data={d} loading={isLoading} />
+      {/* KPI Strip */}
+      <div className="grid grid-cols-6 gap-3">
+        {kpis.map((kpi) => (
+          <div key={kpi.label} className="bg-white border border-slate-100 rounded-lg p-3.5">
+            <p className="text-[10px] text-slate-400 uppercase tracking-[0.06em] font-[500] leading-none">
+              {kpi.label}
+            </p>
+            <p className={`text-[22px] font-[500] tracking-tight leading-none mt-2.5 ${
+              kpi.accent ? "text-amber-600" : "text-slate-900"
+            } ${dashLoading ? "opacity-20 animate-pulse" : ""}`}>
+              {kpi.value}
+            </p>
+            <p className="text-[10px] text-slate-400 mt-1.5 leading-none">{kpi.sub}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Two-column body */}
+      <div className="grid grid-cols-[1fr_264px] gap-4">
+        {/* Recent salary requests */}
+        <div className="bg-white border border-slate-100 rounded-lg overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+            <span className="text-[12px] font-[500] text-slate-800">Recent salary requests</span>
+            <button
+              onClick={() => void navigate("/salary-requests")}
+              className="text-[11px] text-slate-400 hover:text-slate-600 transition-colors"
+            >
+              View all →
+            </button>
+          </div>
+
+          <div className="grid grid-cols-[1fr_88px_88px_64px] px-4 py-2 bg-slate-50/60 border-b border-slate-100">
+            {["Employee", "Amount", "Status", "When"].map((h) => (
+              <span key={h} className="text-[10px] font-[500] uppercase tracking-[0.05em] text-slate-400">
+                {h}
+              </span>
+            ))}
+          </div>
+
+          {srLoading ? (
+            <>
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="grid grid-cols-[1fr_88px_88px_64px] px-4 py-3 border-b border-slate-50 items-center">
+                  <div className="space-y-1.5">
+                    <div className="h-2.5 w-32 bg-slate-100 rounded animate-pulse" />
+                    <div className="h-2 w-20 bg-slate-100 rounded animate-pulse" />
+                  </div>
+                  <div className="h-2.5 w-14 bg-slate-100 rounded animate-pulse" />
+                  <div className="h-4 w-14 bg-slate-100 rounded animate-pulse" />
+                  <div className="h-2 w-10 bg-slate-100 rounded animate-pulse" />
+                </div>
+              ))}
+            </>
+          ) : recentRequests.length === 0 ? (
+            <div className="py-10 text-center">
+              <p className="text-[12px] text-slate-400">No salary requests yet</p>
+            </div>
+          ) : (
+            <>
+              {recentRequests.map((req) => (
+                <div
+                  key={req.id}
+                  className="grid grid-cols-[1fr_88px_88px_64px] px-4 py-3 border-b border-slate-50 last:border-0 items-center hover:bg-slate-50/40 transition-colors"
+                >
+                  <div>
+                    <p className="text-[12px] font-[500] text-slate-800 leading-none">{req.employee.name}</p>
+                    <p className="text-[11px] text-slate-400 mt-1 leading-none">
+                      {req.employee.employeeCode} · {req.employee.employer.companyName}
+                    </p>
+                  </div>
+                  <span className="text-[12px] font-[500] text-slate-800">
+                    {formatAmount(req.amount)}
+                  </span>
+                  <div>
+                    <span className={`inline-flex h-[18px] px-1.5 rounded-[3px] items-center text-[10px] font-[500] ${statusBadge(req.status)}`}>
+                      {statusLabel(req.status)}
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-slate-400">{timeAgo(req.requestedAt)}</span>
+                </div>
+              ))}
+            </>
+          )}
+        </div>
+
+        {/* Right: Action queue */}
+        <div className="bg-white border border-slate-100 rounded-lg overflow-hidden flex flex-col">
+          <div className="px-4 py-3 border-b border-slate-100 flex-shrink-0">
+            <span className="text-[12px] font-[500] text-slate-800">Action queue</span>
+          </div>
+
+          <div className="flex-1">
+            {actionItems.map((item) => (
+              <button
+                key={item.label}
+                onClick={() => void navigate(item.to)}
+                className="w-full flex items-center gap-3 px-4 py-3 border-b border-slate-50 last:border-0 hover:bg-slate-50/60 transition-colors text-left"
+              >
+                <span className={`w-[6px] h-[6px] rounded-full flex-shrink-0 ${item.color}`} />
+                <div className="flex-1 min-w-0">
+                  <p className="text-[12px] font-[500] text-slate-800 leading-none">{item.label}</p>
+                  <p className="text-[11px] text-slate-400 mt-1 leading-none">{item.sub}</p>
+                </div>
+                <span className={`text-[11px] font-[500] px-2 py-0.5 rounded-full ${
+                  item.count > 0 ? "bg-amber-50 text-amber-700" : "bg-slate-100 text-slate-400"
+                }`}>
+                  {item.count}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          {/* Employer mini breakdown */}
+          <div className="border-t border-slate-100 px-4 py-3 flex-shrink-0">
+            <p className="text-[10px] font-[500] uppercase tracking-[0.06em] text-slate-400 mb-2.5">
+              Employers
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { label: "Active", value: d.activeEmployers, color: "text-green-600" },
+                { label: "Total", value: d.totalEmployers, color: "text-slate-800" },
+                { label: "Pending", value: Math.max(0, d.totalEmployers - d.activeEmployers), color: "text-amber-600" },
+              ].map((s) => (
+                <div key={s.label} className="bg-slate-50 rounded-md p-2 text-center">
+                  <p className={`text-[15px] font-[500] leading-none ${s.color} ${dashLoading ? "animate-pulse opacity-20" : ""}`}>
+                    {s.value}
+                  </p>
+                  <p className="text-[10px] text-slate-400 mt-1 leading-none">{s.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

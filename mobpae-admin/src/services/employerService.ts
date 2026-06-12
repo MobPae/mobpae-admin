@@ -13,7 +13,7 @@ export async function getEmployer(employerId: string): Promise<Employer> {
 
 export async function updateEmployerStatus(
   employerId: string,
-  status: string
+  status: Employer["status"]
 ): Promise<Employer> {
   const response = await api.patch<Employer>(`/employers/${employerId}/status`, { status });
   return response.data;

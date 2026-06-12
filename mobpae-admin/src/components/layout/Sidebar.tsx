@@ -10,92 +10,115 @@ import {
   ArrowDownCircle,
   RefreshCcw,
   Settings,
+  type LucideIcon,
 } from "lucide-react";
 
-import SidebarSection from "./SidebarSection";
-
-interface NavItemProps {
+interface NavItem {
   label: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   to: string;
 }
 
-function NavItem({ label, icon: Icon, to }: NavItemProps) {
-  return (
-    <NavLink
-      to={to}
-      className={({ isActive }) =>
-        `w-full flex items-center gap-2.5 px-4 py-2.5 rounded-xl transition-all text-[12px] font-medium ${
-          isActive
-            ? "bg-blue-600 text-white shadow-md"
-            : "text-slate-300 hover:bg-slate-800 hover:text-white"
-        }`
-      }
-    >
-      <Icon size={16} />
-      <span>{label}</span>
-    </NavLink>
-  );
+interface Section {
+  title: string;
+  items: NavItem[];
 }
+
+const SECTIONS: Section[] = [
+  {
+    title: "Overview",
+    items: [{ label: "Dashboard", icon: LayoutDashboard, to: "/dashboard" }],
+  },
+  {
+    title: "Operations",
+    items: [
+      { label: "Employer onboarding", icon: Building2, to: "/employer-enquiries" },
+      { label: "Employers", icon: UserCircle2, to: "/employers" },
+      { label: "Employees", icon: Users, to: "/employees" },
+    ],
+  },
+  {
+    title: "Finance",
+    items: [
+      { label: "Salary requests", icon: Wallet, to: "/salary-requests" },
+      { label: "Disbursals", icon: ArrowDownCircle, to: "/disbursals" },
+      { label: "Repayments", icon: RefreshCcw, to: "/repayments" },
+    ],
+  },
+  {
+    title: "Compliance",
+    items: [
+      { label: "KYC verification", icon: FileCheck, to: "/kyc" },
+      { label: "Bank verification", icon: Landmark, to: "/bank-verification" },
+    ],
+  },
+  {
+    title: "System",
+    items: [{ label: "Settings", icon: Settings, to: "/settings" }],
+  },
+];
 
 export default function Sidebar() {
   return (
-    <aside className="w-64 h-screen bg-[#081028] text-white flex flex-col shrink-0">
+    <aside className="w-[210px] h-screen bg-[#0c1322] flex flex-col flex-shrink-0">
       {/* Logo */}
-      <div className="px-5 py-5 border-b border-slate-800">
-        <h1 className="text-xl font-bold tracking-tight">MobPae</h1>
-        <p className="text-xs text-slate-400 mt-0.5">Admin Portal</p>
+      <div className="h-11 flex items-center px-4 border-b border-white/[0.06] gap-2.5">
+        <div className="w-[22px] h-[22px] rounded-[5px] bg-blue-500 flex items-center justify-center text-white text-[10px] font-[600]">
+          M
+        </div>
+        <span className="text-[13px] font-[500] text-white tracking-tight">MobPae</span>
+        <span className="text-[10px] text-slate-500 mt-px">admin</span>
       </div>
 
       {/* Navigation */}
-      <div className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-        <SidebarSection title="Overview">
-          <NavItem label="Dashboard" icon={LayoutDashboard} to="/dashboard" />
-        </SidebarSection>
+      <nav className="flex-1 overflow-y-auto px-2.5 py-3 space-y-4">
+        {SECTIONS.map((section) => (
+          <div key={section.title}>
+            <p className="text-[10px] font-[500] uppercase tracking-[0.07em] text-slate-500 px-2 mb-1">
+              {section.title}
+            </p>
+            <div className="space-y-px">
+              {section.items.map(({ label, icon: Icon, to }) => (
+                <NavLink
+                  key={to}
+                  to={to}
+                  className={({ isActive }) =>
+                    `flex items-center gap-2.5 px-2.5 py-[7px] rounded-md text-[12px] transition-colors ${
+                      isActive
+                        ? "bg-white/[0.09] text-white"
+                        : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.05]"
+                    }`
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      <Icon
+                        size={14}
+                        className={isActive ? "text-white" : "text-slate-500"}
+                      />
+                      <span className="leading-none">{label}</span>
+                    </>
+                  )}
+                </NavLink>
+              ))}
+            </div>
+          </div>
+        ))}
+      </nav>
 
-        <SidebarSection title="Operations">
-          <NavItem
-            label="Employer Onboarding"
-            icon={Building2}
-            to="/employer-enquiries"
-          />
-          <NavItem label="Employers" icon={UserCircle2} to="/employers" />
-          <NavItem label="Employees" icon={Users} to="/employees" />
-        </SidebarSection>
-
-        <SidebarSection title="Finance">
-          <NavItem
-            label="Salary Requests"
-            icon={Wallet}
-            to="/salary-requests"
-          />
-          <NavItem label="Disbursals" icon={ArrowDownCircle} to="/disbursals" />
-          <NavItem label="Repayments" icon={RefreshCcw} to="/repayments" />
-        </SidebarSection>
-
-        <SidebarSection title="Compliance">
-          <NavItem label="KYC Verification" icon={FileCheck} to="/kyc" />
-          <NavItem
-            label="Bank Verification"
-            icon={Landmark}
-            to="/bank-verification"
-          />
-        </SidebarSection>
-
-        <SidebarSection title="System">
-          <NavItem label="Settings" icon={Settings} to="/settings" />
-        </SidebarSection>
-      </div>
-
-      {/* User Profile */}
-      <div className="border-t border-slate-800 p-4 shrink-0">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-semibold">
+      {/* Footer */}
+      <div className="px-3 py-3 border-t border-white/[0.06]">
+        <div className="flex items-center gap-2.5">
+          <div className="w-6 h-6 rounded-full bg-slate-700 text-slate-200 flex items-center justify-center text-[10px] font-[500]">
             A
           </div>
-          <div>
-            <p className="text-sm font-medium">Admin User</p>
-            <p className="text-xs text-slate-400">Super Admin</p>
+          <div className="flex-1 min-w-0">
+            <p className="text-[11px] font-[500] text-slate-300 leading-none truncate">
+              Admin User
+            </p>
+            <p className="text-[10px] text-slate-500 mt-0.5 leading-none">
+              Super Admin
+            </p>
           </div>
         </div>
       </div>
