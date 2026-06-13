@@ -32,24 +32,24 @@ const SECTIONS: Section[] = [
   {
     title: "Operations",
     items: [
-      { label: "Employer onboarding", icon: Building2, to: "/employer-enquiries" },
-      { label: "Employers", icon: UserCircle2, to: "/employers" },
-      { label: "Employees", icon: Users, to: "/employees" },
+      { label: "Employer onboarding", icon: Building2,    to: "/employer-enquiries" },
+      { label: "Employers",           icon: UserCircle2,  to: "/employers"          },
+      { label: "Employees",           icon: Users,        to: "/employees"          },
     ],
   },
   {
     title: "Finance",
     items: [
-      { label: "Salary requests", icon: Wallet, to: "/salary-requests" },
-      { label: "Disbursals", icon: ArrowDownCircle, to: "/disbursals" },
-      { label: "Repayments", icon: RefreshCcw, to: "/repayments" },
+      { label: "Salary requests", icon: Wallet,         to: "/salary-requests" },
+      { label: "Disbursals",      icon: ArrowDownCircle,to: "/disbursals"      },
+      { label: "Repayments",      icon: RefreshCcw,     to: "/repayments"      },
     ],
   },
   {
     title: "Compliance",
     items: [
-      { label: "KYC verification", icon: FileCheck, to: "/kyc" },
-      { label: "Bank verification", icon: Landmark, to: "/bank-verification" },
+      { label: "KYC verification",  icon: FileCheck, to: "/kyc"               },
+      { label: "Bank verification", icon: Landmark,  to: "/bank-verification" },
     ],
   },
   {
@@ -60,10 +60,10 @@ const SECTIONS: Section[] = [
 
 export default function Sidebar() {
   return (
-    <aside className="w-[210px] h-screen bg-[#0c1322] flex flex-col flex-shrink-0">
+    <aside className="w-[228px] h-screen bg-[#0c1322] flex flex-col flex-shrink-0">
       {/* Logo */}
-      <div className="h-11 flex items-center px-4 border-b border-white/[0.06] gap-2.5">
-        <div className="w-[22px] h-[22px] rounded-[5px] bg-blue-500 flex items-center justify-center text-white text-[10px] font-[600]">
+      <div className="h-[52px] flex items-center px-5 border-b border-white/[0.06] gap-3">
+        <div className="w-[24px] h-[24px] rounded-[6px] bg-blue-500 flex items-center justify-center text-white text-[11px] font-[600]">
           M
         </div>
         <span className="text-[13px] font-[500] text-white tracking-tight">MobPae</span>
@@ -71,19 +71,19 @@ export default function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-2.5 py-3 space-y-4">
+      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-5">
         {SECTIONS.map((section) => (
           <div key={section.title}>
-            <p className="text-[10px] font-[500] uppercase tracking-[0.07em] text-slate-500 px-2 mb-1">
+            <p className="text-[10px] font-[700] uppercase tracking-[0.1em] text-white/30 px-2.5 mb-1.5">
               {section.title}
             </p>
-            <div className="space-y-px">
+            <div className="space-y-0.5">
               {section.items.map(({ label, icon: Icon, to }) => (
                 <NavLink
                   key={to}
                   to={to}
                   className={({ isActive }) =>
-                    `flex items-center gap-2.5 px-2.5 py-[7px] rounded-md text-[12px] transition-colors ${
+                    `flex items-center gap-3 px-2.5 py-2 rounded-md text-[12.5px] transition-colors ${
                       isActive
                         ? "bg-white/[0.09] text-white"
                         : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.05]"
@@ -92,10 +92,7 @@ export default function Sidebar() {
                 >
                   {({ isActive }) => (
                     <>
-                      <Icon
-                        size={14}
-                        className={isActive ? "text-white" : "text-slate-500"}
-                      />
+                      <Icon size={15} className={isActive ? "text-white" : "text-slate-500"} />
                       <span className="leading-none">{label}</span>
                     </>
                   )}
@@ -107,18 +104,14 @@ export default function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="px-3 py-3 border-t border-white/[0.06]">
-        <div className="flex items-center gap-2.5">
-          <div className="w-6 h-6 rounded-full bg-slate-700 text-slate-200 flex items-center justify-center text-[10px] font-[500]">
+      <div className="px-4 py-4 border-t border-white/[0.06]">
+        <div className="flex items-center gap-3">
+          <div className="w-7 h-7 rounded-full bg-slate-700 text-slate-300 flex items-center justify-center text-[11px] font-[600]">
             A
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[11px] font-[500] text-slate-300 leading-none truncate">
-              Admin User
-            </p>
-            <p className="text-[10px] text-slate-500 mt-0.5 leading-none">
-              Super Admin
-            </p>
+            <p className="text-[12px] font-[500] text-slate-300 leading-none truncate">Admin User</p>
+            <p className="text-[10px] text-slate-500 mt-0.5 leading-none">Super Admin</p>
           </div>
         </div>
       </div>

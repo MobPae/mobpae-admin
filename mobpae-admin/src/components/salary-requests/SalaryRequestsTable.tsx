@@ -1,138 +1,123 @@
-import type { SalaryRequest } from "../../types/salary-request";
+import type { SalaryRequest, SalaryRequestStatus } from "../../types/salary-request";
 
-interface SalaryRequestsTableProps {
+interface Props {
   requests: SalaryRequest[];
-  onView: (request: SalaryRequest) => void;
+  selectedId: string | null;
+  onSelect: (r: SalaryRequest) => void;
 }
 
-export default function SalaryRequestsTable({
-  requests,
-  onView,
-}: SalaryRequestsTableProps) {
+const AVATAR_COLORS: Record<string, string> = {
+  A:"bg-rose-500",B:"bg-pink-500",C:"bg-fuchsia-500",D:"bg-purple-500",
+  E:"bg-violet-500",F:"bg-indigo-500",G:"bg-blue-500",H:"bg-sky-500",
+  I:"bg-cyan-500",J:"bg-teal-500",K:"bg-emerald-500",L:"bg-green-500",
+  M:"bg-lime-600",N:"bg-yellow-600",O:"bg-amber-500",P:"bg-orange-500",
+  Q:"bg-red-500",R:"bg-rose-600",S:"bg-pink-600",T:"bg-fuchsia-600",
+  U:"bg-purple-600",V:"bg-violet-600",W:"bg-indigo-600",X:"bg-blue-600",
+  Y:"bg-sky-600",Z:"bg-cyan-600",
+};
+const avatarBg = (n: string) => AVATAR_COLORS[n.charAt(0).toUpperCase()] ?? "bg-slate-600";
+
+const STATUS_CONFIG: Record<SalaryRequestStatus, { label: string; dot: string; text: string; bg: string }> = {
+  SUBMITTED:           { label: "Submitted",    dot: "bg-amber-400",   text: "text-amber-700",   bg: "bg-amber-50"   },
+  EMPLOYER_APPROVED:   { label: "Emp Approved", dot: "bg-blue-400",    text: "text-blue-700",    bg: "bg-blue-50"    },
+  EMPLOYER_REJECTED:   { label: "Rejected",     dot: "bg-red-400",     text: "text-red-600",     bg: "bg-red-50"     },
+  READY_FOR_DISBURSAL: { label: "Ready",        dot: "bg-indigo-400",  text: "text-indigo-700",  bg: "bg-indigo-50"  },
+  DISBURSED:           { label: "Disbursed",    dot: "bg-emerald-400", text: "text-emerald-700", bg: "bg-emerald-50" },
+  REPAYMENT_SCHEDULED: { label: "Repayment",    dot: "bg-violet-400",  text: "text-violet-700",  bg: "bg-violet-50"  },
+  REPAID:              { label: "Repaid",        dot: "bg-slate-300",   text: "text-slate-500",   bg: "bg-slate-100"  },
+};
+
+const fmt = (v: string | null) =>
+  v ? `₹${Number(v).toLocaleString("en-IN")}` : "—";
+
+const TH = "px-4 py-2.5 text-left text-[10px] font-[600] uppercase tracking-[0.08em] text-slate-400 whitespace-nowrap";
+const TD = "px-4 py-3.5 align-middle";
+
+export default function SalaryRequestsTable({ requests, selectedId, onSelect }: Props) {
   return (
-    <div className="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-slate-200 bg-slate-100/80">
-              <th className="text-left px-6 py-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                Employee
-              </th>
-
-              <th className="text-left px-6 py-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                Employer
-              </th>
-
-              <th className="text-left px-6 py-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                Amount
-              </th>
-
-              <th className="text-left px-6 py-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                Status
-              </th>
-
-              <th className="text-left px-6 py-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                Requested On
-              </th>
-
-              <th className="text-right px-6 py-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {requests.map((request, index) => (
+    <div className="bg-white rounded-xl border border-slate-100 overflow-hidden">
+      <table className="w-full table-fixed">
+        <colgroup>
+          <col style={{ width: "17%" }} /> {/* Employee */}
+          <col style={{ width: "15%" }} /> {/* Email */}
+          <col style={{ width: "15%" }} /> {/* Company */}
+          <col style={{ width: "10%" }} /> {/* Amount */}
+          <col style={{ width: "10%" }} /> {/* Approved */}
+          <col style={{ width: "15%" }} /> {/* Status */}
+          <col style={{ width: "11%" }} /> {/* Date */}
+          <col style={{ width: "7%" }}  /> {/* Action */}
+        </colgroup>
+        <thead>
+          <tr className="border-b border-slate-100 bg-slate-50">
+            <th className={TH}>Employee</th>
+            <th className={TH}>Email</th>
+            <th className={TH}>Company</th>
+            <th className={TH}>Amount</th>
+            <th className={TH}>Approved</th>
+            <th className={TH}>Status</th>
+            <th className={TH}>Requested</th>
+            <th className={TH}></th>
+          </tr>
+        </thead>
+        <tbody>
+          {requests.map((req) => {
+            const isSelected = selectedId === req.id;
+            const s = STATUS_CONFIG[req.status];
+            return (
               <tr
-                key={request.id}
-                className={`
-                  border-b
-                  border-slate-100
-                  hover:bg-blue-50
-                  transition-colors
-                  ${index % 2 === 0 ? "bg-white" : "bg-slate-50/60"}
-                `}
+                key={req.id}
+                onClick={() => onSelect(req)}
+                className={`border-b border-slate-50 last:border-0 cursor-pointer transition-colors group ${
+                  isSelected ? "bg-blue-50/60" : "hover:bg-slate-50/70"
+                }`}
               >
-                <td className="px-6 py-4">
-                  <div>
-                    <p className="text-sm font-medium text-slate-900">
-                      {request.employee.name}
-                    </p>
-
-                    <p className="text-xs text-slate-500">
-                      {request.employee.employeeCode}
-                    </p>
-
-                    <p className="text-[11px] text-slate-400">
-                      {request.employee.email}
-                    </p>
+                <td className={TD}>
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className={`w-7 h-7 rounded-lg ${avatarBg(req.employee.name)} text-white flex items-center justify-center text-[11px] font-[700] flex-shrink-0`}>
+                      {req.employee.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[12px] font-[500] text-slate-900 leading-none truncate">{req.employee.name}</p>
+                      <span className="font-mono text-[10px] text-slate-400">{req.employee.employeeCode}</span>
+                    </div>
                   </div>
                 </td>
-
-                <td className="px-6 py-4">
-                  <div>
-                    <p className="text-sm font-medium text-slate-900">
-                      {request.employee.employer.companyName}
-                    </p>
-
-                    <p className="text-xs text-slate-500">
-                      {request.employee.employer.companyCode}
-                    </p>
-                  </div>
+                <td className={TD}>
+                  <p className="text-[12px] text-slate-600 truncate">{req.employee.email}</p>
                 </td>
-
-                <td className="px-6 py-4">
-                  <span className="text-sm font-semibold text-slate-900">
-                    ₹{Number(request.amount).toLocaleString()}
+                <td className={TD}>
+                  <p className="text-[12px] font-[500] text-slate-800 truncate">{req.employee.employer.companyName}</p>
+                  <span className="font-mono text-[10px] text-slate-400">{req.employee.employer.companyCode}</span>
+                </td>
+                <td className={TD}>
+                  <p className="text-[12px] font-[600] text-slate-900 tabular-nums">{fmt(req.amount)}</p>
+                </td>
+                <td className={TD}>
+                  <p className="text-[12px] font-[500] text-slate-700 tabular-nums">{fmt(req.approvedAmount)}</p>
+                </td>
+                <td className={TD}>
+                  <span className={`inline-flex items-center gap-1.5 h-[22px] px-2.5 rounded-full text-[11px] font-[500] ${s.bg} ${s.text}`}>
+                    <span className={`w-[6px] h-[6px] rounded-full flex-shrink-0 ${s.dot}`} />
+                    {s.label}
                   </span>
                 </td>
-
-                <td className="px-6 py-4">
-                  <span
-                    className={`px-2.5 py-1 rounded-full text-[11px] font-medium ${
-                      request.status === "EMPLOYER_APPROVED" ||
-                      request.status === "READY_FOR_DISBURSAL" ||
-                      request.status === "REPAID"
-                        ? "bg-green-100 text-green-700"
-                        : request.status === "EMPLOYER_REJECTED"
-                        ? "bg-red-100 text-red-700"
-                        : request.status === "DISBURSED"
-                        ? "bg-blue-100 text-blue-700"
-                        : "bg-amber-100 text-amber-700"
-                    }`}
-                  >
-                    {request.status}
-                  </span>
+                <td className={TD}>
+                  <p className="text-[12px] text-slate-500">
+                    {new Date(req.requestedAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+                  </p>
                 </td>
-
-                <td className="px-6 py-4">
-                  <span className="text-sm text-slate-700">
-                    {new Date(request.requestedAt).toLocaleDateString()}
+                <td className={TD}>
+                  <span className={`text-[11px] font-[500] ${isSelected ? "text-blue-600" : "text-blue-500"}`}>
+                    {isSelected ? "Close" : "Review →"}
                   </span>
-                </td>
-
-                <td className="px-6 py-4 text-right">
-                  <button
-                    onClick={() => onView(request)}
-                    className="
-                      px-3
-                      py-1.5
-                      rounded-xl
-                      border
-                      border-slate-200
-                      text-xs
-                      font-medium
-                      text-blue-600
-                      hover:bg-blue-50
-                    "
-                  >
-                    View
-                  </button>
                 </td>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            );
+          })}
+        </tbody>
+      </table>
+      <div className="px-5 py-2.5 border-t border-slate-100 bg-slate-50/50">
+        <p className="text-[11px] text-slate-400">{requests.length} {requests.length === 1 ? "request" : "requests"}</p>
       </div>
     </div>
   );

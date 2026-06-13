@@ -2,193 +2,106 @@ import type { BankAccount } from "../../types/bankAccount";
 
 interface Props {
   accounts: BankAccount[];
-  onReview: (account: BankAccount) => void;
+  selectedId: string | null;
+  onSelect: (a: BankAccount) => void;
 }
 
-export default function BankVerificationTable({ accounts, onReview }: Props) {
+const AVATAR_COLORS: Record<string, string> = {
+  A:"bg-rose-500",    B:"bg-pink-500",    C:"bg-fuchsia-500", D:"bg-purple-500",
+  E:"bg-violet-500",  F:"bg-indigo-500",  G:"bg-blue-500",    H:"bg-sky-500",
+  I:"bg-cyan-500",    J:"bg-teal-500",    K:"bg-emerald-500", L:"bg-green-500",
+  M:"bg-lime-500",    N:"bg-yellow-500",  O:"bg-amber-500",   P:"bg-orange-500",
+  Q:"bg-red-500",     R:"bg-rose-600",    S:"bg-pink-600",    T:"bg-fuchsia-600",
+  U:"bg-purple-600",  V:"bg-violet-600",  W:"bg-indigo-600",  X:"bg-blue-600",
+  Y:"bg-sky-600",     Z:"bg-cyan-600",
+};
+
+export default function BankVerificationTable({ accounts, selectedId, onSelect }: Props) {
   return (
-    <div className="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-slate-200 bg-slate-100/80">
-              <th className="text-left px-6 py-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                Employee
+    <div className="bg-white border border-slate-100 rounded-xl overflow-hidden">
+      <table className="w-full table-fixed">
+        <colgroup>
+          <col style={{ width: "18%" }} />
+          <col style={{ width: "16%" }} />
+          <col style={{ width: "16%" }} />
+          <col style={{ width: "14%" }} />
+          <col style={{ width: "12%" }} />
+          <col style={{ width: "9%"  }} />
+          <col style={{ width: "8%"  }} />
+          <col style={{ width: "7%"  }} />
+        </colgroup>
+        <thead>
+          <tr className="border-b border-slate-100 bg-slate-50/60">
+            {["Employee","Email","Employer","Bank","Account","IFSC","Status",""].map((h, i) => (
+              <th key={i} className="px-4 py-2.5 text-left text-[10px] font-[500] uppercase tracking-[0.06em] text-slate-400">
+                {h}
               </th>
-
-              <th className="text-left px-6 py-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                Employer
-              </th>
-
-              <th className="text-left px-6 py-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                Bank Details
-              </th>
-
-              <th className="text-left px-6 py-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                Verification
-              </th>
-
-              <th className="text-left px-6 py-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                Added On
-              </th>
-
-              <th className="text-right px-6 py-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {accounts.map((account, index) => (
+            ))}
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-slate-50">
+          {accounts.map(a => {
+            const first = a.employee.name.charAt(0).toUpperCase();
+            const av    = AVATAR_COLORS[first] ?? "bg-slate-500";
+            const sel   = selectedId === a.id;
+            return (
               <tr
-                key={account.id}
-                className={`
-                  border-b border-slate-100
-                  hover:bg-blue-50
-                  transition-colors
-                  ${index % 2 === 0 ? "bg-white" : "bg-slate-50/60"}
-                `}
+                key={a.id}
+                onClick={() => onSelect(a)}
+                className={`cursor-pointer transition-colors group ${sel ? "bg-blue-50/60" : "hover:bg-slate-50/80"}`}
               >
                 {/* Employee */}
-                <td className="px-6 py-4">
-                  <div>
-                    <p className="text-sm font-semibold text-slate-900">
-                      {account.employee?.name}
-                    </p>
-
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-xs text-slate-500">
-                        {account.employee?.employeeCode}
-                      </span>
-
-                      <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
-                          account.employee?.employmentStatus === "ACTIVE"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
-                        }`}
-                      >
-                        {account.employee?.employmentStatus}
-                      </span>
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className={`w-7 h-7 rounded-lg ${av} text-white flex-shrink-0 flex items-center justify-center text-[11px] font-[600]`}>
+                      {first}
                     </div>
-
-                    <p className="text-[11px] text-slate-400 mt-1">
-                      {account.employee?.email}
-                    </p>
-                  </div>
-                </td>
-
-                {/* Employer */}
-                <td className="px-6 py-4">
-                  <div>
-                    <p className="text-sm font-semibold text-slate-900">
-                      {account.employee?.employer?.companyName}
-                    </p>
-
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-xs text-slate-500">
-                        {account.employee?.employer?.companyCode}
-                      </span>
-
-                      <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
-                          account.employee?.employer?.status === "ACTIVE"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
-                        }`}
-                      >
-                        {account.employee?.employer?.status}
-                      </span>
+                    <div className="min-w-0">
+                      <p className="text-[12px] font-[500] text-slate-900 truncate leading-none">{a.employee.name}</p>
+                      <p className="text-[10px] text-slate-400 font-mono mt-0.5 leading-none">{a.employee.employeeCode}</p>
                     </div>
                   </div>
                 </td>
-
-                {/* Bank Details */}
-                <td className="px-6 py-4">
-                  <div>
-                    <p className="text-sm font-semibold text-slate-900">
-                      {account.bankName || "-"}
-                    </p>
-
-                    <p className="text-xs text-slate-500 mt-1">
-                      Account • ****{account.accountNumber?.slice(-4)}
-                    </p>
-
-                    <div className="flex flex-wrap gap-2 mt-3">
-                      <span className="px-2 py-1 rounded-md bg-orange-50 text-orange-700 text-[11px] font-medium">
-                        IFSC: {account.ifscCode}
-                      </span>
-
-                      {account.upiId && (
-                        <span className="px-2 py-1 rounded-md bg-purple-50 text-purple-700 text-[11px]">
-                          UPI: {account.upiId}
-                        </span>
-                      )}
-                    </div>
-                  </div>
+                <td className="px-4 py-3">
+                  <span className="text-[11px] text-slate-500 truncate block">{a.employee.email}</span>
                 </td>
-
-                {/* Verification */}
-                <td className="px-6 py-4">
-                  <div className="flex flex-col gap-1">
-                    <span
-                      className={`inline-flex w-fit px-2.5 py-1 rounded-full text-[11px] font-medium ${
-                        account.verified
-                          ? "bg-green-100 text-green-700"
-                          : "bg-amber-100 text-amber-700"
-                      }`}
-                    >
-                      {account.verified ? "COMPLETED" : "PENDING"}
+                <td className="px-4 py-3">
+                  <p className="text-[12px] font-[500] text-slate-700 truncate leading-none">{a.employee.employer.companyName}</p>
+                  <p className="text-[10px] font-mono text-slate-400 mt-0.5 leading-none">{a.employee.employer.companyCode}</p>
+                </td>
+                <td className="px-4 py-3">
+                  <p className="text-[12px] font-[500] text-slate-700 truncate leading-none">{a.bankName ?? "—"}</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5 leading-none truncate">{a.accountHolderName}</p>
+                </td>
+                <td className="px-4 py-3">
+                  <span className="text-[11px] font-mono text-slate-700">····{a.accountNumber.slice(-4)}</span>
+                </td>
+                <td className="px-4 py-3">
+                  <span className="text-[11px] font-mono text-slate-600">{a.ifscCode}</span>
+                </td>
+                <td className="px-4 py-3">
+                  {a.verified ? (
+                    <span className="inline-flex items-center gap-1.5 h-[22px] px-2.5 rounded-full text-[11px] font-[500] bg-emerald-50 text-emerald-700">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      Verified
                     </span>
-                  </div>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 h-[22px] px-2.5 rounded-full text-[11px] font-[500] bg-amber-50 text-amber-700">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                      Pending
+                    </span>
+                  )}
                 </td>
-
-                {/* Added On */}
-                <td className="px-6 py-4">
-                  <div>
-                    <p className="text-sm text-slate-900">
-                      {new Date(account.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                </td>
-
-                {/* Actions */}
-                <td className="px-6 py-4 text-right">
-                  <button
-                    onClick={() => onReview(account)}
-                    className="
-                      px-3
-                      py-1.5
-                      rounded-xl
-                      bg-blue-50
-                      text-blue-700
-                      text-xs
-                      font-medium
-                      hover:bg-blue-100
-                      transition-all
-                    "
-                  >
-                    Review
-                  </button>
+                <td className="px-4 py-3 text-right">
+                  <span className={`text-[11px] font-[500] transition-colors ${sel ? "text-blue-600" : "text-blue-500 group-hover:text-blue-600"}`}>
+                    {a.verified ? "View →" : "Review →"}
+                  </span>
                 </td>
               </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {accounts.length === 0 && (
-          <div className="py-16 text-center">
-            <h3 className="text-lg font-semibold text-slate-900">
-              No Bank Accounts Found
-            </h3>
-
-            <p className="text-slate-500 mt-2">
-              Bank account submissions will appear here once employees add their
-              accounts.
-            </p>
-          </div>
-        )}
-      </div>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 }

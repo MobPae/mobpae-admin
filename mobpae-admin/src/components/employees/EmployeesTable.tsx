@@ -1,202 +1,133 @@
-import type { Employee } from "../../types/employee";
+import type { Employee, EmploymentStatus } from "../../types/employee";
 
-interface EmployeesTableProps {
+interface Props {
   employees: Employee[];
+  selectedId: string | null;
+  onSelect: (employee: Employee) => void;
 }
 
-export default function EmployeesTable({ employees }: EmployeesTableProps) {
+const AVATAR_COLORS: Record<string, string> = {
+  A:"bg-rose-500",B:"bg-pink-500",C:"bg-fuchsia-500",D:"bg-purple-500",
+  E:"bg-violet-500",F:"bg-indigo-500",G:"bg-blue-500",H:"bg-sky-500",
+  I:"bg-cyan-500",J:"bg-teal-500",K:"bg-emerald-500",L:"bg-green-500",
+  M:"bg-lime-600",N:"bg-yellow-600",O:"bg-amber-500",P:"bg-orange-500",
+  Q:"bg-red-500",R:"bg-rose-600",S:"bg-pink-600",T:"bg-fuchsia-600",
+  U:"bg-purple-600",V:"bg-violet-600",W:"bg-indigo-600",X:"bg-blue-600",
+  Y:"bg-sky-600",Z:"bg-cyan-600",
+};
+const avatarBg = (n: string) => AVATAR_COLORS[n.charAt(0).toUpperCase()] ?? "bg-slate-600";
+
+const STATUS_CONFIG: Record<EmploymentStatus, { label: string; dot: string; text: string; bg: string }> = {
+  ACTIVE:   { label: "Active",   dot: "bg-emerald-400", text: "text-emerald-700", bg: "bg-emerald-50" },
+  INACTIVE: { label: "Inactive", dot: "bg-red-400",     text: "text-red-600",     bg: "bg-red-50"     },
+};
+
+const TH = "px-4 py-2.5 text-left text-[10px] font-[600] uppercase tracking-[0.08em] text-slate-400 whitespace-nowrap";
+const TD = "px-4 py-3.5 align-middle";
+
+export default function EmployeesTable({ employees, selectedId, onSelect }: Props) {
   return (
-    <div className="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-slate-200 bg-slate-100/80">
-              <th className="text-left px-6 py-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                Employee
-              </th>
-
-              <th className="text-left px-6 py-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                Employer
-              </th>
-
-              <th className="text-left px-6 py-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                Salary
-              </th>
-
-              <th className="text-left px-6 py-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                Status
-              </th>
-
-              <th className="text-left px-6 py-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                Added On
-              </th>
-
-              <th className="text-right px-6 py-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {employees.map((employee, index) => (
+    <div className="bg-white rounded-xl border border-slate-100 overflow-hidden">
+      <table className="w-full table-fixed">
+        <colgroup>
+          <col style={{ width: "16%" }} /> {/* Name */}
+          <col style={{ width: "17%" }} /> {/* Email */}
+          <col style={{ width: "13%" }} /> {/* Phone */}
+          <col style={{ width: "16%" }} /> {/* Employer */}
+          <col style={{ width: "11%" }} /> {/* Salary */}
+          <col style={{ width: "11%" }} /> {/* Status */}
+          <col style={{ width: "9%" }}  /> {/* App */}
+          <col style={{ width: "7%" }}  /> {/* Action */}
+        </colgroup>
+        <thead>
+          <tr className="border-b border-slate-100 bg-slate-50">
+            <th className={TH}>Employee</th>
+            <th className={TH}>Email</th>
+            <th className={TH}>Phone</th>
+            <th className={TH}>Employer</th>
+            <th className={TH}>Salary</th>
+            <th className={TH}>Status</th>
+            <th className={TH}>App</th>
+            <th className={TH}></th>
+          </tr>
+        </thead>
+        <tbody>
+          {employees.map((emp) => {
+            const isSelected = selectedId === emp.id;
+            const s = STATUS_CONFIG[emp.employmentStatus];
+            return (
               <tr
-                key={employee.id}
-                className={`
-                  border-b
-                  border-slate-100
-                  hover:bg-blue-50
-                  transition-colors
-                  ${index % 2 === 0 ? "bg-white" : "bg-slate-50/60"}
-                `}
+                key={emp.id}
+                onClick={() => onSelect(emp)}
+                className={`border-b border-slate-50 last:border-0 cursor-pointer transition-colors group ${
+                  isSelected ? "bg-blue-50/60" : "hover:bg-slate-50/70"
+                }`}
               >
                 {/* Employee */}
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="
-                        w-10
-                        h-10
-                        rounded-xl
-                        bg-gradient-to-br
-                        from-blue-500
-                        to-indigo-600
-                        text-white
-                        flex
-                        items-center
-                        justify-center
-                        text-sm
-                        font-semibold
-                      "
-                    >
-                      {employee.name.charAt(0)}
+                <td className={TD}>
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className={`w-7 h-7 rounded-lg ${avatarBg(emp.name)} text-white flex items-center justify-center text-[11px] font-[700] flex-shrink-0`}>
+                      {emp.name.charAt(0).toUpperCase()}
                     </div>
-
-                    <div>
-                      <p className="text-sm font-semibold text-slate-900">
-                        {employee.name}
-                      </p>
-
-                      <p className="text-xs text-slate-500">
-                        {employee.employeeCode}
-                      </p>
-
-                      <p className="text-[11px] text-slate-400 mt-0.5">
-                        {employee.email}
-                      </p>
+                    <div className="min-w-0">
+                      <p className="text-[12px] font-[500] text-slate-900 leading-none truncate">{emp.name}</p>
+                      <span className="font-mono text-[10px] text-slate-400">{emp.employeeCode}</span>
                     </div>
                   </div>
+                </td>
+
+                {/* Email */}
+                <td className={TD}>
+                  <p className="text-[12px] text-slate-600 truncate">{emp.email}</p>
+                </td>
+
+                {/* Phone */}
+                <td className={TD}>
+                  <p className="text-[12px] text-slate-600 font-mono">{emp.phone}</p>
                 </td>
 
                 {/* Employer */}
-                <td className="px-6 py-4">
-                  <div>
-                    <p className="text-sm font-medium text-slate-900">
-                      {employee.employer.companyName}
-                    </p>
-
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-xs text-slate-500">
-                        {employee.employer.companyCode}
-                      </span>
-
-                      {employee.employer.status === "SUSPENDED" && (
-                        <span className="px-2 py-0.5 rounded-md bg-red-50 text-red-600 text-[10px] font-medium">
-                          Inactive
-                        </span>
-                      )}
-                    </div>
-                  </div>
+                <td className={TD}>
+                  <p className="text-[12px] font-[500] text-slate-800 truncate">{emp.employer.companyName}</p>
+                  <span className="font-mono text-[10px] text-slate-400">{emp.employer.companyCode}</span>
                 </td>
 
                 {/* Salary */}
-                <td className="px-6 py-4">
-                  <span className="text-sm font-semibold text-slate-900">
-                    ₹{Number(employee.salaryInHand).toLocaleString()}
-                  </span>
+                <td className={TD}>
+                  <p className="text-[12px] font-[600] text-slate-900 tabular-nums">
+                    ₹{Number(emp.salaryInHand).toLocaleString("en-IN")}
+                  </p>
                 </td>
 
                 {/* Status */}
-                <td className="px-6 py-4">
-                  <div className="flex flex-col gap-1">
-                    <span
-                      className={`inline-flex w-fit px-2.5 py-1 rounded-full text-[11px] font-medium ${
-                        employee.employmentStatus === "ACTIVE"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
-                      }`}
-                    >
-                      {employee.employmentStatus === "ACTIVE"
-                        ? "Active"
-                        : "Inactive"}
-                    </span>
-
-                    {employee.employer.status === "SUSPENDED" && (
-                      <span
-                        className="
-                          inline-flex
-                          w-fit
-                          px-2.5
-                          py-1
-                          rounded-full
-                          text-[11px]
-                          font-medium
-                          bg-red-100
-                          text-red-700
-                        "
-                      >
-                        Employer Inactive
-                      </span>
-                    )}
-                  </div>
-                </td>
-
-                {/* Created */}
-                <td className="px-6 py-4">
-                  <span className="text-sm text-slate-700">
-                    {new Date(employee.createdAt).toLocaleDateString("en-IN", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    })}
+                <td className={TD}>
+                  <span className={`inline-flex items-center gap-1.5 h-[22px] px-2.5 rounded-full text-[11px] font-[500] ${s.bg} ${s.text}`}>
+                    <span className={`w-[6px] h-[6px] rounded-full flex-shrink-0 ${s.dot}`} />
+                    {s.label}
                   </span>
                 </td>
 
-                {/* Actions */}
-                <td className="px-6 py-4 text-right">
-                  <button
-                    className="
-                      px-3
-                      py-1.5
-                      rounded-xl
-                      border
-                      border-slate-200
-                      text-xs
-                      font-medium
-                      text-blue-600
-                      hover:bg-blue-50
-                      hover:border-blue-200
-                      transition-all
-                    "
-                  >
-                    View Details
-                  </button>
+                {/* App activated */}
+                <td className={TD}>
+                  {emp.appActivated
+                    ? <span className="inline-flex items-center gap-1.5 h-[22px] px-2.5 rounded-full text-[11px] font-[500] bg-blue-50 text-blue-700"><span className="w-[6px] h-[6px] rounded-full bg-blue-400 flex-shrink-0" />On</span>
+                    : <span className="inline-flex items-center gap-1.5 h-[22px] px-2.5 rounded-full text-[11px] font-[500] bg-slate-100 text-slate-400"><span className="w-[6px] h-[6px] rounded-full bg-slate-300 flex-shrink-0" />Off</span>
+                  }
+                </td>
+
+                {/* Action */}
+                <td className={TD}>
+                  <span className={`text-[11px] font-[500] ${isSelected ? "text-blue-600" : "text-blue-500"}`}>
+                    {isSelected ? "Close" : "View →"}
+                  </span>
                 </td>
               </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {employees.length === 0 && (
-          <div className="py-16 text-center">
-            <h3 className="text-lg font-semibold text-slate-900">
-              No Employees Found
-            </h3>
-
-            <p className="text-slate-500 mt-2">
-              Employees will appear here once onboarded.
-            </p>
-          </div>
-        )}
+            );
+          })}
+        </tbody>
+      </table>
+      <div className="px-5 py-2.5 border-t border-slate-100 bg-slate-50/50">
+        <p className="text-[11px] text-slate-400">{employees.length} {employees.length === 1 ? "employee" : "employees"}</p>
       </div>
     </div>
   );

@@ -143,59 +143,70 @@ export default function DashboardPage() {
             </button>
           </div>
 
-          <div className="grid grid-cols-[1fr_88px_88px_64px] px-4 py-2 bg-slate-50/60 border-b border-slate-100">
-            {["Employee", "Amount", "Status", "When"].map((h) => (
-              <span key={h} className="text-[10px] font-[500] uppercase tracking-[0.05em] text-slate-400">
-                {h}
-              </span>
-            ))}
-          </div>
 
-          {srLoading ? (
-            <>
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="grid grid-cols-[1fr_88px_88px_64px] px-4 py-3 border-b border-slate-50 items-center">
-                  <div className="space-y-1.5">
-                    <div className="h-2.5 w-32 bg-slate-100 rounded animate-pulse" />
-                    <div className="h-2 w-20 bg-slate-100 rounded animate-pulse" />
-                  </div>
-                  <div className="h-2.5 w-14 bg-slate-100 rounded animate-pulse" />
-                  <div className="h-4 w-14 bg-slate-100 rounded animate-pulse" />
-                  <div className="h-2 w-10 bg-slate-100 rounded animate-pulse" />
-                </div>
-              ))}
-            </>
-          ) : recentRequests.length === 0 ? (
-            <div className="py-10 text-center">
-              <p className="text-[12px] text-slate-400">No salary requests yet</p>
-            </div>
-          ) : (
-            <>
-              {recentRequests.map((req) => (
-                <div
-                  key={req.id}
-                  className="grid grid-cols-[1fr_88px_88px_64px] px-4 py-3 border-b border-slate-50 last:border-0 items-center hover:bg-slate-50/40 transition-colors"
-                >
-                  <div>
-                    <p className="text-[12px] font-[500] text-slate-800 leading-none">{req.employee.name}</p>
-                    <p className="text-[11px] text-slate-400 mt-1 leading-none">
-                      {req.employee.employeeCode} · {req.employee.employer.companyName}
-                    </p>
-                  </div>
-                  <span className="text-[12px] font-[500] text-slate-800">
-                    {formatAmount(req.amount)}
-                  </span>
-                  <div>
-                    <span className={`inline-flex h-[18px] px-1.5 rounded-[3px] items-center text-[10px] font-[500] ${statusBadge(req.status)}`}>
-                      {statusLabel(req.status)}
-                    </span>
-                  </div>
-                  <span className="text-[11px] text-slate-400">{timeAgo(req.requestedAt)}</span>
-                </div>
-              ))}
-            </>
-          )}
+
+          <table className="w-full table-fixed">
+            <colgroup>
+              <col style={{ width: "28%" }} />
+              <col style={{ width: "24%" }} />
+              <col style={{ width: "18%" }} />
+              <col style={{ width: "18%" }} />
+              <col style={{ width: "12%" }} />
+            </colgroup>
+            <thead>
+              <tr className="border-b border-slate-100 bg-slate-50">
+                {["Employee", "Company", "Amount", "Status", "When"].map((h) => (
+                  <th key={h} className="px-4 py-2 text-left text-[10px] font-[600] uppercase tracking-[0.08em] text-slate-400">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {srLoading ? (
+                [...Array(5)].map((_, i) => (
+                  <tr key={i} className="border-b border-slate-50">
+                    <td className="px-4 py-3"><div className="h-2.5 w-24 bg-slate-100 rounded animate-pulse" /></td>
+                    <td className="px-4 py-3"><div className="h-2.5 w-20 bg-slate-100 rounded animate-pulse" /></td>
+                    <td className="px-4 py-3"><div className="h-2.5 w-14 bg-slate-100 rounded animate-pulse" /></td>
+                    <td className="px-4 py-3"><div className="h-4 w-16 bg-slate-100 rounded-full animate-pulse" /></td>
+                    <td className="px-4 py-3"><div className="h-2.5 w-10 bg-slate-100 rounded animate-pulse" /></td>
+                  </tr>
+                ))
+              ) : recentRequests.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-4 py-10 text-center text-[12px] text-slate-400">No salary requests yet</td>
+                </tr>
+              ) : (
+                recentRequests.map((req) => (
+                  <tr key={req.id} className="border-b border-slate-50 last:border-0 hover:bg-slate-50/60 transition-colors">
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className="w-6 h-6 rounded-md bg-gradient-to-br from-slate-600 to-slate-800 text-white flex items-center justify-center text-[10px] font-[700] flex-shrink-0">
+                          {req.employee.name.charAt(0).toUpperCase()}
+                        </div>
+                        <p className="text-[12px] font-[500] text-slate-800 truncate">{req.employee.name}</p>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <p className="text-[12px] text-slate-500 truncate">{req.employee.employer.companyName}</p>
+                    </td>
+                    <td className="px-4 py-3">
+                      <p className="text-[12px] font-[600] text-slate-900 tabular-nums">{formatAmount(req.amount)}</p>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`inline-flex h-[20px] px-2.5 rounded-full items-center text-[10px] font-[500] ${statusBadge(req.status)}`}>
+                        {statusLabel(req.status)}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <p className="text-[11px] text-slate-400">{timeAgo(req.requestedAt)}</p>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
+
 
         {/* Right: Action queue */}
         <div className="bg-white border border-slate-100 rounded-lg overflow-hidden flex flex-col">
