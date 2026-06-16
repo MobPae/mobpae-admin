@@ -1,7 +1,8 @@
-import { CheckCircle2, FileText, Loader2, X, XCircle } from "lucide-react";
-import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { X, CheckCircle2, XCircle, Loader2, FileText } from "lucide-react";
+import { verifyKycDocument, rejectKycDocument } from "../../services/kycService";
 import type { KycDocument } from "../../types/kyc";
-import { rejectKycDocument, verifyKycDocument } from "../../services/kycService";
 
 interface Props {
   open: boolean;
@@ -10,148 +11,154 @@ interface Props {
   onCompleted: () => void;
 }
 
+const STATUS_BADGE: Record<string, string> = {
+  PENDING:  "bg-amber-50 text-amber-700",
+  VERIFIED: "bg-emerald-50 text-emerald-700",
+  REJECTED: "bg-red-50 text-red-600",
+};
+
+const DOC_LABEL: Record<string, string> = {
+  AADHAR:      "Aadhaar",
+  PAN:         "PAN Card",
+  SALARY_SLIP: "Salary Slip",
+  OTHER:       "Other",
+};
+
 export default function KycDrawer({ open, document, onClose, onCompleted }: Props) {
-  const [submitting, setSubmitting] = useState<"approve" | "reject" | null>(null);
-  const [error, setError] = useState("");
-
-  if (!open) return null;
-
-  if (!document) return null;
-
-  async function handleDecision(action: "approve" | "reject") {
-    if (!document) return;
-
-    setError("");
-    setSubmitting(action);
-
-    try {
-      if (action === "approve") {
-        await verifyKycDocument(document.id);
-      } else {
-        await rejectKycDocument(document.id);
-      }
-
+  const verifyMutation = useMutation({
+    mutationFn: () => verifyKycDocument(document!.id),
+    onSuccess: () => {
+      toast.success("Document verified", { description: `${document?.employee.name}'s ${DOC_LABEL[document?.documentType ?? ""] ?? document?.documentType} approved.` });
       onCompleted();
-    } catch (caughtError) {
-      setError(
-        caughtError instanceof Error
-          ? caughtError.message
-          : "Unable to update KYC document"
-      );
-    } finally {
-      setSubmitting(null);
-    }
-  }
+    },
+    onError: (err: unknown) => {
+      toast.error("Verification failed", { description: err instanceof Error ? err.message : "Unexpected error" });
+    },
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: () => rejectKycDocument(document!.id),
+    onSuccess: () => {
+      toast.success("Document rejected", { description: `${document?.employee.name}'s KYC document has been rejected.` });
+      onCompleted();
+    },
+    onError: (err: unknown) => {
+      toast.error("Rejection failed", { description: err instanceof Error ? err.message : "Unexpected error" });
+    },
+  });
+
+  if (!open || !document) return null;
+
+  const isBusy  = verifyMutation.isPending || rejectMutation.isPending;
+  const canAct  = document.status === "PENDING";
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-slate-950/40">
-      <button
-        type="button"
-        className="absolute inset-0 cursor-default"
-        aria-label="Close KYC review"
-        onClick={onClose}
-      />
+    <>
+      <div className="fixed inset-0 bg-black/20 z-40" onClick={onClose} />
 
-      <aside className="relative h-full w-full max-w-xl overflow-y-auto bg-white shadow-2xl">
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white px-6 py-5">
-          <div>
-            <p className="text-xs font-semibold uppercase text-blue-600">
-              KYC Review
-            </p>
-            <h2 className="mt-1 text-xl font-bold text-slate-900">
-              {document.documentType}
-            </h2>
+      <div className="fixed top-0 right-0 h-full w-[440px] bg-white z-50 flex flex-col border-l border-slate-200 shadow-xl">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-slate-700 to-slate-900 text-white flex items-center justify-center text-[12px] font-[600]">
+              {document.employee.name.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <p className="text-[13px] font-[500] text-slate-900 leading-none">{document.employee.name}</p>
+              <p className="text-[11px] text-slate-400 mt-0.5 leading-none">{document.employee.employer.companyName}</p>
+            </div>
           </div>
-
-          <button
-            type="button"
-            onClick={onClose}
-            className="grid h-10 w-10 place-items-center rounded-full border border-slate-200 text-slate-500 hover:bg-slate-50"
-          >
-            <X size={18} />
-          </button>
+          <div className="flex items-center gap-2">
+            <span className={`inline-flex h-[18px] px-1.5 rounded-[3px] items-center text-[10px] font-[500] ${STATUS_BADGE[document.status] ?? "bg-slate-100 text-slate-500"}`}>
+              {document.status}
+            </span>
+            <button onClick={onClose} className="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
+              <X size={14} />
+            </button>
+          </div>
         </div>
 
-        <div className="space-y-5 p-6">
-          <section className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-            <div className="flex items-start gap-4">
-              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-blue-100 text-blue-700">
-                <FileText size={22} />
-              </div>
-
-              <div>
-                <h3 className="text-base font-semibold text-slate-900">
-                  Submitted document
-                </h3>
-                <p className="mt-1 break-all text-sm text-slate-500">
-                  {document.filePath}
-                </p>
-                <span className="mt-3 inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">
-                  {document.status}
-                </span>
-              </div>
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
+          {/* Document info */}
+          <section>
+            <p className="text-[10px] font-[500] uppercase tracking-[0.07em] text-slate-400 mb-2">Document</p>
+            <div className="border border-slate-100 rounded-lg divide-y divide-slate-100">
+              {[
+                { k: "Type",         v: DOC_LABEL[document.documentType] ?? document.documentType },
+                { k: "Status",       v: document.status },
+                { k: "Submitted on", v: new Date(document.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) },
+                ...(document.verifiedAt ? [{ k: "Reviewed on", v: new Date(document.verifiedAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) }] : []),
+                ...(document.verifiedBy ? [{ k: "Reviewed by", v: document.verifiedBy }] : []),
+              ].map(({ k, v }) => (
+                <div key={k} className="flex items-center justify-between px-3 py-2.5">
+                  <span className="text-[11px] text-slate-400">{k}</span>
+                  <span className="text-[11px] font-[500] text-slate-800">{v}</span>
+                </div>
+              ))}
             </div>
           </section>
 
-          <section className="grid gap-3 rounded-2xl border border-slate-200 p-5">
-            <Detail label="Employee" value={document.employee?.name} />
-            <Detail label="Employee Code" value={document.employee?.employeeCode} />
-            <Detail label="Email" value={document.employee?.email} />
-            <Detail
-              label="Employer"
-              value={document.employee?.employer?.companyName || "-"}
-            />
-            <Detail
-              label="Submitted On"
-              value={new Date(document.createdAt).toLocaleString()}
-            />
+          {/* File */}
+          <section>
+            <p className="text-[10px] font-[500] uppercase tracking-[0.07em] text-slate-400 mb-2">File</p>
+            <div className="border border-slate-100 rounded-lg px-3 py-3 flex items-start gap-2.5">
+              <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
+                <FileText size={13} className="text-slate-500" />
+              </div>
+              <p className="text-[11px] text-slate-500 break-all leading-relaxed">{document.filePath}</p>
+            </div>
           </section>
 
-          <div className="rounded-2xl bg-blue-50 p-4 text-sm text-blue-800">
-            For this MVP, uploaded PDFs are accepted as submitted. Approving only
-            changes the KYC status to verified.
-          </div>
+          {/* Employee */}
+          <section>
+            <p className="text-[10px] font-[500] uppercase tracking-[0.07em] text-slate-400 mb-2">Employee</p>
+            <div className="border border-slate-100 rounded-lg divide-y divide-slate-100">
+              {[
+                { k: "Name",          v: document.employee.name },
+                { k: "Employee code", v: <span className="font-mono">{document.employee.employeeCode}</span> },
+                { k: "Email",         v: document.employee.email },
+                { k: "Employer",      v: document.employee.employer.companyName },
+              ].map(({ k, v }) => (
+                <div key={k} className="flex items-center justify-between px-3 py-2.5">
+                  <span className="text-[11px] text-slate-400">{k}</span>
+                  <span className="text-[11px] font-[500] text-slate-800 text-right max-w-[60%] truncate">{v}</span>
+                </div>
+              ))}
+            </div>
+          </section>
 
-          {error && (
-            <div className="rounded-2xl bg-red-50 p-4 text-sm font-medium text-red-700">
-              {error}
+          {!canAct && (
+            <div className="bg-slate-50 rounded-md px-3 py-2.5 border border-slate-100">
+              <p className="text-[11px] text-slate-500">
+                {document.status === "VERIFIED" ? "This document has already been verified." : "This document has been rejected."}
+              </p>
             </div>
           )}
         </div>
 
-        <div className="sticky bottom-0 grid grid-cols-2 gap-3 border-t border-slate-200 bg-white p-6">
-          <button
-            type="button"
-            disabled={Boolean(submitting)}
-            onClick={() => handleDecision("reject")}
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl border border-red-200 bg-red-50 text-sm font-semibold text-red-700 hover:bg-red-100 disabled:opacity-60"
-          >
-            {submitting === "reject" ? <Loader2 className="animate-spin" size={17} /> : <XCircle size={17} />}
-            Reject
-          </button>
-
-          <button
-            type="button"
-            disabled={Boolean(submitting)}
-            onClick={() => handleDecision("approve")}
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-blue-600 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
-          >
-            {submitting === "approve" ? <Loader2 className="animate-spin" size={17} /> : <CheckCircle2 size={17} />}
-            Approve
-          </button>
-        </div>
-      </aside>
-    </div>
-  );
-}
-
-function Detail({ label, value }: { label: string; value?: string }) {
-  return (
-    <div className="flex items-center justify-between gap-4">
-      <span className="text-sm text-slate-500">{label}</span>
-      <strong className="text-right text-sm font-semibold text-slate-900">
-        {value || "-"}
-      </strong>
-    </div>
+        {/* Footer */}
+        {canAct && (
+          <div className="border-t border-slate-100 px-5 py-3.5 flex-shrink-0 flex gap-2">
+            <button
+              onClick={() => rejectMutation.mutate()}
+              disabled={isBusy}
+              className="flex-1 h-8 rounded-md border border-red-200 bg-red-50 hover:bg-red-100 text-[12px] font-[500] text-red-700 flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
+            >
+              {rejectMutation.isPending ? <Loader2 size={12} className="animate-spin" /> : <XCircle size={12} />}
+              {rejectMutation.isPending ? "Rejecting…" : "Reject"}
+            </button>
+            <button
+              onClick={() => verifyMutation.mutate()}
+              disabled={isBusy}
+              className="flex-1 h-8 rounded-md bg-slate-900 hover:bg-[slate-800] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
+            >
+              {verifyMutation.isPending ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle2 size={12} />}
+              {verifyMutation.isPending ? "Verifying…" : "Verify"}
+            </button>
+          </div>
+        )}
+      </div>
+    </>
   );
 }

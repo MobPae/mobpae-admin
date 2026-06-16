@@ -1,20 +1,10 @@
-const API_BASE_URL = "http://localhost:3000";
+import api from "../lib/axios";
 
-export async function login(email: string, password: string) {
-  const response = await fetch(`${API_BASE_URL}/auth/login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      email,
-      password,
-    }),
-  });
+export interface LoginResponse {
+  accessToken: string;
+}
 
-  if (!response.ok) {
-    throw new Error("Invalid credentials");
-  }
-
-  return response.json();
+export async function login(email: string, password: string): Promise<LoginResponse> {
+  const response = await api.post<LoginResponse>("/auth/login", { email, password });
+  return response.data;
 }

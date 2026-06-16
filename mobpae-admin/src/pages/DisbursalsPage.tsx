@@ -1,189 +1,132 @@
-import { useEffect, useState } from "react";
-import { Search } from "lucide-react";
-
-import DisbursalStats from "../components/disbursals/DisbursalStats";
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Search, CreditCard, Clock, CheckCircle, XCircle } from "lucide-react";
+import { getDisbursals } from "../services/disbursalService";
 import DisbursalsTable from "../components/disbursals/DisbursalsTable";
 import DisbursalDrawer from "../components/disbursals/DisbursalDrawer";
-
-import { getDisbursals } from "../services/disbursalService";
+import type { DisbursalStatus } from "../types/disbursal";
 import type { Disbursal } from "../types/disbursal";
 
+type FilterStatus = "ALL" | DisbursalStatus;
+
+const CHIPS: { key: FilterStatus; label: string }[] = [
+  { key: "ALL",       label: "All"       },
+  { key: "PENDING",   label: "Pending"   },
+  { key: "DISBURSED", label: "Disbursed" },
+  { key: "FAILED",    label: "Failed"    },
+];
+
 export default function DisbursalsPage() {
-  const [loading, setLoading] = useState(true);
+  const qc = useQueryClient();
+  const [search,   setSearch]   = useState("");
+  const [filter,   setFilter]   = useState<FilterStatus>("ALL");
+  const [selected, setSelected] = useState<Disbursal | null>(null);
 
-  const [disbursals, setDisbursals] = useState<Disbursal[]>([]);
-
-  const [searchTerm, setSearchTerm] = useState("");
-
-  const [statusFilter, setStatusFilter] = useState("ALL");
-
-  const [drawerOpen, setDrawerOpen] = useState(false);
-
-  const [selectedDisbursal, setSelectedDisbursal] = useState<Disbursal | null>(
-    null
-  );
-
-  useEffect(() => {
-    async function loadDisbursals() {
-      try {
-        const data = await getDisbursals();
-
-        console.log("DISBURSALS", data);
-        setDisbursals(data || []);
-      } catch (error) {
-        console.error("Failed to load disbursals", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadDisbursals();
-  }, []);
-
-  const filteredDisbursals = disbursals.filter((disbursal) => {
-    const matchesSearch =
-      disbursal.salaryRequest.employee.name
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      disbursal.salaryRequest.employee.employeeCode
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      disbursal.salaryRequest.employee.employer.companyName
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
-
-    const matchesStatus =
-      statusFilter === "ALL" || disbursal.status === statusFilter;
-
-    return matchesSearch && matchesStatus;
+  const { data = [], isLoading } = useQuery({
+    queryKey: ["disbursals"],
+    queryFn: getDisbursals,
   });
 
-  if (loading) {
-    return (
-      <div className="p-8">
-        <p className="text-slate-500">Loading disbursals...</p>
-      </div>
-    );
-  }
+  const pending   = data.filter(d => d.status === "PENDING").length;
+  const disbursed = data.filter(d => d.status === "DISBURSED").length;
+  const failed    = data.filter(d => d.status === "FAILED").length;
+  const total     = data.length;
+
+  const rows = data.filter(d => {
+    const q = search.toLowerCase();
+    const matchSearch =
+      d.salaryRequest.employee.name.toLowerCase().includes(q) ||
+      d.salaryRequest.employee.employeeCode.toLowerCase().includes(q) ||
+      d.salaryRequest.employee.employer.companyName.toLowerCase().includes(q);
+    const matchFilter = filter === "ALL" || d.status === filter;
+    return matchSearch && matchFilter;
+  });
 
   return (
-    <div className="p-8 space-y-6">
+    <div className="px-8 py-6 space-y-5">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-slate-900">Disbursals</h1>
-
-        <p className="text-slate-500 mt-2">
-          Track and manage salary disbursals.
-        </p>
+        <h1 className="text-[22px] font-[600] text-slate-900 tracking-[-0.01em]">Disbursals</h1>
+        <p className="text-[13px] text-slate-400 mt-0.5">Track and manage salary disbursals</p>
       </div>
 
-      {/* Stats */}
-      <DisbursalStats disbursals={disbursals} />
+      {/* Pipeline strip */}
+      <div className="grid grid-cols-4 gap-3">
+        {[
+          { icon: <Clock size={14} />,        color: "text-amber-500",   bg: "bg-amber-50",   label: "Pending",   val: pending   },
+          { icon: <CheckCircle size={14} />,  color: "text-emerald-500", bg: "bg-emerald-50", label: "Disbursed", val: disbursed },
+          { icon: <XCircle size={14} />,      color: "text-red-500",     bg: "bg-red-50",     label: "Failed",    val: failed    },
+          { icon: <CreditCard size={14} />,   color: "text-slate-500",   bg: "bg-slate-50",   label: "Total",     val: total     },
+        ].map(({ icon, color, bg, label, val }) => (
+          <div key={label} className="bg-white border border-slate-100 rounded-xl px-4 py-3.5 flex items-center gap-3">
+            <div className={`w-7 h-7 rounded-lg ${bg} ${color} flex items-center justify-center`}>{icon}</div>
+            <div>
+              <p className="text-[20px] font-[600] text-slate-900 leading-none tabular-nums">{val}</p>
+              <p className="text-[11px] text-slate-400 mt-0.5">{label}</p>
+            </div>
+          </div>
+        ))}
+      </div>
 
-      {/* Search & Filters */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <div className="relative w-full max-w-md">
-          <Search
-            size={16}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-          />
-
+      {/* Search + filters */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <div className="relative">
+          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
-            placeholder="Search disbursals..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="
-              w-full
-              h-10
-              pl-10
-              pr-4
-              text-sm
-              bg-white
-              border
-              border-slate-200
-              rounded-xl
-              outline-none
-              focus:border-blue-500
-            "
+            placeholder="Search by name, code, employer…"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="h-8 pl-8 pr-4 text-[12px] bg-white border border-slate-200 rounded-lg outline-none focus:border-blue-400 w-64 text-slate-700 placeholder-slate-400"
           />
         </div>
-
-        <div className="flex items-center gap-2 flex-wrap">
-          <button
-            onClick={() => setStatusFilter("ALL")}
-            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-              statusFilter === "ALL"
-                ? "bg-blue-600 text-white"
-                : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
-            }`}
-          >
-            All
-          </button>
-
-          <button
-            onClick={() => setStatusFilter("PENDING")}
-            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-              statusFilter === "PENDING"
-                ? "bg-amber-600 text-white"
-                : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
-            }`}
-          >
-            Pending
-          </button>
-
-          <button
-            onClick={() => setStatusFilter("DISBURSED")}
-            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-              statusFilter === "DISBURSED"
-                ? "bg-green-600 text-white"
-                : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
-            }`}
-          >
-            Disbursed
-          </button>
-
-          <button
-            onClick={() => setStatusFilter("FAILED")}
-            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-              statusFilter === "FAILED"
-                ? "bg-red-600 text-white"
-                : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
-            }`}
-          >
-            Failed
-          </button>
+        <div className="flex items-center gap-1.5">
+          {CHIPS.map(c => {
+            const count = c.key === "ALL" ? total
+              : c.key === "PENDING" ? pending
+              : c.key === "DISBURSED" ? disbursed
+              : failed;
+            const active = filter === c.key;
+            return (
+              <button
+                key={c.key}
+                onClick={() => setFilter(c.key)}
+                className={`h-7 px-3 rounded-full text-[11px] font-[500] transition-colors ${
+                  active ? "bg-slate-900 text-white" : "bg-white border border-slate-200 text-slate-500 hover:border-slate-300"
+                }`}
+              >
+                {c.label} · {count}
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Empty State */}
-      {filteredDisbursals.length === 0 ? (
-        <div className="bg-white border border-slate-200 rounded-xl p-10 text-center">
-          <h3 className="text-lg font-semibold text-slate-900">
-            No Disbursals Found
-          </h3>
-
-          <p className="text-slate-500 mt-2">
-            Disbursals will appear here once salary requests are approved and
-            processed.
-          </p>
+      {/* Table */}
+      {isLoading ? (
+        <div className="bg-white border border-slate-100 rounded-xl px-6 py-10 text-center">
+          <p className="text-[13px] text-slate-400">Loading disbursals…</p>
+        </div>
+      ) : rows.length === 0 ? (
+        <div className="bg-white border border-slate-100 rounded-xl px-6 py-10 text-center">
+          <p className="text-[13px] text-slate-500 font-[500]">No disbursals found</p>
+          <p className="text-[12px] text-slate-400 mt-1">Disbursals are created when salary requests are approved for disbursal.</p>
         </div>
       ) : (
         <DisbursalsTable
-          disbursals={filteredDisbursals}
-          onView={(disbursal) => {
-            setSelectedDisbursal(disbursal);
-            setDrawerOpen(true);
-          }}
+          disbursals={rows}
+          selectedId={selected?.id ?? null}
+          onSelect={d => setSelected(d)}
         />
       )}
 
       <DisbursalDrawer
-        open={drawerOpen}
-        disbursal={selectedDisbursal}
-        onClose={() => {
-          setDrawerOpen(false);
-          setSelectedDisbursal(null);
+        open={!!selected}
+        disbursal={selected}
+        onClose={() => setSelected(null)}
+        onMutated={() => {
+          qc.invalidateQueries({ queryKey: ["disbursals"] });
+          setSelected(null);
         }}
       />
     </div>

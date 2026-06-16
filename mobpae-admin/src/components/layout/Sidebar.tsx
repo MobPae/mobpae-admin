@@ -1,105 +1,119 @@
+import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
   Building2,
+  UserCircle2,
   Users,
   FileCheck,
   Landmark,
   Wallet,
-  CreditCard,
+  ArrowDownCircle,
+  RefreshCcw,
+  CircleDollarSign,
   Settings,
+  type LucideIcon,
 } from "lucide-react";
 
-import SidebarSection from "./SidebarSection";
-
-interface SidebarProps {
-  activePage: string;
-  onMenuClick: (page: string) => void;
+interface NavItem {
+  label: string;
+  icon: LucideIcon;
+  to: string;
 }
 
-export default function Sidebar({ activePage, onMenuClick }: SidebarProps) {
-  const MenuItem = ({
-    label,
-    icon: Icon,
-    page,
-  }: {
-    label: string;
-    icon: React.ElementType;
-    page: string;
-  }) => (
-    <button
-      onClick={() => onMenuClick(page)}
-      className={`w-full flex items-center gap-2.5 px-4 py-3 rounded-xl transition-all text-[12px] font-medium ${
-        activePage === page
-          ? "bg-blue-600 text-white shadow-md"
-          : "text-slate-300 hover:bg-slate-800 hover:text-white"
-      }`}
-    >
-      <Icon size={18} />
-      <span>{label}</span>
-    </button>
-  );
+interface Section {
+  title: string;
+  items: NavItem[];
+}
 
+const SECTIONS: Section[] = [
+  {
+    title: "Overview",
+    items: [{ label: "Dashboard", icon: LayoutDashboard, to: "/dashboard" }],
+  },
+  {
+    title: "Operations",
+    items: [
+      { label: "Employer onboarding", icon: Building2,    to: "/employer-enquiries" },
+      { label: "Employers",           icon: UserCircle2,  to: "/employers"          },
+      { label: "Employees",           icon: Users,        to: "/employees"          },
+    ],
+  },
+  {
+    title: "Finance",
+    items: [
+      { label: "Salary requests", icon: Wallet,            to: "/salary-requests" },
+      { label: "Disbursals",      icon: ArrowDownCircle,   to: "/disbursals"      },
+      { label: "Repayments",      icon: RefreshCcw,        to: "/repayments"      },
+      { label: "Settlements",     icon: CircleDollarSign,  to: "/settlements"     },
+    ],
+  },
+  {
+    title: "Compliance",
+    items: [
+      { label: "KYC verification",  icon: FileCheck, to: "/kyc"               },
+      { label: "Bank verification", icon: Landmark,  to: "/bank-verification" },
+    ],
+  },
+  {
+    title: "System",
+    items: [{ label: "Settings", icon: Settings, to: "/settings" }],
+  },
+];
+
+export default function Sidebar() {
   return (
-    <aside className="w-72 h-screen bg-[#081028] text-white flex flex-col shrink-0">
+    <aside className="w-[228px] h-screen bg-white flex flex-col flex-shrink-0 border-r border-slate-100">
       {/* Logo */}
-      <div className="px-6 py-5 border-b border-slate-800">
-        <h1 className="text-2xl font-bold tracking-tight">MobPae</h1>
-
-        <p className="text-sm text-slate-400 mt-1">Admin Portal</p>
+      <div className="h-[52px] flex items-center px-5 border-b border-slate-100 gap-3">
+        <div className="w-[24px] h-[24px] rounded-[6px] bg-[#c4522a] flex items-center justify-center text-white text-[11px] font-[700]">
+          M
+        </div>
+        <span className="text-[13px] font-[600] text-slate-900 tracking-tight">MobPae</span>
+        <span className="text-[10px] text-slate-400 mt-px">admin</span>
       </div>
 
-      {/* Menu */}
-      <div className="flex-1 overflow-y-auto px-3 py-4">
-        <SidebarSection title="Overview">
-          <MenuItem label="Dashboard" icon={LayoutDashboard} page="dashboard" />
-        </SidebarSection>
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-5">
+        {SECTIONS.map((section) => (
+          <div key={section.title}>
+            <p className="text-[10px] font-[700] uppercase tracking-[0.1em] text-slate-400 px-2.5 mb-1.5">
+              {section.title}
+            </p>
+            <div className="space-y-0.5">
+              {section.items.map(({ label, icon: Icon, to }) => (
+                <NavLink
+                  key={to}
+                  to={to}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-2.5 py-[7px] rounded-md text-[12.5px] transition-colors ${
+                      isActive
+                        ? "bg-slate-100 text-slate-900 font-[600]"
+                        : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+                    }`
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      <Icon size={15} className={isActive ? "text-[#c4522a]" : "text-slate-400"} />
+                      <span className="leading-none">{label}</span>
+                    </>
+                  )}
+                </NavLink>
+              ))}
+            </div>
+          </div>
+        ))}
+      </nav>
 
-        <SidebarSection title="Operations">
-          <MenuItem
-            label="Employer Onboarding"
-            icon={Building2}
-            page="employer-enquiries"
-          />
-
-          <MenuItem label="Employers" icon={Building2} page="employers" />
-
-          <MenuItem label="Employees" icon={Users} page="employees" />
-        </SidebarSection>
-
-        <SidebarSection title="Finance">
-          <MenuItem
-            label="Salary Requests"
-            icon={Wallet}
-            page="salary-requests"
-          />
-
-          <MenuItem label="Disbursements" icon={CreditCard} page="disbursals" />
-
-          <MenuItem label="Repayments" icon={CreditCard} page="repayments" />
-        </SidebarSection>
-
-        <SidebarSection title="Compliance">
-          <MenuItem label="KYC Verification" icon={FileCheck} page="kyc" />
-
-          <MenuItem label="Bank Verification" icon={Landmark} page="bank" />
-        </SidebarSection>
-
-        <SidebarSection title="Settings">
-          <MenuItem label="Settings" icon={Settings} page="settings" />
-        </SidebarSection>
-      </div>
-
-      {/* User Profile */}
-      <div className="border-t border-slate-800 p-4 shrink-0">
+      {/* Footer */}
+      <div className="px-4 py-4 border-t border-slate-100">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-slate-700 flex items-center justify-center font-semibold">
+          <div className="w-7 h-7 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-[11px] font-[600]">
             A
           </div>
-
-          <div>
-            <p className="text-sm font-medium">Admin User</p>
-
-            <p className="text-xs text-slate-400">Super Admin</p>
+          <div className="flex-1 min-w-0">
+            <p className="text-[12px] font-[600] text-slate-800 leading-none truncate">Admin User</p>
+            <p className="text-[10px] text-slate-400 mt-0.5 leading-none">Super Admin</p>
           </div>
         </div>
       </div>

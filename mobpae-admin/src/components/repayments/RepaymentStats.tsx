@@ -5,7 +5,7 @@ interface Props {
 }
 
 export default function RepaymentStats({ repayments }: Props) {
-  const pending = repayments.filter((r) => r.status === "PENDING").length;
+  const pending = repayments.filter((r) => r.status === "SCHEDULED").length;
 
   const paid = repayments.filter((r) => r.status === "PAID").length;
 

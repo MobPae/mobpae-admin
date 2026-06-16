@@ -33,7 +33,7 @@ export default function RecentActivity() {
       description: "₹15,000 request approved",
       time: "20 mins ago",
       icon: Wallet,
-      color: "bg-purple-100 text-purple-700",
+      color: "bg-blue-100 text-blue-700",
     },
     {
       employee: {

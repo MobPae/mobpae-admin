@@ -1,313 +1,256 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { X, CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import {
-  Building2,
-  User,
-  ClipboardList,
-  X,
-  CheckCircle,
-  XCircle,
-} from "lucide-react";
-import { approveEmployerEnquiry } from "../../services/employerEnquiryService";
+  approveEmployerEnquiry,
+  rejectEmployerEnquiry,
+} from "../../services/employerEnquiryService";
 import type { EmployerEnquiry } from "../../types/employer-enquiry";
 
-interface EmployerDetailsDrawerProps {
+interface Props {
   open: boolean;
   onClose: () => void;
-  onApproved?: () => void;
+  onMutated?: () => void;
   employer: EmployerEnquiry | null;
 }
 
-export default function EmployerDetailsDrawer({
-  open,
-  onClose,
-  onApproved,
-  employer,
-}: EmployerDetailsDrawerProps) {
-  const [companyCode, setCompanyCode] = useState("");
-  const [payrollDate, setPayrollDate] = useState("");
-  const [payrollCutoffDate, setPayrollCutoffDate] = useState("");
+interface ApproveForm {
+  companyCode: string;
+  payrollDate: string;
+  payrollCutoffDate: string;
+}
 
-  const [approving, setApproving] = useState(false);
+const INIT: ApproveForm = { companyCode: "", payrollDate: "", payrollCutoffDate: "" };
+
+export default function EmployerDetailsDrawer({ open, onClose, onMutated, employer }: Props) {
+  const [form, setForm] = useState<ApproveForm>(INIT);
+  const [rejectConfirm, setRejectConfirm] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setForm(INIT);
+      setRejectConfirm(false);
+    }
+  }, [open, employer?.id]);
+
+  const approveMutation = useMutation({
+    mutationFn: () =>
+      approveEmployerEnquiry(employer!.id, {
+        companyCode: form.companyCode.trim().toUpperCase(),
+        payrollDate: Number(form.payrollDate),
+        payrollCutoffDate: Number(form.payrollCutoffDate),
+      }),
+    onSuccess: () => {
+      toast.success("Employer approved", {
+        description: `${employer?.companyName} onboarded. Credentials sent to ${employer?.email}.`,
+      });
+      onMutated?.();
+      onClose();
+    },
+    onError: (err: unknown) => {
+      toast.error("Approval failed", {
+        description: err instanceof Error ? err.message : "Unexpected error",
+      });
+    },
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: () => rejectEmployerEnquiry(employer!.id),
+    onSuccess: () => {
+      toast.success("Enquiry rejected");
+      onMutated?.();
+      onClose();
+    },
+    onError: (err: unknown) => {
+      toast.error("Rejection failed", {
+        description: err instanceof Error ? err.message : "Unexpected error",
+      });
+    },
+  });
 
   if (!open || !employer) return null;
 
-  const handleApprove = async () => {
-    if (!companyCode || !payrollDate || !payrollCutoffDate) {
-      alert("Please fill all approval fields");
-      return;
-    }
+  const isPending = employer.status === "NEW" || employer.status === "CONTACTED";
+  const isBusy = approveMutation.isPending || rejectMutation.isPending;
 
-    try {
-      setApproving(true);
-
-      await approveEmployerEnquiry(employer.id, {
-        companyCode,
-        payrollDate: Number(payrollDate),
-        payrollCutoffDate: Number(payrollCutoffDate),
-      });
-
-      alert("Employer approved successfully");
-
-      onApproved?.();
-      onClose();
-    } catch (error) {
-      console.error(error);
-
-      alert("Failed to approve employer");
-    } finally {
-      setApproving(false);
-    }
-  };
+  const isFormValid =
+    form.companyCode.trim().length >= 2 &&
+    Number(form.payrollDate) >= 1 &&
+    Number(form.payrollDate) <= 31 &&
+    Number(form.payrollCutoffDate) >= 1 &&
+    Number(form.payrollCutoffDate) <= 31;
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/30 z-40" onClick={onClose} />
+      {/* Backdrop */}
+      <div className="fixed inset-0 bg-black/20 z-40" onClick={onClose} />
 
-      <div className="fixed top-0 right-0 h-full w-[620px] bg-slate-50 shadow-xl z-50 flex flex-col">
-        <div className="flex-1 overflow-y-auto">
-          <div className="p-6">
-            {/* Header */}
-            <div className="flex items-start justify-between">
-              <div>
-                <h2 className="text-lg font-semibold text-slate-900">
-                  {employer.companyName}
-                </h2>
-
-                <div className="mt-3">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      employer.status === "APPROVED"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-amber-100 text-amber-700"
-                    }`}
-                  >
-                    {employer.status}
-                  </span>
-                </div>
-              </div>
-
-              <button
-                onClick={onClose}
-                className="text-slate-400 hover:text-slate-700"
-              >
-                <X size={20} />
-              </button>
+      {/* Drawer */}
+      <div className="fixed top-0 right-0 h-full w-[440px] bg-white z-50 flex flex-col border-l border-slate-200 shadow-xl">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-slate-700 to-slate-900 text-white flex items-center justify-center text-[12px] font-[600]">
+              {employer.companyName.charAt(0).toUpperCase()}
             </div>
-
-            {/* Tabs */}
-            <div className="mt-8 border-b border-slate-200">
-              <div className="flex gap-8">
-                <button className="pb-3 text-sm font-medium text-blue-600 border-b-2 border-blue-600">
-                  Overview
-                </button>
-
-                <button className="pb-3 text-xs text-slate-500">
-                  Documents
-                </button>
-
-                <button className="pb-3 text-xs text-slate-500">
-                  Timeline
-                </button>
-              </div>
+            <div>
+              <p className="text-[13px] font-[500] text-slate-900 leading-none">{employer.companyName}</p>
+              <p className="text-[11px] text-slate-400 mt-0.5 leading-none">{employer.email}</p>
             </div>
-
-            {/* Business Information */}
-            <div className="mt-6 bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-              <div className="flex items-center gap-3 mb-4">
-                <Building2 size={16} className="text-blue-600" />
-
-                <h3 className="text-[14px] font-semibold text-slate-900">
-                  Business Information
-                </h3>
-              </div>
-
-              <div className="space-y-2">
-                <div className="grid grid-cols-2">
-                  <span className="text-[12px] text-slate-500">
-                    Company Name
-                  </span>
-
-                  <span className="text-[12px] text-slate-900 font-medium">
-                    {employer.companyName}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-2">
-                  <span className="text-[12px] text-slate-500">Industry</span>
-
-                  <span className="text-[12px] text-slate-900">
-                    Technology Services
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-2">
-                  <span className="text-[12px] text-slate-500">
-                    Company Size
-                  </span>
-
-                  <span className="text-[12px] text-slate-900">
-                    {employer.employeeCount} Employees
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Contact Information */}
-            <div className="mt-5 bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-              <div className="flex items-center gap-3 mb-4">
-                <User size={16} className="text-blue-600" />
-
-                <h3 className="text-[14px] font-semibold text-slate-900">
-                  Contact Information
-                </h3>
-              </div>
-
-              <div className="space-y-2">
-                <div className="grid grid-cols-2">
-                  <span className="text-[12px] text-slate-500">
-                    Contact Person
-                  </span>
-
-                  <span className="text-[12px] text-slate-900 font-medium">
-                    {employer.contactPerson}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-2">
-                  <span className="text-[12px] text-slate-500">Email</span>
-
-                  <span className="text-[12px] text-slate-900">
-                    {employer.email}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-2">
-                  <span className="text-[12px] text-slate-500">Phone</span>
-
-                  <span className="text-[12px] text-slate-900">
-                    {employer.phone}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Onboarding Details */}
-            <div className="mt-5 bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-              <div className="flex items-center gap-3 mb-4">
-                <ClipboardList size={16} className="text-blue-600" />
-
-                <h3 className="text-[14px] font-semibold text-slate-900">
-                  Onboarding Details
-                </h3>
-              </div>
-
-              <div className="space-y-2">
-                <div className="grid grid-cols-2">
-                  <span className="text-[12px] text-slate-500">
-                    Requested On
-                  </span>
-
-                  <span className="text-[12px] text-slate-900">
-                    {new Date(employer.createdAt).toLocaleString()}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-2">
-                  <span className="text-[12px] text-slate-500">Status</span>
-
-                  <span className="text-[12px] text-slate-900">
-                    {employer.status}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Approval Configuration */}
-            {employer.status !== "APPROVED" && (
-              <div className="mt-5 bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-                <h3 className="text-[14px] font-semibold text-slate-900 mb-4">
-                  Approval Configuration
-                </h3>
-
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-xs text-slate-500 mb-2">
-                      Company Code
-                    </label>
-
-                    <input
-                      value={companyCode}
-                      onChange={(e) => setCompanyCode(e.target.value)}
-                      placeholder="ABC001"
-                      className="w-full border border-slate-200 rounded-xl px-4 py-3"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs text-slate-500 mb-2">
-                      Payroll Date
-                    </label>
-
-                    <input
-                      type="number"
-                      value={payrollDate}
-                      onChange={(e) => setPayrollDate(e.target.value)}
-                      placeholder="30"
-                      className="w-full border border-slate-200 rounded-xl px-4 py-3"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs text-slate-500 mb-2">
-                      Payroll Cutoff Date
-                    </label>
-
-                    <input
-                      type="number"
-                      value={payrollCutoffDate}
-                      onChange={(e) => setPayrollCutoffDate(e.target.value)}
-                      placeholder="25"
-                      className="w-full border border-slate-200 rounded-xl px-4 py-3"
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
-        </div>
-
-        <div className="border-t border-slate-200 bg-white p-4">
-          <div className="flex gap-3">
-            <button className="w-40 border border-red-200 text-red-600 py-3 rounded-xl font-medium hover:bg-red-50 flex items-center justify-center gap-2">
-              <XCircle size={18} />
-              Reject
+          <div className="flex items-center gap-2">
+            <span className={`inline-flex h-[18px] px-1.5 rounded-[3px] items-center text-[10px] font-[500] ${
+              employer.status === "APPROVED" ? "bg-green-50 text-green-700" :
+              employer.status === "REJECTED" ? "bg-red-50 text-red-600" :
+              "bg-amber-50 text-amber-700"
+            }`}>
+              {employer.status}
+            </span>
+            <button
+              onClick={onClose}
+              className="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+            >
+              <X size={14} />
             </button>
-
-            {employer.status !== "APPROVED" && (
-              <button
-                onClick={handleApprove}
-                disabled={approving}
-                className="
-                  flex-1
-                  bg-blue-600
-                  hover:bg-blue-700
-                  text-white
-                  py-3
-                  rounded-xl
-                  font-medium
-                  flex
-                  items-center
-                  justify-center
-                  gap-2
-                  disabled:opacity-60
-                "
-              >
-                <CheckCircle size={18} />
-                {approving ? "Approving..." : "Approve Employer"}
-              </button>
-            )}
           </div>
         </div>
+
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
+          {/* Company details */}
+          <section>
+            <p className="text-[10px] font-[500] uppercase tracking-[0.07em] text-slate-400 mb-2">
+              Company details
+            </p>
+            <div className="border border-slate-100 rounded-lg divide-y divide-slate-100">
+              {[
+                { k: "Contact person", v: employer.contactPerson },
+                { k: "Phone", v: employer.phone },
+                { k: "Est. employees", v: employer.employeeCount != null ? `${employer.employeeCount.toLocaleString("en-IN")}` : "Not specified" },
+                { k: "Submitted", v: new Date(employer.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) },
+                ...(employer.remarks ? [{ k: "Remarks", v: employer.remarks }] : []),
+              ].map(({ k, v }) => (
+                <div key={k} className="flex items-center justify-between px-3 py-2.5">
+                  <span className="text-[11px] text-slate-400">{k}</span>
+                  <span className="text-[11px] font-[500] text-slate-800 text-right max-w-[60%] truncate">{v}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Approval config — only for pending */}
+          {isPending && (
+            <section>
+              <p className="text-[10px] font-[500] uppercase tracking-[0.07em] text-slate-400 mb-2">
+                Approval configuration
+              </p>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-[11px] text-slate-500 mb-1.5">
+                    Company code <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    value={form.companyCode}
+                    onChange={(e) => setForm((f) => ({ ...f, companyCode: e.target.value.toUpperCase() }))}
+                    placeholder="e.g. INFOSYS001"
+                    maxLength={20}
+                    className="w-full h-8 px-3 text-[12px] font-mono bg-slate-50 border border-slate-200 rounded-md outline-none focus:border-slate-400 focus:bg-white transition-colors"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div>
+                    <label className="block text-[11px] text-slate-500 mb-1.5">
+                      Payroll date <span className="text-red-400">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      min={1}
+                      max={31}
+                      value={form.payrollDate}
+                      onChange={(e) => setForm((f) => ({ ...f, payrollDate: e.target.value }))}
+                      placeholder="28"
+                      className="w-full h-8 px-3 text-[12px] bg-slate-50 border border-slate-200 rounded-md outline-none focus:border-slate-400 focus:bg-white transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-slate-500 mb-1.5">
+                      Cutoff date <span className="text-red-400">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      min={1}
+                      max={31}
+                      value={form.payrollCutoffDate}
+                      onChange={(e) => setForm((f) => ({ ...f, payrollCutoffDate: e.target.value }))}
+                      placeholder="21"
+                      className="w-full h-8 px-3 text-[12px] bg-slate-50 border border-slate-200 rounded-md outline-none focus:border-slate-400 focus:bg-white transition-colors"
+                    />
+                  </div>
+                </div>
+                <div className="bg-slate-50 rounded-md px-3 py-2.5 border border-slate-100">
+                  <p className="text-[11px] text-slate-500 leading-relaxed">
+                    Approving creates an employer account. Default password{" "}
+                    <code className="bg-slate-200 px-1 rounded text-[10px] text-slate-700">MobPae@123</code>{" "}
+                    sent to <span className="text-slate-700 font-[500]">{employer.email}</span>.
+                  </p>
+                </div>
+              </div>
+            </section>
+          )}
+        </div>
+
+        {/* Footer */}
+        {isPending && (
+          <div className="border-t border-slate-100 px-5 py-3.5 flex-shrink-0">
+            {rejectConfirm ? (
+              <div className="space-y-2.5">
+                <p className="text-[12px] text-slate-600">
+                  Reject <span className="font-[500] text-slate-800">{employer.companyName}</span>?
+                  This cannot be undone.
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setRejectConfirm(false)}
+                    disabled={isBusy}
+                    className="flex-1 h-8 rounded-md border border-slate-200 text-[12px] font-[500] text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => rejectMutation.mutate()}
+                    disabled={isBusy}
+                    className="flex-1 h-8 rounded-md bg-red-600 hover:bg-red-700 text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-60"
+                  >
+                    {rejectMutation.isPending ? <Loader2 size={12} className="animate-spin" /> : <XCircle size={12} />}
+                    Confirm reject
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setRejectConfirm(true)}
+                  disabled={isBusy}
+                  className="h-8 px-3.5 rounded-md border border-slate-200 text-[12px] font-[500] text-slate-500 hover:border-red-200 hover:text-red-600 transition-colors disabled:opacity-50 flex items-center gap-1.5"
+                >
+                  <XCircle size={12} />
+                  Reject
+                </button>
+                <button
+                  onClick={() => approveMutation.mutate()}
+                  disabled={isBusy || !isFormValid}
+                  className="flex-1 h-8 rounded-md bg-slate-900 hover:bg-[slate-800] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {approveMutation.isPending
+                    ? <Loader2 size={12} className="animate-spin" />
+                    : <CheckCircle2 size={12} />}
+                  {approveMutation.isPending ? "Approving…" : "Approve employer"}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </>
   );

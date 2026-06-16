@@ -1,178 +1,239 @@
-interface Employer {
-  id: string;
-  companyName: string;
-  companyCode: string;
-  contactPerson: string;
-  email: string;
-  phone: string;
-  payrollDate: number;
-  payrollCutoffDate: number;
-  status: string;
-  createdAt: string;
-  updatedAt?: string;
+import type {
+  Employer,
+  EmployerStatus,
+  EmployerRiskStatus,
+} from "../../types/employer";
+
+interface Props {
+  employers: Employer[];
+  selectedId: string | null;
+  onSelect: (employer: Employer) => void;
 }
 
-interface EmployersTableProps {
-  employers: Employer[];
-  onView: (employer: Employer) => void;
-}
+const AVATAR_COLORS: Record<string, string> = {
+  A: "bg-rose-500",
+  B: "bg-pink-500",
+  C: "bg-fuchsia-500",
+  D: "bg-blue-500",
+  E: "bg-blue-500",
+  F: "bg-blue-500",
+  G: "bg-blue-500",
+  H: "bg-sky-500",
+  I: "bg-cyan-500",
+  J: "bg-teal-500",
+  K: "bg-emerald-500",
+  L: "bg-green-500",
+  M: "bg-lime-600",
+  N: "bg-yellow-600",
+  O: "bg-amber-500",
+  P: "bg-orange-500",
+  Q: "bg-red-500",
+  R: "bg-rose-600",
+  S: "bg-pink-600",
+  T: "bg-fuchsia-600",
+  U: "bg-blue-600",
+  V: "bg-blue-600",
+  W: "bg-blue-600",
+  X: "bg-blue-600",
+  Y: "bg-sky-600",
+  Z: "bg-cyan-600",
+};
+const avatarBg = (n: string) =>
+  AVATAR_COLORS[n.charAt(0).toUpperCase()] ?? "bg-slate-600";
+
+const STATUS_CONFIG: Record<
+  EmployerStatus,
+  { label: string; dot: string; text: string; bg: string }
+> = {
+  ACTIVE: {
+    label: "Active",
+    dot: "bg-emerald-400",
+    text: "text-emerald-700",
+    bg: "bg-emerald-50",
+  },
+  PENDING: {
+    label: "Pending",
+    dot: "bg-amber-400",
+    text: "text-amber-700",
+    bg: "bg-amber-50",
+  },
+  APPROVED: {
+    label: "Approved",
+    dot: "bg-blue-400",
+    text: "text-blue-700",
+    bg: "bg-blue-50",
+  },
+  REJECTED: {
+    label: "Rejected",
+    dot: "bg-red-400",
+    text: "text-red-600",
+    bg: "bg-red-50",
+  },
+  INACTIVE: {
+    label: "Inactive",
+    dot: "bg-slate-400",
+    text: "text-slate-500",
+    bg: "bg-slate-100",
+  },
+  SUSPENDED: {
+    label: "Suspended",
+    dot: "bg-orange-400",
+    text: "text-orange-600",
+    bg: "bg-orange-50",
+  },
+};
+
+const RISK_CONFIG: Record<
+  EmployerRiskStatus,
+  { label: string; dot: string; text: string; bg: string }
+> = {
+  GOOD: {
+    label: "Good",
+    dot: "bg-emerald-400",
+    text: "text-emerald-700",
+    bg: "bg-emerald-50",
+  },
+  WARNING: {
+    label: "Warning",
+    dot: "bg-amber-400",
+    text: "text-amber-700",
+    bg: "bg-amber-50",
+  },
+  BLOCKED: {
+    label: "Blocked",
+    dot: "bg-red-400",
+    text: "text-red-600",
+    bg: "bg-red-50",
+  },
+};
+
+const TH =
+  "px-4 py-2.5 text-left text-[10px] font-[600] uppercase tracking-[0.08em] text-slate-400 whitespace-nowrap";
+const TD = "px-4 py-3.5 align-middle";
 
 export default function EmployersTable({
   employers,
-  onView,
-}: EmployersTableProps) {
+  selectedId,
+  onSelect,
+}: Props) {
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="bg-slate-50 border-b border-slate-200">
-              <th className="px-6 py-4 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                Company
-              </th>
-
-              <th className="px-6 py-4 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                Company Code
-              </th>
-
-              <th className="px-6 py-4 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                Contact
-              </th>
-
-              <th className="px-6 py-4 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                Payroll
-              </th>
-
-              <th className="px-6 py-4 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                Status
-              </th>
-
-              <th className="px-6 py-4 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                Updated
-              </th>
-
-              <th className="px-6 py-4 text-right text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                Action
-              </th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {employers.map((employer, index) => (
+    <div className="bg-white rounded-xl border border-slate-100 overflow-hidden">
+      <table className="w-full table-fixed">
+        <colgroup>
+          <col style={{ width: "17%" }} />
+          <col style={{ width: "16%" }} />
+          <col style={{ width: "13%" }} />
+          <col style={{ width: "13%" }} />
+          <col style={{ width: "9%" }} />
+          <col style={{ width: "12%" }} />
+          <col style={{ width: "12%" }} />
+          <col style={{ width: "8%" }} />
+        </colgroup>
+        <thead>
+          <tr className="border-b border-slate-100 bg-slate-50">
+            <th className={TH}>Company</th>
+            <th className={TH}>Email</th>
+            <th className={TH}>Contact</th>
+            <th className={TH}>Phone</th>
+            <th className={TH}>Payroll</th>
+            <th className={TH}>Status</th>
+            <th className={TH}>Risk</th>
+            <th className={TH}></th>
+          </tr>
+        </thead>
+        <tbody>
+          {employers.map((emp) => {
+            const isSelected = selectedId === emp.id;
+            const s = STATUS_CONFIG[emp.status];
+            const r = RISK_CONFIG[emp.riskStatus];
+            return (
               <tr
-                key={employer.id}
-                className={`
-                  border-b
-                  border-slate-100
-                  hover:bg-slate-50
-                  transition-colors
-                  ${index % 2 === 0 ? "bg-white" : "bg-slate-50/30"}
-                `}
+                key={emp.id}
+                onClick={() => onSelect(emp)}
+                className={`border-b border-slate-50 last:border-0 cursor-pointer transition-colors group ${
+                  isSelected ? "bg-blue-50/60" : "hover:bg-slate-50/70"
+                }`}
               >
-                {/* Company */}
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
+                <td className={TD}>
+                  <div className="flex items-center gap-2.5 min-w-0">
                     <div
-                      className="
-                        w-8
-                        h-8
-                        rounded-lg
-                        bg-gradient-to-br
-                        from-blue-500
-                        to-indigo-600
-                        text-white
-                        flex
-                        items-center
-                        justify-center
-                        text-xs
-                        font-semibold
-                      "
+                      className={`w-7 h-7 rounded-lg ${avatarBg(
+                        emp.companyName
+                      )} text-white flex items-center justify-center text-[11px] font-[700] flex-shrink-0`}
                     >
-                      {employer.companyName.charAt(0)}
+                      {emp.companyName.charAt(0).toUpperCase()}
                     </div>
-
-                    <div>
-                      <p className="text-sm font-medium text-slate-900">
-                        {employer.companyName}
+                    <div className="min-w-0">
+                      <p className="text-[12px] font-[500] text-slate-900 leading-none truncate">
+                        {emp.companyName}
                       </p>
-
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        {employer.email}
-                      </p>
+                      <span className="font-mono text-[10px] text-slate-400">
+                        {emp.companyCode}
+                      </span>
                     </div>
                   </div>
                 </td>
-
-                {/* Company Code */}
-                <td className="px-6 py-4">
-                  <span className="inline-flex px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-700 text-xs font-medium">
-                    {employer.companyCode}
-                  </span>
+                <td className={TD}>
+                  <p className="text-[12px] text-slate-600 truncate">
+                    {emp.email}
+                  </p>
                 </td>
-
-                {/* Contact */}
-                <td className="px-6 py-4">
-                  <div>
-                    <p className="text-sm font-medium text-slate-800">
-                      {employer.contactPerson}
-                    </p>
-
-                    <p className="text-xs text-slate-500">Primary Contact</p>
-                  </div>
+                <td className={TD}>
+                  <p className="text-[12px] font-[500] text-slate-800 truncate">
+                    {emp.contactPerson}
+                  </p>
                 </td>
-
-                {/* Payroll */}
-                <td className="px-6 py-4">
-                  <span className="inline-flex px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 text-xs font-medium">
-                    {employer.payrollDate}th
-                  </span>
+                <td className={TD}>
+                  <p className="text-[12px] text-slate-600 font-mono">
+                    {emp.phone}
+                  </p>
                 </td>
-
-                {/* Status */}
-                <td className="px-6 py-4">
+                <td className={TD}>
+                  <p className="text-[12px] font-[500] text-slate-800">
+                    {emp.payrollDate}th
+                  </p>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    cutoff {emp.payrollCutoffDate}th
+                  </p>
+                </td>
+                <td className={TD}>
                   <span
-                    className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${
-                      employer.status === "ACTIVE"
-                        ? "bg-green-50 text-green-700"
-                        : "bg-red-50 text-red-700"
+                    className={`inline-flex items-center gap-1.5 h-[22px] px-2.5 rounded-full text-[11px] font-[500] ${s.bg} ${s.text}`}
+                  >
+                    <span
+                      className={`w-[6px] h-[6px] rounded-full flex-shrink-0 ${s.dot}`}
+                    />
+                    {s.label}
+                  </span>
+                </td>
+                <td className={TD}>
+                  <span
+                    className={`inline-flex items-center gap-1.5 h-[22px] px-2.5 rounded-full text-[11px] font-[500] ${r.bg} ${r.text}`}
+                  >
+                    <span
+                      className={`w-[6px] h-[6px] rounded-full flex-shrink-0 ${r.dot}`}
+                    />
+                    {r.label}
+                  </span>
+                </td>
+                <td className={TD}>
+                  <span
+                    className={`text-[11px] font-[500] transition-colors ${
+                      isSelected ? "text-blue-600" : "text-blue-500"
                     }`}
                   >
-                    {employer.status === "ACTIVE" ? "Active" : "Inactive"}
+                    {isSelected ? "Close" : "Manage →"}
                   </span>
-                </td>
-
-                {/* Updated */}
-                <td className="px-6 py-4">
-                  <span className="inline-flex px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 text-xs">
-                    {new Date(
-                      employer.updatedAt || employer.createdAt
-                    ).toLocaleDateString("en-IN", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </span>
-                </td>
-
-                {/* Action */}
-                <td className="px-6 py-4 text-right">
-                  <button
-                    onClick={() => onView(employer)}
-                    className="
-                      text-blue-600
-                      text-sm
-                      font-medium
-                      hover:text-blue-700
-                      transition-colors
-                    "
-                  >
-                    View →
-                  </button>
                 </td>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            );
+          })}
+        </tbody>
+      </table>
+      <div className="px-5 py-2.5 border-t border-slate-100 bg-slate-50/50">
+        <p className="text-[11px] text-slate-400">
+          {employers.length} {employers.length === 1 ? "employer" : "employers"}
+        </p>
       </div>
     </div>
   );

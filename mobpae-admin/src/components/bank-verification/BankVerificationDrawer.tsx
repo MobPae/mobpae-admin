@@ -1,7 +1,8 @@
-import { CheckCircle2, CreditCard, Loader2, X } from "lucide-react";
-import { useState } from "react";
-import type { BankAccount } from "../../types/bankAccount";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { X, CheckCircle2, Loader2, CreditCard } from "lucide-react";
 import { verifyBankAccount } from "../../services/bankVerificationService";
+import type { BankAccount } from "../../types/bankAccount";
 
 interface Props {
   open: boolean;
@@ -11,131 +12,110 @@ interface Props {
 }
 
 export default function BankVerificationDrawer({ open, account, onClose, onCompleted }: Props) {
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
-
-  if (!open) return null;
-
-  if (!account) return null;
-
-  async function handleVerify() {
-    if (!account) return;
-
-    setError("");
-    setSubmitting(true);
-
-    try {
-      await verifyBankAccount(account.id);
+  const verifyMutation = useMutation({
+    mutationFn: () => verifyBankAccount(account!.id),
+    onSuccess: () => {
+      toast.success("Bank account verified", {
+        description: `${account?.employee.name}'s bank account has been verified.`,
+      });
       onCompleted();
-    } catch (caughtError) {
-      setError(
-        caughtError instanceof Error
-          ? caughtError.message
-          : "Unable to verify bank account"
-      );
-    } finally {
-      setSubmitting(false);
-    }
-  }
+    },
+    onError: (err: unknown) => {
+      toast.error("Verification failed", { description: err instanceof Error ? err.message : "Unexpected error" });
+    },
+  });
+
+  if (!open || !account) return null;
+
+  const isBusy = verifyMutation.isPending;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-slate-950/40">
-      <button
-        type="button"
-        className="absolute inset-0 cursor-default"
-        aria-label="Close bank review"
-        onClick={onClose}
-      />
+    <>
+      <div className="fixed inset-0 bg-black/20 z-40" onClick={onClose} />
 
-      <aside className="relative h-full w-full max-w-xl overflow-y-auto bg-white shadow-2xl">
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white px-6 py-5">
-          <div>
-            <p className="text-xs font-semibold uppercase text-blue-600">
-              Bank Review
-            </p>
-            <h2 className="mt-1 text-xl font-bold text-slate-900">
-              {account.bankName || "Bank account"}
-            </h2>
+      <div className="fixed top-0 right-0 h-full w-[440px] bg-white z-50 flex flex-col border-l border-slate-200 shadow-xl">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-slate-700 to-slate-900 text-white flex items-center justify-center text-[12px] font-[600]">
+              {account.employee.name.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <p className="text-[13px] font-[500] text-slate-900 leading-none">{account.employee.name}</p>
+              <p className="text-[11px] text-slate-400 mt-0.5 leading-none">{account.employee.employer.companyName}</p>
+            </div>
           </div>
-
-          <button
-            type="button"
-            onClick={onClose}
-            className="grid h-10 w-10 place-items-center rounded-full border border-slate-200 text-slate-500 hover:bg-slate-50"
-          >
-            <X size={18} />
-          </button>
+          <div className="flex items-center gap-2">
+            <span className={`inline-flex h-[18px] px-1.5 rounded-[3px] items-center text-[10px] font-[500] ${account.verified ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>
+              {account.verified ? "Verified" : "Pending"}
+            </span>
+            <button onClick={onClose} className="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
+              <X size={14} />
+            </button>
+          </div>
         </div>
 
-        <div className="space-y-5 p-6">
-          <section className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-            <div className="flex items-start gap-4">
-              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-blue-100 text-blue-700">
-                <CreditCard size={22} />
-              </div>
-              <div>
-                <h3 className="text-base font-semibold text-slate-900">
-                  Account details
-                </h3>
-                <p className="mt-1 text-sm text-slate-500">
-                  {account.accountHolderName}
-                </p>
-                <span
-                  className={`mt-3 inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-                    account.verified
-                      ? "bg-green-100 text-green-700"
-                      : "bg-amber-100 text-amber-700"
-                  }`}
-                >
-                  {account.verified ? "VERIFIED" : "PENDING"}
-                </span>
-              </div>
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
+          {/* Bank account details */}
+          <section>
+            <p className="text-[10px] font-[500] uppercase tracking-[0.07em] text-slate-400 mb-2">Bank account</p>
+            <div className="border border-slate-100 rounded-lg divide-y divide-slate-100">
+              {[
+                { k: "Account holder",  v: account.accountHolderName },
+                { k: "Bank name",       v: account.bankName ?? "—" },
+                { k: "Account number",  v: <span className="font-mono">····{account.accountNumber.slice(-4)}</span> },
+                { k: "IFSC code",       v: <span className="font-mono">{account.ifscCode}</span> },
+                ...(account.upiId ? [{ k: "UPI ID", v: account.upiId }] : []),
+                { k: "Added on",        v: new Date(account.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) },
+              ].map(({ k, v }) => (
+                <div key={k} className="flex items-center justify-between px-3 py-2.5">
+                  <span className="text-[11px] text-slate-400">{k}</span>
+                  <span className="text-[11px] font-[500] text-slate-800 text-right max-w-[60%] truncate">{v}</span>
+                </div>
+              ))}
             </div>
           </section>
 
-          <section className="grid gap-3 rounded-2xl border border-slate-200 p-5">
-            <Detail label="Employee" value={account.employee?.name} />
-            <Detail label="Employee Code" value={account.employee?.employeeCode} />
-            <Detail label="Bank Name" value={account.bankName || "-"} />
-            <Detail label="Account Number" value={`****${account.accountNumber?.slice(-4)}`} />
-            <Detail label="IFSC" value={account.ifscCode} />
-            <Detail label="UPI" value={account.upiId || "-"} />
-            <Detail
-              label="Submitted On"
-              value={new Date(account.createdAt).toLocaleString()}
-            />
+          {/* Employee */}
+          <section>
+            <p className="text-[10px] font-[500] uppercase tracking-[0.07em] text-slate-400 mb-2">Employee</p>
+            <div className="border border-slate-100 rounded-lg divide-y divide-slate-100">
+              {[
+                { k: "Name",            v: account.employee.name },
+                { k: "Employee code",   v: <span className="font-mono">{account.employee.employeeCode}</span> },
+                { k: "Email",           v: account.employee.email },
+                { k: "Employer",        v: account.employee.employer.companyName },
+              ].map(({ k, v }) => (
+                <div key={k} className="flex items-center justify-between px-3 py-2.5">
+                  <span className="text-[11px] text-slate-400">{k}</span>
+                  <span className="text-[11px] font-[500] text-slate-800 text-right max-w-[60%] truncate">{v}</span>
+                </div>
+              ))}
+            </div>
           </section>
 
-          {error && (
-            <div className="rounded-2xl bg-red-50 p-4 text-sm font-medium text-red-700">
-              {error}
+          {account.verified && (
+            <div className="bg-emerald-50 rounded-md px-3 py-2.5 border border-emerald-100">
+              <p className="text-[11px] text-emerald-700">This bank account has already been verified.</p>
             </div>
           )}
         </div>
 
-        <div className="sticky bottom-0 border-t border-slate-200 bg-white p-6">
-          <button
-            type="button"
-            disabled={submitting || account.verified}
-            onClick={handleVerify}
-            className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-blue-600 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
-          >
-            {submitting ? <Loader2 className="animate-spin" size={17} /> : <CheckCircle2 size={17} />}
-            {account.verified ? "Already verified" : "Verify bank account"}
-          </button>
-        </div>
-      </aside>
-    </div>
-  );
-}
-
-function Detail({ label, value }: { label: string; value?: string }) {
-  return (
-    <div className="flex items-center justify-between gap-4">
-      <span className="text-sm text-slate-500">{label}</span>
-      <strong className="text-right text-sm font-semibold text-slate-900">
-        {value || "-"}
-      </strong>
-    </div>
+        {/* Footer */}
+        {!account.verified && (
+          <div className="border-t border-slate-100 px-5 py-3.5 flex-shrink-0">
+            <button
+              onClick={() => verifyMutation.mutate()}
+              disabled={isBusy}
+              className="w-full h-8 rounded-md bg-slate-900 hover:bg-[slate-800] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
+            >
+              {isBusy ? <Loader2 size={12} className="animate-spin" /> : <CreditCard size={12} />}
+              {isBusy ? "Verifying…" : "Verify bank account"}
+            </button>
+          </div>
+        )}
+      </div>
+    </>
   );
 }

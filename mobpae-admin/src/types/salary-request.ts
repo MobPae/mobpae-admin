@@ -1,27 +1,42 @@
+export type SalaryRequestStatus =
+  | "SUBMITTED"
+  | "EMPLOYER_APPROVED"
+  | "EMPLOYER_REJECTED"
+  | "READY_FOR_DISBURSAL"
+  | "DISBURSED"
+  | "REPAYMENT_SCHEDULED"
+  | "REPAID";
+
 export interface SalaryRequest {
   id: string;
-
-  amount: number;
-  approvedAmount?: number | null;
-
-  status: string;
-
+  amount: string;
+  approvedAmount: string | null;
+  approvedBy: string | null;
+  approvedAt: string | null;
+  reason: string | null;
+  remarks: string | null;
   requestedAt: string;
-  remarks?: string | null;
-
+  repaymentDate: string | null;
+  status: SalaryRequestStatus;
+  createdAt: string;
+  updatedAt: string;
   disbursal?: {
     id: string;
-    amount: number;
+    amount: string;
     status: string;
-    disbursedAt?: string | null;
+    disbursedAt: string | null;
   } | null;
-
+  repayment?: {
+    id: string;
+    totalAmount: string;
+    dueDate: string;
+    status: string;
+  } | null;
   employee: {
     id: string;
     employeeCode: string;
     name: string;
     email: string;
-
     employer: {
       id: string;
       companyName: string;

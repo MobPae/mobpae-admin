@@ -1,175 +1,225 @@
-import { CheckCircle2, CreditCard, Loader2, X } from "lucide-react";
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { X, CheckCircle2, CreditCard, Loader2 } from "lucide-react";
 import {
   approveSalaryRequestForDisbursal,
   disburseSalaryRequest,
 } from "../../services/salaryRequestService";
 import type { SalaryRequest } from "../../types/salary-request";
 
-interface SalaryRequestDrawerProps {
+interface Props {
   open: boolean;
   request: SalaryRequest | null;
   onClose: () => void;
-  onCompleted: () => void;
+  onMutated: () => void;
 }
 
-const formatMoney = (amount: number | string | null | undefined) =>
-  `₹${Number(amount ?? 0).toLocaleString("en-IN")}`;
+const STATUS_BADGE: Record<string, string> = {
+  SUBMITTED:           "bg-amber-50 text-amber-700",
+  EMPLOYER_APPROVED:   "bg-blue-50 text-blue-700",
+  EMPLOYER_REJECTED:   "bg-red-50 text-red-600",
+  READY_FOR_DISBURSAL: "bg-blue-50 text-blue-700",
+  DISBURSED:           "bg-emerald-50 text-emerald-700",
+  REPAYMENT_SCHEDULED: "bg-blue-50 text-blue-700",
+  REPAID:              "bg-slate-100 text-slate-500",
+};
 
-const readableStatus = (status: string) =>
-  status
-    .replaceAll("_", " ")
-    .toLowerCase()
-    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+const STATUS_LABEL: Record<string, string> = {
+  SUBMITTED:           "Submitted",
+  EMPLOYER_APPROVED:   "Employer Approved",
+  EMPLOYER_REJECTED:   "Rejected",
+  READY_FOR_DISBURSAL: "Ready for Disbursal",
+  DISBURSED:           "Disbursed",
+  REPAYMENT_SCHEDULED: "Repayment Scheduled",
+  REPAID:              "Repaid",
+};
 
-export default function SalaryRequestDrawer({
-  open,
-  request,
-  onClose,
-  onCompleted,
-}: SalaryRequestDrawerProps) {
-  const [submitting, setSubmitting] = useState<"approve" | "disburse" | null>(null);
-  const [error, setError] = useState("");
+const fmt = (v: string | null | undefined) =>
+  v ? `₹${Number(v).toLocaleString("en-IN")}` : "—";
+
+export default function SalaryRequestDrawer({ open, request, onClose, onMutated }: Props) {
+  const [disbursing, setDisbursing] = useState(false);
+
+  const approveMutation = useMutation({
+    mutationFn: () => approveSalaryRequestForDisbursal(request!.id),
+    onSuccess: () => {
+      toast.success("Approved for disbursal", {
+        description: `${request?.employee.name}'s request is ready to disburse.`,
+      });
+      onMutated();
+    },
+    onError: (err: unknown) => {
+      toast.error("Approval failed", { description: err instanceof Error ? err.message : "Unexpected error" });
+    },
+  });
+
+  const disburseMutation = useMutation({
+    mutationFn: () => disburseSalaryRequest(request!.disbursal!.id),
+    onSuccess: () => {
+      toast.success("Disbursed", {
+        description: `₹${Number(request?.amount).toLocaleString("en-IN")} sent to ${request?.employee.name}.`,
+      });
+      onMutated();
+    },
+    onError: (err: unknown) => {
+      toast.error("Disbursal failed", { description: err instanceof Error ? err.message : "Unexpected error" });
+    },
+  });
 
   if (!open || !request) return null;
 
-  const selectedRequest = request;
-  const employerApproved = selectedRequest.status === "EMPLOYER_APPROVED";
-  const readyForDisbursal = selectedRequest.status === "READY_FOR_DISBURSAL";
-  const disbursed = selectedRequest.status === "DISBURSED" || selectedRequest.disbursal?.status === "DISBURSED";
-  const canAdminApprove = employerApproved;
-  const canDisburse = readyForDisbursal && Boolean(selectedRequest.disbursal?.id) && selectedRequest.disbursal?.status !== "DISBURSED";
+  const canApprove  = request.status === "EMPLOYER_APPROVED";
+  const canDisburse = request.status === "READY_FOR_DISBURSAL" && !!request.disbursal?.id && request.disbursal.status !== "DISBURSED";
+  const isBusy      = approveMutation.isPending || disburseMutation.isPending || disbursing;
 
-  async function handleAdminApprove() {
-    setSubmitting("approve");
-    setError("");
-    try {
-      await approveSalaryRequestForDisbursal(selectedRequest.id);
-      await onCompleted();
-    } catch (error) {
-      setError(error instanceof Error ? error.message : "Unable to approve request");
-    } finally {
-      setSubmitting(null);
-    }
-  }
-
-  async function handleDisburse() {
-    if (!selectedRequest.disbursal?.id) return;
-
-    setSubmitting("disburse");
-    setError("");
-    try {
-      await disburseSalaryRequest(selectedRequest.disbursal.id);
-      await onCompleted();
-    } catch (error) {
-      setError(error instanceof Error ? error.message : "Unable to disburse request");
-    } finally {
-      setSubmitting(null);
-    }
-  }
+  // suppress unused warning
+  void setDisbursing;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-slate-900/40">
-      <aside className="h-full w-full max-w-xl overflow-y-auto bg-white shadow-2xl">
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white px-6 py-5">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-blue-600">
-              Salary Request
-            </p>
-            <h2 className="text-xl font-bold text-slate-900">{request.id}</h2>
-          </div>
+    <>
+      <div className="fixed inset-0 bg-black/20 z-40" onClick={onClose} />
 
-          <button
-            className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50"
-            onClick={onClose}
-            type="button"
-          >
-            <X size={18} />
-          </button>
-        </div>
-
-        <div className="space-y-5 p-6">
-          <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-sm text-slate-500">Requested amount</p>
-                <strong className="mt-1 block text-3xl text-slate-950">
-                  {formatMoney(request.amount)}
-                </strong>
-              </div>
-
-              <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">
-                {readableStatus(request.status)}
-              </span>
+      <div className="fixed top-0 right-0 h-full w-[440px] bg-white z-50 flex flex-col border-l border-slate-200 shadow-xl">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-slate-700 to-slate-900 text-white flex items-center justify-center text-[12px] font-[600]">
+              {request.employee.name.charAt(0).toUpperCase()}
             </div>
-
-            <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
-              <Info label="Requested on" value={new Date(request.requestedAt).toLocaleDateString()} />
-              <Info label="Approved amount" value={formatMoney(request.approvedAmount ?? request.amount)} />
+            <div>
+              <p className="text-[13px] font-[500] text-slate-900 leading-none">{request.employee.name}</p>
+              <p className="text-[11px] text-slate-400 mt-0.5 leading-none">{request.employee.employer.companyName}</p>
             </div>
           </div>
-
-          <div className="rounded-3xl border border-slate-200 bg-white p-5">
-            <h3 className="text-sm font-semibold text-slate-900">Employee</h3>
-            <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-              <Info label="Name" value={request.employee.name} />
-              <Info label="Employee code" value={request.employee.employeeCode} />
-              <Info label="Email" value={request.employee.email} />
-              <Info label="Employer" value={request.employee.employer.companyName} />
-            </div>
-          </div>
-
-          <div className="rounded-3xl border border-slate-200 bg-white p-5">
-            <h3 className="text-sm font-semibold text-slate-900">Admin action</h3>
-            <p className="mt-2 text-sm text-slate-500">
-              Admin approval is available only after employer approval. Disbursal is available after admin approval.
-            </p>
-
-            {error ? (
-              <div className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">
-                {error}
-              </div>
-            ) : null}
-
-            {!employerApproved && !readyForDisbursal && !disbursed ? (
-              <div className="mt-4 rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-700">
-                Waiting for employer approval.
-              </div>
-            ) : null}
-
-            <div className="mt-5 grid grid-cols-2 gap-3">
-              <button
-                className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
-                disabled={!canAdminApprove || submitting !== null}
-                onClick={handleAdminApprove}
-                type="button"
-              >
-                {submitting === "approve" ? <Loader2 className="animate-spin" size={17} /> : <CheckCircle2 size={17} />}
-                Admin approve
-              </button>
-
-              <button
-                className="flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
-                disabled={!canDisburse || submitting !== null}
-                onClick={handleDisburse}
-                type="button"
-              >
-                {submitting === "disburse" ? <Loader2 className="animate-spin" size={17} /> : <CreditCard size={17} />}
-                Disburse
-              </button>
-            </div>
+          <div className="flex items-center gap-2">
+            <span className={`inline-flex h-[18px] px-1.5 rounded-[3px] items-center text-[10px] font-[500] ${STATUS_BADGE[request.status] ?? "bg-slate-100 text-slate-500"}`}>
+              {STATUS_LABEL[request.status] ?? request.status}
+            </span>
+            <button onClick={onClose} className="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
+              <X size={14} />
+            </button>
           </div>
         </div>
-      </aside>
-    </div>
-  );
-}
 
-function Info({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <p className="text-xs text-slate-500">{label}</p>
-      <strong className="mt-1 block text-sm font-semibold text-slate-900">{value}</strong>
-    </div>
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
+          {/* Amount summary */}
+          <section>
+            <p className="text-[10px] font-[500] uppercase tracking-[0.07em] text-slate-400 mb-2">Request summary</p>
+            <div className="border border-slate-100 rounded-lg divide-y divide-slate-100">
+              {[
+                { k: "Requested amount",  v: fmt(request.amount) },
+                { k: "Approved amount",   v: fmt(request.approvedAmount) },
+                { k: "Reason",            v: request.reason ?? "Not provided" },
+                { k: "Requested on",      v: new Date(request.requestedAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) },
+                ...(request.approvedAt ? [{ k: "Approved on", v: new Date(request.approvedAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) }] : []),
+                ...(request.remarks ? [{ k: "Remarks", v: request.remarks }] : []),
+              ].map(({ k, v }) => (
+                <div key={k} className="flex items-center justify-between px-3 py-2.5">
+                  <span className="text-[11px] text-slate-400">{k}</span>
+                  <span className="text-[11px] font-[500] text-slate-800 text-right max-w-[60%] truncate">{v}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Employee */}
+          <section>
+            <p className="text-[10px] font-[500] uppercase tracking-[0.07em] text-slate-400 mb-2">Employee</p>
+            <div className="border border-slate-100 rounded-lg divide-y divide-slate-100">
+              {[
+                { k: "Name",          v: request.employee.name },
+                { k: "Employee code", v: <span className="font-mono">{request.employee.employeeCode}</span> },
+                { k: "Email",         v: request.employee.email },
+                { k: "Employer",      v: request.employee.employer.companyName },
+              ].map(({ k, v }) => (
+                <div key={k} className="flex items-center justify-between px-3 py-2.5">
+                  <span className="text-[11px] text-slate-400">{k}</span>
+                  <span className="text-[11px] font-[500] text-slate-800 text-right max-w-[60%] truncate">{v}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Disbursal info if exists */}
+          {request.disbursal && (
+            <section>
+              <p className="text-[10px] font-[500] uppercase tracking-[0.07em] text-slate-400 mb-2">Disbursal</p>
+              <div className="border border-slate-100 rounded-lg divide-y divide-slate-100">
+                {[
+                  { k: "Amount",     v: fmt(request.disbursal.amount) },
+                  { k: "Status",     v: request.disbursal.status },
+                  ...(request.disbursal.disbursedAt ? [{ k: "Disbursed on", v: new Date(request.disbursal.disbursedAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) }] : []),
+                ].map(({ k, v }) => (
+                  <div key={k} className="flex items-center justify-between px-3 py-2.5">
+                    <span className="text-[11px] text-slate-400">{k}</span>
+                    <span className="text-[11px] font-[500] text-slate-800">{v}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Repayment info if exists */}
+          {request.repayment && (
+            <section>
+              <p className="text-[10px] font-[500] uppercase tracking-[0.07em] text-slate-400 mb-2">Repayment</p>
+              <div className="border border-slate-100 rounded-lg divide-y divide-slate-100">
+                {[
+                  { k: "Total amount", v: fmt(request.repayment.totalAmount) },
+                  { k: "Due date",     v: new Date(request.repayment.dueDate).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) },
+                  { k: "Status",       v: request.repayment.status },
+                ].map(({ k, v }) => (
+                  <div key={k} className="flex items-center justify-between px-3 py-2.5">
+                    <span className="text-[11px] text-slate-400">{k}</span>
+                    <span className="text-[11px] font-[500] text-slate-800">{v}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Info note when no action available */}
+          {!canApprove && !canDisburse && (
+            <div className="bg-slate-50 rounded-md px-3 py-2.5 border border-slate-100">
+              <p className="text-[11px] text-slate-500 leading-relaxed">
+                {request.status === "SUBMITTED"
+                  ? "Waiting for employer to review and approve this request."
+                  : request.status === "EMPLOYER_REJECTED"
+                  ? "This request was rejected by the employer."
+                  : "No further action required for this request."}
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Footer actions */}
+        {(canApprove || canDisburse) && (
+          <div className="border-t border-slate-100 px-5 py-3.5 flex-shrink-0 flex gap-2">
+            {canApprove && (
+              <button
+                onClick={() => approveMutation.mutate()}
+                disabled={isBusy}
+                className="flex-1 h-8 rounded-md bg-slate-900 hover:bg-[slate-800] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
+              >
+                {approveMutation.isPending ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle2 size={12} />}
+                {approveMutation.isPending ? "Approving…" : "Approve for disbursal"}
+              </button>
+            )}
+            {canDisburse && (
+              <button
+                onClick={() => disburseMutation.mutate()}
+                disabled={isBusy}
+                className="flex-1 h-8 rounded-md bg-emerald-600 hover:bg-emerald-700 text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
+              >
+                {disburseMutation.isPending ? <Loader2 size={12} className="animate-spin" /> : <CreditCard size={12} />}
+                {disburseMutation.isPending ? "Disbursing…" : "Disburse"}
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+    </>
   );
 }

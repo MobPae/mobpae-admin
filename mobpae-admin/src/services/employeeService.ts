@@ -1,17 +1,12 @@
-const API_BASE_URL = "http://localhost:3000";
+import api from "../lib/axios";
+import type { Employee } from "../types/employee";
 
-export async function getEmployees() {
-  const token = localStorage.getItem("accessToken");
+export async function getEmployees(): Promise<Employee[]> {
+  const response = await api.get<Employee[]>("/employees");
+  return response.data;
+}
 
-  const response = await fetch(`${API_BASE_URL}/employees`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch employees");
-  }
-
-  return response.json();
+export async function getEmployee(employeeId: string): Promise<Employee> {
+  const response = await api.get<Employee>(`/employees/${employeeId}`);
+  return response.data;
 }

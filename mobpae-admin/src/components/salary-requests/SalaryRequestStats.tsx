@@ -9,9 +9,9 @@ export default function SalaryRequestStats({
 }: SalaryRequestStatsProps) {
   const pending = requests.filter((r) => r.status === "SUBMITTED").length;
 
-  const approved = requests.filter((r) => r.status === "APPROVED").length;
+  const approved = requests.filter((r) => r.status === "EMPLOYER_APPROVED" || r.status === "READY_FOR_DISBURSAL").length;
 
-  const rejected = requests.filter((r) => r.status === "REJECTED").length;
+  const rejected = requests.filter((r) => r.status === "EMPLOYER_REJECTED").length;
 
   const stats = [
     {
