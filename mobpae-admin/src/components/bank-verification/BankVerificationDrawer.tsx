@@ -108,7 +108,7 @@ export default function BankVerificationDrawer({ open, account, onClose, onCompl
             <button
               onClick={() => verifyMutation.mutate()}
               disabled={isBusy}
-              className="w-full h-8 rounded-md bg-slate-900 hover:bg-slate-800 text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
+              className="w-full h-8 rounded-md bg-slate-900 hover:bg-[slate-800] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
             >
               {isBusy ? <Loader2 size={12} className="animate-spin" /> : <CreditCard size={12} />}
               {isBusy ? "Verifying…" : "Verify bank account"}

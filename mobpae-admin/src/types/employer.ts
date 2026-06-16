@@ -1,4 +1,4 @@
-export type EmployerStatus = "PENDING" | "APPROVED" | "REJECTED" | "ACTIVE" | "SUSPENDED";
+export type EmployerStatus = "PENDING" | "APPROVED" | "REJECTED" | "ACTIVE" | "INACTIVE" | "SUSPENDED";
 export type EmployerRiskStatus = "GOOD" | "WARNING" | "BLOCKED";
 
 export interface Employer {
@@ -15,4 +15,18 @@ export interface Employer {
   riskStatus: EmployerRiskStatus;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface CreateEmployerPayload {
+  companyName: string;
+  companyCode: string;
+  contactPerson: string;
+  email: string;
+  phone: string;
+}
+
+// Backend may optionally return login credentials in the create response
+export interface CreateEmployerResponse extends Employer {
+  loginEmail?: string;
+  temporaryPassword?: string;
 }

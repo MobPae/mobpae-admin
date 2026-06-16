@@ -151,7 +151,7 @@ export default function KycDrawer({ open, document, onClose, onCompleted }: Prop
             <button
               onClick={() => verifyMutation.mutate()}
               disabled={isBusy}
-              className="flex-1 h-8 rounded-md bg-slate-900 hover:bg-slate-800 text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
+              className="flex-1 h-8 rounded-md bg-slate-900 hover:bg-[slate-800] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
             >
               {verifyMutation.isPending ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle2 size={12} />}
               {verifyMutation.isPending ? "Verifying…" : "Verify"}

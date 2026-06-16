@@ -217,7 +217,7 @@ export default function SettingsPage() {
         </SectionCard>
 
         {/* Notifications */}
-        <SectionCard icon={<Bell size={13} className="text-violet-600" />} color="bg-violet-50" title="Notifications">
+        <SectionCard icon={<Bell size={13} className="text-blue-600" />} color="bg-blue-50" title="Notifications">
           {NOTIFICATION_RULES.map(r => <ToggleRow key={r.key} k={r.key} label={r.label} />)}
         </SectionCard>
       </div>

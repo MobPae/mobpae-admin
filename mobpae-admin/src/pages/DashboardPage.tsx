@@ -21,10 +21,10 @@ function statusBadge(status: SalaryRequest["status"]): string {
   switch (status) {
     case "SUBMITTED": return "bg-amber-50 text-amber-700";
     case "EMPLOYER_APPROVED": return "bg-blue-50 text-blue-700";
-    case "READY_FOR_DISBURSAL": return "bg-indigo-50 text-indigo-700";
+    case "READY_FOR_DISBURSAL": return "bg-blue-50 text-blue-700";
     case "DISBURSED": return "bg-green-50 text-green-700";
     case "EMPLOYER_REJECTED": return "bg-red-50 text-red-600";
-    case "REPAYMENT_SCHEDULED": return "bg-violet-50 text-violet-700";
+    case "REPAYMENT_SCHEDULED": return "bg-blue-50 text-blue-700";
     case "REPAID": return "bg-slate-100 text-slate-500";
   }
 }
@@ -36,7 +36,7 @@ function statusLabel(status: SalaryRequest["status"]): string {
     case "READY_FOR_DISBURSAL": return "Ready";
     case "DISBURSED": return "Disbursed";
     case "EMPLOYER_REJECTED": return "Rejected";
-    case "REPAYMENT_SCHEDULED": return "Repayment";
+    case "REPAYMENT_SCHEDULED": return "Recovery";
     case "REPAID": return "Repaid";
   }
 }
@@ -81,14 +81,14 @@ export default function DashboardPage() {
     { label: "Pending requests", value: d.pendingSalaryRequests, sub: "awaiting review", accent: d.pendingSalaryRequests > 0 },
     { label: "Pending disbursals", value: d.pendingDisbursals, sub: "ready to process", accent: d.pendingDisbursals > 0 },
     { label: "KYC pending", value: d.pendingKycDocuments, sub: "docs in queue", accent: d.pendingKycDocuments > 0 },
-    { label: "Active repayments", value: d.activeRepayments, sub: "in progress", accent: false },
+    { label: "Active recoveries", value: d.activeRepayments, sub: "in progress", accent: false },
   ];
 
   const actionItems = [
     { label: "Salary requests", sub: "Awaiting review", count: d.pendingSalaryRequests, color: "bg-amber-400", to: "/salary-requests" },
     { label: "KYC documents", sub: "Pending verification", count: d.pendingKycDocuments, color: "bg-blue-400", to: "/kyc" },
-    { label: "Disbursals", sub: "Ready to process", count: d.pendingDisbursals, color: "bg-indigo-400", to: "/disbursals" },
-    { label: "Active repayments", sub: "In progress", count: d.activeRepayments, color: "bg-slate-400", to: "/repayments" },
+    { label: "Disbursals", sub: "Ready to process", count: d.pendingDisbursals, color: "bg-blue-400", to: "/disbursals" },
+    { label: "Active recoveries", sub: "In progress", count: d.activeRepayments, color: "bg-slate-400", to: "/recoveries" },
   ];
 
   return (

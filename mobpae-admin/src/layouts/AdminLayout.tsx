@@ -41,7 +41,7 @@ export default function AdminLayout() {
             </button>
             <div className="w-px h-4 bg-slate-200 mx-2" />
             <div className="flex items-center gap-2 mr-1">
-              <div className="w-6 h-6 rounded-full bg-slate-800 text-white flex items-center justify-center text-[10px] font-[500]">
+              <div className="w-6 h-6 rounded-full bg-[#c4522a] text-white flex items-center justify-center text-[10px] font-[500]">
                 A
               </div>
               <span className="text-[12px] text-slate-500">Admin</span>

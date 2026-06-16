@@ -240,7 +240,7 @@ export default function EmployerDetailsDrawer({ open, onClose, onMutated, employ
                 <button
                   onClick={() => approveMutation.mutate()}
                   disabled={isBusy || !isFormValid}
-                  className="flex-1 h-8 rounded-md bg-slate-900 hover:bg-slate-800 text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="flex-1 h-8 rounded-md bg-slate-900 hover:bg-[slate-800] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {approveMutation.isPending
                     ? <Loader2 size={12} className="animate-spin" />

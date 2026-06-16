@@ -30,6 +30,13 @@ export interface Membership {
   };
 }
 
+export interface MembershipSummary {
+  activeMemberships: number;
+  pendingMemberships: number;
+  rejectedMemberships: number;
+  totalRevenue: string | number;
+}
+
 export interface MembershipCoupon {
   id: string;
   code: string;

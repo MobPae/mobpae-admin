@@ -170,7 +170,7 @@ export default function PendingActionsTable() {
                           text-white
                           text-xs
                           font-medium
-                          hover:bg-slate-800
+                          hover:bg-[slate-800]
                           transition-all
                         "
                     >

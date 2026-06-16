@@ -17,14 +17,28 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Handle auth errors globally
+// Handle auth errors globally.
+// Guard: only redirect once per expired-session, not once per parallel in-flight request.
+let redirectingToLogin = false;
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const requestUrl: string = error.config?.url ?? "";
+    const is401 = error.response?.status === 401;
+
+    // Don't treat a bad-credentials response from the login endpoint as "session expired".
+    const isAuthEndpoint = requestUrl.includes("/auth/login");
+
+    if (is401 && !isAuthEndpoint && !redirectingToLogin) {
+      redirectingToLogin = true;
       removeToken();
-      window.location.href = "/login";
+      // Use replace so the login page doesn't end up in browser history.
+      window.location.replace("/login");
+      // Reset flag after navigation completes so a fresh login session works.
+      setTimeout(() => { redirectingToLogin = false; }, 3000);
     }
+
     return Promise.reject(error);
   }
 );

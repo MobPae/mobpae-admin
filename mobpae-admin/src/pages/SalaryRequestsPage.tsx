@@ -51,7 +51,7 @@ export default function SalaryRequestsPage() {
   const pipeline = [
     { label: "Submitted",   key: "SUBMITTED" as const,           color: "bg-amber-400",   text: "text-amber-600"   },
     { label: "Emp Approved",key: "EMPLOYER_APPROVED" as const,   color: "bg-blue-400",    text: "text-blue-600"    },
-    { label: "Ready",       key: "READY_FOR_DISBURSAL" as const, color: "bg-indigo-400",  text: "text-indigo-600"  },
+    { label: "Ready",       key: "READY_FOR_DISBURSAL" as const, color: "bg-blue-400",  text: "text-blue-600"  },
     { label: "Disbursed",   key: "DISBURSED" as const,           color: "bg-emerald-400", text: "text-emerald-600" },
   ];
 

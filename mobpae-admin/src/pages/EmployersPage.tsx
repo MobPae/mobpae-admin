@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import EmployersTable from "../components/employers/EmployersTable";
 import EmployerManagementDrawer from "../components/employers/EmployerManagementDrawer";
+import CreateEmployerDrawer from "../components/employers/CreateEmployerDrawer";
 import type { Employer, EmployerStatus } from "../types/employer";
 import { getEmployers } from "../services/employerService";
 
@@ -11,6 +12,7 @@ const STATUS_CHIPS: { label: string; value: "ALL" | EmployerStatus }[] = [
   { label: "Active", value: "ACTIVE" },
   { label: "Pending", value: "PENDING" },
   { label: "Suspended", value: "SUSPENDED" },
+  { label: "Inactive", value: "INACTIVE" },
   { label: "Rejected", value: "REJECTED" },
 ];
 
@@ -28,12 +30,14 @@ export default function EmployersPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"ALL" | EmployerStatus>("ALL");
   const [selected, setSelected] = useState<Employer | null>(null);
+  const [showCreate, setShowCreate] = useState(false);
 
   const counts: Record<EmployerStatus, number> = {
-    ACTIVE: employers.filter((e) => e.status === "ACTIVE").length,
-    PENDING: employers.filter((e) => e.status === "PENDING").length,
-    APPROVED: employers.filter((e) => e.status === "APPROVED").length,
-    REJECTED: employers.filter((e) => e.status === "REJECTED").length,
+    ACTIVE:    employers.filter((e) => e.status === "ACTIVE").length,
+    PENDING:   employers.filter((e) => e.status === "PENDING").length,
+    APPROVED:  employers.filter((e) => e.status === "APPROVED").length,
+    REJECTED:  employers.filter((e) => e.status === "REJECTED").length,
+    INACTIVE:  employers.filter((e) => e.status === "INACTIVE").length,
     SUSPENDED: employers.filter((e) => e.status === "SUSPENDED").length,
   };
 
@@ -61,9 +65,21 @@ export default function EmployersPage() {
   return (
     <div className="p-5 space-y-4">
       {/* Page header */}
-      <div>
-        <h1 className="text-[15px] font-[500] text-slate-900 leading-none">Employers</h1>
-        <p className="text-[11px] text-slate-400 mt-1.5">Manage onboarded employer accounts</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-[15px] font-[500] text-slate-900 leading-none">Employers</h1>
+          <p className="text-[11px] text-slate-400 mt-1.5">Manage employer accounts</p>
+        </div>
+        <button
+          onClick={() => setShowCreate(true)}
+          className="h-8 px-3.5 rounded-lg text-white text-[12px] font-[600] flex items-center gap-1.5 transition-colors"
+          style={{ background: "#c4522a" }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "#a8411f"; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "#c4522a"; }}
+        >
+          <Plus size={13} />
+          Create Employer
+        </button>
       </div>
 
       {isError && (
@@ -168,6 +184,11 @@ export default function EmployersPage() {
         employer={selected}
         onClose={() => setSelected(null)}
         onMutated={() => void queryClient.invalidateQueries({ queryKey: ["employers"] })}
+      />
+
+      <CreateEmployerDrawer
+        open={showCreate}
+        onClose={() => setShowCreate(false)}
       />
     </div>
   );

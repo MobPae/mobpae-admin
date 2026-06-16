@@ -1,4 +1,24 @@
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap");
 @import "tailwindcss";
+
+@theme inline {
+  --font-sans:    "Geist", ui-sans-serif, -apple-system, system-ui, sans-serif;
+  --font-display: "Geist", ui-sans-serif, -apple-system, system-ui, sans-serif;
+  --font-serif:   "Instrument Serif", ui-serif, Georgia, serif;
+
+  /* ── Brand: terracotta replaces blue across all blue-* classes ── */
+  --color-blue-50:  #fdf3ee;
+  --color-blue-100: #fbe3d3;
+  --color-blue-200: #f6c4a4;
+  --color-blue-300: #ef9d6d;
+  --color-blue-400: #e57340;
+  --color-blue-500: #c4522a;
+  --color-blue-600: #a8411f;
+  --color-blue-700: #8a3118;
+  --color-blue-800: #6d2514;
+  --color-blue-900: #511c0f;
+  --color-blue-950: #2d0f07;
+}
 
 html,
 body,
@@ -6,9 +26,15 @@ body,
   margin: 0;
   width: 100%;
   height: 100%;
-  font-family: "Inter", sans-serif;
+  font-family: "Geist", ui-sans-serif, -apple-system, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 body {
   background: #f8fafc;
 }
+
+.font-sans    { font-family: "Geist", ui-sans-serif, -apple-system, system-ui, sans-serif; }
+.font-display { font-family: "Geist", ui-sans-serif, -apple-system, system-ui, sans-serif; }
+.font-serif   { font-family: "Instrument Serif", ui-serif, Georgia, serif; }

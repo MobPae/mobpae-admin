@@ -46,7 +46,7 @@ export default function EmployerManagementCard({
               rounded-xl
               bg-gradient-to-br
               from-blue-500
-              to-indigo-600
+              to-blue-600
               text-white
               flex
               items-center

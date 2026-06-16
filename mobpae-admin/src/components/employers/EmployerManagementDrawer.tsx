@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { X, Ban, CheckCircle2, Loader2 } from "lucide-react";
+import { X, Ban, CheckCircle2, Loader2, PauseCircle } from "lucide-react";
 import { updateEmployerStatus } from "../../services/employerService";
 import type { Employer } from "../../types/employer";
 
@@ -17,6 +17,7 @@ const STATUS_BADGE: Record<Employer["status"], string> = {
   PENDING:   "bg-amber-50 text-amber-700",
   APPROVED:  "bg-blue-50 text-blue-700",
   REJECTED:  "bg-red-50 text-red-600",
+  INACTIVE:  "bg-slate-100 text-slate-500",
   SUSPENDED: "bg-orange-50 text-orange-600",
 };
 
@@ -28,18 +29,29 @@ const RISK_BADGE: Record<Employer["riskStatus"], string> = {
 
 export default function EmployerManagementDrawer({ open, onClose, onMutated, employer }: Props) {
   const [suspendConfirm, setSuspendConfirm] = useState(false);
+  const [deactivateConfirm, setDeactivateConfirm] = useState(false);
 
   useEffect(() => {
-    if (open) setSuspendConfirm(false);
+    if (open) {
+      setSuspendConfirm(false);
+      setDeactivateConfirm(false);
+    }
   }, [open, employer?.id]);
+
+  const STATUS_LABEL: Record<Employer["status"], string> = {
+    ACTIVE:    "activated",
+    INACTIVE:  "deactivated",
+    SUSPENDED: "suspended",
+    PENDING:   "set to pending",
+    APPROVED:  "approved",
+    REJECTED:  "rejected",
+  };
 
   const mutation = useMutation({
     mutationFn: (status: Employer["status"]) => updateEmployerStatus(employer!.id, status),
     onSuccess: (_data, status) => {
-      toast.success(status === "SUSPENDED" ? "Employer suspended" : "Employer activated", {
-        description: status === "SUSPENDED"
-          ? `${employer?.companyName} has been suspended.`
-          : `${employer?.companyName} is now active.`,
+      toast.success(`Employer ${STATUS_LABEL[status]}`, {
+        description: `${employer?.companyName} has been ${STATUS_LABEL[status]}.`,
       });
       onMutated();
       onClose();
@@ -54,8 +66,9 @@ export default function EmployerManagementDrawer({ open, onClose, onMutated, emp
   if (!open || !employer) return null;
 
   const isBusy = mutation.isPending;
-  const canSuspend = employer.status === "ACTIVE";
-  const canActivate = employer.status === "SUSPENDED" || employer.status === "PENDING";
+  const canSuspend    = employer.status === "ACTIVE";
+  const canDeactivate = employer.status === "ACTIVE";
+  const canActivate   = employer.status === "SUSPENDED" || employer.status === "PENDING" || employer.status === "INACTIVE";
 
   return (
     <>
@@ -146,34 +159,75 @@ export default function EmployerManagementDrawer({ open, onClose, onMutated, emp
         </div>
 
         {/* Footer — actions */}
-        {(canSuspend || canActivate) && (
-          <div className="border-t border-slate-100 px-5 py-3.5 flex-shrink-0">
-            {canSuspend && (
-              suspendConfirm ? (
-                <div className="space-y-2.5">
-                  <p className="text-[12px] text-slate-600">
-                    Suspend <span className="font-[500] text-slate-800">{employer.companyName}</span>? Employees will lose advance access.
-                  </p>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setSuspendConfirm(false)}
-                      disabled={isBusy}
-                      className="flex-1 h-8 rounded-md border border-slate-200 text-[12px] font-[500] text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={() => mutation.mutate("SUSPENDED")}
-                      disabled={isBusy}
-                      className="flex-1 h-8 rounded-md bg-red-600 hover:bg-red-700 text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-60"
-                    >
-                      {isBusy ? <Loader2 size={12} className="animate-spin" /> : <Ban size={12} />}
-                      Confirm suspend
-                    </button>
-                  </div>
-                </div>
-              ) : (
+        {(canSuspend || canDeactivate || canActivate) && (
+          <div className="border-t border-slate-100 px-5 py-3.5 flex-shrink-0 space-y-2.5">
+
+            {/* Suspend confirm flow */}
+            {canSuspend && suspendConfirm && (
+              <div className="space-y-2.5">
+                <p className="text-[12px] text-slate-600">
+                  Suspend <span className="font-[500] text-slate-800">{employer.companyName}</span>? Employees will lose advance access.
+                </p>
                 <div className="flex gap-2">
+                  <button
+                    onClick={() => setSuspendConfirm(false)}
+                    disabled={isBusy}
+                    className="flex-1 h-8 rounded-md border border-slate-200 text-[12px] font-[500] text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => mutation.mutate("SUSPENDED")}
+                    disabled={isBusy}
+                    className="flex-1 h-8 rounded-md bg-red-600 hover:bg-red-700 text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-60"
+                  >
+                    {isBusy ? <Loader2 size={12} className="animate-spin" /> : <Ban size={12} />}
+                    Confirm suspend
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Deactivate confirm flow */}
+            {canDeactivate && deactivateConfirm && (
+              <div className="space-y-2.5">
+                <p className="text-[12px] text-slate-600">
+                  Deactivate <span className="font-[500] text-slate-800">{employer.companyName}</span>? Payroll access will be disabled.
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setDeactivateConfirm(false)}
+                    disabled={isBusy}
+                    className="flex-1 h-8 rounded-md border border-slate-200 text-[12px] font-[500] text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => mutation.mutate("INACTIVE")}
+                    disabled={isBusy}
+                    className="flex-1 h-8 rounded-md bg-slate-600 hover:bg-slate-700 text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-60"
+                  >
+                    {isBusy ? <Loader2 size={12} className="animate-spin" /> : <PauseCircle size={12} />}
+                    Confirm deactivate
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Normal action buttons (hidden when a confirm dialog is showing) */}
+            {!suspendConfirm && !deactivateConfirm && (
+              <div className="flex gap-2">
+                {canActivate && (
+                  <button
+                    onClick={() => mutation.mutate("ACTIVE")}
+                    disabled={isBusy}
+                    className="flex-1 h-8 rounded-md bg-slate-900 hover:bg-slate-800 text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
+                  >
+                    {isBusy ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle2 size={12} />}
+                    {isBusy ? "Activating…" : "Activate"}
+                  </button>
+                )}
+                {canSuspend && (
                   <button
                     onClick={() => setSuspendConfirm(true)}
                     disabled={isBusy}
@@ -182,18 +236,18 @@ export default function EmployerManagementDrawer({ open, onClose, onMutated, emp
                     <Ban size={12} />
                     Suspend
                   </button>
-                </div>
-              )
-            )}
-            {canActivate && (
-              <button
-                onClick={() => mutation.mutate("ACTIVE")}
-                disabled={isBusy}
-                className="w-full h-8 rounded-md bg-slate-900 hover:bg-slate-800 text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
-              >
-                {isBusy ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle2 size={12} />}
-                {isBusy ? "Activating…" : "Activate employer"}
-              </button>
+                )}
+                {canDeactivate && (
+                  <button
+                    onClick={() => setDeactivateConfirm(true)}
+                    disabled={isBusy}
+                    className="h-8 px-3.5 rounded-md border border-slate-200 text-[12px] font-[500] text-slate-500 hover:border-slate-400 hover:text-slate-700 transition-colors disabled:opacity-50 flex items-center gap-1.5"
+                  >
+                    <PauseCircle size={12} />
+                    Deactivate
+                  </button>
+                )}
+              </div>
             )}
           </div>
         )}

@@ -12,7 +12,7 @@ export default function SystemOverview() {
       label: "Employees",
       value: "1,248",
       icon: Users,
-      className: "bg-purple-100 text-purple-700 border border-purple-200",
+      className: "bg-blue-100 text-blue-700 border border-blue-200",
     },
     {
       label: "Requests",
@@ -24,7 +24,7 @@ export default function SystemOverview() {
       label: "Disbursed",
       value: "₹4.2L",
       icon: Landmark,
-      className: "bg-indigo-100 text-indigo-700 border border-indigo-200",
+      className: "bg-blue-100 text-blue-700 border border-blue-200",
     },
     {
       label: "Repaid",

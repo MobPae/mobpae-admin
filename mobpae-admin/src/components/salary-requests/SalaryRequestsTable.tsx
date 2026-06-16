@@ -7,12 +7,12 @@ interface Props {
 }
 
 const AVATAR_COLORS: Record<string, string> = {
-  A:"bg-rose-500",B:"bg-pink-500",C:"bg-fuchsia-500",D:"bg-purple-500",
-  E:"bg-violet-500",F:"bg-indigo-500",G:"bg-blue-500",H:"bg-sky-500",
+  A:"bg-rose-500",B:"bg-pink-500",C:"bg-fuchsia-500",D:"bg-blue-500",
+  E:"bg-blue-500",F:"bg-blue-500",G:"bg-blue-500",H:"bg-sky-500",
   I:"bg-cyan-500",J:"bg-teal-500",K:"bg-emerald-500",L:"bg-green-500",
   M:"bg-lime-600",N:"bg-yellow-600",O:"bg-amber-500",P:"bg-orange-500",
   Q:"bg-red-500",R:"bg-rose-600",S:"bg-pink-600",T:"bg-fuchsia-600",
-  U:"bg-purple-600",V:"bg-violet-600",W:"bg-indigo-600",X:"bg-blue-600",
+  U:"bg-blue-600",V:"bg-blue-600",W:"bg-blue-600",X:"bg-blue-600",
   Y:"bg-sky-600",Z:"bg-cyan-600",
 };
 const avatarBg = (n: string) => AVATAR_COLORS[n.charAt(0).toUpperCase()] ?? "bg-slate-600";
@@ -21,9 +21,9 @@ const STATUS_CONFIG: Record<SalaryRequestStatus, { label: string; dot: string; t
   SUBMITTED:           { label: "Submitted",    dot: "bg-amber-400",   text: "text-amber-700",   bg: "bg-amber-50"   },
   EMPLOYER_APPROVED:   { label: "Emp Approved", dot: "bg-blue-400",    text: "text-blue-700",    bg: "bg-blue-50"    },
   EMPLOYER_REJECTED:   { label: "Rejected",     dot: "bg-red-400",     text: "text-red-600",     bg: "bg-red-50"     },
-  READY_FOR_DISBURSAL: { label: "Ready",        dot: "bg-indigo-400",  text: "text-indigo-700",  bg: "bg-indigo-50"  },
+  READY_FOR_DISBURSAL: { label: "Ready",        dot: "bg-blue-400",  text: "text-blue-700",  bg: "bg-blue-50"  },
   DISBURSED:           { label: "Disbursed",    dot: "bg-emerald-400", text: "text-emerald-700", bg: "bg-emerald-50" },
-  REPAYMENT_SCHEDULED: { label: "Repayment",    dot: "bg-violet-400",  text: "text-violet-700",  bg: "bg-violet-50"  },
+  REPAYMENT_SCHEDULED: { label: "Repayment",    dot: "bg-blue-400",  text: "text-blue-700",  bg: "bg-blue-50"  },
   REPAID:              { label: "Repaid",        dot: "bg-slate-300",   text: "text-slate-500",   bg: "bg-slate-100"  },
 };
 
@@ -38,14 +38,14 @@ export default function SalaryRequestsTable({ requests, selectedId, onSelect }: 
     <div className="bg-white rounded-xl border border-slate-100 overflow-hidden">
       <table className="w-full table-fixed">
         <colgroup>
-          <col style={{ width: "17%" }} /> {/* Employee */}
-          <col style={{ width: "15%" }} /> {/* Email */}
-          <col style={{ width: "15%" }} /> {/* Company */}
-          <col style={{ width: "10%" }} /> {/* Amount */}
-          <col style={{ width: "10%" }} /> {/* Approved */}
-          <col style={{ width: "15%" }} /> {/* Status */}
-          <col style={{ width: "11%" }} /> {/* Date */}
-          <col style={{ width: "7%" }}  /> {/* Action */}
+          <col style={{ width: "17%" }} />
+          <col style={{ width: "15%" }} />
+          <col style={{ width: "15%" }} />
+          <col style={{ width: "10%" }} />
+          <col style={{ width: "10%" }} />
+          <col style={{ width: "15%" }} />
+          <col style={{ width: "11%" }} />
+          <col style={{ width: "7%" }} />
         </colgroup>
         <thead>
           <tr className="border-b border-slate-100 bg-slate-50">

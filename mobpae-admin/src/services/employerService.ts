@@ -1,5 +1,5 @@
 import api from "../lib/axios";
-import type { Employer } from "../types/employer";
+import type { CreateEmployerPayload, CreateEmployerResponse, Employer } from "../types/employer";
 
 export async function getEmployers(): Promise<Employer[]> {
   const response = await api.get<Employer[]>("/employers");
@@ -8,6 +8,11 @@ export async function getEmployers(): Promise<Employer[]> {
 
 export async function getEmployer(employerId: string): Promise<Employer> {
   const response = await api.get<Employer>(`/employers/${employerId}`);
+  return response.data;
+}
+
+export async function createEmployer(payload: CreateEmployerPayload): Promise<CreateEmployerResponse> {
+  const response = await api.post<CreateEmployerResponse>("/employers", payload);
   return response.data;
 }
 

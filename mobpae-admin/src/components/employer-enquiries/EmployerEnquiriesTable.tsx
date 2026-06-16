@@ -7,12 +7,12 @@ interface Props {
 }
 
 const AVATAR_COLORS: Record<string, string> = {
-  A:"bg-rose-500",B:"bg-pink-500",C:"bg-fuchsia-500",D:"bg-purple-500",
-  E:"bg-violet-500",F:"bg-indigo-500",G:"bg-blue-500",H:"bg-sky-500",
+  A:"bg-rose-500",B:"bg-pink-500",C:"bg-fuchsia-500",D:"bg-blue-500",
+  E:"bg-blue-500",F:"bg-blue-500",G:"bg-blue-500",H:"bg-sky-500",
   I:"bg-cyan-500",J:"bg-teal-500",K:"bg-emerald-500",L:"bg-green-500",
   M:"bg-lime-600",N:"bg-yellow-600",O:"bg-amber-500",P:"bg-orange-500",
   Q:"bg-red-500",R:"bg-rose-600",S:"bg-pink-600",T:"bg-fuchsia-600",
-  U:"bg-purple-600",V:"bg-violet-600",W:"bg-indigo-600",X:"bg-blue-600",
+  U:"bg-blue-600",V:"bg-blue-600",W:"bg-blue-600",X:"bg-blue-600",
   Y:"bg-sky-600",Z:"bg-cyan-600",
 };
 const avatarBg = (n: string) => AVATAR_COLORS[n.charAt(0).toUpperCase()] ?? "bg-slate-600";
@@ -42,13 +42,13 @@ export default function EmployerEnquiriesTable({ enquiries, selectedId, onSelect
     <div className="bg-white rounded-xl border border-slate-100 overflow-hidden">
       <table className="w-full table-fixed">
         <colgroup>
-          <col style={{ width: "20%" }} /> {/* Company */}
-          <col style={{ width: "18%" }} /> {/* Email */}
-          <col style={{ width: "14%" }} /> {/* Contact */}
-          <col style={{ width: "14%" }} /> {/* Phone */}
-          <col style={{ width: "10%" }} /> {/* Employees */}
-          <col style={{ width: "14%" }} /> {/* Status */}
-          <col style={{ width: "10%" }} /> {/* Received */}
+          <col style={{ width: "20%" }} />
+          <col style={{ width: "18%" }} />
+          <col style={{ width: "14%" }} />
+          <col style={{ width: "14%" }} />
+          <col style={{ width: "10%" }} />
+          <col style={{ width: "14%" }} />
+          <col style={{ width: "10%" }} />
         </colgroup>
         <thead>
           <tr className="border-b border-slate-100 bg-slate-50">

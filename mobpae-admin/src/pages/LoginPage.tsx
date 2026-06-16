@@ -1,255 +1,254 @@
-import LoginFeature from "../components/auth/LoginFeature";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, ShieldCheck, Users, Zap } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../services/authService";
-import { useEffect, useState } from "react";
 import { getToken, setToken } from "../utils/auth";
+
+const BRAND = "#c4522a";
+const BRAND_DARK = "#a8411f";
+const BRAND_LIGHT = "#fdf3ee";
+
+const STATS = [
+  { label: "Active employers", value: "24" },
+  { label: "Employees enrolled", value: "1,280" },
+  { label: "Advances disbursed", value: "₹48L" },
+  { label: "Recovery rate", value: "99.2%" },
+];
+
+const FEATURES = [
+  { icon: Users,       text: "Manage all employer accounts and employee records" },
+  { icon: Zap,         text: "Approve salary advance requests in real-time"       },
+  { icon: ShieldCheck, text: "Full audit trail, KYC verification and bank control"  },
+];
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
+  const [email, setEmail]               = useState("");
+  const [password, setPassword]         = useState("");
+  const [loading, setLoading]           = useState(false);
+  const [error, setError]               = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => { if (getToken()) navigate("/"); }, [navigate]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-
     try {
       setLoading(true);
       setError("");
-
       const response = await login(email, password);
-
       setToken(response.accessToken);
-
       navigate("/");
     } catch {
-      setError("Invalid email or password");
+      setError("Invalid email or password. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    if (getToken()) {
-      navigate("/");
-    }
-  }, [navigate]);
   return (
-    <div className="h-screen overflow-hidden flex bg-slate-100">
-      {/* LEFT PANEL */}
-      <div className="hidden lg:flex lg:w-[55%] relative overflow-hidden bg-gradient-to-br from-[#020617] via-[#081028] to-[#1D4ED8]">
-        {/* Background Glow */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.08),transparent_40%)]" />
+    <div className="min-h-screen flex bg-white overflow-hidden">
 
-        <div className="relative z-10 flex flex-col justify-center w-full px-12 py-10">
+      {/* ── Left panel — terracotta ──────────────────────────────────────── */}
+      <div
+        className="hidden lg:flex lg:w-[52%] xl:w-[48%] flex-col flex-shrink-0 relative overflow-hidden"
+        style={{ background: BRAND }}
+      >
+        {/* Architectural line-grid overlay */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px)
+            `,
+            backgroundSize: "40px 40px",
+          }}
+        />
+        {/* Top-right accent glow */}
+        <div className="absolute top-[-100px] right-[-100px] w-[400px] h-[400px] rounded-full bg-black/10 blur-[100px] pointer-events-none" />
+        {/* Bottom-left accent */}
+        <div className="absolute bottom-[-60px] left-[-60px] w-[300px] h-[300px] rounded-full bg-white/8 blur-[80px] pointer-events-none" />
+
+        <div className="relative flex flex-col h-full px-10 py-10 justify-center">
           {/* Logo */}
-          <div>
-            <div className="mb-5">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-white shadow-xl flex items-center justify-center">
-                  <span className="text-blue-600 text-2xl font-black tracking-tight">
-                    MP
-                  </span>
-                </div>
-
-                <div>
-                  <h1 className="text-white text-3xl font-bold">MobPae</h1>
-
-                  <p className="text-blue-200 text-sm tracking-wider">
-                    ADMIN PORTAL
-                  </p>
-                </div>
-              </div>
+          <div className="flex items-center gap-3 mb-10">
+            <div
+              className="w-9 h-9 rounded-xl flex items-center justify-center font-[700] text-[15px] flex-shrink-0"
+              style={{ background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.3)", color: "white" }}
+            >
+              M
+            </div>
+            <div>
+              <p className="text-[14px] font-[600] text-white leading-none">MobPae</p>
+              <p className="text-[9px] text-white/50 mt-0.5 uppercase tracking-[0.14em]">Admin Console</p>
             </div>
           </div>
 
-          {/* Content */}
-          <div className="max-w-xl">
-            <span className="inline-flex items-center rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm text-white backdrop-blur-sm">
-              Financial Wellness Platform
-            </span>
+          {/* Headline */}
+          <div className="mb-10">
+            <div
+              className="inline-flex items-center gap-2 rounded-full px-3 py-1 mb-6 text-[11px] font-[500] text-white/80 uppercase tracking-[0.07em]"
+              style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.2)" }}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+              Platform command centre
+            </div>
 
-            <h2 className="mt-8 text-5xl font-bold leading-tight text-white">
-              Because Financial Emergencies Don't Wait for Payday
-            </h2>
+            <h1 className="text-[34px] font-[700] text-white leading-[1.15] tracking-[-0.02em]">
+              One place to run<br />
+              earned wage access<br />
+              <span style={{ color: "rgba(255,255,255,0.6)" }}>end-to-end.</span>
+            </h1>
 
-            <p className="mt-6 text-base leading-8 text-slate-300 max-w-lg">
-              Streamline employer onboarding, employee management, salary
-              advances, repayments and payroll integrations through one secure
-              platform.
-            </p>
-
-            <div className="mt-10 space-y-4 max-w-lg">
-              <LoginFeature
-                title="Instant Salary Access"
-                description="Employees access earned salary before payday."
-              />
-
-              <LoginFeature
-                title="Payroll Integrated"
-                description="Built for employers with seamless payroll workflows."
-              />
-
-              <LoginFeature
-                title="Secure & Compliant"
-                description="Enterprise-grade security and audit trails."
-              />
+            <div className="mt-8 space-y-3">
+              {FEATURES.map(({ icon: Icon, text }) => (
+                <div key={text} className="flex items-start gap-3">
+                  <div
+                    className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
+                    style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.2)" }}
+                  >
+                    <Icon size={12} color="white" />
+                  </div>
+                  <p className="text-[13px] text-white/70 leading-snug">{text}</p>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Preview */}
-          {/* <div className="mt-6 max-w-sm">
-            <LoginPreviewCard />
-          </div> */}
+          {/* Live stats card */}
+          <div
+            className="rounded-2xl p-4"
+            style={{ background: "rgba(0,0,0,0.15)", border: "1px solid rgba(255,255,255,0.12)" }}
+          >
+            <p className="text-[10px] font-[600] text-white/40 uppercase tracking-[0.1em] mb-3">Platform overview</p>
+            <div className="grid grid-cols-2 gap-3">
+              {STATS.map(({ label, value }) => (
+                <div key={label}>
+                  <p className="text-[20px] font-[700] text-white leading-none tabular-nums">{value}</p>
+                  <p className="text-[11px] text-white/40 mt-1">{label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* RIGHT PANEL */}
-      <div className="flex-1 flex items-center justify-center bg-slate-50 px-8">
-        <div className="w-full max-w-[660px]">
-          <div className="bg-white/95 backdrop-blur-xl border border-white rounded-[36px] shadow-[0_20px_60px_rgba(15,23,42,0.12)] p-12">
-            {/* Mobile Logo */}
-            <div className="lg:hidden flex items-center gap-3 mb-8">
-              <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold">
-                M
-              </div>
+      {/* ── Right panel — white form ─────────────────────────────────────── */}
+      <div className="flex-1 flex items-center justify-center px-6 py-10 bg-[#fafafa]">
+        <div className="w-full max-w-[380px]">
 
-              <div>
-                <h2 className="font-bold text-slate-900">MobPae</h2>
-
-                <p className="text-xs text-slate-500">ADMIN PORTAL</p>
-              </div>
+          {/* Mobile logo */}
+          <div className="flex items-center gap-3 mb-8 lg:hidden">
+            <div
+              className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-[700] text-[15px]"
+              style={{ background: BRAND }}
+            >
+              M
             </div>
+            <p className="text-[14px] font-[600] text-slate-900">MobPae Admin</p>
+          </div>
 
-            <p className="text-xs font-semibold tracking-widest text-blue-600 uppercase mb-3">
-              MOBPAE ADMIN
-            </p>
-            <h1 className="text-4xl font-bold text-slate-900">
-              Welcome Back 👋
-            </h1>
+          {/* Eyebrow + heading */}
+          <p
+            className="text-[11px] font-[600] uppercase tracking-[0.1em] mb-2"
+            style={{ color: BRAND }}
+          >
+            Secure admin access
+          </p>
+          <h2 className="text-[28px] font-[700] text-slate-900 tracking-[-0.02em] leading-tight">
+            Sign in to<br />Admin Console
+          </h2>
+          <p className="mt-2 text-[13px] text-slate-500 leading-relaxed">
+            Role-based access — admin credentials only.
+          </p>
 
-            <p className="mt-3 text-slate-500 text-base">
-              Sign in to continue to MobPae Admin Portal.
-            </p>
-
-            <form onSubmit={handleLogin} className="mt-10 space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Email Address
-                </label>
-
+          <form onSubmit={handleLogin} className="mt-8 space-y-4">
+            {/* Email */}
+            <div>
+              <label className="block text-[12px] font-[500] text-slate-700 mb-1.5">Email address</label>
+              <div className="relative">
+                <Mail size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   type="email"
                   autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="admin@mobpae.com"
-                  className="w-full h-14 px-5 bg-slate-50 text-base rounded-2xl border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all"
+                  required
+                  className="w-full h-10 pl-9 pr-4 text-[13px] bg-white border border-slate-200 rounded-lg text-slate-900 placeholder-slate-400 outline-none transition"
+                  style={{ boxShadow: "none" }}
+                  onFocus={(e) => { e.target.style.borderColor = BRAND; e.target.style.boxShadow = `0 0 0 3px ${BRAND_LIGHT}`; }}
+                  onBlur={(e) => { e.target.style.borderColor = "#e2e8f0"; e.target.style.boxShadow = "none"; }}
                 />
               </div>
+            </div>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Password
-                </label>
-
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    autoComplete="current-password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter password"
-                    className="
-                      w-full
-                      h-14
-                      px-5
-                      bg-slate-50
-                      text-base
-                      rounded-2xl
-                      border
-                      border-slate-200
-                      focus:border-blue-500
-                      focus:ring-4
-                      focus:ring-blue-100
-                      outline-none
-                      transition-all
-                    "
-                  />
-
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-4 text-slate-400"
-                  >
-                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between text-sm">
-                <label className="flex items-center gap-2 text-slate-600">
-                  <input type="checkbox" />
-                  Remember Me
-                </label>
-
+            {/* Password */}
+            <div>
+              <label className="block text-[12px] font-[500] text-slate-700 mb-1.5">Password</label>
+              <div className="relative">
+                <Lock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  required
+                  className="w-full h-10 pl-9 pr-10 text-[13px] bg-white border border-slate-200 rounded-lg text-slate-900 placeholder-slate-400 outline-none transition"
+                  style={{ boxShadow: "none" }}
+                  onFocus={(e) => { e.target.style.borderColor = BRAND; e.target.style.boxShadow = `0 0 0 3px ${BRAND_LIGHT}`; }}
+                  onBlur={(e) => { e.target.style.borderColor = "#e2e8f0"; e.target.style.boxShadow = "none"; }}
+                />
                 <button
                   type="button"
-                  className="text-blue-600 hover:text-blue-700"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                 >
-                  Forgot Password?
+                  {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
                 </button>
               </div>
+            </div>
 
-              {error && (
-                <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-2xl px-4 py-3">
-                  {error}
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="
-                w-full
-                h-14
-                rounded-2xl
-                bg-gradient-to-r
-                from-blue-600
-                to-blue-700
-                text-white
-                text-base
-                font-semibold
-                shadow-lg
-                shadow-blue-500/25
-                hover:scale-[1.01]
-                transition-all
-                disabled:opacity-70
-                disabled:cursor-not-allowed"
-              >
-                {loading ? "Signing In..." : "Sign In"}
-              </button>
-
-              <div className="flex justify-center gap-3 mt-4 text-xs text-slate-500">
-                <span>Secure Authentication</span>
-                <span>•</span>
-                <span>Role-Based Access</span>
-                <span>•</span>
-                <span>Audit Logs Enabled</span>
+            {/* Error */}
+            {error && (
+              <div className="bg-red-50 border border-red-100 rounded-lg px-3 py-2.5">
+                <p className="text-[12px] text-red-600 font-[500]">{error}</p>
               </div>
-            </form>
+            )}
 
-            <div className="mt-10 pt-6 border-t border-slate-100">
-              <div className="flex items-center justify-between text-xs text-slate-400">
-                <span>Protected by MobPae Security</span>
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full h-10 rounded-lg text-white text-[13px] font-[600] flex items-center justify-center gap-2 transition disabled:opacity-50 mt-2"
+              style={{ background: loading ? BRAND_DARK : BRAND }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = BRAND_DARK; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = BRAND; }}
+            >
+              {loading ? (
+                <svg className="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="32" strokeDashoffset="12" strokeLinecap="round" />
+                </svg>
+              ) : "Sign in to Admin Console"}
+            </button>
+          </form>
 
-                <span>Version 1.0 • © 2026</span>
-              </div>
+          {/* Security note */}
+          <div className="mt-6 flex items-center gap-3 bg-white border border-slate-100 rounded-xl p-4">
+            <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
+              <ShieldCheck size={13} className="text-slate-500" />
+            </div>
+            <div>
+              <p className="text-[12px] font-[500] text-slate-800">Admin access only</p>
+              <p className="text-[11px] text-slate-400 mt-0.5">Use credentials provisioned by MobPae.</p>
             </div>
           </div>
+
+          <p className="mt-6 text-center text-[11px] text-slate-400">
+            Version 1.0 · © 2026 MobPae
+          </p>
         </div>
       </div>
     </div>

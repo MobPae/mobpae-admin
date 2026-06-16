@@ -10,6 +10,7 @@ export interface EmployerSettlement {
   totalAmount: string;
   outstandingAmount: string;
   dueDate: string;
+  gracePeriodEnd: string | null;
   paidDate: string | null;
   status: EmployerSettlementStatus;
   referenceNumber: string | null;

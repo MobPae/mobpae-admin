@@ -10,7 +10,9 @@ import EmployersPage from "./pages/EmployersPage";
 import EmployeesPage from "./pages/EmployeesPage";
 import SalaryRequestsPage from "./pages/SalaryRequestsPage";
 import DisbursalsPage from "./pages/DisbursalsPage";
-import RepaymentsPage from "./pages/RepaymentsPage";
+import RecoveriesPage from "./pages/RecoveriesPage";
+import SettlementsPage from "./pages/SettlementsPage";
+import MembershipsPage from "./pages/MembershipsPage";
 import KycVerificationPage from "./pages/KycVerificationPage";
 import BankVerificationPage from "./pages/BankVerificationPage";
 import SettingsPage from "./pages/SettingsPage";
@@ -38,7 +40,9 @@ export default function App() {
           <Route path="employees" element={<EmployeesPage />} />
           <Route path="salary-requests" element={<SalaryRequestsPage />} />
           <Route path="disbursals" element={<DisbursalsPage />} />
-          <Route path="repayments" element={<RepaymentsPage />} />
+          <Route path="recoveries" element={<RecoveriesPage />} />
+          <Route path="settlements" element={<SettlementsPage />} />
+          <Route path="memberships" element={<MembershipsPage />} />
           <Route path="kyc" element={<KycVerificationPage />} />
           <Route path="bank-verification" element={<BankVerificationPage />} />
           <Route path="settings" element={<SettingsPage />} />

@@ -19,9 +19,9 @@ const STATUS_BADGE: Record<string, string> = {
   SUBMITTED:           "bg-amber-50 text-amber-700",
   EMPLOYER_APPROVED:   "bg-blue-50 text-blue-700",
   EMPLOYER_REJECTED:   "bg-red-50 text-red-600",
-  READY_FOR_DISBURSAL: "bg-indigo-50 text-indigo-700",
+  READY_FOR_DISBURSAL: "bg-blue-50 text-blue-700",
   DISBURSED:           "bg-emerald-50 text-emerald-700",
-  REPAYMENT_SCHEDULED: "bg-violet-50 text-violet-700",
+  REPAYMENT_SCHEDULED: "bg-blue-50 text-blue-700",
   REPAID:              "bg-slate-100 text-slate-500",
 };
 
@@ -201,7 +201,7 @@ export default function SalaryRequestDrawer({ open, request, onClose, onMutated 
               <button
                 onClick={() => approveMutation.mutate()}
                 disabled={isBusy}
-                className="flex-1 h-8 rounded-md bg-slate-900 hover:bg-slate-800 text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
+                className="flex-1 h-8 rounded-md bg-slate-900 hover:bg-[slate-800] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
               >
                 {approveMutation.isPending ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle2 size={12} />}
                 {approveMutation.isPending ? "Approving…" : "Approve for disbursal"}
