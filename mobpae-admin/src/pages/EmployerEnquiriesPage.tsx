@@ -1,39 +1,42 @@
 import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Search } from "lucide-react";
 import EmployerEnquiriesTable from "../components/employer-enquiries/EmployerEnquiriesTable";
 import EmployerDetailsDrawer from "../components/employer-enquiries/EmployerDetailsDrawer";
+import CreateEmployerDrawer from "../components/employers/CreateEmployerDrawer";
+import type { CreateEmployerPrefill } from "../components/employers/CreateEmployerDrawer";
 import type { EmployerEnquiry, EmployerEnquiryStatus } from "../types/employer-enquiry";
 import { getEmployerEnquiries } from "../services/employerEnquiryService";
 
 const STATUS_CHIPS: { label: string; value: "ALL" | EmployerEnquiryStatus }[] = [
-  { label: "All", value: "ALL" },
-  { label: "New", value: "NEW" },
+  { label: "All",       value: "ALL"       },
+  { label: "New",       value: "NEW"       },
   { label: "Contacted", value: "CONTACTED" },
-  { label: "Approved", value: "APPROVED" },
-  { label: "Rejected", value: "REJECTED" },
+  { label: "Onboarded", value: "ONBOARDED" },
+  { label: "Rejected",  value: "REJECTED"  },
 ];
 
-const CHIP_ON = "bg-slate-900 text-white border-slate-900";
+const CHIP_ON  = "bg-slate-900 text-white border-slate-900";
 const CHIP_OFF = "bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-700";
 
 export default function EmployerEnquiriesPage() {
-  const queryClient = useQueryClient();
-
   const { data: enquiries = [], isLoading, isError } = useQuery({
     queryKey: ["employer-enquiries"],
     queryFn: getEmployerEnquiries,
   });
 
-  const [search, setSearch] = useState("");
+  const [search,       setSearch]       = useState("");
   const [statusFilter, setStatusFilter] = useState<"ALL" | EmployerEnquiryStatus>("ALL");
-  const [selected, setSelected] = useState<EmployerEnquiry | null>(null);
+  const [selected,     setSelected]     = useState<EmployerEnquiry | null>(null);
+  const [createPrefill, setCreatePrefill] = useState<CreateEmployerPrefill | undefined>(undefined);
 
+  // ONBOARDED counts both APPROVED (legacy) and ONBOARDED (current backend value)
   const counts: Record<EmployerEnquiryStatus, number> = {
-    NEW: enquiries.filter((e) => e.status === "NEW").length,
+    NEW:       enquiries.filter((e) => e.status === "NEW").length,
     CONTACTED: enquiries.filter((e) => e.status === "CONTACTED").length,
-    APPROVED: enquiries.filter((e) => e.status === "APPROVED").length,
-    REJECTED: enquiries.filter((e) => e.status === "REJECTED").length,
+    APPROVED:  enquiries.filter((e) => e.status === "APPROVED").length,
+    ONBOARDED: enquiries.filter((e) => e.status === "ONBOARDED" || e.status === "APPROVED").length,
+    REJECTED:  enquiries.filter((e) => e.status === "REJECTED").length,
   };
   const total = enquiries.length;
 
@@ -44,31 +47,40 @@ export default function EmployerEnquiriesPage() {
       e.companyName.toLowerCase().includes(q) ||
       e.contactPerson.toLowerCase().includes(q) ||
       e.email.toLowerCase().includes(q);
-    const matchStatus = statusFilter === "ALL" || e.status === statusFilter;
+    // "ONBOARDED" filter matches both ONBOARDED (current) and APPROVED (legacy)
+    const matchStatus =
+      statusFilter === "ALL" ||
+      e.status === statusFilter ||
+      (statusFilter === "ONBOARDED" && e.status === "APPROVED");
     return matchSearch && matchStatus;
   });
 
-  const handleMutated = () => {
-    void queryClient.invalidateQueries({ queryKey: ["employer-enquiries"] });
-  };
+  // Called from EmployerDetailsDrawer "Create Employer" button
+  function handleCreateFromLead(enquiry: EmployerEnquiry) {
+    setCreatePrefill({
+      companyName:   enquiry.companyName,
+      contactPerson: enquiry.contactPerson,
+      email:         enquiry.email,
+      phone:         enquiry.phone,
+      enquiryId:     enquiry.id,
+    });
+  }
 
   const pipeline = [
-    { label: "New", status: "NEW" as const, color: "bg-amber-400", text: "text-amber-600" },
-    { label: "Contacted", status: "CONTACTED" as const, color: "bg-blue-400", text: "text-blue-600" },
-    { label: "Approved", status: "APPROVED" as const, color: "bg-green-400", text: "text-green-600" },
-    { label: "Rejected", status: "REJECTED" as const, color: "bg-slate-300", text: "text-slate-500" },
+    { label: "New",       status: "NEW"       as const, color: "bg-amber-400",  text: "text-amber-600"  },
+    { label: "Contacted", status: "CONTACTED" as const, color: "bg-blue-400",   text: "text-blue-600"   },
+    { label: "Onboarded", status: "ONBOARDED" as const, color: "bg-green-400",  text: "text-green-600"  },
+    { label: "Rejected",  status: "REJECTED"  as const, color: "bg-slate-300",  text: "text-slate-500"  },
   ];
 
   return (
     <div className="p-5 space-y-4">
       {/* Page header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-[15px] font-[500] text-slate-900 leading-none">Employer onboarding</h1>
-          <p className="text-[11px] text-slate-400 mt-1.5">
-            Review and approve employer onboarding requests
-          </p>
-        </div>
+      <div>
+        <h1 className="text-[15px] font-[500] text-slate-900 leading-none">Enquiries</h1>
+        <p className="text-[11px] text-slate-400 mt-1.5">
+          Inbound leads from the website
+        </p>
       </div>
 
       {isError && (
@@ -179,11 +191,19 @@ export default function EmployerEnquiriesPage() {
         />
       )}
 
+      {/* Lead detail drawer */}
       <EmployerDetailsDrawer
         open={selected !== null}
         employer={selected}
         onClose={() => setSelected(null)}
-        onMutated={handleMutated}
+        onCreateEmployer={handleCreateFromLead}
+      />
+
+      {/* Create employer drawer — opened from lead, stays on this page */}
+      <CreateEmployerDrawer
+        open={createPrefill !== undefined}
+        prefill={createPrefill}
+        onClose={() => setCreatePrefill(undefined)}
       />
     </div>
   );

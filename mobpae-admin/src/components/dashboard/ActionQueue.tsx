@@ -87,8 +87,8 @@ export default function ActionQueue({ data, loading = false }: ActionQueueProps)
       countColor: "text-slate-600",
     },
     {
-      label: "Employer Enquiries",
-      description: "Onboarding requests",
+      label: "Enquiries",
+      description: "Employer leads",
       icon: Building2,
       count: 0,
       to: "/employer-enquiries",

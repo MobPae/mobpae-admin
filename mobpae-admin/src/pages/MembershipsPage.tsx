@@ -1,22 +1,27 @@
 import { useState, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  Building2,
   CheckCircle2,
   ChevronRight,
   CircleDollarSign,
   CreditCard,
   Search,
   Tag,
+  TimerOff,
+  Users,
   X,
   XCircle,
 } from "lucide-react";
 import {
   getMemberships,
   getMembershipSummary,
+  getEmployerMembershipSummary,
   approveMembership,
   rejectMembership,
 } from "../services/membershipService";
-import type { Membership, MembershipStatus } from "../types/membership";
+import type { Membership, MembershipStatus, EmployerMembershipSummary } from "../types/membership";
+import { getApiErrorMessage } from "../utils/api-errors";
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -74,6 +79,54 @@ function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
+// ── employer summary table ────────────────────────────────────────────────────
+
+function EmployerSummaryTable({ employers }: { employers: EmployerMembershipSummary[] }) {
+  if (!employers.length) {
+    return (
+      <div className="py-10 text-center">
+        <p className="text-[12px] text-slate-400">No employer data available</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-[12px]">
+        <thead>
+          <tr className="border-b border-slate-100">
+            {["Company", "Total Members", "Active Members", "Revenue"].map(h => (
+              <th key={h} className="px-4 py-3 text-left text-[11px] font-[500] text-slate-400 whitespace-nowrap">{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-slate-50">
+          {employers.map(e => (
+            <tr key={e.employerId} className="hover:bg-slate-50/60 transition-colors">
+              <td className="px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-md bg-[#fdf3ee] flex items-center justify-center flex-shrink-0">
+                    <Building2 size={12} className="text-[#c4522a]" />
+                  </div>
+                  <span className="font-[500] text-slate-800">{e.companyName}</span>
+                </div>
+              </td>
+              <td className="px-4 py-3 tabular-nums text-slate-600">{e.totalMembers}</td>
+              <td className="px-4 py-3">
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-[500] bg-emerald-50 text-emerald-700">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  {e.activeMembers}
+                </span>
+              </td>
+              <td className="px-4 py-3 tabular-nums font-[600] text-slate-800">{formatCurrency(e.membershipRevenue)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 // ── page ──────────────────────────────────────────────────────────────────────
 
 export default function MembershipsPage() {
@@ -85,16 +138,22 @@ export default function MembershipsPage() {
   const [remarks,     setRemarks]     = useState("");
   const [actionError, setActionError] = useState("");
 
-  // Source: GET /membership
+  // GET /membership
   const { data: memberships = [], isLoading } = useQuery({
     queryKey: ["memberships"],
     queryFn: getMemberships,
   });
 
-  // Source: GET /membership/summary
+  // GET /membership/summary
   const { data: summary } = useQuery({
     queryKey: ["memberships-summary"],
     queryFn: getMembershipSummary,
+  });
+
+  // GET /membership/employer-summary
+  const { data: employerSummary = [] } = useQuery({
+    queryKey: ["memberships-employer-summary"],
+    queryFn: getEmployerMembershipSummary,
   });
 
   const counts = useMemo(() => {
@@ -121,6 +180,7 @@ export default function MembershipsPage() {
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["memberships"] });
     qc.invalidateQueries({ queryKey: ["memberships-summary"] });
+    qc.invalidateQueries({ queryKey: ["memberships-employer-summary"] });
   };
 
   const handleAction = async (action: "approve" | "reject") => {
@@ -134,7 +194,7 @@ export default function MembershipsPage() {
       setSelected(null);
       setRemarks("");
     } catch (err) {
-      setActionError(err instanceof Error ? err.message : "Action failed. Please try again.");
+      setActionError(getApiErrorMessage(err, "Action failed. Please try again."));
     } finally {
       setActing(null);
     }
@@ -148,15 +208,24 @@ export default function MembershipsPage() {
         <p className="text-[13px] text-slate-400 mt-0.5">Employee membership plans and verification</p>
       </div>
 
-      {/* Dashboard cards — sourced from GET /membership/summary */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
+      {/* Summary cards — GET /membership/summary */}
+      <div className="grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6 gap-3">
         <div className="bg-[#c4522a] border border-[#a8411f] rounded-xl px-4 py-3.5 flex items-center gap-3">
           <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
-            <CreditCard size={14} className="text-white/70" />
+            <Users size={14} className="text-white/70" />
           </div>
           <div>
-            <p className="text-[20px] font-[600] text-white leading-none tabular-nums">{summary?.activeMemberships ?? "—"}</p>
-            <p className="text-[11px] text-white/40 mt-0.5">Active memberships</p>
+            <p className="text-[20px] font-[600] text-white leading-none tabular-nums">{summary?.totalMembers ?? "—"}</p>
+            <p className="text-[11px] text-white/40 mt-0.5">Total members</p>
+          </div>
+        </div>
+        <div className="bg-white border border-slate-100 rounded-xl px-4 py-3.5 flex items-center gap-3">
+          <div className="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
+            <CreditCard size={14} className="text-emerald-600" />
+          </div>
+          <div>
+            <p className="text-[20px] font-[600] text-slate-900 leading-none tabular-nums">{summary?.active ?? "—"}</p>
+            <p className="text-[11px] text-slate-400 mt-0.5">Active</p>
           </div>
         </div>
         <div className="bg-white border border-slate-100 rounded-xl px-4 py-3.5 flex items-center gap-3">
@@ -164,7 +233,7 @@ export default function MembershipsPage() {
             <CreditCard size={14} className="text-amber-600" />
           </div>
           <div>
-            <p className="text-[20px] font-[600] text-slate-900 leading-none tabular-nums">{summary?.pendingMemberships ?? "—"}</p>
+            <p className="text-[20px] font-[600] text-slate-900 leading-none tabular-nums">{summary?.pending ?? "—"}</p>
             <p className="text-[11px] text-slate-400 mt-0.5">Pending review</p>
           </div>
         </div>
@@ -173,8 +242,17 @@ export default function MembershipsPage() {
             <XCircle size={14} className="text-red-500" />
           </div>
           <div>
-            <p className="text-[20px] font-[600] text-slate-900 leading-none tabular-nums">{summary?.rejectedMemberships ?? "—"}</p>
+            <p className="text-[20px] font-[600] text-slate-900 leading-none tabular-nums">{summary?.rejected ?? "—"}</p>
             <p className="text-[11px] text-slate-400 mt-0.5">Rejected</p>
+          </div>
+        </div>
+        <div className="bg-white border border-slate-100 rounded-xl px-4 py-3.5 flex items-center gap-3">
+          <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
+            <TimerOff size={14} className="text-slate-500" />
+          </div>
+          <div>
+            <p className="text-[20px] font-[600] text-slate-900 leading-none tabular-nums">{summary?.expired ?? "—"}</p>
+            <p className="text-[11px] text-slate-400 mt-0.5">Expired</p>
           </div>
         </div>
         <div className="bg-white border border-slate-100 rounded-xl px-4 py-3.5 flex items-center gap-3">
@@ -182,11 +260,22 @@ export default function MembershipsPage() {
             <CircleDollarSign size={14} className="text-emerald-600" />
           </div>
           <div>
-            <p className="text-[20px] font-[600] text-slate-900 leading-none tabular-nums">{formatCurrency(summary?.totalRevenue ?? 0)}</p>
-            <p className="text-[11px] text-slate-400 mt-0.5">Membership revenue</p>
+            <p className="text-[20px] font-[600] text-slate-900 leading-none tabular-nums">{formatCurrency(summary?.membershipRevenue ?? 0)}</p>
+            <p className="text-[11px] text-slate-400 mt-0.5">Revenue</p>
           </div>
         </div>
       </div>
+
+      {/* Employer breakdown — GET /membership/employer-summary */}
+      {employerSummary.length > 0 && (
+        <div className="bg-white border border-slate-100 rounded-xl overflow-hidden">
+          <div className="px-5 py-3.5 border-b border-slate-100">
+            <p className="text-[13px] font-[600] text-slate-900">By Employer</p>
+            <p className="text-[11px] text-slate-400 mt-0.5">Membership breakdown per company</p>
+          </div>
+          <EmployerSummaryTable employers={employerSummary} />
+        </div>
+      )}
 
       {/* Search + filter */}
       <div className="flex items-center gap-3 flex-wrap">
@@ -222,7 +311,7 @@ export default function MembershipsPage() {
         </div>
       </div>
 
-      {/* Table — sourced from GET /membership */}
+      {/* Membership list — GET /membership */}
       <div className="bg-white border border-slate-100 rounded-xl overflow-hidden">
         {isLoading ? (
           <div className="py-16 text-center"><p className="text-[13px] text-slate-400">Loading memberships…</p></div>
@@ -274,7 +363,7 @@ export default function MembershipsPage() {
         )}
       </div>
 
-      {/* Drawer — uses GET /membership/{id}, POST /membership/{id}/approve|reject */}
+      {/* Detail drawer */}
       {selected && (
         <>
           <div className="fixed inset-0 z-30 bg-black/20 backdrop-blur-[1px]" onClick={() => setSelected(null)} />
@@ -300,7 +389,6 @@ export default function MembershipsPage() {
             </div>
 
             <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
-              {/* Plan details */}
               <div>
                 <p className="text-[11px] font-[600] text-slate-400 uppercase tracking-[0.07em] mb-2">Plan Details</p>
                 <div className="bg-white border border-slate-100 rounded-xl px-4 py-1">
@@ -315,7 +403,6 @@ export default function MembershipsPage() {
                 </div>
               </div>
 
-              {/* Payment */}
               <div>
                 <p className="text-[11px] font-[600] text-slate-400 uppercase tracking-[0.07em] mb-2">Payment</p>
                 <div className="bg-white border border-slate-100 rounded-xl px-4 py-1">
@@ -334,7 +421,6 @@ export default function MembershipsPage() {
                 </div>
               </div>
 
-              {/* Verification */}
               {(selected.verifiedBy || selected.verifiedAt) && (
                 <div>
                   <p className="text-[11px] font-[600] text-slate-400 uppercase tracking-[0.07em] mb-2">Verification</p>
@@ -345,7 +431,6 @@ export default function MembershipsPage() {
                 </div>
               )}
 
-              {/* Existing remarks */}
               {selected.remarks && (
                 <div>
                   <p className="text-[11px] font-[600] text-slate-400 uppercase tracking-[0.07em] mb-2">Remarks</p>
@@ -355,7 +440,6 @@ export default function MembershipsPage() {
                 </div>
               )}
 
-              {/* Remarks input for pending */}
               {selected.status === "PENDING" && (
                 <div>
                   <p className="text-[11px] font-[600] text-slate-400 uppercase tracking-[0.07em] mb-2">Add Remarks (optional)</p>
@@ -370,7 +454,6 @@ export default function MembershipsPage() {
               )}
             </div>
 
-            {/* Footer actions — POST /membership/{id}/approve | reject */}
             {selected.status === "PENDING" && (
               <div className="px-5 py-4 border-t border-slate-100 space-y-2">
                 {actionError && <p className="text-[11px] text-red-600 text-center">{actionError}</p>}

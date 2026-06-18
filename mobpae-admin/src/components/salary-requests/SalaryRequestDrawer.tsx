@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { X, CheckCircle2, CreditCard, Loader2 } from "lucide-react";
+import { getApiErrorMessage } from "../../utils/api-errors";
 import {
   approveSalaryRequestForDisbursal,
   disburseSalaryRequest,
@@ -50,7 +51,7 @@ export default function SalaryRequestDrawer({ open, request, onClose, onMutated 
       onMutated();
     },
     onError: (err: unknown) => {
-      toast.error("Approval failed", { description: err instanceof Error ? err.message : "Unexpected error" });
+      toast.error("Approval failed", { description: getApiErrorMessage(err)});
     },
   });
 
@@ -63,7 +64,7 @@ export default function SalaryRequestDrawer({ open, request, onClose, onMutated 
       onMutated();
     },
     onError: (err: unknown) => {
-      toast.error("Disbursal failed", { description: err instanceof Error ? err.message : "Unexpected error" });
+      toast.error("Disbursal failed", { description: getApiErrorMessage(err)});
     },
   });
 

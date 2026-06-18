@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { X, CheckCircle2, XCircle, Loader2, FileText } from "lucide-react";
+import { getApiErrorMessage } from "../../utils/api-errors";
 import { verifyKycDocument, rejectKycDocument } from "../../services/kycService";
 import type { KycDocument } from "../../types/kyc";
 
@@ -32,7 +33,7 @@ export default function KycDrawer({ open, document, onClose, onCompleted }: Prop
       onCompleted();
     },
     onError: (err: unknown) => {
-      toast.error("Verification failed", { description: err instanceof Error ? err.message : "Unexpected error" });
+      toast.error("Verification failed", { description: getApiErrorMessage(err) });
     },
   });
 
@@ -43,7 +44,7 @@ export default function KycDrawer({ open, document, onClose, onCompleted }: Prop
       onCompleted();
     },
     onError: (err: unknown) => {
-      toast.error("Rejection failed", { description: err instanceof Error ? err.message : "Unexpected error" });
+      toast.error("Rejection failed", { description: getApiErrorMessage(err) });
     },
   });
 

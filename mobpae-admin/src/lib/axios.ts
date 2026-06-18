@@ -1,8 +1,8 @@
 import axios from "axios";
-import { getToken, removeToken } from "../utils/auth";
+import { getToken, setToken, getRefreshToken, setRefreshToken, removeToken } from "../utils/auth";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ?? "http://localhost:3000",
+  baseURL: import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3000",
   headers: {
     "Content-Type": "application/json",
   },
@@ -18,28 +18,79 @@ api.interceptors.request.use((config) => {
 });
 
 // Handle auth errors globally.
-// Guard: only redirect once per expired-session, not once per parallel in-flight request.
-let redirectingToLogin = false;
+// On 401: attempt one silent refresh before falling back to full logout.
+let isRefreshing = false;
+let refreshQueue: Array<(token: string) => void> = [];
+
+function drainQueue(newToken: string) {
+  refreshQueue.forEach((cb) => cb(newToken));
+  refreshQueue = [];
+}
+
+function forceLogout() {
+  removeToken();
+  window.location.replace("/login");
+}
 
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    const requestUrl: string = error.config?.url ?? "";
+  async (error) => {
+    const originalRequest = error.config as typeof error.config & { _retry?: boolean };
+    const requestUrl: string = originalRequest?.url ?? "";
     const is401 = error.response?.status === 401;
 
-    // Don't treat a bad-credentials response from the login endpoint as "session expired".
-    const isAuthEndpoint = requestUrl.includes("/auth/login");
+    // Don't intercept auth endpoints — wrong creds should just bubble up as errors
+    const isAuthEndpoint =
+      requestUrl.includes("/auth/login") ||
+      requestUrl.includes("/auth/refresh") ||
+      requestUrl.includes("/auth/logout");
 
-    if (is401 && !isAuthEndpoint && !redirectingToLogin) {
-      redirectingToLogin = true;
-      removeToken();
-      // Use replace so the login page doesn't end up in browser history.
-      window.location.replace("/login");
-      // Reset flag after navigation completes so a fresh login session works.
-      setTimeout(() => { redirectingToLogin = false; }, 3000);
+    if (!is401 || isAuthEndpoint || originalRequest._retry) {
+      return Promise.reject(error);
     }
 
-    return Promise.reject(error);
+    const storedRefreshToken = getRefreshToken();
+    if (!storedRefreshToken) {
+      forceLogout();
+      return Promise.reject(error);
+    }
+
+    if (isRefreshing) {
+      // Another refresh is already in flight — queue this request
+      return new Promise((resolve, reject) => {
+        refreshQueue.push((newToken: string) => {
+          originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          resolve(api(originalRequest));
+        });
+        setTimeout(() => reject(error), 10000);
+      });
+    }
+
+    originalRequest._retry = true;
+    isRefreshing = true;
+
+    try {
+      const { data } = await axios.post<{ accessToken: string; refreshToken: string }>(
+        `${api.defaults.baseURL}/auth/refresh`,
+        { refreshToken: storedRefreshToken },
+        { headers: { "Content-Type": "application/json" } }
+      );
+
+      setToken(data.accessToken);
+      setRefreshToken(data.refreshToken);
+
+      api.defaults.headers.common.Authorization = `Bearer ${data.accessToken}`;
+      originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+
+      drainQueue(data.accessToken);
+      return api(originalRequest);
+    } catch {
+      drainQueue("");
+      forceLogout();
+      return Promise.reject(error);
+    } finally {
+      isRefreshing = false;
+    }
   }
 );
 

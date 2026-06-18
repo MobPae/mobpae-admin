@@ -1,3 +1,10 @@
+// Matches GET /membership/revenue-summary
+export interface RevenueSummary {
+  membershipRevenue: string | number;
+  interestRevenue: string | number;
+  totalRevenue: string | number;
+}
+
 // Matches GET /dashboard/admin exactly
 export interface AdminDashboard {
   totalEmployers: number;

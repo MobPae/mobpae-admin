@@ -22,3 +22,7 @@ export async function markSettlementPaid(id: string): Promise<EmployerSettlement
   const data = response.data;
   return data?.settlement ?? data?.employerSettlement ?? data?.data ?? data;
 }
+
+export async function sendSettlementReport(id: string): Promise<void> {
+  await api.post(`/employer-settlements/${id}/send-report`);
+}

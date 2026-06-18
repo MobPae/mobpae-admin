@@ -30,11 +30,23 @@ export interface Membership {
   };
 }
 
+// Matches GET /membership/summary
 export interface MembershipSummary {
-  activeMemberships: number;
-  pendingMemberships: number;
-  rejectedMemberships: number;
-  totalRevenue: string | number;
+  totalMembers: number;
+  active: number;
+  pending: number;
+  rejected: number;
+  expired: number;
+  membershipRevenue: string | number;
+}
+
+// Matches GET /membership/employer-summary
+export interface EmployerMembershipSummary {
+  employerId: string;
+  companyName: string;
+  totalMembers: number;
+  activeMembers: number;
+  membershipRevenue: string | number;
 }
 
 export interface MembershipCoupon {

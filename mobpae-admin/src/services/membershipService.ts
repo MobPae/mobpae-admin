@@ -1,5 +1,5 @@
 import api from "../lib/axios";
-import type { Membership, MembershipCoupon, MembershipSummary } from "../types/membership";
+import type { Membership, MembershipCoupon, MembershipSummary, EmployerMembershipSummary } from "../types/membership";
 
 function unwrapList<T>(data: unknown, keys: string[]): T[] {
   if (Array.isArray(data)) return data as T[];
@@ -34,11 +34,19 @@ export async function getMembershipSummary(): Promise<MembershipSummary> {
   const raw = unwrapItem<Record<string, unknown>>(response.data, ["summary"]);
   const num = (v: unknown): number => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
   return {
-    activeMemberships:   num(raw?.activeMemberships  ?? raw?.active),
-    pendingMemberships:  num(raw?.pendingMemberships ?? raw?.pending),
-    rejectedMemberships: num(raw?.rejectedMemberships ?? raw?.rejected),
-    totalRevenue:        raw?.totalRevenue ?? raw?.revenue ?? 0,
+    totalMembers:      num(raw?.totalMembers ?? raw?.total),
+    active:            num(raw?.active ?? raw?.activeMemberships),
+    pending:           num(raw?.pending ?? raw?.pendingMemberships),
+    rejected:          num(raw?.rejected ?? raw?.rejectedMemberships),
+    expired:           num(raw?.expired ?? raw?.expiredMemberships),
+    membershipRevenue: raw?.membershipRevenue ?? raw?.totalRevenue ?? raw?.revenue ?? 0,
   };
+}
+
+// GET /membership/employer-summary — per-employer breakdown
+export async function getEmployerMembershipSummary(): Promise<EmployerMembershipSummary[]> {
+  const response = await api.get("/membership/employer-summary");
+  return unwrapList<EmployerMembershipSummary>(response.data, ["employers", "summary"]);
 }
 
 // GET /membership/pending — pending only

@@ -74,7 +74,7 @@ export default function BankVerificationTable({ accounts, selectedId, onSelect }
                   <p className="text-[10px] text-slate-400 mt-0.5 leading-none truncate">{a.accountHolderName}</p>
                 </td>
                 <td className="px-4 py-3">
-                  <span className="text-[11px] font-mono text-slate-700">····{a.accountNumber.slice(-4)}</span>
+                  <span className="text-[11px] font-mono text-slate-700">{a.accountNumber}</span>
                 </td>
                 <td className="px-4 py-3">
                   <span className="text-[11px] font-mono text-slate-600">{a.ifscCode}</span>

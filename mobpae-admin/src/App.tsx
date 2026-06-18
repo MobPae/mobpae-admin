@@ -13,9 +13,13 @@ import DisbursalsPage from "./pages/DisbursalsPage";
 import RecoveriesPage from "./pages/RecoveriesPage";
 import SettlementsPage from "./pages/SettlementsPage";
 import MembershipsPage from "./pages/MembershipsPage";
+import RevenuePage from "./pages/RevenuePage";
 import KycVerificationPage from "./pages/KycVerificationPage";
 import BankVerificationPage from "./pages/BankVerificationPage";
 import SettingsPage from "./pages/SettingsPage";
+import ChangePasswordPage from "./pages/ChangePasswordPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 export default function App() {
   return (
@@ -23,6 +27,18 @@ export default function App() {
       <Routes>
         {/* Public */}
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+        {/* Semi-protected: needs token but outside main layout */}
+        <Route
+          path="/change-password"
+          element={
+            <ProtectedRoute>
+              <ChangePasswordPage />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Protected — all admin pages nested inside AdminLayout via Outlet */}
         <Route
@@ -43,6 +59,7 @@ export default function App() {
           <Route path="recoveries" element={<RecoveriesPage />} />
           <Route path="settlements" element={<SettlementsPage />} />
           <Route path="memberships" element={<MembershipsPage />} />
+          <Route path="revenue" element={<RevenuePage />} />
           <Route path="kyc" element={<KycVerificationPage />} />
           <Route path="bank-verification" element={<BankVerificationPage />} />
           <Route path="settings" element={<SettingsPage />} />

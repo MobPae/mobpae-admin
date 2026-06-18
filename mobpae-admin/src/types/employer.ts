@@ -23,6 +23,7 @@ export interface CreateEmployerPayload {
   contactPerson: string;
   email: string;
   phone: string;
+  employerEnquiryId?: string; // links the new employer to its source lead
 }
 
 // Backend may optionally return login credentials in the create response

@@ -1,7 +1,7 @@
 // Background     #F8FAFC
 // Card           #FFFFFF
 
-// Primary        #2563EB
+// Primary        #d95a2e
 // Success        #16A34A
 // Warning        #D97706
 // Danger         #DC2626

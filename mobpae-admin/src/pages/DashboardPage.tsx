@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { getAdminDashboard } from "../services/dashboardService";
+import { getHealth } from "../services/healthService";
 import { getSalaryRequests } from "../services/salaryRequestService";
 import type { AdminDashboard } from "../types/dashboard";
 import type { SalaryRequest } from "../types/salary-request";
@@ -64,6 +65,13 @@ export default function DashboardPage() {
     queryFn: getAdminDashboard,
   });
 
+  const { data: health } = useQuery({
+    queryKey: ["health"],
+    queryFn: getHealth,
+    retry: false,
+    refetchInterval: 60_000,
+  });
+
   const { data: salaryRequests, isLoading: srLoading } = useQuery({
     queryKey: ["salary-requests"],
     queryFn: getSalaryRequests,
@@ -106,9 +114,9 @@ export default function DashboardPage() {
             })}
           </p>
         </div>
-        <div className="flex items-center gap-1.5 h-6 px-2.5 rounded-md bg-green-50 border border-green-100">
-          <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-          <span className="text-[11px] text-green-700 font-[500]">Live</span>
+        <div className={`flex items-center gap-1.5 h-6 px-2.5 rounded-md border ${health?.status === "ok" ? "bg-green-50 border-green-100" : health === undefined ? "bg-slate-50 border-slate-200" : "bg-red-50 border-red-100"}`}>
+          <span className={`w-1.5 h-1.5 rounded-full ${health?.status === "ok" ? "bg-green-500" : health === undefined ? "bg-slate-300" : "bg-red-500"}`} />
+          <span className={`text-[11px] font-[500] ${health?.status === "ok" ? "text-green-700" : health === undefined ? "text-slate-500" : "text-red-700"}`}>{health?.status === "ok" ? "Live" : health === undefined ? "Checking…" : "Degraded"}</span>
         </div>
       </div>
 

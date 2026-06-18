@@ -1,12 +1,21 @@
-@import url("https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 @import "tailwindcss";
 
-@theme inline {
-  --font-sans:    "Geist", ui-sans-serif, -apple-system, system-ui, sans-serif;
-  --font-display: "Geist", ui-sans-serif, -apple-system, system-ui, sans-serif;
-  --font-serif:   "Instrument Serif", ui-serif, Georgia, serif;
+/* Override browser autofill background — prevents yellow/blue tint on saved credentials */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+  -webkit-text-fill-color: #111 !important;
+  transition: background-color 9999s ease-in-out 0s;
+}
 
-  /* ── Brand: terracotta replaces blue across all blue-* classes ── */
+@theme inline {
+  --font-sans:    "Inter", ui-sans-serif, -apple-system, system-ui, sans-serif;
+  --font-display: "Inter", ui-sans-serif, -apple-system, system-ui, sans-serif;
+  --font-serif:   "Inter", ui-sans-serif, -apple-system, system-ui, sans-serif;
+
+  /* Remap Tailwind blue-* → terracotta palette */
   --color-blue-50:  #fdf3ee;
   --color-blue-100: #fbe3d3;
   --color-blue-200: #f6c4a4;
@@ -26,15 +35,15 @@ body,
   margin: 0;
   width: 100%;
   height: 100%;
-  font-family: "Geist", ui-sans-serif, -apple-system, system-ui, sans-serif;
+  font-family: "Inter", ui-sans-serif, -apple-system, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
 body {
-  background: #f8fafc;
+  background: #faf4ef;
 }
 
-.font-sans    { font-family: "Geist", ui-sans-serif, -apple-system, system-ui, sans-serif; }
-.font-display { font-family: "Geist", ui-sans-serif, -apple-system, system-ui, sans-serif; }
-.font-serif   { font-family: "Instrument Serif", ui-serif, Georgia, serif; }
+.font-sans    { font-family: "Inter", ui-sans-serif, -apple-system, system-ui, sans-serif; }
+.font-display { font-family: "Inter", ui-sans-serif, -apple-system, system-ui, sans-serif; }
+.font-serif   { font-family: "Inter", ui-sans-serif, -apple-system, system-ui, sans-serif; }

@@ -1,13 +1,21 @@
 import { Bell, LogOut, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { logout } from "../../services/authService";
 import { removeToken } from "../../utils/auth";
 
 export default function Header() {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    removeToken();
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch {
+      // Ignore API errors — still clear local session
+    } finally {
+      removeToken();
+      navigate("/login");
+    }
   };
 
   return (

@@ -18,10 +18,11 @@ const AVATAR_COLORS: Record<string, string> = {
 const avatarBg = (n: string) => AVATAR_COLORS[n.charAt(0).toUpperCase()] ?? "bg-slate-600";
 
 const STATUS_CONFIG: Record<EmployerEnquiryStatus, { label: string; dot: string; text: string; bg: string }> = {
-  NEW:       { label:"New",       dot:"bg-amber-400",   text:"text-amber-700",   bg:"bg-amber-50"   },
-  CONTACTED: { label:"Contacted", dot:"bg-blue-400",    text:"text-blue-700",    bg:"bg-blue-50"    },
-  APPROVED:  { label:"Approved",  dot:"bg-emerald-400", text:"text-emerald-700", bg:"bg-emerald-50" },
-  REJECTED:  { label:"Rejected",  dot:"bg-red-400",     text:"text-red-600",     bg:"bg-red-50"     },
+  NEW:        { label:"New",       dot:"bg-amber-400",   text:"text-amber-700",   bg:"bg-amber-50"   },
+  CONTACTED:  { label:"Contacted", dot:"bg-blue-400",    text:"text-blue-700",    bg:"bg-blue-50"    },
+  APPROVED:   { label:"Onboarded", dot:"bg-emerald-400", text:"text-emerald-700", bg:"bg-emerald-50" },
+  ONBOARDED:  { label:"Onboarded", dot:"bg-emerald-400", text:"text-emerald-700", bg:"bg-emerald-50" },
+  REJECTED:   { label:"Rejected",  dot:"bg-red-400",     text:"text-red-600",     bg:"bg-red-50"     },
 };
 
 function timeAgo(dateStr: string): string {
@@ -64,7 +65,7 @@ export default function EmployerEnquiriesTable({ enquiries, selectedId, onSelect
         <tbody>
           {enquiries.map((enq) => {
             const isSelected = selectedId === enq.id;
-            const s = STATUS_CONFIG[enq.status];
+            const s = STATUS_CONFIG[enq.status] ?? { label: enq.status, dot: "bg-slate-400", text: "text-slate-500", bg: "bg-slate-100" };
             return (
               <tr
                 key={enq.id}

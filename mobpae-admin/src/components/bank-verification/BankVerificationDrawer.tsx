@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { X, CheckCircle2, Loader2, CreditCard } from "lucide-react";
+import { getApiErrorMessage } from "../../utils/api-errors";
 import { verifyBankAccount } from "../../services/bankVerificationService";
 import type { BankAccount } from "../../types/bankAccount";
 
@@ -21,7 +22,7 @@ export default function BankVerificationDrawer({ open, account, onClose, onCompl
       onCompleted();
     },
     onError: (err: unknown) => {
-      toast.error("Verification failed", { description: err instanceof Error ? err.message : "Unexpected error" });
+      toast.error("Verification failed", { description: getApiErrorMessage(err) });
     },
   });
 
@@ -64,7 +65,7 @@ export default function BankVerificationDrawer({ open, account, onClose, onCompl
               {[
                 { k: "Account holder",  v: account.accountHolderName },
                 { k: "Bank name",       v: account.bankName ?? "—" },
-                { k: "Account number",  v: <span className="font-mono">····{account.accountNumber.slice(-4)}</span> },
+                { k: "Account number",  v: <span className="font-mono">{account.accountNumber}</span> },
                 { k: "IFSC code",       v: <span className="font-mono">{account.ifscCode}</span> },
                 ...(account.upiId ? [{ k: "UPI ID", v: account.upiId }] : []),
                 { k: "Added on",        v: new Date(account.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) },

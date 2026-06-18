@@ -1,13 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Building2, CheckCircle2, Copy, Loader2, X } from "lucide-react";
+import { getApiErrorMessage } from "../../utils/api-errors";
 import { createEmployer } from "../../services/employerService";
 import type { CreateEmployerPayload } from "../../types/employer";
+
+export interface CreateEmployerPrefill {
+  companyName?: string;
+  contactPerson?: string;
+  email?: string;
+  phone?: string;
+  enquiryId?: string;   // if set, backend atomically links employer and sets enquiry status → ONBOARDED
+}
 
 interface Props {
   open: boolean;
   onClose: () => void;
+  prefill?: CreateEmployerPrefill;
 }
 
 const EMPTY: CreateEmployerPayload = {
@@ -18,7 +28,7 @@ const EMPTY: CreateEmployerPayload = {
   phone: "",
 };
 
-export default function CreateEmployerDrawer({ open, onClose }: Props) {
+export default function CreateEmployerDrawer({ open, onClose, prefill }: Props) {
   const queryClient = useQueryClient();
   const [form, setForm] = useState<CreateEmployerPayload>(EMPTY);
   const [credentials, setCredentials] = useState<{
@@ -27,10 +37,27 @@ export default function CreateEmployerDrawer({ open, onClose }: Props) {
     companyName: string;
   } | null>(null);
 
+  // Re-populate form whenever the drawer opens (with or without prefill)
+  useEffect(() => {
+    if (open) {
+      setForm({
+        companyName:   prefill?.companyName   ?? "",
+        companyCode:   "",
+        contactPerson: prefill?.contactPerson ?? "",
+        email:         prefill?.email         ?? "",
+        phone:         prefill?.phone         ?? "",
+      });
+      setCredentials(null);
+    }
+  }, [open, prefill]);
+
   const mutation = useMutation({
     mutationFn: createEmployer,
     onSuccess: (data) => {
+      // Invalidate both lists — backend links enquiry + updates its status atomically
       void queryClient.invalidateQueries({ queryKey: ["employers"] });
+      void queryClient.invalidateQueries({ queryKey: ["employer-enquiries"] });
+
       if (data.loginEmail || data.temporaryPassword) {
         setCredentials({
           loginEmail: data.loginEmail,
@@ -46,7 +73,7 @@ export default function CreateEmployerDrawer({ open, onClose }: Props) {
     },
     onError: (err: unknown) => {
       toast.error("Failed to create employer", {
-        description: err instanceof Error ? err.message : "Unexpected error occurred",
+        description: getApiErrorMessage(err),
       });
     },
   });
@@ -60,7 +87,10 @@ export default function CreateEmployerDrawer({ open, onClose }: Props) {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    mutation.mutate(form);
+    mutation.mutate({
+      ...form,
+      ...(prefill?.enquiryId ? { employerEnquiryId: prefill.enquiryId } : {}),
+    });
   }
 
   const set =
@@ -70,6 +100,7 @@ export default function CreateEmployerDrawer({ open, onClose }: Props) {
 
   const allFilled = Object.values(form).every((v) => v.trim() !== "");
   const isBusy = mutation.isPending;
+  const hasPrefill = !!(prefill?.companyName || prefill?.email);
 
   if (!open) return null;
 
@@ -90,7 +121,12 @@ export default function CreateEmployerDrawer({ open, onClose }: Props) {
             >
               <Building2 size={13} />
             </div>
-            <p className="text-[13px] font-[600] text-slate-900">Create Employer</p>
+            <div>
+              <p className="text-[13px] font-[600] text-slate-900">Create Employer</p>
+              {hasPrefill && (
+                <p className="text-[11px] text-slate-400 leading-none mt-0.5">Pre-filled from lead</p>
+              )}
+            </div>
           </div>
           <button
             onClick={handleClose}
@@ -109,9 +145,7 @@ export default function CreateEmployerDrawer({ open, onClose }: Props) {
             <h2 className="text-[17px] font-[700] text-slate-900 tracking-tight mb-1">
               Employer Created
             </h2>
-            <p className="text-[12px] text-slate-400 mb-1">
-              {credentials.companyName}
-            </p>
+            <p className="text-[12px] text-slate-400 mb-1">{credentials.companyName}</p>
             <p className="text-[12px] text-slate-400 mb-7">
               Share these login credentials with the employer
             </p>
@@ -130,8 +164,8 @@ export default function CreateEmployerDrawer({ open, onClose }: Props) {
               style={{ background: "#fdf3ee", border: "1px solid #fde8d8" }}
             >
               <p className="text-[11px] leading-relaxed" style={{ color: "#a8411f" }}>
-                Status is <strong>PENDING</strong> by default. Open the employer record and click{" "}
-                <strong>Activate</strong> to allow employee logins.
+                Status is <strong>PENDING</strong> by default. Go to{" "}
+                <strong>Employers</strong> and click <strong>Activate</strong> to allow employee logins.
               </p>
             </div>
 
@@ -147,9 +181,11 @@ export default function CreateEmployerDrawer({ open, onClose }: Props) {
           <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
             <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
 
-              <div className="bg-slate-50 border border-slate-100 rounded-lg px-4 py-3 text-[12px] text-slate-500 leading-relaxed">
-                Creates a new employer account directly. The employer can log in immediately if activated.
-              </div>
+              {hasPrefill && (
+                <div className="bg-emerald-50 border border-emerald-100 rounded-lg px-4 py-3 text-[12px] text-emerald-700 leading-relaxed">
+                  Fields pre-filled from the lead. Add a Company Code to complete.
+                </div>
+              )}
 
               <FormField
                 label="Company Name"
@@ -195,9 +231,7 @@ export default function CreateEmployerDrawer({ open, onClose }: Props) {
             <div className="border-t border-slate-100 px-5 py-3.5 flex-shrink-0 space-y-2.5">
               {mutation.isError && (
                 <p className="text-[11px] text-red-600 font-[500]">
-                  {mutation.error instanceof Error
-                    ? mutation.error.message
-                    : "Failed to create employer. Please try again."}
+                  {getApiErrorMessage(mutation.error, "Failed to create employer. Please try again.")}
                 </p>
               )}
               <button

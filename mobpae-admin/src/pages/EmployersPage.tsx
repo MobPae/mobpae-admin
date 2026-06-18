@@ -78,7 +78,7 @@ export default function EmployersPage() {
           onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "#c4522a"; }}
         >
           <Plus size={13} />
-          Create Employer
+          Add Employer
         </button>
       </div>
 
@@ -190,6 +190,7 @@ export default function EmployersPage() {
         open={showCreate}
         onClose={() => setShowCreate(false)}
       />
+
     </div>
   );
 }

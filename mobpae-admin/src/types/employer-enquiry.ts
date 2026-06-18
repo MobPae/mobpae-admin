@@ -1,4 +1,4 @@
-export type EmployerEnquiryStatus = "NEW" | "CONTACTED" | "APPROVED" | "REJECTED";
+export type EmployerEnquiryStatus = "NEW" | "CONTACTED" | "APPROVED" | "REJECTED" | "ONBOARDED";
 
 export type EmployerEnquiry = {
   id: string;
