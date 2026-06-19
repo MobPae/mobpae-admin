@@ -1,4 +1,5 @@
 import api from "../lib/axios";
+import { removeToken } from "../utils/auth";
 
 export interface LoginResponse {
   accessToken: string;
@@ -30,7 +31,8 @@ export async function refreshAccessToken(refreshToken: string): Promise<RefreshR
 }
 
 export async function logout(): Promise<void> {
-  await api.post("/auth/logout");
+  try { await api.post("/auth/logout"); } catch { /* best-effort */ }
+  removeToken();
 }
 
 export async function forgotPassword(email: string): Promise<void> {

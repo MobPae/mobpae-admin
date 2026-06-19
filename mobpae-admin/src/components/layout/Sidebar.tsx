@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
+  ScrollText,
   Building2,
   UserCircle2,
   Users,
@@ -13,6 +14,7 @@ import {
   CircleDollarSign,
   CreditCard,
   Settings,
+  CalendarClock,
   type LucideIcon,
 } from "lucide-react";
 
@@ -60,7 +62,11 @@ const SECTIONS: Section[] = [
   },
   {
     title: "System",
-    items: [{ label: "Settings", icon: Settings, to: "/settings" }],
+    items: [
+      { label: "Audit Logs",     icon: ScrollText,    to: "/audit-logs" },
+      { label: "Scheduled Jobs", icon: CalendarClock, to: "/jobs"        },
+      { label: "Settings",       icon: Settings,      to: "/settings"    },
+    ],
   },
 ];
 
@@ -68,7 +74,7 @@ export default function Sidebar() {
   return (
     <aside
       className="w-[228px] h-screen flex flex-col flex-shrink-0"
-      style={{ background: "linear-gradient(180deg, #5c1f0d 0%, #7a2210 45%, #a8411f 100%)" }}
+      style={{ background: "linear-gradient(180deg, #022c22 0%, #065f46 45%, #047857 100%)" }}
     >
       {/* Logo */}
       <div className="h-[52px] flex items-center px-5 gap-3 border-b border-white/10">

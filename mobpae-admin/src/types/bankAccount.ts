@@ -23,3 +23,14 @@ export interface BankAccount {
     };
   };
 }
+
+/** One row from GET /bank-accounts/grouped-by-employer */
+export interface BankEmployerGroup {
+  employerId: string;
+  companyName: string;
+  companyCode: string;
+  totalAccounts: number;
+  pendingCount: number;
+  verifiedCount: number;
+  accounts: BankAccount[];
+}

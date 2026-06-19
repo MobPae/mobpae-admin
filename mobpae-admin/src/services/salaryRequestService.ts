@@ -3,8 +3,9 @@ import type { SalaryRequest } from "../types/salary-request";
 import type { Disbursal } from "../types/disbursal";
 
 export async function getSalaryRequests(): Promise<SalaryRequest[]> {
-  const response = await api.get<SalaryRequest[]>("/salary-requests");
-  return response.data;
+  const response = await api.get("/salary-requests");
+  const raw = response.data;
+  return Array.isArray(raw) ? raw : ((raw?.data ?? []) as SalaryRequest[]);
 }
 
 export async function getSalaryRequest(requestId: string): Promise<SalaryRequest> {
@@ -13,8 +14,9 @@ export async function getSalaryRequest(requestId: string): Promise<SalaryRequest
 }
 
 export async function getSalaryRequestsByEmployee(employeeId: string): Promise<SalaryRequest[]> {
-  const response = await api.get<SalaryRequest[]>(`/salary-requests/employee/${employeeId}`);
-  return response.data;
+  const response = await api.get(`/salary-requests/employee/${employeeId}`);
+  const raw = response.data;
+  return Array.isArray(raw) ? raw : ((raw?.data ?? []) as SalaryRequest[]);
 }
 
 export async function approveSalaryRequestForDisbursal(salaryRequestId: string): Promise<Disbursal> {

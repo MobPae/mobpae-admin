@@ -117,7 +117,7 @@ export default function CreateEmployerDrawer({ open, onClose, prefill }: Props) 
           <div className="flex items-center gap-2.5">
             <div
               className="w-7 h-7 rounded-lg flex items-center justify-center text-white"
-              style={{ background: "#c4522a" }}
+              style={{ background: "#059669" }}
             >
               <Building2 size={13} />
             </div>
@@ -161,9 +161,9 @@ export default function CreateEmployerDrawer({ open, onClose, prefill }: Props) 
 
             <div
               className="w-full mt-5 rounded-lg px-4 py-3 text-left"
-              style={{ background: "#fdf3ee", border: "1px solid #fde8d8" }}
+              style={{ background: "#ecfdf5", border: "1px solid #bbf7d0" }}
             >
-              <p className="text-[11px] leading-relaxed" style={{ color: "#a8411f" }}>
+              <p className="text-[11px] leading-relaxed" style={{ color: "#047857" }}>
                 Status is <strong>PENDING</strong> by default. Go to{" "}
                 <strong>Employers</strong> and click <strong>Activate</strong> to allow employee logins.
               </p>
@@ -238,9 +238,9 @@ export default function CreateEmployerDrawer({ open, onClose, prefill }: Props) 
                 type="submit"
                 disabled={isBusy || !allFilled}
                 className="w-full h-9 rounded-lg text-white text-[13px] font-[600] flex items-center justify-center gap-2 transition-colors disabled:opacity-40"
-                style={{ background: "#c4522a" }}
-                onMouseEnter={(e) => { if (!isBusy && allFilled) (e.currentTarget as HTMLButtonElement).style.background = "#a8411f"; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "#c4522a"; }}
+                style={{ background: "#059669" }}
+                onMouseEnter={(e) => { if (!isBusy && allFilled) (e.currentTarget as HTMLButtonElement).style.background = "#047857"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "#059669"; }}
               >
                 {isBusy && <Loader2 size={13} className="animate-spin" />}
                 {isBusy ? "Creating…" : "Create Employer"}
@@ -287,8 +287,8 @@ function FormField({
         className="w-full h-9 px-3 text-[13px] bg-white border border-slate-200 rounded-lg text-slate-900 placeholder-slate-300 outline-none transition-colors"
         style={{ boxShadow: "none" }}
         onFocus={(e) => {
-          e.target.style.borderColor = "#c4522a";
-          e.target.style.boxShadow = "0 0 0 3px #fdf3ee";
+          e.target.style.borderColor = "#059669";
+          e.target.style.boxShadow = "0 0 0 3px #ecfdf5";
         }}
         onBlur={(e) => {
           e.target.style.borderColor = "";
@@ -320,7 +320,7 @@ function CredRow({ label, value }: { label: string; value: string }) {
         onClick={copy}
         title="Copy to clipboard"
         className="w-7 h-7 rounded-md bg-white border border-slate-200 flex items-center justify-center flex-shrink-0 transition-colors hover:border-slate-300"
-        style={copied ? { borderColor: "#c4522a", color: "#c4522a" } : { color: "#94a3b8" }}
+        style={copied ? { borderColor: "#059669", color: "#059669" } : { color: "#94a3b8" }}
       >
         <Copy size={12} />
       </button>

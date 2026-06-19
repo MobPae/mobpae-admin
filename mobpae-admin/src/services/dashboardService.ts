@@ -2,8 +2,29 @@ import api from "../lib/axios";
 import type { AdminDashboard, RevenueSummary } from "../types/dashboard";
 
 export async function getAdminDashboard(): Promise<AdminDashboard> {
-  const response = await api.get<AdminDashboard>("/dashboard/admin");
-  return response.data;
+  const response = await api.get("/reports/dashboard");
+  // Unwrap if backend wraps in { data: ... }
+  const raw = (response.data && typeof response.data === "object" && "data" in (response.data as object))
+    ? (response.data as Record<string, unknown>).data as Record<string, unknown>
+    : response.data as Record<string, unknown>;
+  const n = (v: unknown): number => { const x = Number(v); return Number.isFinite(x) ? x : 0; };
+  return {
+    totalEmployers:       n(raw.totalEmployers),
+    activeEmployers:      n(raw.activeEmployers),
+    totalEmployees:       n(raw.totalEmployees),
+    activeEmployees:      n(raw.activeEmployees),
+    pendingKycDocuments:  n(raw.pendingKycDocuments ?? raw.pendingKyc),
+    pendingBankAccounts:  n(raw.pendingBankAccounts ?? raw.pendingBanks),
+    pendingSalaryRequests:n(raw.pendingSalaryRequests ?? raw.pendingRequests),
+    pendingDisbursals:    n(raw.pendingDisbursals),
+    disbursedAmount:      n(raw.disbursedAmount ?? raw.totalDisbursed),
+    recoveredAmount:      n(raw.recoveredAmount ?? raw.totalRecovered),
+    outstandingAmount:    n(raw.outstandingAmount ?? raw.totalOutstanding),
+    pendingSettlements:   n(raw.pendingSettlements),
+    membershipRevenue:    n(raw.membershipRevenue),
+    activeMemberships:    n(raw.activeMemberships),
+    activeRepayments:     n(raw.activeRepayments),
+  };
 }
 
 // GET /membership/revenue-summary

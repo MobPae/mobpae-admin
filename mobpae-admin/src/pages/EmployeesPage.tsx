@@ -10,7 +10,7 @@ const CHIP_ON = "bg-slate-900 text-white border-slate-900";
 const CHIP_OFF = "bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-700";
 
 export default function EmployeesPage() {
-  const { data: employees = [], isLoading, isError } = useQuery({
+  const { data: employees = [], isLoading, isError, refetch } = useQuery({
     queryKey: ["employees"],
     queryFn: getEmployees,
   });
@@ -153,6 +153,7 @@ export default function EmployeesPage() {
         open={selected !== null}
         employee={selected}
         onClose={() => setSelected(null)}
+        onRefresh={() => void refetch()}
       />
     </div>
   );

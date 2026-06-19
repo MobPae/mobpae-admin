@@ -105,8 +105,8 @@ function EmployerSummaryTable({ employers }: { employers: EmployerMembershipSumm
             <tr key={e.employerId} className="hover:bg-slate-50/60 transition-colors">
               <td className="px-4 py-3">
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-md bg-[#fdf3ee] flex items-center justify-center flex-shrink-0">
-                    <Building2 size={12} className="text-[#c4522a]" />
+                  <div className="w-6 h-6 rounded-md bg-[#ecfdf5] flex items-center justify-center flex-shrink-0">
+                    <Building2 size={12} className="text-[#059669]" />
                   </div>
                   <span className="font-[500] text-slate-800">{e.companyName}</span>
                 </div>
@@ -210,7 +210,7 @@ export default function MembershipsPage() {
 
       {/* Summary cards — GET /membership/summary */}
       <div className="grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6 gap-3">
-        <div className="bg-[#c4522a] border border-[#a8411f] rounded-xl px-4 py-3.5 flex items-center gap-3">
+        <div className="bg-[#059669] border border-[#047857] rounded-xl px-4 py-3.5 flex items-center gap-3">
           <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
             <Users size={14} className="text-white/70" />
           </div>

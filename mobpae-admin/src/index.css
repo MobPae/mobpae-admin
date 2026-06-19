@@ -1,4 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 @import "tailwindcss";
 
 /* Override browser autofill background — prevents yellow/blue tint on saved credentials */
@@ -11,22 +10,22 @@ input:-webkit-autofill:focus {
 }
 
 @theme inline {
-  --font-sans:    "Inter", ui-sans-serif, -apple-system, system-ui, sans-serif;
-  --font-display: "Inter", ui-sans-serif, -apple-system, system-ui, sans-serif;
-  --font-serif:   "Inter", ui-sans-serif, -apple-system, system-ui, sans-serif;
+  --font-sans:    "DM Sans", ui-sans-serif, -apple-system, system-ui, sans-serif;
+  --font-display: "DM Sans", ui-sans-serif, -apple-system, system-ui, sans-serif;
+  --font-serif:   "DM Sans", ui-sans-serif, -apple-system, system-ui, sans-serif;
 
-  /* Remap Tailwind blue-* → terracotta palette */
-  --color-blue-50:  #fdf3ee;
-  --color-blue-100: #fbe3d3;
-  --color-blue-200: #f6c4a4;
-  --color-blue-300: #ef9d6d;
-  --color-blue-400: #e57340;
-  --color-blue-500: #c4522a;
-  --color-blue-600: #a8411f;
-  --color-blue-700: #8a3118;
-  --color-blue-800: #6d2514;
-  --color-blue-900: #511c0f;
-  --color-blue-950: #2d0f07;
+  /* Remap Tailwind blue-* → emerald palette */
+  --color-blue-50:  #ecfdf5;
+  --color-blue-100: #d1fae5;
+  --color-blue-200: #a7f3d0;
+  --color-blue-300: #6ee7b7;
+  --color-blue-400: #34d399;
+  --color-blue-500: #10b981;
+  --color-blue-600: #059669;
+  --color-blue-700: #047857;
+  --color-blue-800: #065f46;
+  --color-blue-900: #064e3b;
+  --color-blue-950: #022c22;
 }
 
 html,
@@ -35,15 +34,15 @@ body,
   margin: 0;
   width: 100%;
   height: 100%;
-  font-family: "Inter", ui-sans-serif, -apple-system, system-ui, sans-serif;
+  font-family: "DM Sans", ui-sans-serif, -apple-system, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
 body {
-  background: #faf4ef;
+  background: #f8fafc;
 }
 
-.font-sans    { font-family: "Inter", ui-sans-serif, -apple-system, system-ui, sans-serif; }
-.font-display { font-family: "Inter", ui-sans-serif, -apple-system, system-ui, sans-serif; }
-.font-serif   { font-family: "Inter", ui-sans-serif, -apple-system, system-ui, sans-serif; }
+.font-sans    { font-family: "DM Sans", ui-sans-serif, -apple-system, system-ui, sans-serif; }
+.font-display { font-family: "DM Sans", ui-sans-serif, -apple-system, system-ui, sans-serif; }
+.font-serif   { font-family: "DM Sans", ui-sans-serif, -apple-system, system-ui, sans-serif; }

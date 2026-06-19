@@ -108,7 +108,7 @@ function StatCard({ label, value, icon, iconBg, iconColor, highlight, sub }: {
   iconBg: string; iconColor: string; highlight?: boolean; sub?: string;
 }) {
   return (
-    <div className={`rounded-xl px-4 py-3.5 flex items-center gap-3 border ${highlight ? "bg-[#c4522a] border-[#a8411f]" : "bg-white border-slate-100"}`}>
+    <div className={`rounded-xl px-4 py-3.5 flex items-center gap-3 border ${highlight ? "bg-[#059669] border-[#047857]" : "bg-white border-slate-100"}`}>
       <div className={`w-8 h-8 rounded-lg ${iconBg} flex items-center justify-center ${iconColor} flex-shrink-0`}>{icon}</div>
       <div>
         <p className={`text-[20px] font-[600] leading-none tabular-nums ${highlight ? "text-white" : "text-slate-900"}`}>{value}</p>
@@ -388,10 +388,10 @@ export default function SettlementsPage() {
                           title="Send Report"
                           disabled={sending === s.id}
                           onClick={e => handleSendReport(s, e)}
-                          className="h-7 w-7 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:border-[#c4522a] hover:text-[#c4522a] hover:bg-[#fdf3ee] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                          className="h-7 w-7 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:border-[#059669] hover:text-[#059669] hover:bg-[#ecfdf5] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                         >
                           {sending === s.id
-                            ? <span className="w-3 h-3 border-2 border-[#c4522a]/30 border-t-[#c4522a] rounded-full animate-spin" />
+                            ? <span className="w-3 h-3 border-2 border-[#059669]/30 border-t-[#059669] rounded-full animate-spin" />
                             : <Send size={13} />
                           }
                         </button>
@@ -532,10 +532,10 @@ export default function SettlementsPage() {
               <button
                 onClick={() => handleSendReport(selected)}
                 disabled={sending === selected.id}
-                className="w-full h-10 flex items-center justify-center gap-2 rounded-lg border border-[#c4522a] text-[#c4522a] text-[13px] font-[600] hover:bg-[#fdf3ee] disabled:opacity-50 transition-colors"
+                className="w-full h-10 flex items-center justify-center gap-2 rounded-lg border border-[#059669] text-[#059669] text-[13px] font-[600] hover:bg-[#ecfdf5] disabled:opacity-50 transition-colors"
               >
                 {sending === selected.id
-                  ? <span className="w-4 h-4 border-2 border-[#c4522a]/30 border-t-[#c4522a] rounded-full animate-spin" />
+                  ? <span className="w-4 h-4 border-2 border-[#059669]/30 border-t-[#059669] rounded-full animate-spin" />
                   : <Send size={15} />
                 }
                 {sending === selected.id ? "Sending…" : "Send Report"}

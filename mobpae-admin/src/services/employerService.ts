@@ -2,8 +2,9 @@ import api from "../lib/axios";
 import type { CreateEmployerPayload, CreateEmployerResponse, Employer } from "../types/employer";
 
 export async function getEmployers(): Promise<Employer[]> {
-  const response = await api.get<Employer[]>("/employers");
-  return response.data;
+  const response = await api.get("/employers");
+  const raw = response.data;
+  return Array.isArray(raw) ? raw : ((raw?.data ?? []) as Employer[]);
 }
 
 export async function getEmployer(employerId: string): Promise<Employer> {

@@ -73,9 +73,9 @@ export default function EmployersPage() {
         <button
           onClick={() => setShowCreate(true)}
           className="h-8 px-3.5 rounded-lg text-white text-[12px] font-[600] flex items-center gap-1.5 transition-colors"
-          style={{ background: "#c4522a" }}
-          onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "#a8411f"; }}
-          onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "#c4522a"; }}
+          style={{ background: "#059669" }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "#047857"; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "#059669"; }}
         >
           <Plus size={13} />
           Add Employer

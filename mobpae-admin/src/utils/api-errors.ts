@@ -1,5 +1,8 @@
 import axios from "axios";
 
+export const isForbidden = (error: unknown) =>
+  axios.isAxiosError(error) && error.response?.status === 403;
+
 export const getApiErrorMessage = (
   error: unknown,
   fallback = "Something went wrong. Please try again.",

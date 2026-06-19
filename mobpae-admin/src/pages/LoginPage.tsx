@@ -4,9 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { login } from "../services/authService";
 import { getToken, setToken, setRefreshToken } from "../utils/auth";
 
-const B  = "#c4522a";
-const BD = "#a8411f";
-const CREAM = "#faf4ef";
+const B  = "#059669";
+const BD = "#047857";
+const CREAM = "#f8fafc";
 
 const features = [
   { icon: "○", label: "Security & Compliance",   sub: "Audit logs, access policies"       },
@@ -49,7 +49,7 @@ export default function LoginPage() {
       {/* ── LEFT PANEL ─────────────────────────────────────────────────────── */}
       <div style={{
         width: "55%", flexShrink: 0,
-        background: `linear-gradient(155deg, #5c1f0d 0%, #7a2210 30%, ${BD} 60%, ${B} 100%)`,
+        background: `linear-gradient(155deg, #022c22 0%, #065f46 30%, ${BD} 60%, ${B} 100%)`,
         display: "flex", flexDirection: "column",
         position: "relative", overflow: "hidden",
       }}>
@@ -135,7 +135,7 @@ export default function LoginPage() {
           <div style={{ maxWidth: 380, width: "100%", margin: "0 auto" }}>
 
             {/* Access badge */}
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: `rgba(196,82,42,0.10)`, border: `1px solid rgba(196,82,42,0.20)`, borderRadius: 999, padding: "5px 14px", marginBottom: 28 }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: `rgba(5,150,105,0.10)`, border: `1px solid rgba(5,150,105,0.20)`, borderRadius: 999, padding: "5px 14px", marginBottom: 28 }}>
               <div style={{ width: 7, height: 7, borderRadius: "50%", border: `1.5px solid ${B}` }} />
               <span style={{ fontSize: 11, fontWeight: 600, color: B, letterSpacing: "0.10em", textTransform: "uppercase" }}>Admin Access</span>
             </div>
@@ -207,12 +207,12 @@ export default function LoginPage() {
                 type="submit" disabled={loading}
                 style={{
                   width: "100%", height: 50, marginTop: 4,
-                  background: loading ? "#c4825e" : `linear-gradient(135deg, ${BD} 0%, ${B} 100%)`,
+                  background: loading ? "#6ee7b7" : `linear-gradient(135deg, ${BD} 0%, ${B} 100%)`,
                   color: "white", borderRadius: 10, border: "none",
                   fontSize: 14, fontWeight: 700, letterSpacing: "0.01em",
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
                   cursor: loading ? "not-allowed" : "pointer",
-                  boxShadow: loading ? "none" : "0 4px 16px rgba(196,82,42,0.30)",
+                  boxShadow: loading ? "none" : "0 4px 16px rgba(5,150,105,0.30)",
                   transition: "all 0.15s",
                 }}
               >

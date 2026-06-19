@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { X, CheckCircle2, CreditCard, Loader2 } from "lucide-react";
-import { getApiErrorMessage } from "../../utils/api-errors";
+import { getApiErrorMessage, isForbidden } from "../../utils/api-errors";
 import {
   approveSalaryRequestForDisbursal,
   disburseSalaryRequest,
@@ -51,7 +51,10 @@ export default function SalaryRequestDrawer({ open, request, onClose, onMutated 
       onMutated();
     },
     onError: (err: unknown) => {
-      toast.error("Approval failed", { description: getApiErrorMessage(err)});
+      const msg = isForbidden(err)
+        ? "You don't have permission to approve this request."
+        : getApiErrorMessage(err);
+      toast.error("Approval failed", { description: msg });
     },
   });
 
@@ -64,7 +67,10 @@ export default function SalaryRequestDrawer({ open, request, onClose, onMutated 
       onMutated();
     },
     onError: (err: unknown) => {
-      toast.error("Disbursal failed", { description: getApiErrorMessage(err)});
+      const msg = isForbidden(err)
+        ? "You don't have permission to disburse this request."
+        : getApiErrorMessage(err);
+      toast.error("Disbursal failed", { description: msg });
     },
   });
 

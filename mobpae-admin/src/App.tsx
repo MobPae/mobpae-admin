@@ -11,12 +11,15 @@ import EmployeesPage from "./pages/EmployeesPage";
 import SalaryRequestsPage from "./pages/SalaryRequestsPage";
 import DisbursalsPage from "./pages/DisbursalsPage";
 import RecoveriesPage from "./pages/RecoveriesPage";
+import RepaymentsPage from "./pages/RepaymentsPage";
 import SettlementsPage from "./pages/SettlementsPage";
 import MembershipsPage from "./pages/MembershipsPage";
 import RevenuePage from "./pages/RevenuePage";
 import KycVerificationPage from "./pages/KycVerificationPage";
 import BankVerificationPage from "./pages/BankVerificationPage";
 import SettingsPage from "./pages/SettingsPage";
+import AuditLogsPage from "./pages/AuditLogsPage";
+import JobsPage from "./pages/JobsPage";
 import ChangePasswordPage from "./pages/ChangePasswordPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
@@ -57,12 +60,15 @@ export default function App() {
           <Route path="salary-requests" element={<SalaryRequestsPage />} />
           <Route path="disbursals" element={<DisbursalsPage />} />
           <Route path="recoveries" element={<RecoveriesPage />} />
+          <Route path="repayments" element={<RepaymentsPage />} />
           <Route path="settlements" element={<SettlementsPage />} />
           <Route path="memberships" element={<MembershipsPage />} />
           <Route path="revenue" element={<RevenuePage />} />
           <Route path="kyc" element={<KycVerificationPage />} />
           <Route path="bank-verification" element={<BankVerificationPage />} />
           <Route path="settings" element={<SettingsPage />} />
+          <Route path="audit-logs" element={<AuditLogsPage />} />
+          <Route path="jobs" element={<JobsPage />} />
 
           {/* Catch-all */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

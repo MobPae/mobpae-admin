@@ -10,9 +10,17 @@ const EMPTY_DASHBOARD: AdminDashboard = {
   totalEmployers: 0,
   activeEmployers: 0,
   totalEmployees: 0,
+  activeEmployees: 0,
   pendingKycDocuments: 0,
+  pendingBankAccounts: 0,
   pendingSalaryRequests: 0,
   pendingDisbursals: 0,
+  disbursedAmount: 0,
+  recoveredAmount: 0,
+  outstandingAmount: 0,
+  pendingSettlements: 0,
+  membershipRevenue: 0,
+  activeMemberships: 0,
   activeRepayments: 0,
 };
 
@@ -83,13 +91,28 @@ export default function DashboardPage() {
     .sort((a, b) => new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime())
     .slice(0, 5);
 
+  const fmt = (n: number) =>
+    n >= 1_00_00_000 ? `₹${(n / 1_00_00_000).toFixed(1)}Cr`
+    : n >= 1_00_000  ? `₹${(n / 1_00_000).toFixed(1)}L`
+    : n >= 1_000     ? `₹${(n / 1_000).toFixed(1)}K`
+    : `₹${n.toLocaleString("en-IN")}`;
+
   const kpis = [
-    { label: "Active employers", value: d.activeEmployers, sub: `${d.totalEmployers} total`, accent: false },
-    { label: "Total employees", value: d.totalEmployees.toLocaleString("en-IN"), sub: "across all orgs", accent: false },
-    { label: "Pending requests", value: d.pendingSalaryRequests, sub: "awaiting review", accent: d.pendingSalaryRequests > 0 },
-    { label: "Pending disbursals", value: d.pendingDisbursals, sub: "ready to process", accent: d.pendingDisbursals > 0 },
-    { label: "KYC pending", value: d.pendingKycDocuments, sub: "docs in queue", accent: d.pendingKycDocuments > 0 },
-    { label: "Active recoveries", value: d.activeRepayments, sub: "in progress", accent: false },
+    { label: "Active employers",   value: d.activeEmployers,                           sub: `${d.totalEmployers} total`,     accent: false },
+    { label: "Active employees",   value: d.activeEmployees.toLocaleString("en-IN"),   sub: `${d.totalEmployees} total`,     accent: false },
+    { label: "Pending requests",   value: d.pendingSalaryRequests,                     sub: "awaiting review",               accent: d.pendingSalaryRequests > 0 },
+    { label: "Pending disbursals", value: d.pendingDisbursals,                         sub: "ready to process",              accent: d.pendingDisbursals > 0 },
+    { label: "KYC pending",        value: d.pendingKycDocuments,                       sub: "docs in queue",                 accent: d.pendingKycDocuments > 0 },
+    { label: "Bank pending",       value: d.pendingBankAccounts,                       sub: "awaiting verify",               accent: d.pendingBankAccounts > 0 },
+  ];
+
+  const financialKpis = [
+    { label: "Disbursed",          value: fmt(d.disbursedAmount),   sub: "total disbursed",       accent: false },
+    { label: "Outstanding",        value: fmt(d.outstandingAmount), sub: "to be recovered",        accent: d.outstandingAmount > 0 },
+    { label: "Recovered",          value: fmt(d.recoveredAmount),   sub: "repayments collected",   accent: false },
+    { label: "Settlements",        value: d.pendingSettlements,     sub: "pending",                accent: d.pendingSettlements > 0 },
+    { label: "Membership rev.",    value: fmt(d.membershipRevenue), sub: "from memberships",       accent: false },
+    { label: "Active memberships", value: d.activeMemberships,      sub: "subscribed",             accent: false },
   ];
 
   const actionItems = [
@@ -120,7 +143,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* KPI Strip */}
+      {/* KPI Strip — operational */}
       <div className="grid grid-cols-6 gap-3">
         {kpis.map((kpi) => (
           <div key={kpi.label} className="bg-white border border-slate-100 rounded-lg p-3.5">
@@ -128,6 +151,23 @@ export default function DashboardPage() {
               {kpi.label}
             </p>
             <p className={`text-[22px] font-[500] tracking-tight leading-none mt-2.5 ${
+              kpi.accent ? "text-amber-600" : "text-slate-900"
+            } ${dashLoading ? "opacity-20 animate-pulse" : ""}`}>
+              {kpi.value}
+            </p>
+            <p className="text-[10px] text-slate-400 mt-1.5 leading-none">{kpi.sub}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* KPI Strip — financial */}
+      <div className="grid grid-cols-6 gap-3">
+        {financialKpis.map((kpi) => (
+          <div key={kpi.label} className="bg-white border border-slate-100 rounded-lg p-3.5">
+            <p className="text-[10px] text-slate-400 uppercase tracking-[0.06em] font-[500] leading-none">
+              {kpi.label}
+            </p>
+            <p className={`text-[18px] font-[500] tracking-tight leading-none mt-2.5 ${
               kpi.accent ? "text-amber-600" : "text-slate-900"
             } ${dashLoading ? "opacity-20 animate-pulse" : ""}`}>
               {kpi.value}

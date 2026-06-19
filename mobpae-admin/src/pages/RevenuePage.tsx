@@ -29,7 +29,7 @@ function RevenueCard({
     <div
       className={`rounded-xl px-6 py-5 flex flex-col gap-3 ${
         highlight
-          ? "bg-[#c4522a] border border-[#a8411f]"
+          ? "bg-[#059669] border border-[#047857]"
           : "bg-white border border-slate-100"
       }`}
     >
@@ -93,8 +93,8 @@ export default function RevenuePage() {
               label="Membership Revenue"
               value={formatCurrency(revenue.membershipRevenue)}
               icon={<CreditCard size={16} />}
-              iconBg="bg-[#fdf3ee]"
-              iconColor="text-[#c4522a]"
+              iconBg="bg-[#ecfdf5]"
+              iconColor="text-[#059669]"
               sub="From membership plan payments"
             />
             <RevenueCard
@@ -114,7 +114,7 @@ export default function RevenuePage() {
             </div>
             <div className="px-5 py-4 space-y-3">
               {[
-                { label: "Membership revenue", value: revenue.membershipRevenue, color: "#c4522a" },
+                { label: "Membership revenue", value: revenue.membershipRevenue, color: "#059669" },
                 { label: "Interest revenue",   value: revenue.interestRevenue,   color: "#059669" },
               ].map(({ label, value, color }) => {
                 const total = Number(revenue.totalRevenue) || 1;

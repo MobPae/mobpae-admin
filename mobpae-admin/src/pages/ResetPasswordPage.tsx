@@ -3,9 +3,9 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { resetPassword } from "../services/authService";
 
-const B  = "#c4522a";
-const BD = "#a8411f";
-const CREAM = "#faf4ef";
+const B  = "#059669";
+const BD = "#047857";
+const CREAM = "#f8fafc";
 
 export default function ResetPasswordPage() {
   const navigate = useNavigate();
@@ -88,7 +88,7 @@ export default function ResetPasswordPage() {
                 background: `linear-gradient(135deg, ${BD} 0%, ${B} 100%)`,
                 color: "white", borderRadius: 10, border: "none",
                 fontSize: 14, fontWeight: 700, cursor: "pointer",
-                boxShadow: "0 4px 16px rgba(196,82,42,0.30)",
+                boxShadow: "0 4px 16px rgba(5,150,105,0.30)",
               }}
             >
               Sign in
@@ -153,7 +153,7 @@ export default function ResetPasswordPage() {
                   fontSize: 14, fontWeight: 700,
                   display: "flex", alignItems: "center", justifyContent: "center",
                   cursor: loading ? "not-allowed" : "pointer",
-                  boxShadow: loading ? "none" : "0 4px 16px rgba(196,82,42,0.30)",
+                  boxShadow: loading ? "none" : "0 4px 16px rgba(5,150,105,0.30)",
                   transition: "all 0.15s",
                 }}
               >

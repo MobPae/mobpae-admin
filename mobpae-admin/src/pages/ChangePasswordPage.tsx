@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, KeyRound, Lock, ShieldCheck } from "lucide-react";
-import { changePassword } from "../services/authService";
+import { changePassword, logout } from "../services/authService";
 import { getApiErrorMessage } from "../utils/api-errors";
 
-const BRAND = "#c4522a";
-const BRAND_LIGHT = "#fdf3ee";
+const BRAND = "#059669";
+const BRAND_LIGHT = "#ecfdf5";
 
 export default function ChangePasswordPage() {
   const navigate = useNavigate();
@@ -35,8 +35,10 @@ export default function ChangePasswordPage() {
     setLoading(true);
     try {
       await changePassword(current, next);
+      // Backend invalidates all sessions on password change — clear tokens and force re-login
+      await logout();
       setSuccess(true);
-      setTimeout(() => navigate("/dashboard"), 1500);
+      setTimeout(() => navigate("/login"), 1500);
     } catch (err) {
       const msg = getApiErrorMessage(err, "Failed to change password.");
       setError(msg.toLowerCase().includes("incorrect") || msg.toLowerCase().includes("wrong") ? "Current password is incorrect." : msg);
@@ -158,7 +160,7 @@ function Field({
           placeholder={placeholder}
           autoComplete={autoComplete}
           required
-          className="w-full h-10 pl-9 pr-10 text-[13px] bg-white border border-slate-200 rounded-lg text-slate-900 placeholder-slate-400 outline-none focus:border-[#c4522a] focus:ring-2 focus:ring-[#c4522a]/10 transition"
+          className="w-full h-10 pl-9 pr-10 text-[13px] bg-white border border-slate-200 rounded-lg text-slate-900 placeholder-slate-400 outline-none focus:border-[#059669] focus:ring-2 focus:ring-[#059669]/10 transition"
         />
         <button
           type="button"
