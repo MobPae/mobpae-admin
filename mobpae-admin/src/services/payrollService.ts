@@ -1,5 +1,11 @@
 // Payroll service — admin portal
-// Note: /payroll/recoveries, /payroll/summaries, and /payroll/recoveries/:id
-// are not available on the backend. Recoveries are accessed via /salary-requests.
-// This file is retained for future use.
-export {};
+import { apiClient } from "../lib/api-client";
+
+/**
+ * POST /payroll/process-recovery/:employerId
+ * Processes all due repayments for the employer: marks them paid,
+ * creates a settlement, and re-enables employee eligibility.
+ */
+export async function processRecovery(employerId: string): Promise<void> {
+  await apiClient.post(`/payroll/process-recovery/${employerId}`);
+}

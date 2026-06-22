@@ -15,6 +15,7 @@ import {
   CreditCard,
   Settings,
   CalendarClock,
+  Bell,
   type LucideIcon,
 } from "lucide-react";
 
@@ -63,6 +64,7 @@ const SECTIONS: Section[] = [
   {
     title: "System",
     items: [
+      { label: "Notifications",  icon: Bell,          to: "/notifications" },
       { label: "Audit Logs",     icon: ScrollText,    to: "/audit-logs" },
       { label: "Scheduled Jobs", icon: CalendarClock, to: "/jobs"        },
       { label: "Settings",       icon: Settings,      to: "/settings"    },

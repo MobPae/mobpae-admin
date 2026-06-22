@@ -21,6 +21,7 @@ const BankVerificationPage = lazy(() => import("./pages/BankVerificationPage"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
 const AuditLogsPage = lazy(() => import("./pages/AuditLogsPage"));
 const JobsPage = lazy(() => import("./pages/JobsPage"));
+const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
 import ChangePasswordPage from "./pages/ChangePasswordPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
@@ -71,6 +72,7 @@ export default function App() {
           <Route path="settings" element={<SettingsPage />} />
           <Route path="audit-logs" element={<AuditLogsPage />} />
           <Route path="jobs" element={<JobsPage />} />
+          <Route path="notifications" element={<NotificationsPage />} />
 
           {/* Catch-all */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

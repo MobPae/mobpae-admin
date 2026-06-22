@@ -36,6 +36,7 @@ function drainQueue(newToken: string) {
 
 function forceLogout() {
   removeToken();
+  sessionStorage.setItem("mobpae_session_expired", "1");
   window.location.replace("/login");
 }
 

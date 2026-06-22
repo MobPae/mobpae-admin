@@ -25,6 +25,13 @@ export default function LoginPage() {
 
   useEffect(() => { if (getToken()) navigate("/"); }, [navigate]);
 
+  useEffect(() => {
+    if (sessionStorage.getItem("mobpae_session_expired")) {
+      sessionStorage.removeItem("mobpae_session_expired");
+      setError("Your session has expired. Please sign in again.");
+    }
+  }, []);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     loginAttempted.current = true;

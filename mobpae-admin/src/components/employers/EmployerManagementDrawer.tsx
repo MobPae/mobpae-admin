@@ -2,9 +2,10 @@ import { useEscKey } from "../../lib/useEscKey";
 import { useState, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { X, Ban, CheckCircle2, Loader2, RotateCcw, Copy, Mail } from "lucide-react";
+import { X, Ban, CheckCircle2, Loader2, RotateCcw, Copy, Mail, RefreshCw } from "lucide-react";
 import { getApiErrorMessage } from "../../utils/api-errors";
 import { updateEmployerStatus } from "../../services/employerService";
+import { processRecovery } from "../../services/payrollService";
 import { getSalaryRequestsByEmployer } from "../../services/salaryRequestService";
 import type { Employer } from "../../types/employer";
 import type { SalaryRequest } from "../../types/salary-request";
@@ -44,11 +45,12 @@ const SR_STATUS: Record<string, { label: string; cls: string }> = {
 export default function EmployerManagementDrawer({ open, onClose, onMutated, employer }: Props) {
   useEscKey(open, onClose);
   const [suspendConfirm,    setSuspendConfirm]    = useState(false);
+  const [recoveryConfirm,   setRecoveryConfirm]   = useState(false);
   const [tempPassword,      setTempPassword]      = useState<string | null>(null);
   const [copiedPassword,    setCopiedPassword]    = useState(false);
 
   useEffect(() => {
-    if (open) { setSuspendConfirm(false); setTempPassword(null); }
+    if (open) { setSuspendConfirm(false); setRecoveryConfirm(false); setTempPassword(null); }
   }, [open, employer?.id]);
 
   const { data: recentRequests = [], isLoading: reqLoading } = useQuery<SalaryRequest[]>({
@@ -87,12 +89,28 @@ export default function EmployerManagementDrawer({ open, onClose, onMutated, emp
     },
   });
 
+  const recoveryMutation = useMutation({
+    mutationFn: () => processRecovery(employer!.id),
+    onSuccess: () => {
+      toast.success("Recovery processed", {
+        description: `All due repayments for ${employer?.companyName} have been processed.`,
+      });
+      setRecoveryConfirm(false);
+      onMutated();
+    },
+    onError: (err: unknown) => {
+      toast.error("Recovery failed", { description: getApiErrorMessage(err) });
+      setRecoveryConfirm(false);
+    },
+  });
+
   if (!open || !employer) return null;
 
-  const isBusy      = mutation.isPending;
-  const canActivate = employer.status === "PENDING" || employer.status === "INACTIVE";
+  const isBusy        = mutation.isPending;
+  const isRecovering  = recoveryMutation.isPending;
+  const canActivate   = employer.status === "PENDING" || employer.status === "INACTIVE";
   const canReactivate = employer.status === "SUSPENDED";
-  const canSuspend  = employer.status === "ACTIVE";
+  const canSuspend    = employer.status === "ACTIVE";
 
   return (
     <>
@@ -296,6 +314,34 @@ export default function EmployerManagementDrawer({ open, onClose, onMutated, emp
               </div>
             )}
 
+            {/* Process Recovery confirm */}
+            {recoveryConfirm && (
+              <div className="mb-3 rounded-lg bg-amber-50 border border-amber-200 p-3">
+                <p className="text-[12px] font-[600] text-amber-800 mb-1">Process recovery?</p>
+                <p className="text-[11px] text-amber-700 mb-3">
+                  This will mark all due repayments for <strong>{employer.companyName}</strong> as paid,
+                  create a settlement, and re-enable employee eligibility.
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setRecoveryConfirm(false)}
+                    disabled={isRecovering}
+                    className="flex-1 h-7 rounded-md border border-amber-200 text-[11px] font-[500] text-amber-700 hover:bg-amber-100 transition-colors disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => recoveryMutation.mutate()}
+                    disabled={isRecovering}
+                    className="flex-1 h-7 rounded-md bg-amber-600 hover:bg-amber-700 text-[11px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-60"
+                  >
+                    {isRecovering ? <Loader2 size={11} className="animate-spin" /> : <RefreshCw size={11} />}
+                    Confirm
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Normal action buttons */}
             {!suspendConfirm && (
               <div className="flex gap-2">
@@ -332,6 +378,20 @@ export default function EmployerManagementDrawer({ open, onClose, onMutated, emp
                     Suspend
                   </button>
                 )}
+              </div>
+            )}
+
+            {/* Process Recovery — available for any active employer */}
+            {!suspendConfirm && !recoveryConfirm && canSuspend && (
+              <div className="mt-2">
+                <button
+                  onClick={() => setRecoveryConfirm(true)}
+                  disabled={isBusy || isRecovering}
+                  className="w-full h-8 rounded-md border border-[#E4E4EF] text-[12px] font-[500] text-[#62657A] hover:border-amber-300 hover:text-amber-700 hover:bg-amber-50 transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
+                >
+                  <RefreshCw size={12} />
+                  Process Recovery
+                </button>
               </div>
             )}
           </div>
