@@ -60,7 +60,7 @@ function Toggle({ on, loading, onChange }: { on: boolean; loading: boolean; onCh
       onClick={onChange}
       disabled={loading}
       style={{ height: "20px", width: "36px" }}
-      className={`relative inline-flex items-center rounded-full transition-colors disabled:opacity-50 flex-shrink-0 ${on ? "bg-emerald-500" : "bg-slate-200"}`}
+      className={`relative inline-flex items-center rounded-full transition-colors disabled:opacity-50 flex-shrink-0 ${on ? "bg-[#7679FF]" : "bg-[#E4E4EF]"}`}
     >
       {loading
         ? <Loader2 size={10} className="absolute inset-0 m-auto text-white animate-spin" />
@@ -74,12 +74,12 @@ function SectionCard({ icon, color, title, children }: {
   icon: React.ReactNode; color: string; title: string; children: React.ReactNode;
 }) {
   return (
-    <div className="bg-white border border-slate-100 rounded-xl overflow-hidden">
-      <div className="px-5 py-3.5 border-b border-slate-100 flex items-center gap-2">
+    <div className="bg-white border border-[#E4E4EF] rounded-xl overflow-hidden">
+      <div className="px-5 py-3.5 border-b border-[#E4E4EF] flex items-center gap-2">
         <div className={`w-6 h-6 rounded-md ${color} flex items-center justify-center`}>{icon}</div>
-        <p className="text-[13px] font-[500] text-slate-800">{title}</p>
+        <p className="text-[13px] font-[500] text-[#191A2E]">{title}</p>
       </div>
-      <div className="divide-y divide-slate-50">{children}</div>
+      <div className="divide-y divide-[#F0F0F8]">{children}</div>
     </div>
   );
 }
@@ -126,12 +126,12 @@ export default function SettingsPage() {
 
     return (
       <div className="flex items-center justify-between px-5 py-3 group min-h-[44px]">
-        <span className="text-[12px] text-slate-500">{label}</span>
+        <span className="text-[12px] text-[#62657A]">{label}</span>
         <div className="flex items-center gap-2">
           {isEditingThis ? (
             <>
               <div className="flex items-center gap-1">
-                {prefix && <span className="text-[12px] text-slate-400">{prefix}</span>}
+                {prefix && <span className="text-[12px] text-[#62657A]">{prefix}</span>}
                 <input
                   autoFocus
                   type="text"
@@ -141,32 +141,32 @@ export default function SettingsPage() {
                     if (e.key === "Enter") saveMutation.mutate(editing!);
                     if (e.key === "Escape") setEditing(null);
                   }}
-                  className="w-24 h-7 px-2 text-[12px] font-[500] text-slate-900 border border-blue-300 rounded-md outline-none focus:border-blue-500 tabular-nums text-right"
+                  className="w-24 h-7 px-2 text-[12px] font-[500] text-[#191A2E] border border-[#E4E4EF] rounded-md outline-none focus:border-[#7679FF] tabular-nums text-right"
                 />
-                {suffix && <span className="text-[12px] text-slate-400">{suffix}</span>}
+                {suffix && <span className="text-[12px] text-[#62657A]">{suffix}</span>}
               </div>
               <button
                 onClick={() => saveMutation.mutate(editing!)}
                 disabled={isSaving}
-                className="w-6 h-6 rounded-md bg-emerald-600 text-white flex items-center justify-center hover:bg-emerald-700 disabled:opacity-50"
+                className="w-6 h-6 rounded-md bg-[#7679FF] text-white flex items-center justify-center hover:bg-[#5659D9] disabled:opacity-50"
               >
                 {isSaving ? <Loader2 size={10} className="animate-spin" /> : <Check size={10} />}
               </button>
               <button
                 onClick={() => setEditing(null)}
-                className="w-6 h-6 rounded-md border border-slate-200 text-slate-400 flex items-center justify-center hover:bg-slate-50"
+                className="w-6 h-6 rounded-md border border-[#E4E4EF] text-[#62657A] flex items-center justify-center hover:bg-[#F7F7FB]"
               >
                 <X size={10} />
               </button>
             </>
           ) : (
             <>
-              <span className="text-[12px] font-[600] text-slate-900 tabular-nums">
-                {shown ?? <span className="text-slate-300 font-[400]">Not set</span>}
+              <span className="text-[12px] font-[600] text-[#191A2E] tabular-nums">
+                {shown ?? <span className="text-[#62657A] font-[400]">Not set</span>}
               </span>
               <button
                 onClick={() => setEditing({ key: k, value: raw })}
-                className="w-5 h-5 rounded flex items-center justify-center text-slate-400 hover:text-blue-500 opacity-40 group-hover:opacity-100 transition-opacity"
+                className="w-5 h-5 rounded flex items-center justify-center text-[#62657A] hover:text-[#7679FF] opacity-40 group-hover:opacity-100 transition-opacity"
               >
                 <Pencil size={10} />
               </button>
@@ -180,7 +180,7 @@ export default function SettingsPage() {
   function ToggleRow({ k, label }: { k: string; label: string }) {
     return (
       <div className="flex items-center justify-between px-5 py-3 min-h-[44px]">
-        <span className="text-[12px] text-slate-500">{label}</span>
+        <span className="text-[12px] text-[#62657A]">{label}</span>
         <Toggle
           on={isOn(settings, k)}
           loading={toggling === k && saveMutation.isPending}
@@ -193,7 +193,7 @@ export default function SettingsPage() {
   if (isLoading) {
     return (
       <div className="px-8 py-6">
-        <p className="text-[13px] text-slate-400">Loading settings…</p>
+        <p className="text-[13px] text-[#62657A]">Loading settings…</p>
       </div>
     );
   }
@@ -201,12 +201,12 @@ export default function SettingsPage() {
   return (
     <div className="px-8 py-6 space-y-5">
       <div>
-        <h1 className="text-[22px] font-[600] text-slate-900 tracking-[-0.01em]">Settings</h1>
-        <p className="text-[13px] text-slate-400 mt-0.5">Platform-wide configuration · hover any value to edit</p>
+        <h1 className="text-[22px] font-[600] text-[#191A2E] tracking-[-0.01em]">Settings</h1>
+        <p className="text-[13px] text-[#62657A] mt-0.5">Platform-wide configuration · hover any value to edit</p>
       </div>
 
       {/* Salary Advance Rules */}
-      <SectionCard icon={<Settings2 size={13} className="text-blue-600" />} color="bg-blue-50" title="Salary advance rules">
+      <SectionCard icon={<Settings2 size={13} className="text-[#7679FF]" />} color="bg-[#ECEBFF]" title="Salary advance rules">
         {ADVANCE_RULES.map(r => <EditableRow key={r.key} k={r.key} label={r.label} prefix={r.prefix} suffix={r.suffix} />)}
       </SectionCard>
 
@@ -217,7 +217,7 @@ export default function SettingsPage() {
         </SectionCard>
 
         {/* Notifications */}
-        <SectionCard icon={<Bell size={13} className="text-blue-600" />} color="bg-blue-50" title="Notifications">
+        <SectionCard icon={<Bell size={13} className="text-[#7679FF]" />} color="bg-[#ECEBFF]" title="Notifications">
           {NOTIFICATION_RULES.map(r => <ToggleRow key={r.key} k={r.key} label={r.label} />)}
         </SectionCard>
       </div>

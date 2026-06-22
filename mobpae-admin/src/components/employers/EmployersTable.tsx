@@ -14,15 +14,15 @@ const AVATAR_COLORS: Record<string, string> = {
   A: "bg-rose-500",
   B: "bg-pink-500",
   C: "bg-fuchsia-500",
-  D: "bg-blue-500",
-  E: "bg-blue-500",
-  F: "bg-blue-500",
-  G: "bg-blue-500",
+  D: "bg-[#ECEBFF]0",
+  E: "bg-[#ECEBFF]0",
+  F: "bg-[#ECEBFF]0",
+  G: "bg-[#ECEBFF]0",
   H: "bg-sky-500",
   I: "bg-cyan-500",
-  J: "bg-teal-500",
-  K: "bg-emerald-500",
-  L: "bg-green-500",
+  J: "bg-[#7679FF]",
+  K: "bg-[#7679FF]",
+  L: "bg-[#ECEBFF]0",
   M: "bg-lime-600",
   N: "bg-yellow-600",
   O: "bg-amber-500",
@@ -31,84 +31,39 @@ const AVATAR_COLORS: Record<string, string> = {
   R: "bg-rose-600",
   S: "bg-pink-600",
   T: "bg-fuchsia-600",
-  U: "bg-blue-600",
-  V: "bg-blue-600",
-  W: "bg-blue-600",
-  X: "bg-blue-600",
+  U: "bg-[#7679FF]",
+  V: "bg-[#7679FF]",
+  W: "bg-[#7679FF]",
+  X: "bg-[#7679FF]",
   Y: "bg-sky-600",
   Z: "bg-cyan-600",
 };
 const avatarBg = (n: string) =>
-  AVATAR_COLORS[n.charAt(0).toUpperCase()] ?? "bg-slate-600";
+  AVATAR_COLORS[n.charAt(0).toUpperCase()] ?? "bg-[#7679FF]";
 
 const STATUS_CONFIG: Record<
   EmployerStatus,
   { label: string; dot: string; text: string; bg: string }
 > = {
-  ACTIVE: {
-    label: "Active",
-    dot: "bg-emerald-400",
-    text: "text-emerald-700",
-    bg: "bg-emerald-50",
-  },
-  PENDING: {
-    label: "Pending",
-    dot: "bg-amber-400",
-    text: "text-amber-700",
-    bg: "bg-amber-50",
-  },
-  APPROVED: {
-    label: "Approved",
-    dot: "bg-blue-400",
-    text: "text-blue-700",
-    bg: "bg-blue-50",
-  },
-  REJECTED: {
-    label: "Rejected",
-    dot: "bg-red-400",
-    text: "text-red-600",
-    bg: "bg-red-50",
-  },
-  INACTIVE: {
-    label: "Inactive",
-    dot: "bg-slate-400",
-    text: "text-slate-500",
-    bg: "bg-slate-100",
-  },
-  SUSPENDED: {
-    label: "Suspended",
-    dot: "bg-orange-400",
-    text: "text-orange-600",
-    bg: "bg-orange-50",
-  },
+  ACTIVE:   { label: "Active", dot: "bg-[#4E8A18]", text: "text-[#3B6D11]", bg: "bg-[#EBF6E3]" },
+  PENDING:  { label: "Pending", dot: "bg-amber-400", text: "text-amber-700", bg: "bg-amber-50" },
+  APPROVED: { label: "Approved", dot: "bg-[#4E8A18]", text: "text-[#3B6D11]", bg: "bg-[#EBF6E3]" },
+  REJECTED: { label: "Rejected", dot: "bg-red-400", text: "text-red-600", bg: "bg-red-50" },
+  INACTIVE:  { label: "Inactive",  dot: "bg-[#8D90A3]", text: "text-[#62657A]", bg: "bg-[#F0F0F8]"  },
+  SUSPENDED: { label: "Suspended", dot: "bg-[#D45F18]",  text: "text-[#9A4910]", bg: "bg-[#FEF1E7]"  },
 };
 
 const RISK_CONFIG: Record<
   EmployerRiskStatus,
   { label: string; dot: string; text: string; bg: string }
 > = {
-  GOOD: {
-    label: "Good",
-    dot: "bg-emerald-400",
-    text: "text-emerald-700",
-    bg: "bg-emerald-50",
-  },
-  WARNING: {
-    label: "Warning",
-    dot: "bg-amber-400",
-    text: "text-amber-700",
-    bg: "bg-amber-50",
-  },
-  BLOCKED: {
-    label: "Blocked",
-    dot: "bg-red-400",
-    text: "text-red-600",
-    bg: "bg-red-50",
-  },
+  GOOD:    { label: "Good",    dot: "bg-[#4E8A18]", text: "text-[#3B6D11]", bg: "bg-[#EBF6E3]" },
+  WARNING: { label: "Warning", dot: "bg-[#D45F18]",  text: "text-[#9A4910]", bg: "bg-[#FEF1E7]"  },
+  BLOCKED: { label: "Blocked", dot: "bg-red-400",    text: "text-red-600",   bg: "bg-red-50"     },
 };
 
 const TH =
-  "px-4 py-2.5 text-left text-[10px] font-[600] uppercase tracking-[0.08em] text-slate-400 whitespace-nowrap";
+  "px-4 py-2.5 text-left text-[11px] font-[600] uppercase tracking-[0.08em] text-[#62657A] whitespace-nowrap";
 const TD = "px-4 py-3.5 align-middle";
 
 export default function EmployersTable({
@@ -117,7 +72,7 @@ export default function EmployersTable({
   onSelect,
 }: Props) {
   return (
-    <div className="bg-white rounded-xl border border-slate-100 overflow-hidden">
+    <div className="bg-white rounded-xl border border-[#E4E4EF] overflow-hidden">
       <table className="w-full table-fixed">
         <colgroup>
           <col style={{ width: "17%" }} />
@@ -130,7 +85,7 @@ export default function EmployersTable({
           <col style={{ width: "8%" }} />
         </colgroup>
         <thead>
-          <tr className="border-b border-slate-100 bg-slate-50">
+          <tr className="border-b border-[#E4E4EF] bg-[#F7F7FB]">
             <th className={TH}>Company</th>
             <th className={TH}>Email</th>
             <th className={TH}>Contact</th>
@@ -150,8 +105,8 @@ export default function EmployersTable({
               <tr
                 key={emp.id}
                 onClick={() => onSelect(emp)}
-                className={`border-b border-slate-50 last:border-0 cursor-pointer transition-colors group ${
-                  isSelected ? "bg-blue-50/60" : "hover:bg-slate-50/70"
+                className={`border-b border-[#F0F0F8] last:border-0 cursor-pointer transition-colors group ${
+                  isSelected ? "bg-[#ECEBFF]/60" : "hover:bg-[#F7F7FB]/70"
                 }`}
               >
                 <td className={TD}>
@@ -164,35 +119,35 @@ export default function EmployersTable({
                       {emp.companyName.charAt(0).toUpperCase()}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-[12px] font-[500] text-slate-900 leading-none truncate">
+                      <p className="text-[12px] font-[500] text-[#191A2E] leading-none truncate">
                         {emp.companyName}
                       </p>
-                      <span className="font-mono text-[10px] text-slate-400">
+                      <span className="font-mono text-[11px] text-[#62657A]">
                         {emp.companyCode}
                       </span>
                     </div>
                   </div>
                 </td>
                 <td className={TD}>
-                  <p className="text-[12px] text-slate-600 truncate">
+                  <p className="text-[12px] text-[#62657A] truncate">
                     {emp.email}
                   </p>
                 </td>
                 <td className={TD}>
-                  <p className="text-[12px] font-[500] text-slate-800 truncate">
+                  <p className="text-[12px] font-[500] text-[#191A2E] truncate">
                     {emp.contactPerson}
                   </p>
                 </td>
                 <td className={TD}>
-                  <p className="text-[12px] text-slate-600 font-mono">
+                  <p className="text-[12px] text-[#62657A] font-mono">
                     {emp.phone}
                   </p>
                 </td>
                 <td className={TD}>
-                  <p className="text-[12px] font-[500] text-slate-800">
+                  <p className="text-[12px] font-[500] text-[#191A2E]">
                     {emp.payrollDate}th
                   </p>
-                  <p className="text-[11px] text-slate-400 mt-0.5">
+                  <p className="text-[11px] text-[#62657A] mt-0.5">
                     cutoff {emp.payrollCutoffDate}th
                   </p>
                 </td>
@@ -219,7 +174,7 @@ export default function EmployersTable({
                 <td className={TD}>
                   <span
                     className={`text-[11px] font-[500] transition-colors ${
-                      isSelected ? "text-blue-600" : "text-blue-500"
+                      isSelected ? "text-[#7679FF]" : "text-[#7679FF]"
                     }`}
                   >
                     {isSelected ? "Close" : "Manage →"}
@@ -230,8 +185,8 @@ export default function EmployersTable({
           })}
         </tbody>
       </table>
-      <div className="px-5 py-2.5 border-t border-slate-100 bg-slate-50/50">
-        <p className="text-[11px] text-slate-400">
+      <div className="px-5 py-2.5 border-t border-[#E4E4EF] bg-[#F7F7FB]/50">
+        <p className="text-[11px] text-[#62657A]">
           {employers.length} {employers.length === 1 ? "employer" : "employers"}
         </p>
       </div>

@@ -1,5 +1,8 @@
 import api from "../lib/axios";
-import { removeToken } from "../utils/auth";
+import { getTokenRole, removeToken } from "../utils/auth";
+
+const ADMIN_ACCESS_MESSAGE =
+  "This account does not have access to the Admin portal.";
 
 export interface LoginResponse {
   accessToken: string;
@@ -22,11 +25,23 @@ export interface RefreshResponse {
 
 export async function login(email: string, password: string): Promise<LoginResponse> {
   const response = await api.post<LoginResponse>("/auth/login", { email, password });
-  return response.data;
+  const data = response.data;
+  const role = data.user?.role ?? data.role ?? getTokenRole(data.accessToken);
+
+  if (role !== "ADMIN") {
+    removeToken();
+    throw new Error(ADMIN_ACCESS_MESSAGE);
+  }
+
+  return data;
 }
 
 export async function refreshAccessToken(refreshToken: string): Promise<RefreshResponse> {
   const response = await api.post<RefreshResponse>("/auth/refresh", { refreshToken });
+  if (getTokenRole(response.data.accessToken) !== "ADMIN") {
+    removeToken();
+    throw new Error(ADMIN_ACCESS_MESSAGE);
+  }
   return response.data;
 }
 

@@ -7,16 +7,16 @@ export default function FinancialOverview() {
       value: "₹4.2L",
       subtitle: "This month",
       icon: Landmark,
-      bg: "bg-blue-100",
-      text: "text-blue-700",
+      bg: "bg-[#ECEBFF]",
+      text: "text-[#5659D9]",
     },
     {
       title: "Total Repaid",
       value: "₹95K",
       subtitle: "Recovery received",
       icon: TrendingUp,
-      bg: "bg-green-100",
-      text: "text-green-700",
+      bg: "bg-[#ECEBFF]",
+      text: "text-[#5659D9]",
     },
     {
       title: "Outstanding",
@@ -29,14 +29,14 @@ export default function FinancialOverview() {
   ];
 
   return (
-    <div className="col-span-4 bg-white border border-slate-200 rounded-3xl shadow-sm">
+    <div className="col-span-4 bg-white border border-[#E4E4EF] rounded-3xl shadow-sm">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-slate-100">
-        <h3 className="text-base font-semibold text-slate-900">
+      <div className="px-6 py-4 border-b border-[#E4E4EF]">
+        <h3 className="text-base font-semibold text-[#191A2E]">
           Financial Overview
         </h3>
 
-        <p className="text-xs text-slate-500 mt-1">
+        <p className="text-xs text-[#62657A] mt-1">
           Salary advance portfolio summary
         </p>
       </div>
@@ -56,8 +56,8 @@ export default function FinancialOverview() {
                   p-3
                   rounded-2xl
                   border
-                  border-slate-100
-                  hover:bg-slate-50
+                  border-[#E4E4EF]
+                  hover:bg-[#F7F7FB]
                   transition-all
                 "
             >
@@ -77,15 +77,15 @@ export default function FinancialOverview() {
                 </div>
 
                 <div>
-                  <p className="text-xs text-slate-500">{item.title}</p>
+                  <p className="text-xs text-[#62657A]">{item.title}</p>
 
-                  <p className="text-sm font-medium text-slate-900 mt-1">
+                  <p className="text-sm font-medium text-[#191A2E] mt-1">
                     {item.subtitle}
                   </p>
                 </div>
               </div>
 
-              <h4 className="text-lg font-bold text-slate-900">{item.value}</h4>
+              <h4 className="text-lg font-bold text-[#191A2E]">{item.value}</h4>
             </div>
           );
         })}

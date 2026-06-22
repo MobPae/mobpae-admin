@@ -6,8 +6,8 @@ import type { Employee, EmploymentStatus } from "../types/employee";
 import EmployeesTable from "../components/employees/EmployeesTable";
 import EmployeeDrawer from "../components/employees/EmployeeDrawer";
 
-const CHIP_ON = "bg-slate-900 text-white border-slate-900";
-const CHIP_OFF = "bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-700";
+const CHIP_ON = "bg-[#191A2E] text-white border-[#191A2E]";
+const CHIP_OFF = "bg-white border-[#E4E4EF] text-[#62657A] hover:border-[#E4E4EF] hover:text-[#62657A]";
 
 export default function EmployeesPage() {
   const { data: employees = [], isLoading, isError, refetch } = useQuery({
@@ -37,17 +37,17 @@ export default function EmployeesPage() {
   };
 
   const pipeline = [
-    { label: "Active",      key: "ACTIVE" as const,   value: counts.ACTIVE,     color: "bg-emerald-400", text: "text-emerald-600" },
+    { label: "Active",      key: "ACTIVE" as const,   value: counts.ACTIVE,     color: "bg-[#7679FF]", text: "text-[#7679FF]" },
     { label: "Inactive",    key: "INACTIVE" as const,  value: counts.INACTIVE,   color: "bg-red-300",     text: "text-red-500"     },
-    { label: "App Enabled", key: null,                  value: counts.appActive,  color: "bg-blue-400",    text: "text-blue-600"    },
-    { label: "Total",       key: null,                  value: employees.length,  color: "bg-slate-300",   text: "text-slate-600"   },
+    { label: "App Enabled", key: null,                  value: counts.appActive,  color: "bg-[#7679FF]",    text: "text-[#7679FF]"    },
+    { label: "Total",       key: null,                  value: employees.length,  color: "bg-[#D4D5E0]",   text: "text-[#62657A]"   },
   ];
 
   return (
     <div className="p-5 space-y-4">
       <div>
-        <h1 className="text-[15px] font-[500] text-slate-900 leading-none">Employees</h1>
-        <p className="text-[11px] text-slate-400 mt-1.5">Manage employee accounts across all employers</p>
+        <h1 className="text-[15px] font-[500] text-[#191A2E] leading-none">Employees</h1>
+        <p className="text-[11px] text-[#62657A] mt-1.5">Manage employee accounts across all employers</p>
       </div>
 
       {isError && (
@@ -65,11 +65,11 @@ export default function EmployeesPage() {
             <button
               key={label}
               onClick={() => key && setStatusFilter(statusFilter === key ? "ALL" : key)}
-              className={`bg-white border rounded-lg p-3.5 text-left transition-colors ${isActive ? "border-slate-300" : "border-slate-100 hover:border-slate-200"} ${!key ? "cursor-default" : "cursor-pointer"}`}
+              className={`bg-white border rounded-lg p-3.5 text-left transition-colors ${isActive ? "border-[#E4E4EF]" : "border-[#E4E4EF] hover:border-[#E4E4EF]"} ${!key ? "cursor-default" : "cursor-pointer"}`}
             >
-              <p className="text-[10px] font-[500] uppercase tracking-[0.06em] text-slate-400 leading-none">{label}</p>
+              <p className="text-[11px] font-[500] uppercase tracking-[0.06em] text-[#62657A] leading-none">{label}</p>
               <p className={`text-[22px] font-[500] tracking-tight leading-none mt-2.5 ${text} ${isLoading ? "opacity-20 animate-pulse" : ""}`}>{value}</p>
-              <div className="h-[3px] rounded-full bg-slate-100 mt-2.5">
+              <div className="h-[3px] rounded-full bg-[#F0F0F8] mt-2.5">
                 <div className={`h-full rounded-full ${color} transition-all`} style={{ width: `${pct}%` }} />
               </div>
             </button>
@@ -80,20 +80,20 @@ export default function EmployeesPage() {
       {/* Filter bar */}
       <div className="flex items-center gap-3 flex-wrap">
         <div className="relative">
-          <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#62657A]" />
           <input
             type="text"
             placeholder="Search name, email, code…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="h-8 pl-8 pr-3 w-56 text-[12px] bg-white border border-slate-200 rounded-md outline-none focus:border-slate-400 transition-colors"
+            className="h-8 pl-8 pr-3 w-56 text-[12px] bg-white border border-[#E4E4EF] rounded-md outline-none focus:border-[#7679FF] transition-colors"
           />
         </div>
 
         <select
           value={employerFilter}
           onChange={(e) => setEmployerFilter(e.target.value)}
-          className="h-8 px-2.5 text-[12px] bg-white border border-slate-200 rounded-md outline-none focus:border-slate-400 text-slate-600 transition-colors"
+          className="h-8 px-2.5 text-[12px] bg-white border border-[#E4E4EF] rounded-md outline-none focus:border-[#7679FF] text-[#62657A] transition-colors"
         >
           <option value="ALL">All employers</option>
           {employers.map((emp) => (
@@ -114,28 +114,28 @@ export default function EmployeesPage() {
         </div>
 
         <div className="flex-1" />
-        <span className="text-[11px] text-slate-400">{filtered.length} result{filtered.length !== 1 ? "s" : ""}</span>
+        <span className="text-[11px] text-[#62657A]">{filtered.length} result{filtered.length !== 1 ? "s" : ""}</span>
       </div>
 
       {/* Table */}
       {isLoading ? (
-        <div className="bg-white border border-slate-100 rounded-xl overflow-hidden">
+        <div className="bg-white border border-[#E4E4EF] rounded-xl overflow-hidden">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="flex items-center gap-4 px-5 py-3.5 border-b border-slate-50 last:border-0">
-              <div className="w-7 h-7 rounded-lg bg-slate-100 animate-pulse flex-shrink-0" />
+            <div key={i} className="flex items-center gap-4 px-5 py-3.5 border-b border-[#F0F0F8] last:border-0">
+              <div className="w-7 h-7 rounded-lg bg-[#F0F0F8] animate-pulse flex-shrink-0" />
               <div className="flex-1 space-y-1.5">
-                <div className="h-2.5 w-32 bg-slate-100 rounded animate-pulse" />
-                <div className="h-2 w-20 bg-slate-100 rounded animate-pulse" />
+                <div className="h-2.5 w-32 bg-[#F0F0F8] rounded animate-pulse" />
+                <div className="h-2 w-20 bg-[#F0F0F8] rounded animate-pulse" />
               </div>
-              <div className="h-2.5 w-24 bg-slate-100 rounded animate-pulse" />
-              <div className="h-4 w-16 bg-slate-100 rounded-full animate-pulse" />
+              <div className="h-2.5 w-24 bg-[#F0F0F8] rounded animate-pulse" />
+              <div className="h-4 w-16 bg-[#F0F0F8] rounded-full animate-pulse" />
             </div>
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-white border border-slate-100 rounded-xl py-14 text-center">
-          <p className="text-[13px] font-[500] text-slate-700">No employees found</p>
-          <p className="text-[11px] text-slate-400 mt-1">
+        <div className="bg-white border border-[#E4E4EF] rounded-xl py-14 text-center">
+          <p className="text-[13px] font-[500] text-[#62657A]">No employees found</p>
+          <p className="text-[11px] text-[#62657A] mt-1">
             {search || statusFilter !== "ALL" || employerFilter !== "ALL"
               ? "Try adjusting your search or filters."
               : "No employees onboarded yet."}

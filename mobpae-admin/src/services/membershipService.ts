@@ -39,7 +39,9 @@ export async function getMembershipSummary(): Promise<MembershipSummary> {
     pending:           num(raw?.pending ?? raw?.pendingMemberships),
     rejected:          num(raw?.rejected ?? raw?.rejectedMemberships),
     expired:           num(raw?.expired ?? raw?.expiredMemberships),
-    membershipRevenue: raw?.membershipRevenue ?? raw?.totalRevenue ?? raw?.revenue ?? 0,
+    membershipRevenue: num(
+      raw?.membershipRevenue ?? raw?.totalRevenue ?? raw?.revenue
+    ),
   };
 }
 
@@ -77,4 +79,15 @@ export async function rejectMembership(id: string, remarks?: string): Promise<Me
 export async function getCoupons(): Promise<MembershipCoupon[]> {
   const response = await api.get("/membership/coupons");
   return unwrapList<MembershipCoupon>(response.data, ["coupons"]);
+}
+
+// POST /membership/coupons
+export async function createCoupon(payload: {
+  code: string;
+  discountAmount: number;
+  validTill?: string;
+  isActive?: boolean;
+}): Promise<MembershipCoupon> {
+  const response = await api.post("/membership/coupons", payload);
+  return unwrapItem<MembershipCoupon>(response.data, ["coupon"]);
 }

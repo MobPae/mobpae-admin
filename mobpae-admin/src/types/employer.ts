@@ -23,11 +23,19 @@ export interface CreateEmployerPayload {
   contactPerson: string;
   email: string;
   phone: string;
+  payrollDate: number;
+  payrollCutoffDate: number;
   employerEnquiryId?: string; // links the new employer to its source lead
 }
 
 // Backend may optionally return login credentials in the create response
 export interface CreateEmployerResponse extends Employer {
   loginEmail?: string;
+  temporaryPassword?: string;
+}
+
+// PATCH /employers/:id/status response
+export interface ActivateEmployerResponse {
+  emailDelivered: boolean;
   temporaryPassword?: string;
 }

@@ -8,41 +8,41 @@ import type { AuditLog } from "../services/auditService";
 
 const ACTION_CONFIG: Record<string, { label: string; dot: string; text: string; bg: string }> = {
   // Auth
-  LOGIN_SUCCESS:             { label: "Login",                dot: "bg-blue-400",    text: "text-blue-700",    bg: "bg-blue-50"    },
-  LOGIN_FAILED:              { label: "Login failed",         dot: "bg-red-400",     text: "text-red-600",     bg: "bg-red-50"     },
-  LOGOUT:                    { label: "Logout",               dot: "bg-slate-400",   text: "text-slate-600",   bg: "bg-slate-100"  },
-  LOGOUT_SUCCESS:            { label: "Logout",               dot: "bg-slate-400",   text: "text-slate-600",   bg: "bg-slate-100"  },
-  PASSWORD_CHANGED:          { label: "Password changed",     dot: "bg-amber-400",   text: "text-amber-700",   bg: "bg-amber-50"   },
-  PASSWORD_RESET_REQUESTED:  { label: "Reset requested",      dot: "bg-amber-400",   text: "text-amber-700",   bg: "bg-amber-50"   },
-  PASSWORD_RESET_SUCCESS:    { label: "Password reset",       dot: "bg-emerald-400", text: "text-emerald-700", bg: "bg-emerald-50" },
+  LOGIN_SUCCESS:             { label: "Login", dot: "bg-[#378ADD]", text: "text-[#185FA5]", bg: "bg-[#E7F1FC]" },
+  LOGIN_FAILED:              { label: "Login failed", dot: "bg-red-400", text: "text-red-600", bg: "bg-red-50" },
+  LOGOUT:                    { label: "Logout", dot: "bg-[#8D90A3]", text: "text-[#62657A]", bg: "bg-[#F0F0F8]" },
+  LOGOUT_SUCCESS:            { label: "Logout", dot: "bg-[#8D90A3]", text: "text-[#62657A]", bg: "bg-[#F0F0F8]" },
+  PASSWORD_CHANGED:          { label: "Password changed", dot: "bg-[#4E8A18]", text: "text-[#3B6D11]", bg: "bg-[#EBF6E3]" },
+  PASSWORD_RESET_REQUESTED:  { label: "Reset requested", dot: "bg-amber-400", text: "text-amber-700", bg: "bg-amber-50" },
+  PASSWORD_RESET_SUCCESS:    { label: "Password reset", dot: "bg-[#4E8A18]", text: "text-[#3B6D11]", bg: "bg-[#EBF6E3]" },
   // Employer
-  EMPLOYER_CREATED:          { label: "Employer created",     dot: "bg-emerald-400", text: "text-emerald-700", bg: "bg-emerald-50" },
-  EMPLOYER_STATUS_UPDATED:   { label: "Employer updated",     dot: "bg-blue-400",    text: "text-blue-700",    bg: "bg-blue-50"    },
-  EMPLOYER_APPROVED:         { label: "Employer approved",    dot: "bg-emerald-400", text: "text-emerald-700", bg: "bg-emerald-50" },
-  EMPLOYER_REJECTED:         { label: "Employer rejected",    dot: "bg-red-400",     text: "text-red-600",     bg: "bg-red-50"     },
+  EMPLOYER_CREATED:          { label: "Employer created", dot: "bg-[#378ADD]", text: "text-[#185FA5]", bg: "bg-[#E7F1FC]" },
+  EMPLOYER_STATUS_UPDATED:   { label: "Employer updated", dot: "bg-[#378ADD]", text: "text-[#185FA5]", bg: "bg-[#E7F1FC]" },
+  EMPLOYER_APPROVED:         { label: "Employer approved", dot: "bg-[#4E8A18]", text: "text-[#3B6D11]", bg: "bg-[#EBF6E3]" },
+  EMPLOYER_REJECTED:         { label: "Employer rejected", dot: "bg-red-400", text: "text-red-600", bg: "bg-red-50" },
   // Employee
-  EMPLOYEE_CREATED:          { label: "Employee created",     dot: "bg-emerald-400", text: "text-emerald-700", bg: "bg-emerald-50" },
-  EMPLOYEE_UPDATED:          { label: "Employee updated",     dot: "bg-blue-400",    text: "text-blue-700",    bg: "bg-blue-50"    },
+  EMPLOYEE_CREATED:          { label: "Employee created", dot: "bg-[#378ADD]", text: "text-[#185FA5]", bg: "bg-[#E7F1FC]" },
+  EMPLOYEE_UPDATED:          { label: "Employee updated", dot: "bg-[#378ADD]", text: "text-[#185FA5]", bg: "bg-[#E7F1FC]" },
   // KYC / Bank
-  KYC_SUBMITTED:             { label: "KYC submitted",        dot: "bg-violet-400",  text: "text-violet-700",  bg: "bg-violet-50"  },
-  KYC_APPROVED:              { label: "KYC approved",         dot: "bg-emerald-400", text: "text-emerald-700", bg: "bg-emerald-50" },
-  KYC_REJECTED:              { label: "KYC rejected",         dot: "bg-red-400",     text: "text-red-600",     bg: "bg-red-50"     },
-  BANK_VERIFIED:             { label: "Bank verified",        dot: "bg-emerald-400", text: "text-emerald-700", bg: "bg-emerald-50" },
+  KYC_SUBMITTED:             { label: "KYC submitted", dot: "bg-amber-400", text: "text-amber-700", bg: "bg-amber-50" },
+  KYC_APPROVED:              { label: "KYC approved", dot: "bg-[#4E8A18]", text: "text-[#3B6D11]", bg: "bg-[#EBF6E3]" },
+  KYC_REJECTED:              { label: "KYC rejected", dot: "bg-red-400", text: "text-red-600", bg: "bg-red-50" },
+  BANK_VERIFIED:             { label: "Bank verified", dot: "bg-[#4E8A18]", text: "text-[#3B6D11]", bg: "bg-[#EBF6E3]" },
   // Salary
-  SALARY_REQUEST_CREATED:    { label: "Request created",      dot: "bg-blue-400",    text: "text-blue-700",    bg: "bg-blue-50"    },
-  SALARY_REQUEST_APPROVED:   { label: "Request approved",     dot: "bg-emerald-400", text: "text-emerald-700", bg: "bg-emerald-50" },
-  SALARY_REQUEST_REJECTED:   { label: "Request rejected",     dot: "bg-red-400",     text: "text-red-600",     bg: "bg-red-50"     },
-  SALARY_REQUEST_DISBURSED:  { label: "Disbursed",            dot: "bg-emerald-400", text: "text-emerald-700", bg: "bg-emerald-50" },
+  SALARY_REQUEST_CREATED:    { label: "Request created", dot: "bg-amber-400", text: "text-amber-700", bg: "bg-amber-50" },
+  SALARY_REQUEST_APPROVED:   { label: "Request approved", dot: "bg-[#378ADD]", text: "text-[#185FA5]", bg: "bg-[#E7F1FC]" },
+  SALARY_REQUEST_REJECTED:   { label: "Request rejected", dot: "bg-red-400", text: "text-red-600", bg: "bg-red-50" },
+  SALARY_REQUEST_DISBURSED:  { label: "Disbursed", dot: "bg-[#4E8A18]", text: "text-[#3B6D11]", bg: "bg-[#EBF6E3]" },
   // Disbursal & Repayment
-  DISBURSAL_CREATED:         { label: "Disbursal created",    dot: "bg-blue-400",    text: "text-blue-700",    bg: "bg-blue-50"    },
-  DISBURSAL_PROCESSED:       { label: "Disbursal processed",  dot: "bg-emerald-400", text: "text-emerald-700", bg: "bg-emerald-50" },
-  REPAYMENT_CREATED:         { label: "Repayment created",    dot: "bg-blue-400",    text: "text-blue-700",    bg: "bg-blue-50"    },
+  DISBURSAL_CREATED:         { label: "Disbursal created", dot: "bg-[#378ADD]", text: "text-[#185FA5]", bg: "bg-[#E7F1FC]" },
+  DISBURSAL_PROCESSED:       { label: "Disbursal processed", dot: "bg-[#4E8A18]", text: "text-[#3B6D11]", bg: "bg-[#EBF6E3]" },
+  REPAYMENT_CREATED:         { label: "Repayment created", dot: "bg-[#D45F18]", text: "text-[#9A4910]", bg: "bg-[#FEF1E7]" },
   // Membership
-  MEMBERSHIP_ACTIVATED:      { label: "Membership activated", dot: "bg-emerald-400", text: "text-emerald-700", bg: "bg-emerald-50" },
-  MEMBERSHIP_EXPIRED:        { label: "Membership expired",   dot: "bg-slate-400",   text: "text-slate-600",   bg: "bg-slate-100"  },
+  MEMBERSHIP_ACTIVATED:      { label: "Membership activated", dot: "bg-[#4E8A18]", text: "text-[#3B6D11]", bg: "bg-[#EBF6E3]" },
+  MEMBERSHIP_EXPIRED:        { label: "Membership expired", dot: "bg-[#D45F18]", text: "text-[#9A4910]", bg: "bg-[#FEF1E7]" },
 };
 
-const FALLBACK = { label: "", dot: "bg-slate-300", text: "text-slate-500", bg: "bg-slate-50" };
+const FALLBACK = { label: "", dot: "bg-[#8D90A3]", text: "text-[#62657A]", bg: "bg-[#F0F0F8]" };
 
 function actionCfg(action: string) {
   return ACTION_CONFIG[action] ?? {
@@ -83,11 +83,11 @@ function DeviceBadge({ ua }: { ua: string }) {
   const Icon = isMobile ? Smartphone : Monitor;
   return (
     <div className="flex items-center gap-1.5 mt-1.5">
-      <span className="inline-flex items-center gap-1 h-[18px] px-1.5 rounded bg-slate-100 text-slate-500 text-[10px] font-[500]">
+      <span className="inline-flex items-center gap-1 h-[18px] px-1.5 rounded bg-[#F0F0F8] text-[#62657A] text-[11px] font-[500]">
         <Icon size={9} />
         {os}
       </span>
-      <span className="inline-flex items-center gap-1 h-[18px] px-1.5 rounded bg-slate-100 text-slate-500 text-[10px] font-[500]">
+      <span className="inline-flex items-center gap-1 h-[18px] px-1.5 rounded bg-[#F0F0F8] text-[#62657A] text-[11px] font-[500]">
         <Globe size={9} />
         {browser}
       </span>
@@ -130,7 +130,7 @@ export default function AuditLogsPage() {
   const [entityFilter, setEntityFilter] = useState("");
   const [page, setPage]               = useState(1);
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["audit-logs", page, actionFilter, entityFilter],
     queryFn: () => getAuditLogs({
       page,
@@ -142,8 +142,8 @@ export default function AuditLogsPage() {
   });
 
   const logs: AuditLog[] = data?.data ?? [];
-  const total = data?.total ?? 0;
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const total = data?.pagination?.total ?? 0;
+  const totalPages = data?.pagination?.totalPages ?? Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const rows = logs.filter(log => {
     if (!search) return true;
@@ -170,31 +170,31 @@ export default function AuditLogsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[22px] font-[600] text-slate-900 tracking-[-0.01em]">Audit Logs</h1>
-          <p className="text-[13px] text-slate-400 mt-0.5">Full audit trail — auth, employer, employee, salary, disbursal events</p>
+          <h1 className="text-[22px] font-[600] text-[#191A2E] tracking-[-0.01em]">Audit Logs</h1>
+          <p className="text-[13px] text-[#62657A] mt-0.5">Full audit trail — auth, employer, employee, salary, disbursal events</p>
         </div>
-        <div className="flex items-center gap-1.5 h-6 px-2.5 rounded-md bg-slate-50 border border-slate-200">
-          <Shield size={11} className="text-slate-400" />
-          <span className="text-[11px] text-slate-500 font-[500]">{total.toLocaleString()} events</span>
+        <div className="flex items-center gap-1.5 h-6 px-2.5 rounded-md bg-[#F7F7FB] border border-[#E4E4EF]">
+          <Shield size={11} className="text-[#62657A]" />
+          <span className="text-[11px] text-[#62657A] font-[500]">{total.toLocaleString()} events</span>
         </div>
       </div>
 
       {/* Filters */}
       <div className="flex items-center gap-3 flex-wrap">
         <div className="relative w-72">
-          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#62657A]" />
           <input
             type="text"
             placeholder="Search action, email, entity…"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="h-8 pl-8 pr-4 text-[12px] bg-white border border-slate-200 rounded-lg outline-none focus:border-blue-400 w-full text-slate-700 placeholder-slate-400"
+            className="h-8 pl-8 pr-4 text-[12px] bg-white border border-[#E4E4EF] rounded-lg outline-none focus:border-[#7679FF] w-full text-[#62657A] placeholder-[#B7B9C7]"
           />
         </div>
         <select
           value={actionFilter}
           onChange={handleFilterChange(setActionFilter)}
-          className="h-8 px-2.5 text-[12px] bg-white border border-slate-200 rounded-lg outline-none focus:border-blue-400 text-slate-600"
+          className="h-8 px-2.5 text-[12px] bg-white border border-[#E4E4EF] rounded-lg outline-none focus:border-[#7679FF] text-[#62657A]"
         >
           <option value="">All actions</option>
           {ACTIONS.map(a => <option key={a} value={a}>{a.replace(/_/g, " ")}</option>)}
@@ -202,7 +202,7 @@ export default function AuditLogsPage() {
         <select
           value={entityFilter}
           onChange={handleFilterChange(setEntityFilter)}
-          className="h-8 px-2.5 text-[12px] bg-white border border-slate-200 rounded-lg outline-none focus:border-blue-400 text-slate-600"
+          className="h-8 px-2.5 text-[12px] bg-white border border-[#E4E4EF] rounded-lg outline-none focus:border-[#7679FF] text-[#62657A]"
         >
           <option value="">All entity types</option>
           {ENTITY_TYPES.map(e => <option key={e} value={e}>{e}</option>)}
@@ -210,7 +210,7 @@ export default function AuditLogsPage() {
         {(actionFilter || entityFilter || search) && (
           <button
             onClick={() => { setSearch(""); setActionFilter(""); setEntityFilter(""); setPage(1); }}
-            className="h-8 px-3 text-[12px] text-slate-500 hover:text-slate-700 border border-slate-200 rounded-lg bg-white"
+            className="h-8 px-3 text-[12px] text-[#62657A] hover:text-[#62657A] border border-[#E4E4EF] rounded-lg bg-white"
           >
             Clear filters
           </button>
@@ -219,22 +219,23 @@ export default function AuditLogsPage() {
 
       {/* Table */}
       {isLoading ? (
-        <div className="bg-white border border-slate-100 rounded-xl px-6 py-10 text-center">
-          <p className="text-[13px] text-slate-400">Loading audit logs…</p>
+        <div className="bg-white border border-[#E4E4EF] rounded-xl px-6 py-10 text-center">
+          <p className="text-[13px] text-[#62657A]">Loading audit logs…</p>
         </div>
       ) : isError ? (
-        <div className="bg-white border border-slate-100 rounded-xl px-6 py-10 text-center">
-          <p className="text-[13px] text-slate-500 font-[500]">Could not load audit logs</p>
-          <p className="text-[12px] text-slate-400 mt-1">Ensure the backend exposes <code className="font-mono text-[11px] bg-slate-100 px-1 rounded">GET /audit-logs</code> with admin auth.</p>
+        <div className="bg-white border border-[#E4E4EF] rounded-xl px-6 py-10 text-center">
+          <p className="text-[13px] text-[#62657A] font-[500]">Could not load audit logs</p>
+          <p className="text-[12px] text-[#62657A] mt-1">Ensure the backend exposes <code className="font-mono text-[11px] bg-[#F0F0F8] px-1 rounded">GET /audit-logs</code> with admin auth.</p>
+          <button type="button" onClick={() => void refetch()} className="mt-3 h-8 px-3 rounded-lg border border-[#E4E4EF] text-[12px] font-[600] text-[#62657A] hover:bg-[#F7F7FB]">Try again</button>
         </div>
       ) : rows.length === 0 ? (
-        <div className="bg-white border border-slate-100 rounded-xl px-6 py-10 text-center">
-          <p className="text-[13px] text-slate-500 font-[500]">No audit events found</p>
-          <p className="text-[12px] text-slate-400 mt-1">Events are recorded as admin and user actions occur.</p>
+        <div className="bg-white border border-[#E4E4EF] rounded-xl px-6 py-10 text-center">
+          <p className="text-[13px] text-[#62657A] font-[500]">No audit events found</p>
+          <p className="text-[12px] text-[#62657A] mt-1">Events are recorded as admin and user actions occur.</p>
         </div>
       ) : (
         <>
-          <div className="bg-white border border-slate-100 rounded-xl overflow-hidden">
+          <div className="bg-white border border-[#E4E4EF] rounded-xl overflow-hidden">
             <table className="w-full table-fixed">
               <colgroup>
                 <col style={{ width: "20%" }} />
@@ -245,21 +246,21 @@ export default function AuditLogsPage() {
                 <col style={{ width: "12%" }} />
               </colgroup>
               <thead>
-                <tr className="border-b border-slate-100 bg-slate-50/60">
+                <tr className="border-b border-[#E4E4EF] bg-[#F7F7FB]/60">
                   {["Action", "Performed by", "Entity type", "Entity ID", "Timestamp", "When"].map((h, i) => (
-                    <th key={i} className="px-4 py-2.5 text-left text-[10px] font-[500] uppercase tracking-[0.06em] text-slate-400">
+                    <th key={i} className="px-4 py-2.5 text-left text-[11px] font-[500] uppercase tracking-[0.06em] text-[#62657A]">
                       {h}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50">
+              <tbody className="divide-y divide-[#F0F0F8]">
                 {rows.map(log => {
                   const cfg = actionCfg(log.action);
                   const deviceInfo = log.newValue?.deviceInfo as string | undefined;
                   const ipAddress  = log.newValue?.ipAddress as string | undefined;
                   return (
-                    <tr key={log.id} className="hover:bg-slate-50/50 transition-colors">
+                    <tr key={log.id} className="hover:bg-[#F7F7FB]/50 transition-colors">
                       {/* Action */}
                       <td className="px-4 py-3">
                         <span className={`inline-flex items-center gap-1.5 h-[22px] px-2 rounded-full text-[11px] font-[500] ${cfg.bg} ${cfg.text}`}>
@@ -271,25 +272,25 @@ export default function AuditLogsPage() {
                       <td className="px-4 py-3">
                         {log.user ? (
                           <div>
-                            <p className="text-[12px] font-[500] text-slate-800 truncate leading-none">{log.user.email}</p>
-                            <p className="text-[10px] text-slate-400 mt-0.5 font-mono leading-none">{log.user.role}</p>
+                            <p className="text-[12px] font-[500] text-[#191A2E] truncate leading-none">{log.user.email}</p>
+                            <p className="text-[11px] text-[#62657A] mt-0.5 font-mono leading-none">{log.user.role}</p>
                             {deviceInfo && <DeviceBadge ua={deviceInfo} />}
                             {ipAddress && !deviceInfo && (
-                              <p className="text-[10px] text-slate-400 mt-1 font-mono">{ipAddress}</p>
+                              <p className="text-[11px] text-[#62657A] mt-1 font-mono">{ipAddress}</p>
                             )}
                           </div>
                         ) : (
-                          <span className="text-[11px] text-slate-300">System</span>
+                          <span className="text-[11px] text-[#62657A]">System</span>
                         )}
                       </td>
                       {/* Entity type */}
                       <td className="px-4 py-3">
-                        <span className="text-[11px] text-slate-500 font-mono">{log.entityType ?? "—"}</span>
+                        <span className="text-[11px] text-[#62657A] font-mono">{log.entityType ?? "—"}</span>
                       </td>
                       {/* Entity ID */}
                       <td className="px-4 py-3">
                         <span
-                          className="text-[10px] text-slate-400 font-mono truncate block cursor-default"
+                          className="text-[11px] text-[#62657A] font-mono truncate block cursor-default"
                           title={log.entityId ?? ""}
                         >
                           {log.entityId ? `${log.entityId.slice(0, 8)}…` : "—"}
@@ -297,11 +298,11 @@ export default function AuditLogsPage() {
                       </td>
                       {/* Timestamp */}
                       <td className="px-4 py-3">
-                        <span className="text-[11px] text-slate-500">{formatDate(log.createdAt)}</span>
+                        <span className="text-[11px] text-[#62657A]">{formatDate(log.createdAt)}</span>
                       </td>
                       {/* Relative */}
                       <td className="px-4 py-3">
-                        <span className="text-[11px] text-slate-400">{timeAgo(log.createdAt)}</span>
+                        <span className="text-[11px] text-[#62657A]">{timeAgo(log.createdAt)}</span>
                       </td>
                     </tr>
                   );
@@ -313,14 +314,14 @@ export default function AuditLogsPage() {
           {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex items-center justify-between px-1">
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-[#62657A]">
                 Page {page} of {totalPages} &middot; {total.toLocaleString()} total events
               </p>
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="w-7 h-7 flex items-center justify-center rounded-md border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="w-7 h-7 flex items-center justify-center rounded-md border border-[#E4E4EF] bg-white text-[#62657A] hover:bg-[#F7F7FB] disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                   <ChevronLeft size={13} />
                 </button>
@@ -333,8 +334,8 @@ export default function AuditLogsPage() {
                       onClick={() => setPage(p)}
                       className={`w-7 h-7 text-[11px] rounded-md border ${
                         p === page
-                          ? "border-blue-400 bg-blue-50 text-blue-600 font-[600]"
-                          : "border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
+                          ? "border-[#7679FF] bg-[#ECEBFF] text-[#7679FF] font-[600]"
+                          : "border-[#E4E4EF] bg-white text-[#62657A] hover:bg-[#F7F7FB]"
                       }`}
                     >
                       {p}
@@ -344,7 +345,7 @@ export default function AuditLogsPage() {
                 <button
                   onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  className="w-7 h-7 flex items-center justify-center rounded-md border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="w-7 h-7 flex items-center justify-center rounded-md border border-[#E4E4EF] bg-white text-[#62657A] hover:bg-[#F7F7FB] disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                   <ChevronRight size={13} />
                 </button>

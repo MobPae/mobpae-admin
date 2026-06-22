@@ -16,13 +16,13 @@ const STATUS_CHIPS: { label: string; value: "ALL" | EmployerStatus }[] = [
   { label: "Rejected", value: "REJECTED" },
 ];
 
-const CHIP_ON = "bg-slate-900 text-white border-slate-900";
-const CHIP_OFF = "bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-700";
+const CHIP_ON = "bg-[#191A2E] text-white border-[#191A2E]";
+const CHIP_OFF = "bg-white border-[#E4E4EF] text-[#62657A] hover:border-[#E4E4EF] hover:text-[#62657A]";
 
 export default function EmployersPage() {
   const queryClient = useQueryClient();
 
-  const { data: employers = [], isLoading, isError } = useQuery({
+  const { data: employers = [], isLoading, isError, refetch } = useQuery({
     queryKey: ["employers"],
     queryFn: getEmployers,
   });
@@ -54,10 +54,10 @@ export default function EmployersPage() {
   });
 
   const pipeline = [
-    { label: "Active", key: "ACTIVE" as const, color: "bg-green-400", text: "text-green-600" },
+    { label: "Active", key: "ACTIVE" as const, color: "bg-[#7679FF]", text: "text-[#7679FF]" },
     { label: "Pending", key: "PENDING" as const, color: "bg-amber-400", text: "text-amber-600" },
     { label: "Suspended", key: "SUSPENDED" as const, color: "bg-red-300", text: "text-red-500" },
-    { label: "Rejected", key: "REJECTED" as const, color: "bg-slate-300", text: "text-slate-500" },
+    { label: "Rejected", key: "REJECTED" as const, color: "bg-[#D4D5E0]", text: "text-[#62657A]" },
   ];
 
   const total = employers.length;
@@ -67,15 +67,15 @@ export default function EmployersPage() {
       {/* Page header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[15px] font-[500] text-slate-900 leading-none">Employers</h1>
-          <p className="text-[11px] text-slate-400 mt-1.5">Manage employer accounts</p>
+          <h1 className="text-[15px] font-[500] text-[#191A2E] leading-none">Employers</h1>
+          <p className="text-[11px] text-[#62657A] mt-1.5">Manage employer accounts</p>
         </div>
         <button
           onClick={() => setShowCreate(true)}
           className="h-8 px-3.5 rounded-lg text-white text-[12px] font-[600] flex items-center gap-1.5 transition-colors"
-          style={{ background: "#059669" }}
-          onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "#047857"; }}
-          onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "#059669"; }}
+          style={{ background: "#7679FF" }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "#5659D9"; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "#7679FF"; }}
         >
           <Plus size={13} />
           Add Employer
@@ -83,8 +83,9 @@ export default function EmployersPage() {
       </div>
 
       {isError && (
-        <div className="bg-red-50 border border-red-100 text-red-600 text-[12px] rounded-lg px-4 py-2.5">
-          Could not load employers. Check that the backend is running.
+        <div className="bg-red-50 border border-red-100 text-red-600 text-[12px] rounded-lg px-4 py-3 flex items-center justify-between gap-4">
+          <span>Could not load employers. Check that the backend is running.</span>
+          <button type="button" onClick={() => void refetch()} className="h-8 px-3 rounded-lg bg-white border border-red-200 font-[600] hover:bg-red-50">Try again</button>
         </div>
       )}
 
@@ -98,10 +99,10 @@ export default function EmployersPage() {
               key={key}
               onClick={() => setStatusFilter(statusFilter === key ? "ALL" : key)}
               className={`bg-white border rounded-lg p-3.5 text-left transition-colors ${
-                statusFilter === key ? "border-slate-300" : "border-slate-100 hover:border-slate-200"
+                statusFilter === key ? "border-[#E4E4EF]" : "border-[#E4E4EF] hover:border-[#E4E4EF]"
               }`}
             >
-              <p className="text-[10px] font-[500] uppercase tracking-[0.06em] text-slate-400 leading-none">
+              <p className="text-[11px] font-[500] uppercase tracking-[0.06em] text-[#62657A] leading-none">
                 {label}
               </p>
               <p className={`text-[22px] font-[500] tracking-tight leading-none mt-2.5 ${text} ${
@@ -109,7 +110,7 @@ export default function EmployersPage() {
               }`}>
                 {count}
               </p>
-              <div className="h-[3px] rounded-full bg-slate-100 mt-2.5">
+              <div className="h-[3px] rounded-full bg-[#F0F0F8] mt-2.5">
                 <div className={`h-full rounded-full ${color} transition-all`} style={{ width: `${pct}%` }} />
               </div>
             </button>
@@ -120,13 +121,13 @@ export default function EmployersPage() {
       {/* Filter bar */}
       <div className="flex items-center gap-3">
         <div className="relative">
-          <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#62657A]" />
           <input
             type="text"
             placeholder="Search company, code, contact…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="h-8 pl-8 pr-3 w-56 text-[12px] bg-white border border-slate-200 rounded-md outline-none focus:border-slate-400 transition-colors"
+            className="h-8 pl-8 pr-3 w-56 text-[12px] bg-white border border-[#E4E4EF] rounded-md outline-none focus:border-[#7679FF] transition-colors"
           />
         </div>
         <div className="flex items-center gap-1.5">
@@ -146,28 +147,28 @@ export default function EmployersPage() {
           ))}
         </div>
         <div className="flex-1" />
-        <span className="text-[11px] text-slate-400">{filtered.length} result{filtered.length !== 1 ? "s" : ""}</span>
+        <span className="text-[11px] text-[#62657A]">{filtered.length} result{filtered.length !== 1 ? "s" : ""}</span>
       </div>
 
       {/* Table */}
       {isLoading ? (
-        <div className="bg-white border border-slate-100 rounded-lg overflow-hidden">
+        <div className="bg-white border border-[#E4E4EF] rounded-lg overflow-hidden">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="flex items-center gap-4 px-4 py-3 border-b border-slate-50 last:border-0">
-              <div className="w-7 h-7 rounded-lg bg-slate-100 animate-pulse flex-shrink-0" />
+            <div key={i} className="flex items-center gap-4 px-4 py-3 border-b border-[#F0F0F8] last:border-0">
+              <div className="w-7 h-7 rounded-lg bg-[#F0F0F8] animate-pulse flex-shrink-0" />
               <div className="flex-1 space-y-1.5">
-                <div className="h-2.5 w-40 bg-slate-100 rounded animate-pulse" />
-                <div className="h-2 w-24 bg-slate-100 rounded animate-pulse" />
+                <div className="h-2.5 w-40 bg-[#F0F0F8] rounded animate-pulse" />
+                <div className="h-2 w-24 bg-[#F0F0F8] rounded animate-pulse" />
               </div>
-              <div className="h-4 w-20 bg-slate-100 rounded animate-pulse" />
-              <div className="h-4 w-16 bg-slate-100 rounded-full animate-pulse" />
+              <div className="h-4 w-20 bg-[#F0F0F8] rounded animate-pulse" />
+              <div className="h-4 w-16 bg-[#F0F0F8] rounded-full animate-pulse" />
             </div>
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-white border border-slate-100 rounded-lg py-14 text-center">
-          <p className="text-[13px] font-[500] text-slate-700">No employers found</p>
-          <p className="text-[11px] text-slate-400 mt-1">
+        <div className="bg-white border border-[#E4E4EF] rounded-lg py-14 text-center">
+          <p className="text-[13px] font-[500] text-[#62657A]">No employers found</p>
+          <p className="text-[11px] text-[#62657A] mt-1">
             {search || statusFilter !== "ALL" ? "Try adjusting your search or filter." : "No employers onboarded yet."}
           </p>
         </div>

@@ -7,35 +7,35 @@ interface Props {
 }
 
 const AVATAR_COLORS: Record<string, string> = {
-  A:"bg-rose-500",B:"bg-pink-500",C:"bg-fuchsia-500",D:"bg-blue-500",
-  E:"bg-blue-500",F:"bg-blue-500",G:"bg-blue-500",H:"bg-sky-500",
-  I:"bg-cyan-500",J:"bg-teal-500",K:"bg-emerald-500",L:"bg-green-500",
+  A:"bg-rose-500",B:"bg-pink-500",C:"bg-fuchsia-500",D:"bg-[#ECEBFF]0",
+  E:"bg-[#ECEBFF]0",F:"bg-[#ECEBFF]0",G:"bg-[#ECEBFF]0",H:"bg-sky-500",
+  I:"bg-cyan-500",J:"bg-[#7679FF]",K:"bg-[#7679FF]",L:"bg-[#ECEBFF]0",
   M:"bg-lime-600",N:"bg-yellow-600",O:"bg-amber-500",P:"bg-orange-500",
   Q:"bg-red-500",R:"bg-rose-600",S:"bg-pink-600",T:"bg-fuchsia-600",
-  U:"bg-blue-600",V:"bg-blue-600",W:"bg-blue-600",X:"bg-blue-600",
+  U:"bg-[#7679FF]",V:"bg-[#7679FF]",W:"bg-[#7679FF]",X:"bg-[#7679FF]",
   Y:"bg-sky-600",Z:"bg-cyan-600",
 };
-const avatarBg = (n: string) => AVATAR_COLORS[n.charAt(0).toUpperCase()] ?? "bg-slate-600";
+const avatarBg = (n: string) => AVATAR_COLORS[n.charAt(0).toUpperCase()] ?? "bg-[#7679FF]";
 
 const STATUS_CONFIG: Record<SalaryRequestStatus, { label: string; dot: string; text: string; bg: string }> = {
-  SUBMITTED:           { label: "Submitted",    dot: "bg-amber-400",   text: "text-amber-700",   bg: "bg-amber-50"   },
-  EMPLOYER_APPROVED:   { label: "Emp Approved", dot: "bg-blue-400",    text: "text-blue-700",    bg: "bg-blue-50"    },
-  EMPLOYER_REJECTED:   { label: "Rejected",     dot: "bg-red-400",     text: "text-red-600",     bg: "bg-red-50"     },
-  READY_FOR_DISBURSAL: { label: "Ready",        dot: "bg-blue-400",  text: "text-blue-700",  bg: "bg-blue-50"  },
-  DISBURSED:           { label: "Disbursed",    dot: "bg-emerald-400", text: "text-emerald-700", bg: "bg-emerald-50" },
-  REPAYMENT_SCHEDULED: { label: "Repayment",    dot: "bg-blue-400",  text: "text-blue-700",  bg: "bg-blue-50"  },
-  REPAID:              { label: "Repaid",        dot: "bg-slate-300",   text: "text-slate-500",   bg: "bg-slate-100"  },
+  SUBMITTED:           { label: "Submitted", dot: "bg-amber-400", text: "text-amber-700", bg: "bg-amber-50" },
+  EMPLOYER_APPROVED:   { label: "Emp Approved", dot: "bg-[#378ADD]", text: "text-[#185FA5]", bg: "bg-[#E7F1FC]" },
+  EMPLOYER_REJECTED:   { label: "Rejected", dot: "bg-red-400", text: "text-red-600", bg: "bg-red-50" },
+  READY_FOR_DISBURSAL: { label: "Ready", dot: "bg-lime-500", text: "text-lime-700", bg: "bg-lime-50" },
+  DISBURSED:           { label: "Disbursed", dot: "bg-[#4E8A18]", text: "text-[#3B6D11]", bg: "bg-[#EBF6E3]" },
+  REPAYMENT_SCHEDULED: { label: "Repayment", dot: "bg-[#D45F18]", text: "text-[#9A4910]", bg: "bg-[#FEF1E7]" },
+  REPAID:              { label: "Repaid", dot: "bg-[#287A68]", text: "text-[#1A5944]", bg: "bg-[#D4EDE5]" },
 };
 
 const fmt = (v: string | null) =>
   v ? `₹${Number(v).toLocaleString("en-IN")}` : "—";
 
-const TH = "px-4 py-2.5 text-left text-[10px] font-[600] uppercase tracking-[0.08em] text-slate-400 whitespace-nowrap";
+const TH = "px-4 py-2.5 text-left text-[11px] font-[600] uppercase tracking-[0.08em] text-[#62657A] whitespace-nowrap";
 const TD = "px-4 py-3.5 align-middle";
 
 export default function SalaryRequestsTable({ requests, selectedId, onSelect }: Props) {
   return (
-    <div className="bg-white rounded-xl border border-slate-100 overflow-hidden">
+    <div className="bg-white rounded-xl border border-[#E4E4EF] overflow-hidden">
       <table className="w-full table-fixed">
         <colgroup>
           <col style={{ width: "17%" }} />
@@ -48,7 +48,7 @@ export default function SalaryRequestsTable({ requests, selectedId, onSelect }: 
           <col style={{ width: "7%" }} />
         </colgroup>
         <thead>
-          <tr className="border-b border-slate-100 bg-slate-50">
+          <tr className="border-b border-[#E4E4EF] bg-[#F7F7FB]">
             <th className={TH}>Employee</th>
             <th className={TH}>Email</th>
             <th className={TH}>Company</th>
@@ -67,8 +67,8 @@ export default function SalaryRequestsTable({ requests, selectedId, onSelect }: 
               <tr
                 key={req.id}
                 onClick={() => onSelect(req)}
-                className={`border-b border-slate-50 last:border-0 cursor-pointer transition-colors group ${
-                  isSelected ? "bg-blue-50/60" : "hover:bg-slate-50/70"
+                className={`border-b border-[#F0F0F8] last:border-0 cursor-pointer transition-colors group ${
+                  isSelected ? "bg-[#ECEBFF]/60" : "hover:bg-[#F7F7FB]/70"
                 }`}
               >
                 <td className={TD}>
@@ -77,23 +77,23 @@ export default function SalaryRequestsTable({ requests, selectedId, onSelect }: 
                       {req.employee.name.charAt(0).toUpperCase()}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-[12px] font-[500] text-slate-900 leading-none truncate">{req.employee.name}</p>
-                      <span className="font-mono text-[10px] text-slate-400">{req.employee.employeeCode}</span>
+                      <p className="text-[12px] font-[500] text-[#191A2E] leading-none truncate">{req.employee.name}</p>
+                      <span className="font-mono text-[11px] text-[#62657A]">{req.employee.employeeCode}</span>
                     </div>
                   </div>
                 </td>
                 <td className={TD}>
-                  <p className="text-[12px] text-slate-600 truncate">{req.employee.email}</p>
+                  <p className="text-[12px] text-[#62657A] truncate">{req.employee.email}</p>
                 </td>
                 <td className={TD}>
-                  <p className="text-[12px] font-[500] text-slate-800 truncate">{req.employee.employer.companyName}</p>
-                  <span className="font-mono text-[10px] text-slate-400">{req.employee.employer.companyCode}</span>
+                  <p className="text-[12px] font-[500] text-[#191A2E] truncate">{req.employee.employer.companyName}</p>
+                  <span className="font-mono text-[11px] text-[#62657A]">{req.employee.employer.companyCode}</span>
                 </td>
                 <td className={TD}>
-                  <p className="text-[12px] font-[600] text-slate-900 tabular-nums">{fmt(req.amount)}</p>
+                  <p className="text-[12px] font-[600] text-[#191A2E] tabular-nums">{fmt(req.amount)}</p>
                 </td>
                 <td className={TD}>
-                  <p className="text-[12px] font-[500] text-slate-700 tabular-nums">{fmt(req.approvedAmount)}</p>
+                  <p className="text-[12px] font-[500] text-[#62657A] tabular-nums">{fmt(req.approvedAmount)}</p>
                 </td>
                 <td className={TD}>
                   <span className={`inline-flex items-center gap-1.5 h-[22px] px-2.5 rounded-full text-[11px] font-[500] ${s.bg} ${s.text}`}>
@@ -102,12 +102,12 @@ export default function SalaryRequestsTable({ requests, selectedId, onSelect }: 
                   </span>
                 </td>
                 <td className={TD}>
-                  <p className="text-[12px] text-slate-500">
+                  <p className="text-[12px] text-[#62657A]">
                     {new Date(req.requestedAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
                   </p>
                 </td>
                 <td className={TD}>
-                  <span className={`text-[11px] font-[500] ${isSelected ? "text-blue-600" : "text-blue-500"}`}>
+                  <span className={`text-[11px] font-[500] ${isSelected ? "text-[#7679FF]" : "text-[#7679FF]"}`}>
                     {isSelected ? "Close" : "Review →"}
                   </span>
                 </td>
@@ -116,8 +116,8 @@ export default function SalaryRequestsTable({ requests, selectedId, onSelect }: 
           })}
         </tbody>
       </table>
-      <div className="px-5 py-2.5 border-t border-slate-100 bg-slate-50/50">
-        <p className="text-[11px] text-slate-400">{requests.length} {requests.length === 1 ? "request" : "requests"}</p>
+      <div className="px-5 py-2.5 border-t border-[#E4E4EF] bg-[#F7F7FB]/50">
+        <p className="text-[11px] text-[#62657A]">{requests.length} {requests.length === 1 ? "request" : "requests"}</p>
       </div>
     </div>
   );

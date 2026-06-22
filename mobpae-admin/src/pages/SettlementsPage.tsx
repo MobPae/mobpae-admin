@@ -7,7 +7,6 @@ import {
   Clock3,
   CreditCard,
   Eye,
-  Landmark,
   Search,
   Send,
   X,
@@ -41,10 +40,10 @@ const formatPayrollMonth = (raw: string) => {
 // ── status config ─────────────────────────────────────────────────────────────
 
 const STATUS_CFG: Record<EmployerSettlementStatus, { label: string; bg: string; text: string; dot: string }> = {
-  PENDING:        { label: "Pending",        bg: "bg-amber-50",   text: "text-amber-700",   dot: "bg-amber-400"   },
-  PARTIALLY_PAID: { label: "Partially Paid", bg: "bg-sky-50",     text: "text-sky-700",     dot: "bg-sky-400"     },
-  PAID:           { label: "Paid",           bg: "bg-emerald-50", text: "text-emerald-700", dot: "bg-emerald-400" },
-  OVERDUE:        { label: "Overdue",        bg: "bg-red-50",     text: "text-red-700",     dot: "bg-red-400"     },
+  PENDING:        { label: "Pending", dot: "bg-amber-400", text: "text-amber-700", bg: "bg-amber-50" },
+  PARTIALLY_PAID: { label: "Partially Paid", dot: "bg-[#D45F18]", text: "text-[#9A4910]", bg: "bg-[#FEF1E7]" },
+  PAID:           { label: "Paid", dot: "bg-[#4E8A18]", text: "text-[#3B6D11]", bg: "bg-[#EBF6E3]" },
+  OVERDUE:        { label: "Overdue", dot: "bg-red-400", text: "text-red-600", bg: "bg-red-50" },
 };
 
 function StatusPill({ status }: { status: EmployerSettlementStatus }) {
@@ -83,12 +82,12 @@ function ToastContainer({ toasts, onDismiss }: { toasts: Toast[]; onDismiss: (id
           key={t.id}
           className={`pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-[13px] font-[500] border min-w-[260px] ${
             t.kind === "success"
-              ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+              ? "bg-[#ECEBFF] border-[#C8C9FF] text-[#191A2E]"
               : "bg-red-50 border-red-200 text-red-800"
           }`}
         >
           {t.kind === "success"
-            ? <CheckCircle2 size={15} className="text-emerald-600 flex-shrink-0" />
+            ? <CheckCircle2 size={15} className="text-[#7679FF] flex-shrink-0" />
             : <AlertTriangle size={15} className="text-red-500 flex-shrink-0" />
           }
           <span className="flex-1">{t.message}</span>
@@ -108,11 +107,11 @@ function StatCard({ label, value, icon, iconBg, iconColor, highlight, sub }: {
   iconBg: string; iconColor: string; highlight?: boolean; sub?: string;
 }) {
   return (
-    <div className={`rounded-xl px-4 py-3.5 flex items-center gap-3 border ${highlight ? "bg-[#059669] border-[#047857]" : "bg-white border-slate-100"}`}>
+    <div className={`rounded-xl px-4 py-3.5 flex items-center gap-3 border ${highlight ? "bg-[#7679FF] border-[#5659D9]" : "bg-white border-[#E4E4EF]"}`}>
       <div className={`w-8 h-8 rounded-lg ${iconBg} flex items-center justify-center ${iconColor} flex-shrink-0`}>{icon}</div>
       <div>
-        <p className={`text-[20px] font-[600] leading-none tabular-nums ${highlight ? "text-white" : "text-slate-900"}`}>{value}</p>
-        <p className={`text-[11px] mt-0.5 ${highlight ? "text-white/40" : "text-slate-400"}`}>{label}{sub ? ` · ${sub}` : ""}</p>
+        <p className={`text-[20px] font-[600] leading-none tabular-nums ${highlight ? "text-white" : "text-[#191A2E]"}`}>{value}</p>
+        <p className={`text-[11px] mt-0.5 ${highlight ? "text-white/40" : "text-[#62657A]"}`}>{label}{sub ? ` · ${sub}` : ""}</p>
       </div>
     </div>
   );
@@ -122,9 +121,9 @@ function StatCard({ label, value, icon, iconBg, iconColor, highlight, sub }: {
 
 function InfoRow({ label, value, accent }: { label: string; value: React.ReactNode; accent?: boolean }) {
   return (
-    <div className="flex items-center justify-between py-2.5 border-b border-slate-50 last:border-0">
-      <span className="text-[12px] text-slate-500">{label}</span>
-      <span className={`text-[12px] font-[500] ${accent ? "text-red-600" : "text-slate-800"}`}>{value}</span>
+    <div className="flex items-center justify-between py-2.5 border-b border-[#F0F0F8] last:border-0">
+      <span className="text-[12px] text-[#62657A]">{label}</span>
+      <span className={`text-[12px] font-[500] ${accent ? "text-red-600" : "text-[#191A2E]"}`}>{value}</span>
     </div>
   );
 }
@@ -142,16 +141,16 @@ function Timeline({ s }: { s: EmployerSettlement }) {
       {steps.map((step, i) => (
         <div key={step.label} className="flex gap-3">
           <div className="flex flex-col items-center">
-            <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 border-2 ${step.done ? "border-emerald-400 bg-emerald-50" : "border-slate-200 bg-white"}`}>
+            <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 border-2 ${step.done ? "border-[#7679FF] bg-[#ECEBFF]" : "border-[#E4E4EF] bg-white"}`}>
               {step.done
-                ? <CheckCircle2 size={11} className="text-emerald-600" />
-                : <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />}
+                ? <CheckCircle2 size={11} className="text-[#7679FF]" />
+                : <span className="w-1.5 h-1.5 rounded-full bg-[#D4D5E0]" />}
             </div>
-            {i < steps.length - 1 && <div className={`w-px flex-1 my-1 ${step.done ? "bg-emerald-200" : "bg-slate-100"}`} style={{ minHeight: 18 }} />}
+            {i < steps.length - 1 && <div className={`w-px flex-1 my-1 ${step.done ? "bg-[#C8C9FF]" : "bg-[#F0F0F8]"}`} style={{ minHeight: 18 }} />}
           </div>
           <div className="pb-4">
-            <p className={`text-[12px] font-[500] leading-none ${step.done ? "text-slate-800" : "text-slate-400"}`}>{step.label}</p>
-            {step.date && <p className="text-[11px] text-slate-400 mt-0.5">{formatDate(step.date)}</p>}
+            <p className={`text-[12px] font-[500] leading-none ${step.done ? "text-[#191A2E]" : "text-[#62657A]"}`}>{step.label}</p>
+            {step.date && <p className="text-[11px] text-[#62657A] mt-0.5">{formatDate(step.date)}</p>}
           </div>
         </div>
       ))}
@@ -183,7 +182,7 @@ export default function SettlementsPage() {
   }, []);
 
   // ── query ──────────────────────────────────────────────────────────────────
-  const { data: settlements = [], isLoading } = useQuery({
+  const { data: settlements = [], isLoading, isError, refetch } = useQuery({
     queryKey: ["settlements"],
     queryFn: getSettlements,
   });
@@ -254,8 +253,8 @@ export default function SettlementsPage() {
 
       {/* Header */}
       <div>
-        <h1 className="text-[22px] font-[600] text-slate-900 tracking-[-0.01em]">Settlements</h1>
-        <p className="text-[13px] text-slate-400 mt-0.5">Track employer settlement obligations to MobPae</p>
+        <h1 className="text-[22px] font-[600] text-[#191A2E] tracking-[-0.01em]">Settlements</h1>
+        <p className="text-[13px] text-[#62657A] mt-0.5">Track employer settlement obligations to MobPae</p>
       </div>
 
       {/* Summary cards */}
@@ -284,20 +283,20 @@ export default function SettlementsPage() {
           label="Paid"
           value={counts["PAID"] ?? 0}
           icon={<CheckCircle2 size={15} />}
-          iconBg="bg-emerald-50" iconColor="text-emerald-600"
+          iconBg="bg-[#ECEBFF]" iconColor="text-[#7679FF]"
         />
       </div>
 
       {/* Search + filter */}
       <div className="flex items-center gap-3 flex-wrap">
         <div className="relative">
-          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#62657A]" />
           <input
             type="text"
             placeholder="Search by employer, month, ref…"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="h-8 pl-8 pr-4 text-[12px] bg-white border border-slate-200 rounded-lg outline-none focus:border-blue-400 w-64 text-slate-700 placeholder-slate-400"
+            className="h-8 pl-8 pr-4 text-[12px] bg-white border border-[#E4E4EF] rounded-lg outline-none focus:border-[#7679FF] w-64 text-[#62657A] placeholder-[#B7B9C7]"
           />
         </div>
         <div className="flex items-center gap-1.5">
@@ -307,13 +306,13 @@ export default function SettlementsPage() {
               onClick={() => setFilter(f.value)}
               className={`h-7 px-3 rounded-full text-[12px] font-[500] transition-colors flex items-center gap-1.5 ${
                 filter === f.value
-                  ? "bg-slate-900 text-white"
-                  : "bg-white border border-slate-200 text-slate-600 hover:border-slate-300"
+                  ? "bg-[#191A2E] text-white"
+                  : "bg-white border border-[#E4E4EF] text-[#62657A] hover:border-[#E4E4EF]"
               }`}
             >
               {f.label}
               {counts[f.value] !== undefined && (
-                <span className={`text-[10px] font-[700] ${filter === f.value ? "text-white/60" : "text-slate-400"}`}>
+                <span className={`text-[11px] font-[700] ${filter === f.value ? "text-white/60" : "text-[#62657A]"}`}>
                   {counts[f.value]}
                 </span>
               )}
@@ -323,50 +322,69 @@ export default function SettlementsPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white border border-slate-100 rounded-xl overflow-hidden">
-        {isLoading ? (
-          <div className="py-16 text-center">
-            <p className="text-[13px] text-slate-400">Loading settlements…</p>
+      <div className="bg-white border border-[#E4E4EF] rounded-xl overflow-hidden">
+        {isError ? (
+          <div className="px-6 py-14 text-center">
+            <p className="text-[13px] font-[500] text-red-600">Failed to load settlements</p>
+            <p className="text-[12px] text-[#62657A] mt-1">Check your connection and try again.</p>
+            <button onClick={() => void refetch()} className="mt-4 h-8 px-4 text-[12px] font-[500] bg-white border border-[#E4E4EF] rounded-lg hover:bg-[#F7F7FB] transition-colors text-[#62657A]">
+              Retry
+            </button>
+          </div>
+        ) : isLoading ? (
+          <div>
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="flex items-center gap-4 px-5 py-3.5 border-b border-[#F0F0F8] last:border-0">
+                <div className="w-7 h-7 rounded-lg bg-[#F0F0F8] animate-pulse flex-shrink-0" />
+                <div className="flex-1 space-y-1.5">
+                  <div className="h-2.5 w-28 bg-[#F0F0F8] rounded animate-pulse" />
+                  <div className="h-2 w-20 bg-[#F0F0F8] rounded animate-pulse" />
+                </div>
+                <div className="h-2.5 w-20 bg-[#F0F0F8] rounded animate-pulse" />
+                <div className="h-2.5 w-16 bg-[#F0F0F8] rounded animate-pulse" />
+                <div className="h-4 w-16 bg-[#F0F0F8] rounded-full animate-pulse" />
+              </div>
+            ))}
           </div>
         ) : !rows.length ? (
           <div className="py-16 text-center">
-            <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center mb-3 mx-auto">
-              <CreditCard size={18} className="text-slate-400" />
+            <div className="w-10 h-10 rounded-xl bg-[#F0F0F8] flex items-center justify-center mb-3 mx-auto">
+              <CreditCard size={18} className="text-[#62657A]" />
             </div>
-            <p className="text-[13px] font-[500] text-slate-500">No settlements found</p>
-            <p className="text-[12px] text-slate-400 mt-1">Settlements appear once employer payroll recoveries are due</p>
+            <p className="text-[13px] font-[500] text-[#62657A]">No settlements found</p>
+            <p className="text-[12px] text-[#62657A] mt-1">Settlements appear once employer payroll recoveries are due</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-[12px]">
               <thead>
-                <tr className="border-b border-slate-100">
+                <tr className="border-b border-[#E4E4EF]">
                   {["Employer", "Payroll Month", "Total", "Outstanding", "Late Fee", "Due Date", "Status", "Actions"].map(h => (
-                    <th key={h} className="px-4 py-3 text-left text-[11px] font-[500] text-slate-400 whitespace-nowrap">{h}</th>
+                    <th key={h} className="px-4 py-3 text-left text-[11px] font-[500] text-[#62657A] whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50">
+              <tbody className="divide-y divide-[#F0F0F8]">
                 {rows.map(s => (
                   <tr
                     key={s.id}
-                    className={`hover:bg-slate-50/60 transition-colors ${selected?.id === s.id ? "bg-blue-50/30" : ""} ${s.status === "OVERDUE" ? "bg-red-50/20" : ""}`}
+                    className={`hover:bg-[#F7F7FB]/60 transition-colors ${selected?.id === s.id ? "bg-[#ECEBFF]/30" : ""} ${s.status === "OVERDUE" ? "bg-red-50/20" : ""}`}
                   >
                     <td className="px-4 py-3">
                       <div>
-                        <p className="font-[500] text-slate-800">{s.employer.companyName}</p>
-                        <p className="text-slate-400 text-[10px]">{s.employer.companyCode}</p>
+                        <p className="font-[500] text-[#191A2E]">{s.employer.companyName}</p>
+                        <p className="text-[#62657A] text-[11px]">{s.employer.companyCode}</p>
                       </div>
                     </td>
-                    <td className="px-4 py-3 font-[500] text-slate-700 whitespace-nowrap">{formatPayrollMonth(s.payrollMonth)}</td>
-                    <td className="px-4 py-3 tabular-nums font-[600] text-slate-800 whitespace-nowrap">{formatCurrency(s.totalAmount)}</td>
-                    <td className={`px-4 py-3 tabular-nums font-[600] whitespace-nowrap ${parseFloat(s.outstandingAmount) > 0 ? "text-red-600" : "text-slate-400"}`}>
-                      {parseFloat(s.outstandingAmount) > 0 ? formatCurrency(s.outstandingAmount) : "—"}
+                    <td className="px-4 py-3 font-[500] text-[#62657A] whitespace-nowrap">{formatPayrollMonth(s.payrollMonth)}</td>
+                    <td className="px-4 py-3 tabular-nums font-[600] text-[#191A2E] whitespace-nowrap">{formatCurrency(s.totalAmount)}</td>
+                    <td className={`px-4 py-3 tabular-nums font-[600] whitespace-nowrap ${parseFloat(s.outstandingAmount) > 0 ? "text-red-600" : "text-[#7679FF]"}`}>
+                      {parseFloat(s.outstandingAmount) > 0 ? formatCurrency(s.outstandingAmount) : "No dues"}
                     </td>
-                    <td className="px-4 py-3 tabular-nums text-slate-500 whitespace-nowrap">
-                      {parseFloat(s.lateFeeAmount) > 0 ? formatCurrency(s.lateFeeAmount) : <span className="text-slate-300">—</span>}
+                    <td className="px-4 py-3 tabular-nums text-[#62657A] whitespace-nowrap">
+                      {parseFloat(s.lateFeeAmount) > 0 ? formatCurrency(s.lateFeeAmount) : <span className="text-[#62657A]">—</span>}
                     </td>
-                    <td className={`px-4 py-3 tabular-nums font-[500] whitespace-nowrap ${s.status === "OVERDUE" ? "text-red-600" : "text-slate-600"}`}>
+                    <td className={`px-4 py-3 tabular-nums font-[500] whitespace-nowrap ${s.status === "OVERDUE" ? "text-red-600" : "text-[#62657A]"}`}>
                       {formatDate(s.dueDate)}
                     </td>
                     <td className="px-4 py-3"><StatusPill status={s.status} /></td>
@@ -378,7 +396,7 @@ export default function SettlementsPage() {
                         <button
                           title="View Report"
                           onClick={() => { setSelected(s); setMarkError(""); }}
-                          className="h-7 w-7 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                          className="h-7 w-7 flex items-center justify-center rounded-lg border border-[#E4E4EF] text-[#62657A] hover:border-[#7679FF] hover:text-[#7679FF] hover:bg-[#ECEBFF] transition-colors"
                         >
                           <Eye size={13} />
                         </button>
@@ -388,10 +406,10 @@ export default function SettlementsPage() {
                           title="Send Report"
                           disabled={sending === s.id}
                           onClick={e => handleSendReport(s, e)}
-                          className="h-7 w-7 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:border-[#059669] hover:text-[#059669] hover:bg-[#ecfdf5] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                          className="h-7 w-7 flex items-center justify-center rounded-lg border border-[#E4E4EF] text-[#62657A] hover:border-[#7679FF] hover:text-[#7679FF] hover:bg-[#ECEBFF] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                         >
                           {sending === s.id
-                            ? <span className="w-3 h-3 border-2 border-[#059669]/30 border-t-[#059669] rounded-full animate-spin" />
+                            ? <span className="w-3 h-3 border-2 border-[#7679FF]/30 border-t-[#7679FF] rounded-full animate-spin" />
                             : <Send size={13} />
                           }
                         </button>
@@ -402,10 +420,10 @@ export default function SettlementsPage() {
                             title="Mark as Paid"
                             disabled={marking === s.id}
                             onClick={e => { e.stopPropagation(); void handleMarkPaid(s); }}
-                            className="h-7 px-2.5 flex items-center gap-1 rounded-lg border border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-[11px] font-[500] whitespace-nowrap"
+                            className="h-7 px-2.5 flex items-center gap-1 rounded-lg border border-[#C8C9FF] text-[#5659D9] bg-[#ECEBFF] hover:bg-[#ECEBFF] disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-[11px] font-[500] whitespace-nowrap"
                           >
                             {marking === s.id
-                              ? <span className="w-3 h-3 border-2 border-emerald-400/40 border-t-emerald-600 rounded-full animate-spin" />
+                              ? <span className="w-3 h-3 border-2 border-[#7679FF]/40 border-t-[#7679FF] rounded-full animate-spin" />
                               : <CheckCircle2 size={11} />
                             }
                             {marking === s.id ? "" : "Mark Paid"}
@@ -425,25 +443,25 @@ export default function SettlementsPage() {
       {selected && (
         <>
           <div className="fixed inset-0 z-30 bg-black/20 backdrop-blur-[1px]" onClick={() => setSelected(null)} />
-          <div className="fixed inset-y-0 right-0 z-40 w-[460px] bg-white border-l border-slate-200 shadow-xl flex flex-col">
+          <div className="fixed inset-y-0 right-0 z-40 w-[460px] bg-white border-l border-[#E4E4EF] shadow-xl flex flex-col">
             {/* Header */}
-            <div className="px-5 pt-5 pb-4 border-b border-slate-100">
+            <div className="px-5 pt-5 pb-4 border-b border-[#E4E4EF]">
               <div className="flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-2 mb-1.5">
                     <StatusPill status={selected.status} />
                     {selected.referenceNumber && (
-                      <span className="text-[10px] font-[500] text-slate-400 bg-slate-100 px-2 py-0.5 rounded">
+                      <span className="text-[11px] font-[500] text-[#62657A] bg-[#F0F0F8] px-2 py-0.5 rounded">
                         Ref: {selected.referenceNumber}
                       </span>
                     )}
                   </div>
-                  <p className="text-[16px] font-[700] text-slate-900 leading-tight">{selected.employer.companyName}</p>
-                  <p className="text-[12px] text-slate-400 mt-0.5">{formatPayrollMonth(selected.payrollMonth)} · {selected.employer.companyCode}</p>
+                  <p className="text-[16px] font-[700] text-[#191A2E] leading-tight">{selected.employer.companyName}</p>
+                  <p className="text-[12px] text-[#62657A] mt-0.5">{formatPayrollMonth(selected.payrollMonth)} · {selected.employer.companyCode}</p>
                 </div>
                 <button
                   onClick={() => setSelected(null)}
-                  className="w-7 h-7 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400 hover:text-slate-700"
+                  className="w-7 h-7 flex items-center justify-center rounded-lg border border-[#E4E4EF] text-[#62657A] hover:text-[#62657A]"
                 >
                   <X size={14} />
                 </button>
@@ -474,16 +492,16 @@ export default function SettlementsPage() {
 
               {/* Amount breakdown */}
               <div>
-                <p className="text-[11px] font-[600] text-slate-400 uppercase tracking-[0.07em] mb-2">Amount Breakdown</p>
-                <div className="bg-white border border-slate-100 rounded-xl px-4 py-1">
+                <p className="text-[11px] font-[600] text-[#62657A] uppercase tracking-[0.07em] mb-2">Amount Breakdown</p>
+                <div className="bg-white border border-[#E4E4EF] rounded-xl px-4 py-1">
                   <InfoRow label="Principal"  value={formatCurrency(selected.principalAmount)} />
                   <InfoRow label="Interest"   value={formatCurrency(selected.interestAmount)} />
                   {parseFloat(selected.lateFeeAmount) > 0 && (
                     <InfoRow label="Late fee" value={formatCurrency(selected.lateFeeAmount)} accent />
                   )}
-                  <div className="flex items-center justify-between py-3 border-t border-slate-100 mt-1">
-                    <span className="text-[12px] font-[600] text-slate-800">Total</span>
-                    <span className="text-[14px] font-[700] text-slate-900 tabular-nums">{formatCurrency(selected.totalAmount)}</span>
+                  <div className="flex items-center justify-between py-3 border-t border-[#E4E4EF] mt-1">
+                    <span className="text-[12px] font-[600] text-[#191A2E]">Total</span>
+                    <span className="text-[14px] font-[700] text-[#191A2E] tabular-nums">{formatCurrency(selected.totalAmount)}</span>
                   </div>
                   {parseFloat(selected.outstandingAmount) > 0 && (
                     <div className="flex items-center justify-between py-2.5 border-t border-red-100">
@@ -496,8 +514,8 @@ export default function SettlementsPage() {
 
               {/* Key dates */}
               <div>
-                <p className="text-[11px] font-[600] text-slate-400 uppercase tracking-[0.07em] mb-2">Key Dates</p>
-                <div className="bg-white border border-slate-100 rounded-xl px-4 py-1">
+                <p className="text-[11px] font-[600] text-[#62657A] uppercase tracking-[0.07em] mb-2">Key Dates</p>
+                <div className="bg-white border border-[#E4E4EF] rounded-xl px-4 py-1">
                   <InfoRow label="Due date"          value={formatDate(selected.dueDate)} accent={selected.status === "OVERDUE"} />
                   {selected.gracePeriodEnd && <InfoRow label="Grace period ends" value={formatDate(selected.gracePeriodEnd)} />}
                   {selected.paidDate && <InfoRow label="Paid on"            value={formatDate(selected.paidDate)} />}
@@ -507,23 +525,23 @@ export default function SettlementsPage() {
 
               {/* Timeline */}
               <div>
-                <p className="text-[11px] font-[600] text-slate-400 uppercase tracking-[0.07em] mb-3">Status Timeline</p>
+                <p className="text-[11px] font-[600] text-[#62657A] uppercase tracking-[0.07em] mb-3">Status Timeline</p>
                 <Timeline s={selected} />
               </div>
 
               {/* Notes */}
               {selected.notes && (
                 <div>
-                  <p className="text-[11px] font-[600] text-slate-400 uppercase tracking-[0.07em] mb-2">Notes</p>
-                  <div className="bg-slate-50 border border-slate-100 rounded-xl px-4 py-3">
-                    <p className="text-[12px] text-slate-600 leading-relaxed">{selected.notes}</p>
+                  <p className="text-[11px] font-[600] text-[#62657A] uppercase tracking-[0.07em] mb-2">Notes</p>
+                  <div className="bg-[#F7F7FB] border border-[#E4E4EF] rounded-xl px-4 py-3">
+                    <p className="text-[12px] text-[#62657A] leading-relaxed">{selected.notes}</p>
                   </div>
                 </div>
               )}
             </div>
 
             {/* Footer — drawer actions */}
-            <div className="px-5 py-4 border-t border-slate-100 space-y-2">
+            <div className="px-5 py-4 border-t border-[#E4E4EF] space-y-2">
               {markError && (
                 <p className="text-[11px] text-red-600 text-center">{markError}</p>
               )}
@@ -532,10 +550,10 @@ export default function SettlementsPage() {
               <button
                 onClick={() => handleSendReport(selected)}
                 disabled={sending === selected.id}
-                className="w-full h-10 flex items-center justify-center gap-2 rounded-lg border border-[#059669] text-[#059669] text-[13px] font-[600] hover:bg-[#ecfdf5] disabled:opacity-50 transition-colors"
+                className="w-full h-10 flex items-center justify-center gap-2 rounded-lg border border-[#7679FF] text-[#7679FF] text-[13px] font-[600] hover:bg-[#ECEBFF] disabled:opacity-50 transition-colors"
               >
                 {sending === selected.id
-                  ? <span className="w-4 h-4 border-2 border-[#059669]/30 border-t-[#059669] rounded-full animate-spin" />
+                  ? <span className="w-4 h-4 border-2 border-[#7679FF]/30 border-t-[#7679FF] rounded-full animate-spin" />
                   : <Send size={15} />
                 }
                 {sending === selected.id ? "Sending…" : "Send Report"}
@@ -547,12 +565,12 @@ export default function SettlementsPage() {
                   <button
                     onClick={() => handleMarkPaid(selected)}
                     disabled={marking === selected.id}
-                    className="w-full h-10 flex items-center justify-center gap-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[13px] font-[600] disabled:opacity-50 transition-colors"
+                    className="w-full h-10 flex items-center justify-center gap-2 rounded-lg bg-[#7679FF] hover:bg-[#5659D9] text-white text-[13px] font-[600] disabled:opacity-50 transition-colors"
                   >
                     <CheckCircle2 size={15} />
                     {marking === selected.id ? "Processing…" : "Mark as Paid"}
                   </button>
-                  <p className="text-[11px] text-slate-400 text-center">
+                  <p className="text-[11px] text-[#62657A] text-center">
                     Confirm receipt of {formatCurrency(selected.outstandingAmount || selected.totalAmount)} from {selected.employer.companyName}
                   </p>
                 </>

@@ -1,5 +1,12 @@
 import axios from "axios";
-import { getToken, setToken, getRefreshToken, setRefreshToken, removeToken } from "../utils/auth";
+import {
+  getToken,
+  setToken,
+  getRefreshToken,
+  setRefreshToken,
+  removeToken,
+  getTokenRole,
+} from "../utils/auth";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3000",
@@ -75,6 +82,10 @@ api.interceptors.response.use(
         { refreshToken: storedRefreshToken },
         { headers: { "Content-Type": "application/json" } }
       );
+
+      if (getTokenRole(data.accessToken) !== "ADMIN") {
+        throw new Error("This account does not have access to the Admin portal.");
+      }
 
       setToken(data.accessToken);
       setRefreshToken(data.refreshToken);

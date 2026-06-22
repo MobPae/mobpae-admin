@@ -1,25 +1,26 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { lazy, Suspense } from "react";
 
 import AdminLayout from "./layouts/AdminLayout";
 import LoginPage from "./pages/LoginPage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
-import DashboardPage from "./pages/DashboardPage";
-import EmployerEnquiriesPage from "./pages/EmployerEnquiriesPage";
-import EmployersPage from "./pages/EmployersPage";
-import EmployeesPage from "./pages/EmployeesPage";
-import SalaryRequestsPage from "./pages/SalaryRequestsPage";
-import DisbursalsPage from "./pages/DisbursalsPage";
-import RecoveriesPage from "./pages/RecoveriesPage";
-import RepaymentsPage from "./pages/RepaymentsPage";
-import SettlementsPage from "./pages/SettlementsPage";
-import MembershipsPage from "./pages/MembershipsPage";
-import RevenuePage from "./pages/RevenuePage";
-import KycVerificationPage from "./pages/KycVerificationPage";
-import BankVerificationPage from "./pages/BankVerificationPage";
-import SettingsPage from "./pages/SettingsPage";
-import AuditLogsPage from "./pages/AuditLogsPage";
-import JobsPage from "./pages/JobsPage";
+const DashboardPage = lazy(() => import("./pages/DashboardPage"));
+const EmployerEnquiriesPage = lazy(() => import("./pages/EmployerEnquiriesPage"));
+const EmployersPage = lazy(() => import("./pages/EmployersPage"));
+const EmployeesPage = lazy(() => import("./pages/EmployeesPage"));
+const SalaryRequestsPage = lazy(() => import("./pages/SalaryRequestsPage"));
+const DisbursalsPage = lazy(() => import("./pages/DisbursalsPage"));
+const RecoveriesPage = lazy(() => import("./pages/RecoveriesPage"));
+const RepaymentsPage = lazy(() => import("./pages/RepaymentsPage"));
+const SettlementsPage = lazy(() => import("./pages/SettlementsPage"));
+const MembershipsPage = lazy(() => import("./pages/MembershipsPage"));
+const RevenuePage = lazy(() => import("./pages/RevenuePage"));
+const KycVerificationPage = lazy(() => import("./pages/KycVerificationPage"));
+const BankVerificationPage = lazy(() => import("./pages/BankVerificationPage"));
+const SettingsPage = lazy(() => import("./pages/SettingsPage"));
+const AuditLogsPage = lazy(() => import("./pages/AuditLogsPage"));
+const JobsPage = lazy(() => import("./pages/JobsPage"));
 import ChangePasswordPage from "./pages/ChangePasswordPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
@@ -27,6 +28,7 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 export default function App() {
   return (
     <BrowserRouter>
+      <Suspense fallback={<div className="flex h-screen items-center justify-center bg-[#F7F7FB] text-sm font-medium text-[#62657A]">Loading workspace...</div>}>
       <Routes>
         {/* Public */}
         <Route path="/login" element={<LoginPage />} />
@@ -74,6 +76,7 @@ export default function App() {
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>
       </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }

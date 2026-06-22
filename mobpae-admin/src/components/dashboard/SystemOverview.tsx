@@ -6,13 +6,13 @@ export default function SystemOverview() {
       label: "Employers",
       value: "12",
       icon: Building2,
-      className: "bg-blue-100 text-blue-700 border border-blue-200",
+      className: "bg-[#ECEBFF] text-[#5659D9] border border-[#E4E4EF]",
     },
     {
       label: "Employees",
       value: "1,248",
       icon: Users,
-      className: "bg-blue-100 text-blue-700 border border-blue-200",
+      className: "bg-[#ECEBFF] text-[#5659D9] border border-[#E4E4EF]",
     },
     {
       label: "Requests",
@@ -24,13 +24,13 @@ export default function SystemOverview() {
       label: "Disbursed",
       value: "₹4.2L",
       icon: Landmark,
-      className: "bg-blue-100 text-blue-700 border border-blue-200",
+      className: "bg-[#ECEBFF] text-[#5659D9] border border-[#E4E4EF]",
     },
     {
       label: "Repaid",
       value: "₹95K",
       icon: TrendingUp,
-      className: "bg-green-100 text-green-700 border border-green-200",
+      className: "bg-[#ECEBFF] text-[#5659D9] border border-[#C8C9FF]",
     },
   ];
 
@@ -50,7 +50,7 @@ export default function SystemOverview() {
             >
               <Icon size={12} />
 
-              <span className="uppercase text-[10px] text-xs tracking-wide">
+              <span className="uppercase text-[11px] text-xs tracking-wide">
                 {metric.label}
               </span>
 

@@ -10,6 +10,7 @@ export interface AdminDashboard {
   // Employer totals
   totalEmployers: number;
   activeEmployers: number;
+  pendingEmployers: number;
   // Employee totals
   totalEmployees: number;
   activeEmployees: number;

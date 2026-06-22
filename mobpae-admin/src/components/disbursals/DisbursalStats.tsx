@@ -23,8 +23,8 @@ export default function DisbursalStats({ disbursals }: Props) {
       title: "Disbursed",
       value: disbursed,
       icon: CheckCircle2,
-      bg: "bg-green-50",
-      color: "text-green-600",
+      bg: "bg-[#ECEBFF]",
+      color: "text-[#7679FF]",
     },
     {
       title: "Failed",
@@ -37,8 +37,8 @@ export default function DisbursalStats({ disbursals }: Props) {
       title: "Total",
       value: disbursals.length,
       icon: Wallet,
-      bg: "bg-blue-50",
-      color: "text-blue-600",
+      bg: "bg-[#ECEBFF]",
+      color: "text-[#7679FF]",
     },
   ];
 
@@ -50,13 +50,13 @@ export default function DisbursalStats({ disbursals }: Props) {
         return (
           <div
             key={stat.title}
-            className="bg-white border border-slate-200 rounded-2xl p-4"
+            className="bg-white border border-[#E4E4EF] rounded-2xl p-4"
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-slate-500">{stat.title}</p>
+                <p className="text-xs text-[#62657A]">{stat.title}</p>
 
-                <h3 className="text-xl font-semibold text-slate-900 mt-1">
+                <h3 className="text-xl font-semibold text-[#191A2E] mt-1">
                   {stat.value}
                 </h3>
               </div>

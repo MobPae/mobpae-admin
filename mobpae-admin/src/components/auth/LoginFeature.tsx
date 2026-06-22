@@ -10,13 +10,13 @@ export default function LoginFeature({
   return (
     <div className="flex items-start gap-4 bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl p-4">
       <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
-        <div className="w-2 h-2 rounded-full bg-blue-400" />
+        <div className="w-2 h-2 rounded-full bg-[#7679FF]" />
       </div>
 
       <div>
         <h3 className="text-white font-medium text-sm">{title}</h3>
 
-        <p className="text-slate-300 text-xs mt-1 leading-relaxed">
+        <p className="text-[#62657A] text-xs mt-1 leading-relaxed">
           {description}
         </p>
       </div>

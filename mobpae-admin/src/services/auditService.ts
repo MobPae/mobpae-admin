@@ -18,9 +18,12 @@ export interface AuditLog {
 
 export interface AuditLogsResponse {
   data: AuditLog[];
-  total: number;
-  page: number;
-  limit: number;
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 }
 
 export interface AuditLogsParams {
@@ -32,11 +35,15 @@ export interface AuditLogsParams {
 }
 
 export async function getAuditLogs(params?: AuditLogsParams): Promise<AuditLogsResponse> {
-  const response = await api.get<AuditLogsResponse>("/audit-logs", { params });
-  // Normalise: some backends return array directly, others return paginated wrapper
-  const raw = response.data as unknown;
-  if (Array.isArray(raw)) {
-    return { data: raw as AuditLog[], total: (raw as AuditLog[]).length, page: 1, limit: (raw as AuditLog[]).length };
-  }
-  return raw as AuditLogsResponse;
+  const response = await api.get<unknown>("/audit-logs", { params });
+  const raw = response.data as Record<string, unknown>;
+  // Backend returns { data: [], pagination: { page, limit, total, totalPages } }
+  const logs = Array.isArray(raw?.data) ? (raw.data as AuditLog[]) : (Array.isArray(raw) ? (raw as AuditLog[]) : []);
+  const pagination = (raw?.pagination as AuditLogsResponse["pagination"] | undefined) ?? {
+    page:       (params?.page  ?? 1),
+    limit:      (params?.limit ?? 20),
+    total:      logs.length,
+    totalPages: 1,
+  };
+  return { data: logs, pagination };
 }

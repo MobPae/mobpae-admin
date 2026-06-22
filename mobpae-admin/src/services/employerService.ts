@@ -1,5 +1,5 @@
 import api from "../lib/axios";
-import type { CreateEmployerPayload, CreateEmployerResponse, Employer } from "../types/employer";
+import type { ActivateEmployerResponse, CreateEmployerPayload, CreateEmployerResponse, Employer } from "../types/employer";
 
 export async function getEmployers(): Promise<Employer[]> {
   const response = await api.get("/employers");
@@ -20,7 +20,7 @@ export async function createEmployer(payload: CreateEmployerPayload): Promise<Cr
 export async function updateEmployerStatus(
   employerId: string,
   status: Employer["status"]
-): Promise<Employer> {
-  const response = await api.patch<Employer>(`/employers/${employerId}/status`, { status });
+): Promise<ActivateEmployerResponse> {
+  const response = await api.patch<ActivateEmployerResponse>(`/employers/${employerId}/status`, { status });
   return response.data;
 }

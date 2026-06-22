@@ -9,6 +9,7 @@ import type { SalaryRequest } from "../types/salary-request";
 const EMPTY_DASHBOARD: AdminDashboard = {
   totalEmployers: 0,
   activeEmployers: 0,
+  pendingEmployers: 0,
   totalEmployees: 0,
   activeEmployees: 0,
   pendingKycDocuments: 0,
@@ -28,13 +29,13 @@ const EMPTY_REQUESTS: SalaryRequest[] = [];
 
 function statusBadge(status: SalaryRequest["status"]): string {
   switch (status) {
-    case "SUBMITTED": return "bg-amber-50 text-amber-700";
-    case "EMPLOYER_APPROVED": return "bg-blue-50 text-blue-700";
-    case "READY_FOR_DISBURSAL": return "bg-blue-50 text-blue-700";
-    case "DISBURSED": return "bg-green-50 text-green-700";
-    case "EMPLOYER_REJECTED": return "bg-red-50 text-red-600";
-    case "REPAYMENT_SCHEDULED": return "bg-blue-50 text-blue-700";
-    case "REPAID": return "bg-slate-100 text-slate-500";
+    case "SUBMITTED":           return "bg-amber-50 text-amber-700";
+    case "EMPLOYER_APPROVED":   return "bg-[#E7F1FC] text-[#185FA5]";
+    case "READY_FOR_DISBURSAL": return "bg-lime-50 text-lime-700";
+    case "DISBURSED":           return "bg-[#EBF6E3] text-[#3B6D11]";
+    case "EMPLOYER_REJECTED":   return "bg-red-50 text-red-600";
+    case "REPAYMENT_SCHEDULED": return "bg-[#FEF1E7] text-[#9A4910]";
+    case "REPAID":              return "bg-[#D4EDE5] text-[#1A5944]";
   }
 }
 
@@ -117,9 +118,9 @@ export default function DashboardPage() {
 
   const actionItems = [
     { label: "Salary requests", sub: "Awaiting review", count: d.pendingSalaryRequests, color: "bg-amber-400", to: "/salary-requests" },
-    { label: "KYC documents", sub: "Pending verification", count: d.pendingKycDocuments, color: "bg-blue-400", to: "/kyc" },
-    { label: "Disbursals", sub: "Ready to process", count: d.pendingDisbursals, color: "bg-blue-400", to: "/disbursals" },
-    { label: "Active recoveries", sub: "In progress", count: d.activeRepayments, color: "bg-slate-400", to: "/recoveries" },
+    { label: "KYC documents", sub: "Pending verification", count: d.pendingKycDocuments, color: "bg-[#7679FF]", to: "/kyc" },
+    { label: "Disbursals", sub: "Ready to process", count: d.pendingDisbursals, color: "bg-[#7679FF]", to: "/disbursals" },
+    { label: "Active recoveries", sub: "In progress", count: d.activeRepayments, color: "bg-[#B7B9C7]", to: "/recoveries" },
   ];
 
   return (
@@ -127,8 +128,8 @@ export default function DashboardPage() {
       {/* Page header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[15px] font-[500] text-slate-900 leading-none">Dashboard</h1>
-          <p className="text-[11px] text-slate-400 mt-1.5">
+          <h1 className="text-[15px] font-[500] text-[#191A2E] leading-none">Dashboard</h1>
+          <p className="text-[11px] text-[#62657A] mt-1.5">
             {new Date().toLocaleDateString("en-IN", {
               weekday: "long",
               day: "numeric",
@@ -137,25 +138,25 @@ export default function DashboardPage() {
             })}
           </p>
         </div>
-        <div className={`flex items-center gap-1.5 h-6 px-2.5 rounded-md border ${health?.status === "ok" ? "bg-green-50 border-green-100" : health === undefined ? "bg-slate-50 border-slate-200" : "bg-red-50 border-red-100"}`}>
-          <span className={`w-1.5 h-1.5 rounded-full ${health?.status === "ok" ? "bg-green-500" : health === undefined ? "bg-slate-300" : "bg-red-500"}`} />
-          <span className={`text-[11px] font-[500] ${health?.status === "ok" ? "text-green-700" : health === undefined ? "text-slate-500" : "text-red-700"}`}>{health?.status === "ok" ? "Live" : health === undefined ? "Checking…" : "Degraded"}</span>
+        <div className={`flex items-center gap-1.5 h-6 px-2.5 rounded-md border ${health?.status === "ok" ? "bg-[#ECEBFF] border-[#ECEBFF]" : health === undefined ? "bg-[#F7F7FB] border-[#E4E4EF]" : "bg-red-50 border-red-100"}`}>
+          <span className={`w-1.5 h-1.5 rounded-full ${health?.status === "ok" ? "bg-[#ECEBFF]0" : health === undefined ? "bg-[#D4D5E0]" : "bg-red-500"}`} />
+          <span className={`text-[11px] font-[500] ${health?.status === "ok" ? "text-[#5659D9]" : health === undefined ? "text-[#62657A]" : "text-red-700"}`}>{health?.status === "ok" ? "Live" : health === undefined ? "Checking…" : "Degraded"}</span>
         </div>
       </div>
 
       {/* KPI Strip — operational */}
       <div className="grid grid-cols-6 gap-3">
         {kpis.map((kpi) => (
-          <div key={kpi.label} className="bg-white border border-slate-100 rounded-lg p-3.5">
-            <p className="text-[10px] text-slate-400 uppercase tracking-[0.06em] font-[500] leading-none">
+          <div key={kpi.label} className="bg-white border border-[#E4E4EF] rounded-lg p-3.5">
+            <p className="text-[11px] text-[#62657A] uppercase tracking-[0.06em] font-[500] leading-none">
               {kpi.label}
             </p>
             <p className={`text-[22px] font-[500] tracking-tight leading-none mt-2.5 ${
-              kpi.accent ? "text-amber-600" : "text-slate-900"
+              kpi.accent ? "text-amber-600" : "text-[#191A2E]"
             } ${dashLoading ? "opacity-20 animate-pulse" : ""}`}>
               {kpi.value}
             </p>
-            <p className="text-[10px] text-slate-400 mt-1.5 leading-none">{kpi.sub}</p>
+            <p className="text-[11px] text-[#62657A] mt-1.5 leading-none">{kpi.sub}</p>
           </div>
         ))}
       </div>
@@ -163,16 +164,16 @@ export default function DashboardPage() {
       {/* KPI Strip — financial */}
       <div className="grid grid-cols-6 gap-3">
         {financialKpis.map((kpi) => (
-          <div key={kpi.label} className="bg-white border border-slate-100 rounded-lg p-3.5">
-            <p className="text-[10px] text-slate-400 uppercase tracking-[0.06em] font-[500] leading-none">
+          <div key={kpi.label} className="bg-white border border-[#E4E4EF] rounded-lg p-3.5">
+            <p className="text-[11px] text-[#62657A] uppercase tracking-[0.06em] font-[500] leading-none">
               {kpi.label}
             </p>
             <p className={`text-[18px] font-[500] tracking-tight leading-none mt-2.5 ${
-              kpi.accent ? "text-amber-600" : "text-slate-900"
+              kpi.accent ? "text-amber-600" : "text-[#191A2E]"
             } ${dashLoading ? "opacity-20 animate-pulse" : ""}`}>
               {kpi.value}
             </p>
-            <p className="text-[10px] text-slate-400 mt-1.5 leading-none">{kpi.sub}</p>
+            <p className="text-[11px] text-[#62657A] mt-1.5 leading-none">{kpi.sub}</p>
           </div>
         ))}
       </div>
@@ -180,18 +181,16 @@ export default function DashboardPage() {
       {/* Two-column body */}
       <div className="grid grid-cols-[1fr_264px] gap-4">
         {/* Recent salary requests */}
-        <div className="bg-white border border-slate-100 rounded-lg overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
-            <span className="text-[12px] font-[500] text-slate-800">Recent salary requests</span>
+        <div className="bg-white border border-[#E4E4EF] rounded-lg overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-[#E4E4EF]">
+            <span className="text-[12px] font-[500] text-[#191A2E]">Recent salary requests</span>
             <button
               onClick={() => void navigate("/salary-requests")}
-              className="text-[11px] text-slate-400 hover:text-slate-600 transition-colors"
+              className="text-[11px] text-[#62657A] hover:text-[#62657A] transition-colors"
             >
               View all →
             </button>
           </div>
-
-
 
           <table className="w-full table-fixed">
             <colgroup>
@@ -202,51 +201,51 @@ export default function DashboardPage() {
               <col style={{ width: "12%" }} />
             </colgroup>
             <thead>
-              <tr className="border-b border-slate-100 bg-slate-50">
+              <tr className="border-b border-[#E4E4EF] bg-[#F7F7FB]">
                 {["Employee", "Company", "Amount", "Status", "When"].map((h) => (
-                  <th key={h} className="px-4 py-2 text-left text-[10px] font-[600] uppercase tracking-[0.08em] text-slate-400">{h}</th>
+                  <th key={h} className="px-4 py-2 text-left text-[11px] font-[600] uppercase tracking-[0.08em] text-[#62657A]">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {srLoading ? (
                 [...Array(5)].map((_, i) => (
-                  <tr key={i} className="border-b border-slate-50">
-                    <td className="px-4 py-3"><div className="h-2.5 w-24 bg-slate-100 rounded animate-pulse" /></td>
-                    <td className="px-4 py-3"><div className="h-2.5 w-20 bg-slate-100 rounded animate-pulse" /></td>
-                    <td className="px-4 py-3"><div className="h-2.5 w-14 bg-slate-100 rounded animate-pulse" /></td>
-                    <td className="px-4 py-3"><div className="h-4 w-16 bg-slate-100 rounded-full animate-pulse" /></td>
-                    <td className="px-4 py-3"><div className="h-2.5 w-10 bg-slate-100 rounded animate-pulse" /></td>
+                  <tr key={i} className="border-b border-[#F0F0F8]">
+                    <td className="px-4 py-3"><div className="h-2.5 w-24 bg-[#F0F0F8] rounded animate-pulse" /></td>
+                    <td className="px-4 py-3"><div className="h-2.5 w-20 bg-[#F0F0F8] rounded animate-pulse" /></td>
+                    <td className="px-4 py-3"><div className="h-2.5 w-14 bg-[#F0F0F8] rounded animate-pulse" /></td>
+                    <td className="px-4 py-3"><div className="h-4 w-16 bg-[#F0F0F8] rounded-full animate-pulse" /></td>
+                    <td className="px-4 py-3"><div className="h-2.5 w-10 bg-[#F0F0F8] rounded animate-pulse" /></td>
                   </tr>
                 ))
               ) : recentRequests.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-10 text-center text-[12px] text-slate-400">No salary requests yet</td>
+                  <td colSpan={5} className="px-4 py-10 text-center text-[12px] text-[#62657A]">No salary requests yet</td>
                 </tr>
               ) : (
                 recentRequests.map((req) => (
-                  <tr key={req.id} className="border-b border-slate-50 last:border-0 hover:bg-slate-50/60 transition-colors">
+                  <tr key={req.id} className="border-b border-[#F0F0F8] last:border-0 hover:bg-[#F7F7FB]/60 transition-colors">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2 min-w-0">
-                        <div className="w-6 h-6 rounded-md bg-gradient-to-br from-slate-600 to-slate-800 text-white flex items-center justify-center text-[10px] font-[700] flex-shrink-0">
+                        <div className="w-6 h-6 rounded-md bg-gradient-to-br from-[#191A2E] to-[#2A2C45] text-white flex items-center justify-center text-[11px] font-[700] flex-shrink-0">
                           {req.employee.name.charAt(0).toUpperCase()}
                         </div>
-                        <p className="text-[12px] font-[500] text-slate-800 truncate">{req.employee.name}</p>
+                        <p className="text-[12px] font-[500] text-[#191A2E] truncate">{req.employee.name}</p>
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <p className="text-[12px] text-slate-500 truncate">{req.employee.employer.companyName}</p>
+                      <p className="text-[12px] text-[#62657A] truncate">{req.employee.employer.companyName}</p>
                     </td>
                     <td className="px-4 py-3">
-                      <p className="text-[12px] font-[600] text-slate-900 tabular-nums">{formatAmount(req.amount)}</p>
+                      <p className="text-[12px] font-[600] text-[#191A2E] tabular-nums">{formatAmount(req.amount)}</p>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`inline-flex h-[20px] px-2.5 rounded-full items-center text-[10px] font-[500] ${statusBadge(req.status)}`}>
+                      <span className={`inline-flex h-[20px] px-2.5 rounded-full items-center text-[11px] font-[500] ${statusBadge(req.status)}`}>
                         {statusLabel(req.status)}
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <p className="text-[11px] text-slate-400">{timeAgo(req.requestedAt)}</p>
+                      <p className="text-[11px] text-[#62657A]">{timeAgo(req.requestedAt)}</p>
                     </td>
                   </tr>
                 ))
@@ -257,9 +256,9 @@ export default function DashboardPage() {
 
 
         {/* Right: Action queue */}
-        <div className="bg-white border border-slate-100 rounded-lg overflow-hidden flex flex-col">
-          <div className="px-4 py-3 border-b border-slate-100 flex-shrink-0">
-            <span className="text-[12px] font-[500] text-slate-800">Action queue</span>
+        <div className="bg-white border border-[#E4E4EF] rounded-lg overflow-hidden flex flex-col">
+          <div className="px-4 py-3 border-b border-[#E4E4EF] flex-shrink-0">
+            <span className="text-[12px] font-[500] text-[#191A2E]">Action queue</span>
           </div>
 
           <div className="flex-1">
@@ -267,15 +266,15 @@ export default function DashboardPage() {
               <button
                 key={item.label}
                 onClick={() => void navigate(item.to)}
-                className="w-full flex items-center gap-3 px-4 py-3 border-b border-slate-50 last:border-0 hover:bg-slate-50/60 transition-colors text-left"
+                className="w-full flex items-center gap-3 px-4 py-3 border-b border-[#F0F0F8] last:border-0 hover:bg-[#F7F7FB]/60 transition-colors text-left"
               >
                 <span className={`w-[6px] h-[6px] rounded-full flex-shrink-0 ${item.color}`} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-[12px] font-[500] text-slate-800 leading-none">{item.label}</p>
-                  <p className="text-[11px] text-slate-400 mt-1 leading-none">{item.sub}</p>
+                  <p className="text-[12px] font-[500] text-[#191A2E] leading-none">{item.label}</p>
+                  <p className="text-[11px] text-[#62657A] mt-1 leading-none">{item.sub}</p>
                 </div>
                 <span className={`text-[11px] font-[500] px-2 py-0.5 rounded-full ${
-                  item.count > 0 ? "bg-amber-50 text-amber-700" : "bg-slate-100 text-slate-400"
+                  item.count > 0 ? "bg-amber-50 text-amber-700" : "bg-[#F0F0F8] text-[#62657A]"
                 }`}>
                   {item.count}
                 </span>
@@ -284,21 +283,21 @@ export default function DashboardPage() {
           </div>
 
           {/* Employer mini breakdown */}
-          <div className="border-t border-slate-100 px-4 py-3 flex-shrink-0">
-            <p className="text-[10px] font-[500] uppercase tracking-[0.06em] text-slate-400 mb-2.5">
+          <div className="border-t border-[#E4E4EF] px-4 py-3 flex-shrink-0">
+            <p className="text-[11px] font-[500] uppercase tracking-[0.06em] text-[#62657A] mb-2.5">
               Employers
             </p>
             <div className="grid grid-cols-3 gap-2">
               {[
-                { label: "Active", value: d.activeEmployers, color: "text-green-600" },
-                { label: "Total", value: d.totalEmployers, color: "text-slate-800" },
-                { label: "Pending", value: Math.max(0, d.totalEmployers - d.activeEmployers), color: "text-amber-600" },
+                { label: "Active", value: d.activeEmployers, color: "text-[#7679FF]" },
+                { label: "Total", value: d.totalEmployers, color: "text-[#191A2E]" },
+                { label: "Pending", value: d.pendingEmployers, color: "text-amber-600" },
               ].map((s) => (
-                <div key={s.label} className="bg-slate-50 rounded-md p-2 text-center">
+                <div key={s.label} className="bg-[#F7F7FB] rounded-md p-2 text-center">
                   <p className={`text-[15px] font-[500] leading-none ${s.color} ${dashLoading ? "animate-pulse opacity-20" : ""}`}>
                     {s.value}
                   </p>
-                  <p className="text-[10px] text-slate-400 mt-1 leading-none">{s.label}</p>
+                  <p className="text-[11px] text-[#62657A] mt-1 leading-none">{s.label}</p>
                 </div>
               ))}
             </div>

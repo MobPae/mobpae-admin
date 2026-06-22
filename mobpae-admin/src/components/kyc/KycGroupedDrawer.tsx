@@ -1,3 +1,4 @@
+import { useEscKey } from "../../lib/useEscKey";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { X, CheckCircle2, XCircle, Loader2, ExternalLink, FileText } from "lucide-react";
@@ -22,9 +23,9 @@ const DOC_LABEL: Record<string, string> = {
 const DOC_ORDER = ["PAN", "AADHAR", "SALARY_SLIP", "OTHER"];
 
 const STATUS_BADGE: Record<string, { dot: string; text: string; bg: string; label: string }> = {
-  PENDING:  { dot: "bg-amber-400",   text: "text-amber-700",   bg: "bg-amber-50/80",   label: "Pending"  },
-  VERIFIED: { dot: "bg-emerald-500", text: "text-emerald-700", bg: "bg-emerald-50/80", label: "Verified" },
-  REJECTED: { dot: "bg-red-500",     text: "text-red-600",     bg: "bg-red-50/80",     label: "Rejected" },
+  PENDING:  { dot: "bg-amber-400", text: "text-amber-700", bg: "bg-amber-50/80",   label: "Pending"  },
+  VERIFIED: { dot: "bg-[#4E8A18]", text: "text-[#3B6D11]", bg: "bg-[#EBF6E3]/80", label: "Verified" },
+  REJECTED: { dot: "bg-red-400", text: "text-red-600", bg: "bg-red-50/80",     label: "Rejected" },
 };
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "/api";
@@ -85,41 +86,41 @@ function DocCard({
   const isPdf   = /\.pdf$/i.test(doc.filePath);
 
   return (
-    <div className={`border rounded-xl overflow-hidden ${canAct ? "border-slate-200" : "border-slate-100"}`}>
+    <div className={`border rounded-xl overflow-hidden ${canAct ? "border-[#E4E4EF]" : "border-[#E4E4EF]"}`}>
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 bg-slate-50/60 border-b border-slate-100">
+      <div className="flex items-center justify-between px-4 py-3 bg-[#F7F7FB]/60 border-b border-[#E4E4EF]">
         <div className="flex items-center gap-2">
-          <FileText size={13} className="text-slate-400 flex-shrink-0" />
-          <span className="text-[12px] font-[600] text-slate-900">{DOC_LABEL[doc.documentType] ?? doc.documentType}</span>
+          <FileText size={13} className="text-[#62657A] flex-shrink-0" />
+          <span className="text-[12px] font-[600] text-[#191A2E]">{DOC_LABEL[doc.documentType] ?? doc.documentType}</span>
         </div>
-        <span className={`inline-flex items-center gap-1.5 h-[20px] px-2 rounded-full text-[10px] font-[500] ${sc.bg} ${sc.text}`}>
+        <span className={`inline-flex items-center gap-1.5 h-[20px] px-2 rounded-full text-[11px] font-[500] ${sc.bg} ${sc.text}`}>
           <span className={`w-1.5 h-1.5 rounded-full ${sc.dot}`} />
           {sc.label}
         </span>
       </div>
 
       {/* Meta */}
-      <div className="px-4 divide-y divide-slate-50">
+      <div className="px-4 divide-y divide-[#F0F0F8]">
         <div className="flex items-center justify-between py-2">
-          <span className="text-[11px] text-slate-400">Uploaded</span>
-          <span className="text-[11px] font-[500] text-slate-700">
+          <span className="text-[11px] text-[#62657A]">Uploaded</span>
+          <span className="text-[11px] font-[500] text-[#62657A]">
             {new Date(doc.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
           </span>
         </div>
         {doc.verifiedAt && (
           <div className="flex items-center justify-between py-2">
-            <span className="text-[11px] text-slate-400">
+            <span className="text-[11px] text-[#62657A]">
               {doc.status === "REJECTED" ? "Rejected on" : "Verified on"}
             </span>
-            <span className="text-[11px] font-[500] text-slate-700">
+            <span className="text-[11px] font-[500] text-[#62657A]">
               {new Date(doc.verifiedAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
             </span>
           </div>
         )}
         {doc.verifiedBy && (
           <div className="flex items-center justify-between py-2">
-            <span className="text-[11px] text-slate-400">Reviewed by</span>
-            <span className="text-[11px] font-[500] text-slate-700 truncate max-w-[55%] text-right">{doc.verifiedBy}</span>
+            <span className="text-[11px] text-[#62657A]">Reviewed by</span>
+            <span className="text-[11px] font-[500] text-[#62657A] truncate max-w-[55%] text-right">{doc.verifiedBy}</span>
           </div>
         )}
       </div>
@@ -131,7 +132,7 @@ function DocCard({
             <img
               src={fileUrl}
               alt={DOC_LABEL[doc.documentType]}
-              className="w-full rounded-lg border border-slate-100 object-contain max-h-[120px]"
+              className="w-full rounded-lg border border-[#E4E4EF] object-contain max-h-[120px]"
               onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
             />
           </a>
@@ -140,7 +141,7 @@ function DocCard({
             href={fileUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-2 flex items-center gap-2 text-[11px] font-[500] text-[#059669] hover:underline"
+            className="mt-2 flex items-center gap-2 text-[11px] font-[500] text-[#7679FF] hover:underline"
           >
             <ExternalLink size={11} />
             {isPdf ? "Open PDF" : "View file"}
@@ -162,7 +163,7 @@ function DocCard({
           <button
             onClick={() => verifyMutation.mutate()}
             disabled={isBusy}
-            className="flex-1 h-7 rounded-md bg-slate-900 hover:bg-slate-700 text-[11px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
+            className="flex-1 h-7 rounded-md bg-[#191A2E] hover:bg-[#2A2C45] text-[11px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
           >
             {verifyMutation.isPending ? <Loader2 size={11} className="animate-spin" /> : <CheckCircle2 size={11} />}
             {verifyMutation.isPending ? "Approving…" : "Approve"}
@@ -174,6 +175,7 @@ function DocCard({
 }
 
 export default function KycGroupedDrawer({ open, group, groupQueryKey, onClose }: Props) {
+  useEscKey(open, onClose);
   const docQueryKey = ["kyc-docs-employee", group?.employeeId];
 
   // Fetch the actual documents for this employee when the drawer opens
@@ -204,33 +206,33 @@ export default function KycGroupedDrawer({ open, group, groupQueryKey, onClose }
     <>
       <div className="fixed inset-0 bg-black/20 z-40" onClick={onClose} />
 
-      <div className="fixed top-0 right-0 h-full w-[460px] bg-white z-50 flex flex-col border-l border-slate-200 shadow-xl">
+      <div className="fixed top-0 right-0 h-full w-[460px] bg-white z-50 flex flex-col border-l border-[#E4E4EF] shadow-xl">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 flex-shrink-0">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E4E4EF] flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-slate-700 to-slate-900 text-white flex items-center justify-center text-[12px] font-[600]">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#191A2E] to-[#2A2C45] text-white flex items-center justify-center text-[12px] font-[600]">
               {first}
             </div>
             <div>
-              <p className="text-[13px] font-[500] text-slate-900 leading-none">{group.employeeName}</p>
-              <p className="text-[11px] text-slate-400 mt-0.5 leading-none">
+              <p className="text-[13px] font-[500] text-[#191A2E] leading-none">{group.employeeName}</p>
+              <p className="text-[11px] text-[#62657A] mt-0.5 leading-none">
                 <span className="font-mono">{group.employeeCode}</span>
-                <span className="mx-1.5 text-slate-200">·</span>
+                <span className="mx-1.5 text-[#D4D5E0]">·</span>
                 {group.companyName}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             {!isLoading && (
-              <div className="flex items-center gap-1.5 text-[10px] font-[500]">
-                {verifiedCount > 0 && <span className="text-emerald-600">{verifiedCount} verified</span>}
+              <div className="flex items-center gap-1.5 text-[11px] font-[500]">
+                {verifiedCount > 0 && <span className="text-[#7679FF]">{verifiedCount} verified</span>}
                 {pendingCount  > 0 && <span className="text-amber-600">{pendingCount} pending</span>}
                 {rejectedCount > 0 && <span className="text-red-500">{rejectedCount} rejected</span>}
               </div>
             )}
             <button
               onClick={onClose}
-              className="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+              className="w-6 h-6 rounded-md flex items-center justify-center text-[#62657A] hover:text-[#62657A] hover:bg-[#F0F0F8] transition-colors"
             >
               <X size={14} />
             </button>
@@ -241,12 +243,12 @@ export default function KycGroupedDrawer({ open, group, groupQueryKey, onClose }
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
           {isLoading ? (
             <div className="py-10 text-center">
-              <p className="text-[13px] text-slate-400">Loading documents…</p>
+              <p className="text-[13px] text-[#62657A]">Loading documents…</p>
             </div>
           ) : sortedDocs.length === 0 && missingTypes.length === 3 ? (
             <div className="py-8 text-center">
-              <p className="text-[13px] text-slate-500 font-[500]">No documents uploaded yet</p>
-              <p className="text-[12px] text-slate-400 mt-1">The employee hasn't submitted any KYC documents.</p>
+              <p className="text-[13px] text-[#62657A] font-[500]">No documents uploaded yet</p>
+              <p className="text-[12px] text-[#62657A] mt-1">The employee hasn't submitted any KYC documents.</p>
             </div>
           ) : (
             <>
@@ -262,13 +264,13 @@ export default function KycGroupedDrawer({ open, group, groupQueryKey, onClose }
 
               {/* Missing doc type slots */}
               {missingTypes.map(type => (
-                <div key={type} className="border border-dashed border-slate-200 rounded-xl px-4 py-4 flex items-center gap-3">
-                  <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
-                    <FileText size={13} className="text-slate-300" />
+                <div key={type} className="border border-dashed border-[#E4E4EF] rounded-xl px-4 py-4 flex items-center gap-3">
+                  <div className="w-7 h-7 rounded-lg bg-[#F0F0F8] flex items-center justify-center flex-shrink-0">
+                    <FileText size={13} className="text-[#62657A]" />
                   </div>
                   <div>
-                    <p className="text-[12px] font-[500] text-slate-400">{DOC_LABEL[type]}</p>
-                    <p className="text-[10px] text-slate-300 mt-0.5">Not uploaded</p>
+                    <p className="text-[12px] font-[500] text-[#62657A]">{DOC_LABEL[type]}</p>
+                    <p className="text-[11px] text-[#62657A] mt-0.5">Not uploaded</p>
                   </div>
                 </div>
               ))}

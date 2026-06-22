@@ -1,3 +1,4 @@
+import { useEscKey } from "../../lib/useEscKey";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { X, CheckCircle2, XCircle, Loader2, FileText } from "lucide-react";
@@ -14,7 +15,7 @@ interface Props {
 
 const STATUS_BADGE: Record<string, string> = {
   PENDING:  "bg-amber-50 text-amber-700",
-  VERIFIED: "bg-emerald-50 text-emerald-700",
+  VERIFIED: "bg-[#EBF6E3] text-[#3B6D11]",
   REJECTED: "bg-red-50 text-red-600",
 };
 
@@ -26,6 +27,7 @@ const DOC_LABEL: Record<string, string> = {
 };
 
 export default function KycDrawer({ open, document, onClose, onCompleted }: Props) {
+  useEscKey(open, onClose);
   const verifyMutation = useMutation({
     mutationFn: () => verifyKycDocument(document!.id),
     onSuccess: () => {
@@ -57,23 +59,23 @@ export default function KycDrawer({ open, document, onClose, onCompleted }: Prop
     <>
       <div className="fixed inset-0 bg-black/20 z-40" onClick={onClose} />
 
-      <div className="fixed top-0 right-0 h-full w-[440px] bg-white z-50 flex flex-col border-l border-slate-200 shadow-xl">
+      <div className="fixed top-0 right-0 h-full w-[440px] bg-white z-50 flex flex-col border-l border-[#E4E4EF] shadow-xl">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 flex-shrink-0">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E4E4EF] flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-slate-700 to-slate-900 text-white flex items-center justify-center text-[12px] font-[600]">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#191A2E] to-[#2A2C45] text-white flex items-center justify-center text-[12px] font-[600]">
               {document.employee.name.charAt(0).toUpperCase()}
             </div>
             <div>
-              <p className="text-[13px] font-[500] text-slate-900 leading-none">{document.employee.name}</p>
-              <p className="text-[11px] text-slate-400 mt-0.5 leading-none">{document.employee.employer.companyName}</p>
+              <p className="text-[13px] font-[500] text-[#191A2E] leading-none">{document.employee.name}</p>
+              <p className="text-[11px] text-[#62657A] mt-0.5 leading-none">{document.employee.employer.companyName}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <span className={`inline-flex h-[18px] px-1.5 rounded-[3px] items-center text-[10px] font-[500] ${STATUS_BADGE[document.status] ?? "bg-slate-100 text-slate-500"}`}>
+            <span className={`inline-flex h-[18px] px-1.5 rounded-[3px] items-center text-[11px] font-[500] ${STATUS_BADGE[document.status] ?? "bg-[#F0F0F8] text-[#62657A]"}`}>
               {document.status}
             </span>
-            <button onClick={onClose} className="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
+            <button onClick={onClose} className="w-6 h-6 rounded-md flex items-center justify-center text-[#62657A] hover:text-[#62657A] hover:bg-[#F0F0F8] transition-colors">
               <X size={14} />
             </button>
           </div>
@@ -83,8 +85,8 @@ export default function KycDrawer({ open, document, onClose, onCompleted }: Prop
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
           {/* Document info */}
           <section>
-            <p className="text-[10px] font-[500] uppercase tracking-[0.07em] text-slate-400 mb-2">Document</p>
-            <div className="border border-slate-100 rounded-lg divide-y divide-slate-100">
+            <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-[#62657A] mb-2">Document</p>
+            <div className="border border-[#E4E4EF] rounded-lg divide-y divide-[#E4E4EF]">
               {[
                 { k: "Type",         v: DOC_LABEL[document.documentType] ?? document.documentType },
                 { k: "Status",       v: document.status },
@@ -93,8 +95,8 @@ export default function KycDrawer({ open, document, onClose, onCompleted }: Prop
                 ...(document.verifiedBy ? [{ k: "Reviewed by", v: document.verifiedBy }] : []),
               ].map(({ k, v }) => (
                 <div key={k} className="flex items-center justify-between px-3 py-2.5">
-                  <span className="text-[11px] text-slate-400">{k}</span>
-                  <span className="text-[11px] font-[500] text-slate-800">{v}</span>
+                  <span className="text-[11px] text-[#62657A]">{k}</span>
+                  <span className="text-[11px] font-[500] text-[#191A2E]">{v}</span>
                 </div>
               ))}
             </div>
@@ -102,19 +104,19 @@ export default function KycDrawer({ open, document, onClose, onCompleted }: Prop
 
           {/* File */}
           <section>
-            <p className="text-[10px] font-[500] uppercase tracking-[0.07em] text-slate-400 mb-2">File</p>
-            <div className="border border-slate-100 rounded-lg px-3 py-3 flex items-start gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
-                <FileText size={13} className="text-slate-500" />
+            <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-[#62657A] mb-2">File</p>
+            <div className="border border-[#E4E4EF] rounded-lg px-3 py-3 flex items-start gap-2.5">
+              <div className="w-7 h-7 rounded-lg bg-[#F0F0F8] flex items-center justify-center flex-shrink-0">
+                <FileText size={13} className="text-[#62657A]" />
               </div>
-              <p className="text-[11px] text-slate-500 break-all leading-relaxed">{document.filePath}</p>
+              <p className="text-[11px] text-[#62657A] break-all leading-relaxed">{document.filePath}</p>
             </div>
           </section>
 
           {/* Employee */}
           <section>
-            <p className="text-[10px] font-[500] uppercase tracking-[0.07em] text-slate-400 mb-2">Employee</p>
-            <div className="border border-slate-100 rounded-lg divide-y divide-slate-100">
+            <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-[#62657A] mb-2">Employee</p>
+            <div className="border border-[#E4E4EF] rounded-lg divide-y divide-[#E4E4EF]">
               {[
                 { k: "Name",          v: document.employee.name },
                 { k: "Employee code", v: <span className="font-mono">{document.employee.employeeCode}</span> },
@@ -122,16 +124,16 @@ export default function KycDrawer({ open, document, onClose, onCompleted }: Prop
                 { k: "Employer",      v: document.employee.employer.companyName },
               ].map(({ k, v }) => (
                 <div key={k} className="flex items-center justify-between px-3 py-2.5">
-                  <span className="text-[11px] text-slate-400">{k}</span>
-                  <span className="text-[11px] font-[500] text-slate-800 text-right max-w-[60%] truncate">{v}</span>
+                  <span className="text-[11px] text-[#62657A]">{k}</span>
+                  <span className="text-[11px] font-[500] text-[#191A2E] text-right max-w-[60%] truncate">{v}</span>
                 </div>
               ))}
             </div>
           </section>
 
           {!canAct && (
-            <div className="bg-slate-50 rounded-md px-3 py-2.5 border border-slate-100">
-              <p className="text-[11px] text-slate-500">
+            <div className="bg-[#F7F7FB] rounded-md px-3 py-2.5 border border-[#E4E4EF]">
+              <p className="text-[11px] text-[#62657A]">
                 {document.status === "VERIFIED" ? "This document has already been verified." : "This document has been rejected."}
               </p>
             </div>
@@ -140,7 +142,7 @@ export default function KycDrawer({ open, document, onClose, onCompleted }: Prop
 
         {/* Footer */}
         {canAct && (
-          <div className="border-t border-slate-100 px-5 py-3.5 flex-shrink-0 flex gap-2">
+          <div className="border-t border-[#E4E4EF] px-5 py-3.5 flex-shrink-0 flex gap-2">
             <button
               onClick={() => rejectMutation.mutate()}
               disabled={isBusy}
@@ -152,7 +154,7 @@ export default function KycDrawer({ open, document, onClose, onCompleted }: Prop
             <button
               onClick={() => verifyMutation.mutate()}
               disabled={isBusy}
-              className="flex-1 h-8 rounded-md bg-slate-900 hover:bg-[slate-800] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
+              className="flex-1 h-8 rounded-md bg-[#191A2E] hover:bg-[#2A2C45] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
             >
               {verifyMutation.isPending ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle2 size={12} />}
               {verifyMutation.isPending ? "Verifying…" : "Verify"}

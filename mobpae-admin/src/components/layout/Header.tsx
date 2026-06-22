@@ -1,8 +1,8 @@
-import { Bell, LogOut, Search } from "lucide-react";
+import { LogOut, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 import { logout } from "../../services/authService";
 import { removeToken } from "../../utils/auth";
+import { NotificationBell } from "./NotificationBell";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -19,11 +19,11 @@ export default function Header() {
   };
 
   return (
-    <header className="h-16 bg-white border-b border-slate-200 px-8 flex items-center justify-end">
+    <header className="h-16 bg-white border-b border-[#E4E4EF] px-8 flex items-center justify-end">
       <div className="flex items-center gap-4">
         {/* Search */}
         <div className="relative">
-          <Search size={16} className="absolute left-3 top-3 text-slate-400" />
+          <Search size={16} className="absolute left-3 top-3 text-[#62657A]" />
 
           <input
             placeholder="Search..."
@@ -33,41 +33,27 @@ export default function Header() {
               pr-4
               py-2.5
               text-sm
-              bg-slate-50
+              bg-[#F7F7FB]
               border
-              border-slate-200
+              border-[#E4E4EF]
               rounded-xl
               outline-none
-              focus:border-blue-500
+              focus:border-[#7679FF]
             "
           />
         </div>
 
         {/* Notifications */}
-        <button
-          className="
-            w-10
-            h-10
-            rounded-xl
-            border
-            border-slate-200
-            flex
-            items-center
-            justify-center
-            hover:bg-slate-50
-          "
-        >
-          <Bell size={18} />
-        </button>
+        <NotificationBell />
 
         {/* Profile */}
-        <div className="flex items-center gap-3 border-l border-slate-200 pl-4">
+        <div className="flex items-center gap-3 border-l border-[#E4E4EF] pl-4">
           <div
             className="
               w-10
               h-10
               rounded-full
-              bg-blue-600
+              bg-[#7679FF]
               text-white
               flex
               items-center
@@ -79,9 +65,9 @@ export default function Header() {
           </div>
 
           <div>
-            <p className="text-sm font-medium text-slate-900">Admin User</p>
+            <p className="text-sm font-medium text-[#191A2E]">Admin User</p>
 
-            <p className="text-xs text-slate-500">Super Admin</p>
+            <p className="text-xs text-[#62657A]">Super Admin</p>
           </div>
         </div>
 
@@ -93,9 +79,9 @@ export default function Header() {
             px-4
             rounded-xl
             border
-            border-slate-200
-            text-slate-600
-            hover:bg-slate-50
+            border-[#E4E4EF]
+            text-[#62657A]
+            hover:bg-[#F7F7FB]
             flex
             items-center
             gap-2

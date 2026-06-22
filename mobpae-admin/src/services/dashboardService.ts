@@ -11,10 +11,11 @@ export async function getAdminDashboard(): Promise<AdminDashboard> {
   return {
     totalEmployers:       n(raw.totalEmployers),
     activeEmployers:      n(raw.activeEmployers),
+    pendingEmployers:     n(raw.pendingEmployers),
     totalEmployees:       n(raw.totalEmployees),
     activeEmployees:      n(raw.activeEmployees),
     pendingKycDocuments:  n(raw.pendingKycDocuments ?? raw.pendingKyc),
-    pendingBankAccounts:  n(raw.pendingBankAccounts ?? raw.pendingBanks),
+    pendingBankAccounts:  n(raw.pendingBankVerification ?? raw.pendingBankAccounts ?? raw.pendingBanks),
     pendingSalaryRequests:n(raw.pendingSalaryRequests ?? raw.pendingRequests),
     pendingDisbursals:    n(raw.pendingDisbursals),
     disbursedAmount:      n(raw.disbursedAmount ?? raw.totalDisbursed),
@@ -37,9 +38,13 @@ export async function getRevenueSummary(): Promise<RevenueSummary> {
   const data: Record<string, unknown> = (raw.data && typeof raw.data === "object")
     ? (raw.data as Record<string, unknown>)
     : raw;
+  const n = (value: unknown): number => {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
   return {
-    membershipRevenue: data.membershipRevenue ?? data.membership_revenue ?? 0,
-    interestRevenue:   data.interestRevenue   ?? data.interest_revenue   ?? 0,
-    totalRevenue:      data.totalRevenue      ?? data.total_revenue      ?? 0,
+    membershipRevenue: n(data.membershipRevenue ?? data.membership_revenue),
+    interestRevenue:   n(data.interestRevenue   ?? data.interest_revenue),
+    totalRevenue:      n(data.totalRevenue      ?? data.total_revenue),
   };
 }

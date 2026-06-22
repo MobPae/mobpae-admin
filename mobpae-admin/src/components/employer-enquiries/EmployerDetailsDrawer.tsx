@@ -1,4 +1,10 @@
-import { X, Building2, CheckCircle2 } from "lucide-react";
+import { useEscKey } from "../../lib/useEscKey";
+import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { Ban, Building2, CheckCircle2, Loader2, Phone, X } from "lucide-react";
+import { getApiErrorMessage } from "../../utils/api-errors";
+import { updateEnquiryStatus } from "../../services/employerEnquiryService";
 import type { EmployerEnquiry } from "../../types/employer-enquiry";
 
 interface Props {
@@ -9,18 +15,49 @@ interface Props {
 }
 
 const STATUS_CONFIG: Record<string, { cls: string; label: string }> = {
-  NEW:       { cls: "bg-amber-50 text-amber-700",     label: "New"       },
-  CONTACTED: { cls: "bg-blue-50 text-blue-700",       label: "Contacted" },
-  APPROVED:  { cls: "bg-emerald-50 text-emerald-700", label: "Onboarded" },
-  ONBOARDED: { cls: "bg-emerald-50 text-emerald-700", label: "Onboarded" },
-  REJECTED:  { cls: "bg-red-50 text-red-600",         label: "Rejected"  },
+  NEW:       { cls: "bg-amber-50 text-amber-700", label: "New" },
+  CONTACTED: { cls: "bg-[#E7F1FC] text-[#185FA5]", label: "Contacted" },
+  APPROVED:  { cls: "bg-[#EBF6E3] text-[#3B6D11]", label: "Onboarded" },
+  ONBOARDED: { cls: "bg-[#EBF6E3] text-[#3B6D11]", label: "Onboarded" },
+  REJECTED:  { cls: "bg-red-50 text-red-600", label: "Rejected" },
 };
 
 export default function EmployerDetailsDrawer({ open, onClose, employer, onCreateEmployer }: Props) {
+  useEscKey(open, onClose);
+  const qc = useQueryClient();
+  const [rejectMode, setRejectMode] = useState(false);
+  const [rejectRemarks, setRejectRemarks] = useState("");
+
+  const statusMutation = useMutation({
+    mutationFn: ({ status, remarks }: { status: string; remarks?: string }) =>
+      updateEnquiryStatus(employer!.id, status as EmployerEnquiry["status"], remarks),
+    onSuccess: (_data, vars) => {
+      const labels: Record<string, string> = {
+        CONTACTED: "marked as contacted",
+        REJECTED:  "rejected",
+        ONBOARDED: "marked as onboarded",
+      };
+      toast.success(`Lead ${labels[vars.status] ?? "updated"}`, {
+        description: employer?.companyName,
+      });
+      void qc.invalidateQueries({ queryKey: ["employer-enquiries"] });
+      setRejectMode(false);
+      setRejectRemarks("");
+      onClose();
+    },
+    onError: (err: unknown) => {
+      toast.error("Update failed", { description: getApiErrorMessage(err) });
+    },
+  });
+
   if (!open || !employer) return null;
 
-  const statusCfg = STATUS_CONFIG[employer.status] ?? { cls: "bg-slate-100 text-slate-500", label: employer.status };
+  const statusCfg = STATUS_CONFIG[employer.status] ?? { cls: "bg-[#F0F0F8] text-[#62657A]", label: employer.status };
   const isOnboarded = employer.status === "ONBOARDED" || employer.status === "APPROVED";
+  const isRejected  = employer.status === "REJECTED";
+  const canContact  = employer.status === "NEW";
+  const canReject   = employer.status === "NEW" || employer.status === "CONTACTED";
+  const isBusy      = statusMutation.isPending;
 
   return (
     <>
@@ -28,26 +65,26 @@ export default function EmployerDetailsDrawer({ open, onClose, employer, onCreat
       <div className="fixed inset-0 bg-black/20 z-40" onClick={onClose} />
 
       {/* Drawer */}
-      <div className="fixed top-0 right-0 h-full w-[440px] bg-white z-50 flex flex-col border-l border-slate-200 shadow-xl">
+      <div className="fixed top-0 right-0 h-full w-[440px] bg-white z-50 flex flex-col border-l border-[#E4E4EF] shadow-xl">
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 flex-shrink-0">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E4E4EF] flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-slate-700 to-slate-900 text-white flex items-center justify-center text-[12px] font-[600]">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#191A2E] to-[#2A2C45] text-white flex items-center justify-center text-[12px] font-[600]">
               {employer.companyName.charAt(0).toUpperCase()}
             </div>
             <div>
-              <p className="text-[13px] font-[500] text-slate-900 leading-none">{employer.companyName}</p>
-              <p className="text-[11px] text-slate-400 mt-0.5 leading-none">{employer.email}</p>
+              <p className="text-[13px] font-[500] text-[#191A2E] leading-none">{employer.companyName}</p>
+              <p className="text-[11px] text-[#62657A] mt-0.5 leading-none">{employer.email}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <span className={`inline-flex h-[18px] px-1.5 rounded-[3px] items-center text-[10px] font-[500] ${statusCfg.cls}`}>
+            <span className={`inline-flex h-[18px] px-1.5 rounded-[3px] items-center text-[11px] font-[500] ${statusCfg.cls}`}>
               {statusCfg.label}
             </span>
             <button
               onClick={onClose}
-              className="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+              className="w-6 h-6 rounded-md flex items-center justify-center text-[#62657A] hover:text-[#62657A] hover:bg-[#F0F0F8] transition-colors"
             >
               <X size={14} />
             </button>
@@ -56,12 +93,12 @@ export default function EmployerDetailsDrawer({ open, onClose, employer, onCreat
 
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
-          {/* Company details */}
+          {/* Lead details */}
           <section>
-            <p className="text-[10px] font-[500] uppercase tracking-[0.07em] text-slate-400 mb-2">
+            <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-[#62657A] mb-2">
               Lead details
             </p>
-            <div className="border border-slate-100 rounded-lg divide-y divide-slate-100">
+            <div className="border border-[#E4E4EF] rounded-lg divide-y divide-[#E4E4EF]">
               {[
                 { k: "Contact person", v: employer.contactPerson },
                 { k: "Email",          v: employer.email         },
@@ -71,46 +108,125 @@ export default function EmployerDetailsDrawer({ open, onClose, employer, onCreat
                 ...(employer.remarks ? [{ k: "Remarks", v: employer.remarks }] : []),
               ].map(({ k, v }) => (
                 <div key={k} className="flex items-center justify-between px-3 py-2.5">
-                  <span className="text-[11px] text-slate-400">{k}</span>
-                  <span className="text-[11px] font-[500] text-slate-800 text-right max-w-[60%] truncate">{v}</span>
+                  <span className="text-[11px] text-[#62657A]">{k}</span>
+                  <span className="text-[11px] font-[500] text-[#191A2E] text-right max-w-[60%] truncate">{String(v)}</span>
                 </div>
               ))}
             </div>
           </section>
 
-          {/* Status note */}
-          {isOnboarded ? (
-            <div className="rounded-lg bg-emerald-50 border border-emerald-100 px-4 py-3 flex items-start gap-3">
-              <CheckCircle2 size={15} className="text-emerald-600 flex-shrink-0 mt-0.5" />
-              <p className="text-[11px] text-emerald-700 leading-relaxed">
+          {/* Status info */}
+          {isOnboarded && (
+            <div className="rounded-lg bg-[#ECEBFF] border border-[#ECEBFF] px-4 py-3 flex items-start gap-3">
+              <CheckCircle2 size={15} className="text-[#7679FF] flex-shrink-0 mt-0.5" />
+              <p className="text-[11px] text-[#5659D9] leading-relaxed">
                 This company has been onboarded. Their employer account is active in the{" "}
                 <span className="font-[600]">Employers</span> module.
               </p>
             </div>
-          ) : (
-            <div className="rounded-lg bg-slate-50 border border-slate-100 px-4 py-3">
-              <p className="text-[11px] text-slate-500 leading-relaxed">
-                Create an employer account using the lead details above. The form will be pre-filled for you.
+          )}
+
+          {isRejected && (
+            <div className="rounded-lg bg-red-50 border border-red-100 px-4 py-3 flex items-start gap-3">
+              <Ban size={15} className="text-red-500 flex-shrink-0 mt-0.5" />
+              <p className="text-[11px] text-red-600 leading-relaxed">
+                This enquiry has been rejected.
+              </p>
+            </div>
+          )}
+
+          {/* Reject inline form */}
+          {rejectMode && (
+            <div className="rounded-lg bg-red-50 border border-red-100 px-4 py-4 space-y-3">
+              <p className="text-[12px] font-[600] text-red-800">Reject this enquiry</p>
+              <textarea
+                value={rejectRemarks}
+                onChange={e => setRejectRemarks(e.target.value)}
+                placeholder="Reason for rejection (optional)…"
+                rows={3}
+                className="w-full px-3 py-2 text-[12px] bg-white border border-red-200 rounded-lg text-[#191A2E] placeholder-[#B7B9C7] focus:outline-none focus:border-red-400 resize-none transition"
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={() => statusMutation.mutate({ status: "REJECTED", remarks: rejectRemarks || undefined })}
+                  disabled={isBusy}
+                  className="flex-1 h-8 rounded-md bg-red-600 hover:bg-red-700 text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 disabled:opacity-50 transition-colors"
+                >
+                  {isBusy ? <Loader2 size={12} className="animate-spin" /> : <Ban size={12} />}
+                  {isBusy ? "Rejecting…" : "Confirm Reject"}
+                </button>
+                <button
+                  onClick={() => { setRejectMode(false); setRejectRemarks(""); }}
+                  disabled={isBusy}
+                  className="px-3 h-8 rounded-md border border-[#E4E4EF] text-[12px] text-[#62657A] hover:bg-[#F7F7FB] disabled:opacity-50 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Action hints for actionable states */}
+          {!isOnboarded && !isRejected && !rejectMode && (
+            <div className="rounded-lg bg-[#F7F7FB] border border-[#E4E4EF] px-4 py-3">
+              <p className="text-[11px] text-[#62657A] leading-relaxed">
+                {employer.status === "CONTACTED"
+                  ? "Lead has been contacted. Create an employer account to onboard them."
+                  : "Create an employer account using the lead details above. The form will be pre-filled for you."}
               </p>
             </div>
           )}
         </div>
 
-        {/* Footer */}
-        <div className="border-t border-slate-100 px-5 py-3.5 flex-shrink-0">
+        {/* Footer actions */}
+        <div className="border-t border-[#E4E4EF] px-5 py-3.5 flex-shrink-0 space-y-2">
           {isOnboarded ? (
-            <div className="flex items-center justify-center gap-2 h-8 text-[12px] font-[500] text-emerald-600">
+            <div className="flex items-center justify-center gap-2 h-8 text-[12px] font-[500] text-[#7679FF]">
               <CheckCircle2 size={13} />
               Onboarding complete
             </div>
+          ) : isRejected ? (
+            <div className="flex items-center justify-center gap-2 h-8 text-[12px] font-[500] text-[#62657A]">
+              <Ban size={13} />
+              Enquiry rejected
+            </div>
           ) : (
-            <button
-              onClick={() => { onClose(); onCreateEmployer(employer); }}
-              className="w-full h-8 rounded-md bg-slate-900 hover:bg-slate-800 text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors"
-            >
-              <Building2 size={13} />
-              Create Employer
-            </button>
+            <>
+              {/* Primary: Create Employer */}
+              <button
+                onClick={() => { onClose(); onCreateEmployer(employer); }}
+                className="w-full h-8 rounded-md bg-[#191A2E] hover:bg-[#191A2E] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors"
+              >
+                <Building2 size={13} />
+                Create Employer
+              </button>
+
+              {/* Secondary row */}
+              <div className="flex gap-2">
+                {canContact && (
+                  <button
+                    onClick={() => statusMutation.mutate({ status: "CONTACTED" })}
+                    disabled={isBusy}
+                    className="flex-1 h-7 rounded-md border border-[#E4E4EF] text-[11px] font-[500] text-[#7679FF] hover:bg-[#ECEBFF] flex items-center justify-center gap-1.5 disabled:opacity-50 transition-colors"
+                  >
+                    {isBusy && statusMutation.variables?.status === "CONTACTED"
+                      ? <Loader2 size={11} className="animate-spin" />
+                      : <Phone size={11} />}
+                    Mark Contacted
+                  </button>
+                )}
+                {canReject && !rejectMode && (
+                  <button
+                    onClick={() => setRejectMode(true)}
+                    disabled={isBusy}
+                    className="flex-1 h-7 rounded-md border border-red-100 text-[11px] font-[500] text-red-500 hover:bg-red-50 flex items-center justify-center gap-1.5 disabled:opacity-50 transition-colors"
+                  >
+                    <Ban size={11} />
+                    Reject
+                  </button>
+                )}
+              </div>
+            </>
           )}
         </div>
       </div>

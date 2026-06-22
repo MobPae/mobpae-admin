@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  mobpae-logo-color.svg  —  Full logo, colour version
+  Emerald symbol + emerald wordmark on transparent background.
+  For light / white surfaces.
+
+  Master viewBox: 500 × 290
+  Icon: 2× scale, centred at x=250
+  Wordmark: DM Sans 700, font-size 88, letter-spacing 5, baseline y=272
+
+  NOTE: Text uses DM Sans. Open in Inkscape / Illustrator and
+        convert text to outlines (Path › Object to Path) before
+        exporting final production assets.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 290" role="img" aria-label="MobPae logo">
+  <title>MobPae</title>
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@700&amp;display=swap');
+    </style>
+  </defs>
+
+  <!--
+    Icon group
+    Native icon coords: x=11–83, y=9–85 (outer stroke edges: ~5–89, 3–91)
+    Scale 2.0 → icon outer: 10–178 wide (168 px), 6–182 tall (176 px)
+    Translate so icon is horizontally centred at x=250:
+      x_offset = 250 − (11 + 72/2) × 2 = 250 − 94 = 156
+      y_offset = 8  (top padding)
+  -->
+  <g transform="translate(156 8) scale(2)">
+    <rect x="11" y="9" width="72" height="76" rx="15.5" ry="15.5"
+          fill="none" stroke="#0F8F72" stroke-width="12" stroke-linejoin="round"/>
+    <rect x="26" y="55" width="10" height="14" rx="2.5" fill="#0F8F72"/>
+    <rect x="42" y="47" width="10" height="22" rx="2.5" fill="#0F8F72"/>
+    <rect x="58" y="37" width="10" height="32" rx="2.5" fill="#0F8F72"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text
+    x="250" y="272"
+    font-family="'DM Sans', 'Montserrat', ui-sans-serif, system-ui, sans-serif"
+    font-weight="700"
+    font-size="88"
+    letter-spacing="5"
+    text-anchor="middle"
+    fill="#0F8F72">MOBPAE</text>
+</svg>

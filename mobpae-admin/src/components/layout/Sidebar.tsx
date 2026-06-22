@@ -74,22 +74,28 @@ export default function Sidebar() {
   return (
     <aside
       className="w-[228px] h-screen flex flex-col flex-shrink-0"
-      style={{ background: "linear-gradient(180deg, #022c22 0%, #065f46 45%, #047857 100%)" }}
+      style={{ background: "#F0F0F8", borderRight: "1px solid #E4E4EF" }}
     >
       {/* Logo */}
-      <div className="h-[52px] flex items-center px-5 gap-3 border-b border-white/10">
-        <div className="w-[24px] h-[24px] rounded-[6px] bg-white/20 flex items-center justify-center text-white text-[11px] font-[700]">
-          M
-        </div>
-        <span className="text-[13px] font-[600] text-white tracking-tight">MobPae</span>
-        <span className="text-[10px] text-white/35 mt-px">admin</span>
+      <div className="h-[52px] flex items-center px-5 gap-2.5" style={{ borderBottom: "1px solid #E4E4EF" }}>
+        <svg width="26" height="26" viewBox="0 0 100 100" fill="none" aria-hidden="true" style={{flexShrink:0}}>
+          <defs><clipPath id="sb-clip"><rect width="100" height="100" rx="20" ry="20"/></clipPath></defs>
+          <rect width="100" height="100" rx="20" ry="20" fill="#7679FF"/>
+          <g clipPath="url(#sb-clip)">
+            <polygon points="6,100 18,100 68,0 56,0" fill="white" opacity="0.95"/>
+            <polygon points="30,100 42,100 92,0 80,0" fill="white" opacity="0.95"/>
+            <polygon points="54,100 66,100 100,32 100,8" fill="white" opacity="0.95"/>
+          </g>
+        </svg>
+        <span className="text-[13px] font-[700] tracking-[-0.02em]" style={{ color: "#191A2E" }}>MobPae</span>
+        <span className="text-[11px] mt-px font-[600] uppercase" style={{ color: "#8D90A3", letterSpacing: "0.06em" }}>admin</span>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-5">
         {SECTIONS.map((section) => (
           <div key={section.title}>
-            <p className="text-[10px] font-[700] uppercase tracking-[0.1em] text-white/35 px-2.5 mb-1.5">
+            <p className="text-[11px] font-[700] uppercase px-2.5 mb-1.5" style={{ letterSpacing: "0.08em", color: "#AEAEB2" }}>
               {section.title}
             </p>
             <div className="space-y-0.5">
@@ -98,16 +104,20 @@ export default function Sidebar() {
                   key={to}
                   to={to}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 px-2.5 py-[7px] rounded-md text-[12.5px] transition-colors ${
+                    `flex items-center gap-3 px-2.5 py-[7px] rounded-lg text-[12.5px] font-[500] transition-colors ${
                       isActive
-                        ? "bg-white/15 text-white font-[600]"
-                        : "text-white/55 hover:text-white hover:bg-white/10"
+                        ? "font-[600]"
+                        : "hover:bg-black/[0.05]"
                     }`
+                  }
+                  style={({ isActive }) => isActive
+                    ? { background: "rgba(118,121,255,0.12)", color: "#5659D9" }
+                    : { color: "#62657A" }
                   }
                 >
                   {({ isActive }) => (
                     <>
-                      <Icon size={15} className={isActive ? "text-white" : "text-white/40"} />
+                      <Icon size={15} style={{ color: isActive ? "#7679FF" : "#8D90A3" }} />
                       <span className="leading-none">{label}</span>
                     </>
                   )}
@@ -119,14 +129,15 @@ export default function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="px-4 py-4 border-t border-white/10">
+      <div className="px-4 py-4" style={{ borderTop: "1px solid #E4E4EF" }}>
         <div className="flex items-center gap-3">
-          <div className="w-7 h-7 rounded-full bg-white/15 text-white flex items-center justify-center text-[11px] font-[600]">
+          <div className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-[700]"
+            style={{ background: "#7679FF", color: "white" }}>
             A
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[12px] font-[600] text-white leading-none truncate">Admin User</p>
-            <p className="text-[10px] text-white/40 mt-0.5 leading-none">Super Admin</p>
+            <p className="text-[12px] font-[600] leading-none truncate" style={{ color: "#191A2E" }}>Admin User</p>
+            <p className="text-[11px] mt-0.5 leading-none" style={{ color: "#8D90A3" }}>Super Admin</p>
           </div>
         </div>
       </div>

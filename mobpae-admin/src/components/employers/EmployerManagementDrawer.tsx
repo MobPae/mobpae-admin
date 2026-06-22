@@ -1,10 +1,13 @@
+import { useEscKey } from "../../lib/useEscKey";
 import { useState, useEffect } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { X, Ban, CheckCircle2, Loader2, RotateCcw } from "lucide-react";
+import { X, Ban, CheckCircle2, Loader2, RotateCcw, Copy, Mail } from "lucide-react";
 import { getApiErrorMessage } from "../../utils/api-errors";
 import { updateEmployerStatus } from "../../services/employerService";
+import { getSalaryRequestsByEmployer } from "../../services/salaryRequestService";
 import type { Employer } from "../../types/employer";
+import type { SalaryRequest } from "../../types/salary-request";
 
 interface Props {
   open: boolean;
@@ -14,39 +17,70 @@ interface Props {
 }
 
 const STATUS_BADGE: Record<Employer["status"], { cls: string; label: string }> = {
-  ACTIVE:    { cls: "bg-emerald-50 text-emerald-700", label: "Active"     },
-  PENDING:   { cls: "bg-amber-50 text-amber-700",    label: "Pending"    },
-  APPROVED:  { cls: "bg-blue-50 text-blue-700",      label: "Approved"   },
-  REJECTED:  { cls: "bg-red-50 text-red-600",        label: "Rejected"   },
-  INACTIVE:  { cls: "bg-slate-100 text-slate-500",   label: "Inactive"   },
-  SUSPENDED: { cls: "bg-orange-50 text-orange-600",  label: "Suspended"  },
+  ACTIVE:    { cls: "bg-[#EBF6E3] text-[#3B6D11]", label: "Active" },
+  PENDING:   { cls: "bg-amber-50 text-amber-700", label: "Pending" },
+  APPROVED:  { cls: "bg-[#EBF6E3] text-[#3B6D11]", label: "Approved" },
+  REJECTED:  { cls: "bg-red-50 text-red-600", label: "Rejected" },
+  INACTIVE:  { cls: "bg-[#F0F0F8] text-[#62657A]", label: "Inactive" },
+  SUSPENDED: { cls: "bg-[#FEF1E7] text-[#9A4910]", label: "Suspended" },
 };
 
 const RISK_BADGE: Record<Employer["riskStatus"], string> = {
-  GOOD:    "bg-emerald-50 text-emerald-700",
-  WARNING: "bg-amber-50 text-amber-700",
+  GOOD:    "bg-[#EBF6E3] text-[#3B6D11]",
+  WARNING: "bg-[#FEF1E7] text-[#9A4910]",
   BLOCKED: "bg-red-50 text-red-600",
 };
 
+const SR_STATUS: Record<string, { label: string; cls: string }> = {
+  SUBMITTED:            { cls: "bg-amber-50 text-amber-700", label: "Submitted" },
+  EMPLOYER_APPROVED:    { cls: "bg-[#E7F1FC] text-[#185FA5]", label: "Emp. Approved" },
+  EMPLOYER_REJECTED:    { cls: "bg-red-50 text-red-600", label: "Rejected" },
+  READY_FOR_DISBURSAL:  { cls: "bg-lime-50 text-lime-700", label: "Ready" },
+  DISBURSED:            { cls: "bg-[#EBF6E3] text-[#3B6D11]", label: "Disbursed" },
+  REPAYMENT_SCHEDULED:  { cls: "bg-[#FEF1E7] text-[#9A4910]", label: "Repaying" },
+  REPAID:               { cls: "bg-[#D4EDE5] text-[#1A5944]", label: "Repaid" },
+};
+
 export default function EmployerManagementDrawer({ open, onClose, onMutated, employer }: Props) {
-  const [suspendConfirm, setSuspendConfirm] = useState(false);
+  useEscKey(open, onClose);
+  const [suspendConfirm,    setSuspendConfirm]    = useState(false);
+  const [tempPassword,      setTempPassword]      = useState<string | null>(null);
+  const [copiedPassword,    setCopiedPassword]    = useState(false);
 
   useEffect(() => {
-    if (open) setSuspendConfirm(false);
+    if (open) { setSuspendConfirm(false); setTempPassword(null); }
   }, [open, employer?.id]);
+
+  const { data: recentRequests = [], isLoading: reqLoading } = useQuery<SalaryRequest[]>({
+    queryKey: ["salary-requests-employer", employer?.id],
+    queryFn: () => getSalaryRequestsByEmployer(employer!.id, 10),
+    enabled: open && !!employer?.id,
+    staleTime: 60_000,
+  });
 
   const mutation = useMutation({
     mutationFn: (status: Employer["status"]) => updateEmployerStatus(employer!.id, status),
-    onSuccess: (_data, status) => {
+    onSuccess: (data, status) => {
       const labels: Record<Employer["status"], string> = {
         ACTIVE: "activated", INACTIVE: "deactivated", SUSPENDED: "suspended",
         PENDING: "set to pending", APPROVED: "approved", REJECTED: "rejected",
       };
-      toast.success(`Employer ${labels[status]}`, {
-        description: `${employer?.companyName} has been ${labels[status]}.`,
-      });
       onMutated();
-      onClose();
+      // Activation may return credentials the email failed to deliver
+      if (status === "ACTIVE" && data.emailDelivered === false && data.temporaryPassword) {
+        setTempPassword(data.temporaryPassword);
+      } else {
+        if (status === "ACTIVE" && data.emailDelivered) {
+          toast.success("Login credentials emailed successfully", {
+            description: `${employer?.companyName} has been activated.`,
+          });
+        } else {
+          toast.success(`Employer ${labels[status]}`, {
+            description: `${employer?.companyName} has been ${labels[status]}.`,
+          });
+        }
+        onClose();
+      }
     },
     onError: (err: unknown) => {
       toast.error("Action failed", { description: getApiErrorMessage(err) });
@@ -64,25 +98,25 @@ export default function EmployerManagementDrawer({ open, onClose, onMutated, emp
     <>
       <div className="fixed inset-0 bg-black/20 z-40" onClick={onClose} />
 
-      <div className="fixed top-0 right-0 h-full w-[440px] bg-white z-50 flex flex-col border-l border-slate-200 shadow-xl">
+      <div className="fixed top-0 right-0 h-full w-[440px] bg-white z-50 flex flex-col border-l border-[#E4E4EF] shadow-xl">
         {/* Header — same as EmployerDetailsDrawer */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 flex-shrink-0">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E4E4EF] flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-slate-700 to-slate-900 text-white flex items-center justify-center text-[12px] font-[600]">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#191A2E] to-[#2A2C45] text-white flex items-center justify-center text-[12px] font-[600]">
               {employer.companyName.charAt(0).toUpperCase()}
             </div>
             <div>
-              <p className="text-[13px] font-[500] text-slate-900 leading-none">{employer.companyName}</p>
-              <p className="text-[11px] text-slate-400 mt-0.5 leading-none">{employer.email}</p>
+              <p className="text-[13px] font-[500] text-[#191A2E] leading-none">{employer.companyName}</p>
+              <p className="text-[11px] text-[#62657A] mt-0.5 leading-none">{employer.email}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <span className={`inline-flex h-[18px] px-1.5 rounded-[3px] items-center text-[10px] font-[500] ${STATUS_BADGE[employer.status].cls}`}>
+            <span className={`inline-flex h-[18px] px-1.5 rounded-[3px] items-center text-[11px] font-[500] ${STATUS_BADGE[employer.status].cls}`}>
               {STATUS_BADGE[employer.status].label}
             </span>
             <button
               onClick={onClose}
-              className="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+              className="w-6 h-6 rounded-md flex items-center justify-center text-[#62657A] hover:text-[#62657A] hover:bg-[#F0F0F8] transition-colors"
             >
               <X size={14} />
             </button>
@@ -93,18 +127,18 @@ export default function EmployerManagementDrawer({ open, onClose, onMutated, emp
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
           {/* Company details */}
           <section>
-            <p className="text-[10px] font-[500] uppercase tracking-[0.07em] text-slate-400 mb-2">
+            <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-[#62657A] mb-2">
               Company details
             </p>
-            <div className="border border-slate-100 rounded-lg divide-y divide-slate-100">
+            <div className="border border-[#E4E4EF] rounded-lg divide-y divide-[#E4E4EF]">
               {[
                 { k: "Company code", v: <span className="font-mono">{employer.companyCode}</span> },
-                { k: "Risk status",  v: <span className={`inline-flex h-[16px] px-1.5 rounded-[3px] items-center text-[10px] font-[500] ${RISK_BADGE[employer.riskStatus]}`}>{employer.riskStatus}</span> },
+                { k: "Risk status",  v: <span className={`inline-flex h-[16px] px-1.5 rounded-[3px] items-center text-[11px] font-[500] ${RISK_BADGE[employer.riskStatus]}`}>{employer.riskStatus}</span> },
                 { k: "Member since", v: new Date(employer.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) },
               ].map(({ k, v }) => (
                 <div key={k} className="flex items-center justify-between px-3 py-2.5">
-                  <span className="text-[11px] text-slate-400">{k}</span>
-                  <span className="text-[11px] font-[500] text-slate-800">{v}</span>
+                  <span className="text-[11px] text-[#62657A]">{k}</span>
+                  <span className="text-[11px] font-[500] text-[#191A2E]">{v}</span>
                 </div>
               ))}
             </div>
@@ -112,18 +146,18 @@ export default function EmployerManagementDrawer({ open, onClose, onMutated, emp
 
           {/* Contact */}
           <section>
-            <p className="text-[10px] font-[500] uppercase tracking-[0.07em] text-slate-400 mb-2">
+            <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-[#62657A] mb-2">
               Contact information
             </p>
-            <div className="border border-slate-100 rounded-lg divide-y divide-slate-100">
+            <div className="border border-[#E4E4EF] rounded-lg divide-y divide-[#E4E4EF]">
               {[
                 { k: "Contact person", v: employer.contactPerson },
                 { k: "Email",          v: employer.email          },
                 { k: "Phone",          v: employer.phone          },
               ].map(({ k, v }) => (
                 <div key={k} className="flex items-center justify-between px-3 py-2.5">
-                  <span className="text-[11px] text-slate-400">{k}</span>
-                  <span className="text-[11px] font-[500] text-slate-800 truncate max-w-[60%] text-right">{v}</span>
+                  <span className="text-[11px] text-[#62657A]">{k}</span>
+                  <span className="text-[11px] font-[500] text-[#191A2E] truncate max-w-[60%] text-right">{v}</span>
                 </div>
               ))}
             </div>
@@ -131,38 +165,122 @@ export default function EmployerManagementDrawer({ open, onClose, onMutated, emp
 
           {/* Payroll */}
           <section>
-            <p className="text-[10px] font-[500] uppercase tracking-[0.07em] text-slate-400 mb-2">
+            <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-[#62657A] mb-2">
               Payroll configuration
             </p>
-            <div className="border border-slate-100 rounded-lg divide-y divide-slate-100">
+            <div className="border border-[#E4E4EF] rounded-lg divide-y divide-[#E4E4EF]">
               {[
                 { k: "Payroll date", v: `${employer.payrollDate}th of month`         },
                 { k: "Cutoff date",  v: `${employer.payrollCutoffDate}th of month`   },
               ].map(({ k, v }) => (
                 <div key={k} className="flex items-center justify-between px-3 py-2.5">
-                  <span className="text-[11px] text-slate-400">{k}</span>
-                  <span className="text-[11px] font-[500] text-slate-800">{v}</span>
+                  <span className="text-[11px] text-[#62657A]">{k}</span>
+                  <span className="text-[11px] font-[500] text-[#191A2E]">{v}</span>
                 </div>
               ))}
             </div>
           </section>
+
+          {/* Recent salary requests */}
+          <section>
+            <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-[#62657A] mb-2">
+              Recent salary requests
+            </p>
+            {reqLoading ? (
+              <div className="border border-[#E4E4EF] rounded-lg divide-y divide-[#F0F0F8]">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="flex items-center gap-3 px-3 py-2.5">
+                    <div className="h-2 w-24 bg-[#F0F0F8] rounded animate-pulse" />
+                    <div className="h-2 w-16 bg-[#F0F0F8] rounded animate-pulse ml-auto" />
+                    <div className="h-4 w-14 bg-[#F0F0F8] rounded-full animate-pulse" />
+                  </div>
+                ))}
+              </div>
+            ) : recentRequests.length === 0 ? (
+              <div className="border border-[#E4E4EF] rounded-lg px-3 py-4 text-center">
+                <p className="text-[11px] text-[#62657A]">No salary requests found</p>
+              </div>
+            ) : (
+              <div className="border border-[#E4E4EF] rounded-lg divide-y divide-[#F0F0F8]">
+                {recentRequests.map(r => {
+                  const cfg = SR_STATUS[r.status] ?? { label: r.status, cls: "bg-[#F0F0F8] text-[#62657A]" };
+                  return (
+                    <div key={r.id} className="flex items-center gap-3 px-3 py-2.5">
+                      <div className="min-w-0">
+                        <p className="text-[11px] font-[500] text-[#191A2E] truncate">{r.employee?.name ?? "—"}</p>
+                        <p className="text-[11px] text-[#62657A]">{r.employee?.employeeCode ?? ""}</p>
+                      </div>
+                      <div className="ml-auto flex items-center gap-2 flex-shrink-0">
+                        <span className="text-[11px] font-[500] text-[#62657A] tabular-nums">
+                          ₹{Number(r.amount ?? 0).toLocaleString("en-IN")}
+                        </span>
+                        <span className={`inline-flex h-[16px] px-1.5 rounded-[3px] items-center text-[11px] font-[500] ${cfg.cls}`}>
+                          {cfg.label}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </section>
         </div>
 
+        {/* Temp password banner — shown once when email delivery failed */}
+        {tempPassword && (
+          <div className="border-t border-amber-100 bg-amber-50 px-5 py-4 flex-shrink-0 space-y-3">
+            <div className="flex items-start gap-2.5">
+              <Mail size={14} className="text-amber-600 mt-0.5 flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="text-[12px] font-[600] text-amber-800">Email delivery failed</p>
+                <p className="text-[11px] text-amber-700 mt-0.5 leading-relaxed">
+                  Share this temporary password with the employer directly. It will not be shown again.
+                </p>
+              </div>
+            </div>
+            <div className="bg-white border border-amber-200 rounded-lg px-3.5 py-2.5 flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[11px] font-[600] text-[#62657A] uppercase tracking-[0.06em]">Temporary password</p>
+                <p className="text-[13px] font-[600] text-[#191A2E] font-mono mt-0.5 truncate">{tempPassword}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  void navigator.clipboard.writeText(tempPassword);
+                  setCopiedPassword(true);
+                  setTimeout(() => setCopiedPassword(false), 2000);
+                }}
+                title="Copy to clipboard"
+                className="w-7 h-7 rounded-md bg-white border border-[#E4E4EF] flex items-center justify-center flex-shrink-0 transition-colors hover:border-[#E4E4EF]"
+                style={copiedPassword ? { borderColor: "#7679FF", color: "#7679FF" } : { color: "#94a3b8" }}
+              >
+                <Copy size={12} />
+              </button>
+            </div>
+            <button
+              onClick={onClose}
+              className="w-full h-8 rounded-lg bg-[#191A2E] hover:bg-[#191A2E] text-white text-[12px] font-[600] transition-colors"
+            >
+              Done
+            </button>
+          </div>
+        )}
+
         {/* Footer — actions */}
-        {(canActivate || canReactivate || canSuspend) && (
-          <div className="border-t border-slate-100 px-5 py-3.5 flex-shrink-0 space-y-2.5">
+        {!tempPassword && (canActivate || canReactivate || canSuspend) && (
+          <div className="border-t border-[#E4E4EF] px-5 py-3.5 flex-shrink-0 space-y-2.5">
 
             {/* Suspend confirm flow */}
             {canSuspend && suspendConfirm && (
               <div className="space-y-2.5">
-                <p className="text-[12px] text-slate-600">
-                  Suspend <span className="font-[500] text-slate-800">{employer.companyName}</span>? Employees will lose advance access.
+                <p className="text-[12px] text-[#62657A]">
+                  Suspend <span className="font-[500] text-[#191A2E]">{employer.companyName}</span>? Employees will lose advance access.
                 </p>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setSuspendConfirm(false)}
                     disabled={isBusy}
-                    className="flex-1 h-8 rounded-md border border-slate-200 text-[12px] font-[500] text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50"
+                    className="flex-1 h-8 rounded-md border border-[#E4E4EF] text-[12px] font-[500] text-[#62657A] hover:bg-[#F7F7FB] transition-colors disabled:opacity-50"
                   >
                     Cancel
                   </button>
@@ -186,7 +304,7 @@ export default function EmployerManagementDrawer({ open, onClose, onMutated, emp
                   <button
                     onClick={() => mutation.mutate("ACTIVE")}
                     disabled={isBusy}
-                    className="flex-1 h-8 rounded-md bg-slate-900 hover:bg-slate-800 text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
+                    className="flex-1 h-8 rounded-md bg-[#191A2E] hover:bg-[#191A2E] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
                   >
                     {isBusy ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle2 size={12} />}
                     {isBusy ? "Activating…" : "Activate"}
@@ -197,7 +315,7 @@ export default function EmployerManagementDrawer({ open, onClose, onMutated, emp
                   <button
                     onClick={() => mutation.mutate("ACTIVE")}
                     disabled={isBusy}
-                    className="flex-1 h-8 rounded-md bg-slate-900 hover:bg-slate-800 text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
+                    className="flex-1 h-8 rounded-md bg-[#191A2E] hover:bg-[#191A2E] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
                   >
                     {isBusy ? <Loader2 size={12} className="animate-spin" /> : <RotateCcw size={12} />}
                     {isBusy ? "Reactivating…" : "Reactivate"}
@@ -208,7 +326,7 @@ export default function EmployerManagementDrawer({ open, onClose, onMutated, emp
                   <button
                     onClick={() => setSuspendConfirm(true)}
                     disabled={isBusy}
-                    className="h-8 px-3.5 rounded-md border border-slate-200 text-[12px] font-[500] text-slate-500 hover:border-red-200 hover:text-red-600 transition-colors disabled:opacity-50 flex items-center gap-1.5"
+                    className="h-8 px-3.5 rounded-md border border-[#E4E4EF] text-[12px] font-[500] text-[#62657A] hover:border-red-200 hover:text-red-600 transition-colors disabled:opacity-50 flex items-center gap-1.5"
                   >
                     <Ban size={12} />
                     Suspend
