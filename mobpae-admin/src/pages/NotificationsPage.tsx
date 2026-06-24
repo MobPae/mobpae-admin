@@ -30,9 +30,9 @@ function timeAgo(iso: string): string {
 }
 
 const TYPE_CONFIG: Record<NotificationType, { label: string; cls: string }> = {
-  SYSTEM: { label: "System", cls: "bg-[#E7F1FC] text-[#185FA5]" },
+  SYSTEM: { label: "System", cls: "bg-[#DBEAFE] text-[#1D4ED8]" },
   EMAIL:  { label: "Email",  cls: "bg-amber-50 text-amber-700" },
-  SMS:    { label: "SMS",    cls: "bg-[#EBF6E3] text-[#3B6D11]" },
+  SMS:    { label: "SMS",    cls: "bg-[#DCFCE7] text-[#15803D]" },
 };
 
 // ── component ─────────────────────────────────────────────────────────────────
@@ -116,43 +116,43 @@ export default function NotificationsPage() {
 
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-xl bg-[#7679FF]/10 flex items-center justify-center">
-          <Bell size={18} className="text-[#7679FF]" />
+        <div className="w-9 h-9 rounded-xl bg-[#6C4CFF]/10 flex items-center justify-center">
+          <Bell size={18} className="text-[#6C4CFF]" />
         </div>
         <div>
-          <h1 className="text-[16px] font-[700] text-[#191A2E] leading-none">Notifications</h1>
-          <p className="text-[12px] text-[#8D90A3] mt-0.5">Send targeted notifications to employees</p>
+          <h1 className="text-[16px] font-[700] text-[#111827] leading-none">Notifications</h1>
+          <p className="text-[12px] text-[#9CA3AF] mt-0.5">Send targeted notifications to employees</p>
         </div>
       </div>
 
       <div className="grid grid-cols-[420px_1fr] gap-6 items-start">
 
         {/* ── SEND FORM ─────────────────────────────────────────── */}
-        <div className="bg-white rounded-xl border border-[#E4E4EF] shadow-sm p-5 space-y-4">
-          <h2 className="text-[13px] font-[600] text-[#191A2E]">Send notification</h2>
+        <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-5 space-y-4">
+          <h2 className="text-[13px] font-[600] text-[#111827]">Send notification</h2>
 
           {/* Employee picker */}
           <div className="relative">
-            <label className="block text-[11px] font-[600] text-[#62657A] mb-1.5 uppercase tracking-wide">
+            <label className="block text-[11px] font-[600] text-[#6B7280] mb-1.5 uppercase tracking-wide">
               Recipient
             </label>
             {selected ? (
-              <div className="flex items-center justify-between px-3 py-2.5 border border-[#7679FF] rounded-lg bg-[#ECEBFF]/40">
+              <div className="flex items-center justify-between px-3 py-2.5 border border-[#6C4CFF] rounded-lg bg-[#F3F0FF]/40">
                 <div>
-                  <p className="text-[12px] font-[600] text-[#191A2E]">{selected.name}</p>
-                  <p className="text-[11px] text-[#8D90A3]">{selected.email} · {selected.employeeCode}</p>
+                  <p className="text-[12px] font-[600] text-[#111827]">{selected.name}</p>
+                  <p className="text-[11px] text-[#9CA3AF]">{selected.email} · {selected.employeeCode}</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => { setSelected(null); setSearch(""); }}
-                  className="text-[11px] text-[#8D90A3] hover:text-red-500 transition-colors"
+                  className="text-[11px] text-[#9CA3AF] hover:text-red-500 transition-colors"
                 >
                   Change
                 </button>
               </div>
             ) : (
               <div className="relative">
-                <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8D90A3]" />
+                <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9CA3AF]" />
                 <input
                   type="text"
                   value={search}
@@ -160,19 +160,19 @@ export default function NotificationsPage() {
                   onFocus={() => setShowDrop(true)}
                   onBlur={() => setTimeout(() => setShowDrop(false), 150)}
                   onChange={e => { setSearch(e.target.value); setShowDrop(true); }}
-                  className="w-full h-9 pl-8 pr-3 border border-[#E4E4EF] rounded-lg text-[12px] text-[#191A2E] placeholder-[#B7B9C7] focus:outline-none focus:border-[#7679FF] focus:ring-1 focus:ring-[#7679FF]/20"
+                  className="w-full h-9 pl-8 pr-3 border border-[#E5E7EB] rounded-lg text-[12px] text-[#111827] placeholder-[#D1D5DB] focus:outline-none focus:border-[#6C4CFF] focus:ring-1 focus:ring-[#6C4CFF]/20"
                 />
                 {showDrop && filtered.length > 0 && (
-                  <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-white border border-[#E4E4EF] rounded-lg shadow-lg overflow-hidden">
+                  <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-white border border-[#E5E7EB] rounded-lg shadow-lg overflow-hidden">
                     {filtered.map(emp => (
                       <button
                         key={emp.id}
                         type="button"
                         onMouseDown={() => { setSelected(emp); setSearch(""); setShowDrop(false); }}
-                        className="w-full text-left px-3 py-2 hover:bg-[#F7F7FB] transition-colors"
+                        className="w-full text-left px-3 py-2 hover:bg-[#F8F9FC] transition-colors"
                       >
-                        <p className="text-[12px] font-[500] text-[#191A2E]">{emp.name}</p>
-                        <p className="text-[11px] text-[#8D90A3]">{emp.email} · {emp.employeeCode}</p>
+                        <p className="text-[12px] font-[500] text-[#111827]">{emp.name}</p>
+                        <p className="text-[11px] text-[#9CA3AF]">{emp.email} · {emp.employeeCode}</p>
                         {!emp.userId && (
                           <p className="text-[10px] text-red-400 mt-0.5">No user account — cannot send</p>
                         )}
@@ -186,7 +186,7 @@ export default function NotificationsPage() {
 
           {/* Type */}
           <div>
-            <label className="block text-[11px] font-[600] text-[#62657A] mb-1.5 uppercase tracking-wide">
+            <label className="block text-[11px] font-[600] text-[#6B7280] mb-1.5 uppercase tracking-wide">
               Type
             </label>
             <div className="flex gap-2">
@@ -197,8 +197,8 @@ export default function NotificationsPage() {
                   onClick={() => setType(t)}
                   className={`flex-1 h-8 rounded-lg border text-[11px] font-[600] transition-all ${
                     type === t
-                      ? "border-[#7679FF] bg-[#ECEBFF] text-[#5659D9]"
-                      : "border-[#E4E4EF] text-[#62657A] hover:border-[#7679FF]/40"
+                      ? "border-[#6C4CFF] bg-[#F3F0FF] text-[#5B34FF]"
+                      : "border-[#E5E7EB] text-[#6B7280] hover:border-[#6C4CFF]/40"
                   }`}
                 >
                   {TYPE_CONFIG[t].label}
@@ -209,7 +209,7 @@ export default function NotificationsPage() {
 
           {/* Title */}
           <div>
-            <label className="block text-[11px] font-[600] text-[#62657A] mb-1.5 uppercase tracking-wide">
+            <label className="block text-[11px] font-[600] text-[#6B7280] mb-1.5 uppercase tracking-wide">
               Title
             </label>
             <input
@@ -218,14 +218,14 @@ export default function NotificationsPage() {
               onChange={e => setTitle(e.target.value)}
               placeholder="e.g. Your advance has been approved"
               maxLength={120}
-              className="w-full h-9 px-3 border border-[#E4E4EF] rounded-lg text-[12px] text-[#191A2E] placeholder-[#B7B9C7] focus:outline-none focus:border-[#7679FF] focus:ring-1 focus:ring-[#7679FF]/20"
+              className="w-full h-9 px-3 border border-[#E5E7EB] rounded-lg text-[12px] text-[#111827] placeholder-[#D1D5DB] focus:outline-none focus:border-[#6C4CFF] focus:ring-1 focus:ring-[#6C4CFF]/20"
             />
-            <p className="text-[10px] text-[#B7B9C7] mt-1 text-right">{title.length}/120</p>
+            <p className="text-[10px] text-[#D1D5DB] mt-1 text-right">{title.length}/120</p>
           </div>
 
           {/* Message */}
           <div>
-            <label className="block text-[11px] font-[600] text-[#62657A] mb-1.5 uppercase tracking-wide">
+            <label className="block text-[11px] font-[600] text-[#6B7280] mb-1.5 uppercase tracking-wide">
               Message
             </label>
             <textarea
@@ -234,9 +234,9 @@ export default function NotificationsPage() {
               placeholder="Write your notification message here…"
               rows={4}
               maxLength={500}
-              className="w-full px-3 py-2.5 border border-[#E4E4EF] rounded-lg text-[12px] text-[#191A2E] placeholder-[#B7B9C7] focus:outline-none focus:border-[#7679FF] focus:ring-1 focus:ring-[#7679FF]/20 resize-none"
+              className="w-full px-3 py-2.5 border border-[#E5E7EB] rounded-lg text-[12px] text-[#111827] placeholder-[#D1D5DB] focus:outline-none focus:border-[#6C4CFF] focus:ring-1 focus:ring-[#6C4CFF]/20 resize-none"
             />
-            <p className="text-[10px] text-[#B7B9C7] mt-1 text-right">{message.length}/500</p>
+            <p className="text-[10px] text-[#D1D5DB] mt-1 text-right">{message.length}/500</p>
           </div>
 
           {/* Send button */}
@@ -244,7 +244,7 @@ export default function NotificationsPage() {
             type="button"
             onClick={handleSend}
             disabled={!canSend}
-            className="w-full h-9 rounded-lg bg-[#7679FF] hover:bg-[#5659D9] text-white text-[12px] font-[600] flex items-center justify-center gap-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-full h-9 rounded-lg bg-[#6C4CFF] hover:bg-[#5B34FF] text-white text-[12px] font-[600] flex items-center justify-center gap-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {mutation.isPending ? (
               <Loader2 size={13} className="animate-spin" />
@@ -262,26 +262,26 @@ export default function NotificationsPage() {
         </div>
 
         {/* ── NOTIFICATIONS LOG ─────────────────────────────────── */}
-        <div className="bg-white rounded-xl border border-[#E4E4EF] shadow-sm overflow-hidden">
-          <div className="px-5 py-3.5 border-b border-[#E4E4EF] flex items-center justify-between">
-            <h2 className="text-[13px] font-[600] text-[#191A2E]">Notification log</h2>
+        <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm overflow-hidden">
+          <div className="px-5 py-3.5 border-b border-[#E5E7EB] flex items-center justify-between">
+            <h2 className="text-[13px] font-[600] text-[#111827]">Notification log</h2>
             {notifData && (
-              <span className="text-[11px] text-[#8D90A3]">{notifData.total} total</span>
+              <span className="text-[11px] text-[#9CA3AF]">{notifData.total} total</span>
             )}
           </div>
 
           {notifLoading ? (
-            <div className="flex items-center justify-center h-48 text-[#B7B9C7]">
+            <div className="flex items-center justify-center h-48 text-[#D1D5DB]">
               <Loader2 size={18} className="animate-spin" />
             </div>
           ) : notifications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-48 gap-2 text-[#B7B9C7]">
+            <div className="flex flex-col items-center justify-center h-48 gap-2 text-[#D1D5DB]">
               <BellOff size={22} />
               <p className="text-[12px]">No notifications sent yet</p>
             </div>
           ) : (
             <>
-              <div className="divide-y divide-[#F0F0F8]">
+              <div className="divide-y divide-[#F3F4F6]">
                 {notifications.map(n => (
                   <div key={n.id} className="px-5 py-3 hover:bg-[#FAFAFA] transition-colors">
                     <div className="flex items-start justify-between gap-3">
@@ -292,10 +292,10 @@ export default function NotificationsPage() {
                               {TYPE_CONFIG[n.type as NotificationType].label}
                             </span>
                           )}
-                          <span className="text-[12px] font-[600] text-[#191A2E] truncate">{n.title}</span>
+                          <span className="text-[12px] font-[600] text-[#111827] truncate">{n.title}</span>
                         </div>
-                        <p className="text-[11px] text-[#62657A] line-clamp-2">{n.message}</p>
-                        <p className="text-[10px] text-[#B7B9C7] mt-1" title={fmtDate(n.createdAt)}>
+                        <p className="text-[11px] text-[#6B7280] line-clamp-2">{n.message}</p>
+                        <p className="text-[10px] text-[#D1D5DB] mt-1" title={fmtDate(n.createdAt)}>
                           {timeAgo(n.createdAt)} · {n.isRead ? "Read" : "Unread"}
                         </p>
                       </div>
@@ -306,22 +306,22 @@ export default function NotificationsPage() {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="px-5 py-3 border-t border-[#E4E4EF] flex items-center justify-between">
-                  <span className="text-[11px] text-[#8D90A3]">
+                <div className="px-5 py-3 border-t border-[#E5E7EB] flex items-center justify-between">
+                  <span className="text-[11px] text-[#9CA3AF]">
                     Page {page} of {totalPages}
                   </span>
                   <div className="flex gap-1.5">
                     <button
                       onClick={() => setPage(p => Math.max(1, p - 1))}
                       disabled={page === 1}
-                      className="w-7 h-7 flex items-center justify-center rounded-md border border-[#E4E4EF] text-[#62657A] hover:bg-[#F7F7FB] disabled:opacity-40 transition-colors"
+                      className="w-7 h-7 flex items-center justify-center rounded-md border border-[#E5E7EB] text-[#6B7280] hover:bg-[#F8F9FC] disabled:opacity-40 transition-colors"
                     >
                       <ChevronLeft size={13} />
                     </button>
                     <button
                       onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                       disabled={page === totalPages}
-                      className="w-7 h-7 flex items-center justify-center rounded-md border border-[#E4E4EF] text-[#62657A] hover:bg-[#F7F7FB] disabled:opacity-40 transition-colors"
+                      className="w-7 h-7 flex items-center justify-center rounded-md border border-[#E5E7EB] text-[#6B7280] hover:bg-[#F8F9FC] disabled:opacity-40 transition-colors"
                     >
                       <ChevronRight size={13} />
                     </button>

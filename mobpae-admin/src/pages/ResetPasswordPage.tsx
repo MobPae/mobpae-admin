@@ -3,8 +3,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { resetPassword } from "../services/authService";
 
-const B  = "#7679FF";
-const BD = "#5659D9";
+const B  = "#6C4CFF";
+const BD = "#5B34FF";
 const CREAM = "#f8fafc";
 
 export default function ResetPasswordPage() {
@@ -72,16 +72,16 @@ export default function ResetPasswordPage() {
                 <rect x="13" y="7" width="3.5" height="12" rx="0.8" fill="white"/>
               </svg>
           </div>
-          <span style={{ fontSize: 15, fontWeight: 700, color: "#191A2E", letterSpacing: "-0.01em" }}>MobPae</span>
+          <span style={{ fontSize: 15, fontWeight: 700, color: "#111827", letterSpacing: "-0.01em" }}>MobPae</span>
         </div>
 
         {done ? (
           <div>
-            <div style={{ width: 48, height: 48, borderRadius: 12, background: "#ECEBFF", border: "1px solid #C8C9FF", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7679FF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <div style={{ width: 48, height: 48, borderRadius: 12, background: "#F3F0FF", border: "1px solid #C8C9FF", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6C4CFF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
             <h2 style={{ fontSize: 26, fontWeight: 800, color: "#111", letterSpacing: "-0.025em", margin: "0 0 10px" }}>Password reset</h2>
-            <p style={{ fontSize: 14, color: "#8D90A3", lineHeight: 1.6, marginBottom: 28 }}>
+            <p style={{ fontSize: 14, color: "#9CA3AF", lineHeight: 1.6, marginBottom: 28 }}>
               Your password has been updated. All active sessions have been invalidated — please sign in again.
             </p>
             <button
@@ -91,7 +91,7 @@ export default function ResetPasswordPage() {
                 background: `linear-gradient(135deg, ${BD} 0%, ${B} 100%)`,
                 color: "white", borderRadius: 10, border: "none",
                 fontSize: 14, fontWeight: 700, cursor: "pointer",
-                boxShadow: "0 4px 16px rgba(118,121,255,0.30)",
+                boxShadow: "0 4px 16px rgba(108,76,255,0.30)",
               }}
             >
               Sign in
@@ -100,7 +100,7 @@ export default function ResetPasswordPage() {
         ) : (
           <div>
             <h2 style={{ fontSize: 28, fontWeight: 800, color: "#111", letterSpacing: "-0.025em", margin: "0 0 10px" }}>Set new password</h2>
-            <p style={{ fontSize: 14, color: "#8D90A3", lineHeight: 1.6, marginBottom: 28 }}>
+            <p style={{ fontSize: 14, color: "#9CA3AF", lineHeight: 1.6, marginBottom: 28 }}>
               Choose a strong password. All active sessions will be signed out.
             </p>
 
@@ -109,7 +109,7 @@ export default function ResetPasswordPage() {
               <div>
                 <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#333", marginBottom: 8 }}>New Password</label>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, background: "white", border: "1.5px solid #e8e0d8", borderRadius: 10, padding: "11px 14px", transition: "border-color 0.15s" }}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8D90A3" strokeWidth="2" strokeLinecap="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                   <input
                     type={showNew ? "text" : "password"} value={newPassword} onChange={e => setNewPassword(e.target.value)}
                     placeholder="Min. 8 characters" required
@@ -117,7 +117,7 @@ export default function ResetPasswordPage() {
                     onFocus={e => { (e.target.closest("div") as HTMLElement).style.borderColor = B; }}
                     onBlur={e  => { (e.target.closest("div") as HTMLElement).style.borderColor = "#e8e0d8"; }}
                   />
-                  <button type="button" onClick={() => setShowNew(v => !v)} style={{ color: "#B7B9C7", background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex" }}>
+                  <button type="button" onClick={() => setShowNew(v => !v)} style={{ color: "#D1D5DB", background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex" }}>
                     {showNew ? <EyeOff size={15} /> : <Eye size={15} />}
                   </button>
                 </div>
@@ -127,7 +127,7 @@ export default function ResetPasswordPage() {
               <div>
                 <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#333", marginBottom: 8 }}>Confirm Password</label>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, background: "white", border: "1.5px solid #e8e0d8", borderRadius: 10, padding: "11px 14px", transition: "border-color 0.15s" }}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8D90A3" strokeWidth="2" strokeLinecap="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                   <input
                     type={showConfirm ? "text" : "password"} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)}
                     placeholder="Repeat new password" required
@@ -135,7 +135,7 @@ export default function ResetPasswordPage() {
                     onFocus={e => { (e.target.closest("div") as HTMLElement).style.borderColor = B; }}
                     onBlur={e  => { (e.target.closest("div") as HTMLElement).style.borderColor = "#e8e0d8"; }}
                   />
-                  <button type="button" onClick={() => setShowConfirm(v => !v)} style={{ color: "#B7B9C7", background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex" }}>
+                  <button type="button" onClick={() => setShowConfirm(v => !v)} style={{ color: "#D1D5DB", background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex" }}>
                     {showConfirm ? <EyeOff size={15} /> : <Eye size={15} />}
                   </button>
                 </div>
@@ -156,7 +156,7 @@ export default function ResetPasswordPage() {
                   fontSize: 14, fontWeight: 700,
                   display: "flex", alignItems: "center", justifyContent: "center",
                   cursor: loading ? "not-allowed" : "pointer",
-                  boxShadow: loading ? "none" : "0 4px 16px rgba(118,121,255,0.30)",
+                  boxShadow: loading ? "none" : "0 4px 16px rgba(108,76,255,0.30)",
                   transition: "all 0.15s",
                 }}
               >

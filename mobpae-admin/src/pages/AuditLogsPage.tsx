@@ -6,43 +6,43 @@ import type { AuditLog } from "../services/auditService";
 
 // ── Action colour mapping ─────────────────────────────────────────────────────
 
-const ACTION_CONFIG: Record<string, { label: string; dot: string; text: string; bg: string }> = {
+const ACTION_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
   // Auth
-  LOGIN_SUCCESS:             { label: "Login", dot: "bg-[#378ADD]", text: "text-[#185FA5]", bg: "bg-[#E7F1FC]" },
-  LOGIN_FAILED:              { label: "Login failed", dot: "bg-red-400", text: "text-red-600", bg: "bg-red-50" },
-  LOGOUT:                    { label: "Logout", dot: "bg-[#8D90A3]", text: "text-[#62657A]", bg: "bg-[#F0F0F8]" },
-  LOGOUT_SUCCESS:            { label: "Logout", dot: "bg-[#8D90A3]", text: "text-[#62657A]", bg: "bg-[#F0F0F8]" },
-  PASSWORD_CHANGED:          { label: "Password changed", dot: "bg-[#4E8A18]", text: "text-[#3B6D11]", bg: "bg-[#EBF6E3]" },
-  PASSWORD_RESET_REQUESTED:  { label: "Reset requested", dot: "bg-amber-400", text: "text-amber-700", bg: "bg-amber-50" },
-  PASSWORD_RESET_SUCCESS:    { label: "Password reset", dot: "bg-[#4E8A18]", text: "text-[#3B6D11]", bg: "bg-[#EBF6E3]" },
+  LOGIN_SUCCESS:             { label: "Login",              color: "#1D4ED8", bg: "#DBEAFE" },
+  LOGIN_FAILED:              { label: "Login failed",       color: "#DC2626", bg: "#FEE2E2" },
+  LOGOUT:                    { label: "Logout",             color: "#6B7280", bg: "#F3F4F6" },
+  LOGOUT_SUCCESS:            { label: "Logout",             color: "#6B7280", bg: "#F3F4F6" },
+  PASSWORD_CHANGED:          { label: "Password changed",   color: "#16A34A", bg: "#DCFCE7" },
+  PASSWORD_RESET_REQUESTED:  { label: "Reset requested",    color: "#D97706", bg: "#FEF3C7" },
+  PASSWORD_RESET_SUCCESS:    { label: "Password reset",     color: "#16A34A", bg: "#DCFCE7" },
   // Employer
-  EMPLOYER_CREATED:          { label: "Employer created", dot: "bg-[#378ADD]", text: "text-[#185FA5]", bg: "bg-[#E7F1FC]" },
-  EMPLOYER_STATUS_UPDATED:   { label: "Employer updated", dot: "bg-[#378ADD]", text: "text-[#185FA5]", bg: "bg-[#E7F1FC]" },
-  EMPLOYER_APPROVED:         { label: "Employer approved", dot: "bg-[#4E8A18]", text: "text-[#3B6D11]", bg: "bg-[#EBF6E3]" },
-  EMPLOYER_REJECTED:         { label: "Employer rejected", dot: "bg-red-400", text: "text-red-600", bg: "bg-red-50" },
+  EMPLOYER_CREATED:          { label: "Employer created",   color: "#1D4ED8", bg: "#DBEAFE" },
+  EMPLOYER_STATUS_UPDATED:   { label: "Employer updated",   color: "#1D4ED8", bg: "#DBEAFE" },
+  EMPLOYER_APPROVED:         { label: "Employer approved",  color: "#16A34A", bg: "#DCFCE7" },
+  EMPLOYER_REJECTED:         { label: "Employer rejected",  color: "#DC2626", bg: "#FEE2E2" },
   // Employee
-  EMPLOYEE_CREATED:          { label: "Employee created", dot: "bg-[#378ADD]", text: "text-[#185FA5]", bg: "bg-[#E7F1FC]" },
-  EMPLOYEE_UPDATED:          { label: "Employee updated", dot: "bg-[#378ADD]", text: "text-[#185FA5]", bg: "bg-[#E7F1FC]" },
+  EMPLOYEE_CREATED:          { label: "Employee created",   color: "#1D4ED8", bg: "#DBEAFE" },
+  EMPLOYEE_UPDATED:          { label: "Employee updated",   color: "#1D4ED8", bg: "#DBEAFE" },
   // KYC / Bank
-  KYC_SUBMITTED:             { label: "KYC submitted", dot: "bg-amber-400", text: "text-amber-700", bg: "bg-amber-50" },
-  KYC_APPROVED:              { label: "KYC approved", dot: "bg-[#4E8A18]", text: "text-[#3B6D11]", bg: "bg-[#EBF6E3]" },
-  KYC_REJECTED:              { label: "KYC rejected", dot: "bg-red-400", text: "text-red-600", bg: "bg-red-50" },
-  BANK_VERIFIED:             { label: "Bank verified", dot: "bg-[#4E8A18]", text: "text-[#3B6D11]", bg: "bg-[#EBF6E3]" },
+  KYC_SUBMITTED:             { label: "KYC submitted",      color: "#D97706", bg: "#FEF3C7" },
+  KYC_APPROVED:              { label: "KYC approved",       color: "#16A34A", bg: "#DCFCE7" },
+  KYC_REJECTED:              { label: "KYC rejected",       color: "#DC2626", bg: "#FEE2E2" },
+  BANK_VERIFIED:             { label: "Bank verified",      color: "#16A34A", bg: "#DCFCE7" },
   // Salary
-  SALARY_REQUEST_CREATED:    { label: "Request created", dot: "bg-amber-400", text: "text-amber-700", bg: "bg-amber-50" },
-  SALARY_REQUEST_APPROVED:   { label: "Request approved", dot: "bg-[#378ADD]", text: "text-[#185FA5]", bg: "bg-[#E7F1FC]" },
-  SALARY_REQUEST_REJECTED:   { label: "Request rejected", dot: "bg-red-400", text: "text-red-600", bg: "bg-red-50" },
-  SALARY_REQUEST_DISBURSED:  { label: "Disbursed", dot: "bg-[#4E8A18]", text: "text-[#3B6D11]", bg: "bg-[#EBF6E3]" },
+  SALARY_REQUEST_CREATED:    { label: "Request created",    color: "#D97706", bg: "#FEF3C7" },
+  SALARY_REQUEST_APPROVED:   { label: "Request approved",   color: "#1D4ED8", bg: "#DBEAFE" },
+  SALARY_REQUEST_REJECTED:   { label: "Request rejected",   color: "#DC2626", bg: "#FEE2E2" },
+  SALARY_REQUEST_DISBURSED:  { label: "Disbursed",          color: "#16A34A", bg: "#DCFCE7" },
   // Disbursal & Repayment
-  DISBURSAL_CREATED:         { label: "Disbursal created", dot: "bg-[#378ADD]", text: "text-[#185FA5]", bg: "bg-[#E7F1FC]" },
-  DISBURSAL_PROCESSED:       { label: "Disbursal processed", dot: "bg-[#4E8A18]", text: "text-[#3B6D11]", bg: "bg-[#EBF6E3]" },
-  REPAYMENT_CREATED:         { label: "Repayment created", dot: "bg-[#D45F18]", text: "text-[#9A4910]", bg: "bg-[#FEF1E7]" },
+  DISBURSAL_CREATED:         { label: "Disbursal created",  color: "#1D4ED8", bg: "#DBEAFE" },
+  DISBURSAL_PROCESSED:       { label: "Disbursal processed",color: "#16A34A", bg: "#DCFCE7" },
+  REPAYMENT_CREATED:         { label: "Repayment created",  color: "#D97706", bg: "#FEF3C7" },
   // Membership
-  MEMBERSHIP_ACTIVATED:      { label: "Membership activated", dot: "bg-[#4E8A18]", text: "text-[#3B6D11]", bg: "bg-[#EBF6E3]" },
-  MEMBERSHIP_EXPIRED:        { label: "Membership expired", dot: "bg-[#D45F18]", text: "text-[#9A4910]", bg: "bg-[#FEF1E7]" },
+  MEMBERSHIP_ACTIVATED:      { label: "Membership activated",color: "#16A34A", bg: "#DCFCE7" },
+  MEMBERSHIP_EXPIRED:        { label: "Membership expired",  color: "#D97706", bg: "#FEF3C7" },
 };
 
-const FALLBACK = { label: "", dot: "bg-[#8D90A3]", text: "text-[#62657A]", bg: "bg-[#F0F0F8]" };
+const FALLBACK = { label: "", color: "#6B7280", bg: "#F3F4F6" };
 
 function actionCfg(action: string) {
   return ACTION_CONFIG[action] ?? {
@@ -81,16 +81,11 @@ function parseUA(ua: string): DeviceInfo {
 function DeviceBadge({ ua }: { ua: string }) {
   const { os, browser, isMobile } = parseUA(ua);
   const Icon = isMobile ? Smartphone : Monitor;
+  const badgeStyle: React.CSSProperties = { display: "inline-flex", alignItems: "center", gap: 4, height: 18, padding: "0 6px", borderRadius: 4, background: "#F3F4F6", color: "#6B7280", fontSize: 11, fontWeight: 500 };
   return (
-    <div className="flex items-center gap-1.5 mt-1.5">
-      <span className="inline-flex items-center gap-1 h-[18px] px-1.5 rounded bg-[#F0F0F8] text-[#62657A] text-[11px] font-[500]">
-        <Icon size={9} />
-        {os}
-      </span>
-      <span className="inline-flex items-center gap-1 h-[18px] px-1.5 rounded bg-[#F0F0F8] text-[#62657A] text-[11px] font-[500]">
-        <Globe size={9} />
-        {browser}
-      </span>
+    <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6 }}>
+      <span style={badgeStyle}><Icon size={9} />{os}</span>
+      <span style={badgeStyle}><Globe size={9} />{browser}</span>
     </div>
   );
 }
@@ -165,78 +160,74 @@ export default function AuditLogsPage() {
     };
   }
 
+  const selectStyle: React.CSSProperties = { height: 40, padding: "0 12px", fontSize: 13, background: "white", border: "1px solid #E5E7EB", borderRadius: 10, outline: "none", color: "#6B7280", fontFamily: "inherit", cursor: "pointer" };
+  const thStyle: React.CSSProperties = { padding: "12px 16px", textAlign: "left", fontSize: 11.5, fontWeight: 600, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.07em", whiteSpace: "nowrap" };
+  const tdStyle: React.CSSProperties = { padding: "12px 16px", verticalAlign: "top" };
+
   return (
-    <div className="px-8 py-6 space-y-5">
+    <div style={{ padding: "28px 32px", fontFamily: "Inter, ui-sans-serif, sans-serif", display: "flex", flexDirection: "column", gap: 20 }}>
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
-          <h1 className="text-[22px] font-[600] text-[#191A2E] tracking-[-0.01em]">Audit Logs</h1>
-          <p className="text-[13px] text-[#62657A] mt-0.5">Full audit trail — auth, employer, employee, salary, disbursal events</p>
+          <h1 style={{ fontSize: 26, fontWeight: 700, color: "#111827", letterSpacing: "-0.025em", margin: 0 }}>Audit Logs</h1>
+          <p style={{ fontSize: 14, color: "#6B7280", marginTop: 6 }}>Full audit trail — auth, employer, employee, salary, disbursal events</p>
         </div>
-        <div className="flex items-center gap-1.5 h-6 px-2.5 rounded-md bg-[#F7F7FB] border border-[#E4E4EF]">
-          <Shield size={11} className="text-[#62657A]" />
-          <span className="text-[11px] text-[#62657A] font-[500]">{total.toLocaleString()} events</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, height: 32, padding: "0 12px", borderRadius: 8, background: "#F8F9FC", border: "1px solid #E5E7EB" }}>
+          <Shield size={12} color="#6B7280" />
+          <span style={{ fontSize: 12, color: "#6B7280", fontWeight: 500 }}>{total.toLocaleString()} events</span>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="flex items-center gap-3 flex-wrap">
-        <div className="relative w-72">
-          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#62657A]" />
+      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+        <div style={{ position: "relative", width: 288 }}>
+          <Search size={13} color="#9CA3AF" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }} />
           <input
             type="text"
             placeholder="Search action, email, entity…"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="h-8 pl-8 pr-4 text-[12px] bg-white border border-[#E4E4EF] rounded-lg outline-none focus:border-[#7679FF] w-full text-[#62657A] placeholder-[#B7B9C7]"
+            style={{ width: "100%", height: 40, paddingLeft: 36, paddingRight: 16, fontSize: 13, background: "white", border: "1px solid #E5E7EB", borderRadius: 10, outline: "none", color: "#111827", fontFamily: "inherit", boxSizing: "border-box" }}
           />
         </div>
-        <select
-          value={actionFilter}
-          onChange={handleFilterChange(setActionFilter)}
-          className="h-8 px-2.5 text-[12px] bg-white border border-[#E4E4EF] rounded-lg outline-none focus:border-[#7679FF] text-[#62657A]"
-        >
+        <select value={actionFilter} onChange={handleFilterChange(setActionFilter)} style={selectStyle}>
           <option value="">All actions</option>
           {ACTIONS.map(a => <option key={a} value={a}>{a.replace(/_/g, " ")}</option>)}
         </select>
-        <select
-          value={entityFilter}
-          onChange={handleFilterChange(setEntityFilter)}
-          className="h-8 px-2.5 text-[12px] bg-white border border-[#E4E4EF] rounded-lg outline-none focus:border-[#7679FF] text-[#62657A]"
-        >
+        <select value={entityFilter} onChange={handleFilterChange(setEntityFilter)} style={selectStyle}>
           <option value="">All entity types</option>
           {ENTITY_TYPES.map(e => <option key={e} value={e}>{e}</option>)}
         </select>
         {(actionFilter || entityFilter || search) && (
           <button
             onClick={() => { setSearch(""); setActionFilter(""); setEntityFilter(""); setPage(1); }}
-            className="h-8 px-3 text-[12px] text-[#62657A] hover:text-[#62657A] border border-[#E4E4EF] rounded-lg bg-white"
+            style={{ height: 40, padding: "0 14px", fontSize: 13, color: "#6B7280", border: "1px solid #E5E7EB", borderRadius: 10, background: "white", cursor: "pointer", fontFamily: "inherit" }}
           >
             Clear filters
           </button>
         )}
       </div>
 
-      {/* Table */}
+      {/* States */}
       {isLoading ? (
-        <div className="bg-white border border-[#E4E4EF] rounded-xl px-6 py-10 text-center">
-          <p className="text-[13px] text-[#62657A]">Loading audit logs…</p>
+        <div style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 20, padding: "40px 24px", textAlign: "center" }}>
+          <p style={{ fontSize: 13, color: "#6B7280" }}>Loading audit logs…</p>
         </div>
       ) : isError ? (
-        <div className="bg-white border border-[#E4E4EF] rounded-xl px-6 py-10 text-center">
-          <p className="text-[13px] text-[#62657A] font-[500]">Could not load audit logs</p>
-          <p className="text-[12px] text-[#62657A] mt-1">Ensure the backend exposes <code className="font-mono text-[11px] bg-[#F0F0F8] px-1 rounded">GET /audit-logs</code> with admin auth.</p>
-          <button type="button" onClick={() => void refetch()} className="mt-3 h-8 px-3 rounded-lg border border-[#E4E4EF] text-[12px] font-[600] text-[#62657A] hover:bg-[#F7F7FB]">Try again</button>
+        <div style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 20, padding: "40px 24px", textAlign: "center" }}>
+          <p style={{ fontSize: 13, fontWeight: 500, color: "#374151", margin: 0 }}>Could not load audit logs</p>
+          <p style={{ fontSize: 12, color: "#6B7280", marginTop: 4 }}>Ensure the backend exposes <code style={{ fontFamily: "ui-monospace, monospace", fontSize: 11, background: "#F3F4F6", padding: "2px 4px", borderRadius: 4 }}>GET /audit-logs</code> with admin auth.</p>
+          <button type="button" onClick={() => void refetch()} style={{ marginTop: 12, height: 36, padding: "0 14px", borderRadius: 10, border: "1px solid #E5E7EB", fontSize: 12, fontWeight: 600, color: "#6B7280", background: "white", cursor: "pointer", fontFamily: "inherit" }}>Try again</button>
         </div>
       ) : rows.length === 0 ? (
-        <div className="bg-white border border-[#E4E4EF] rounded-xl px-6 py-10 text-center">
-          <p className="text-[13px] text-[#62657A] font-[500]">No audit events found</p>
-          <p className="text-[12px] text-[#62657A] mt-1">Events are recorded as admin and user actions occur.</p>
+        <div style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 20, padding: "40px 24px", textAlign: "center" }}>
+          <p style={{ fontSize: 13, fontWeight: 500, color: "#374151", margin: 0 }}>No audit events found</p>
+          <p style={{ fontSize: 12, color: "#6B7280", marginTop: 4 }}>Events are recorded as admin and user actions occur.</p>
         </div>
       ) : (
         <>
-          <div className="bg-white border border-[#E4E4EF] rounded-xl overflow-hidden">
-            <table className="w-full table-fixed">
+          <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", overflow: "hidden" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", fontSize: 13 }}>
               <colgroup>
                 <col style={{ width: "20%" }} />
                 <col style={{ width: "25%" }} />
@@ -246,63 +237,58 @@ export default function AuditLogsPage() {
                 <col style={{ width: "12%" }} />
               </colgroup>
               <thead>
-                <tr className="border-b border-[#E4E4EF] bg-[#F7F7FB]/60">
+                <tr style={{ borderBottom: "1px solid #F3F4F6", background: "#FAFAFA" }}>
                   {["Action", "Performed by", "Entity type", "Entity ID", "Timestamp", "When"].map((h, i) => (
-                    <th key={i} className="px-4 py-2.5 text-left text-[11px] font-[500] uppercase tracking-[0.06em] text-[#62657A]">
-                      {h}
-                    </th>
+                    <th key={i} style={thStyle}>{h}</th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#F0F0F8]">
+              <tbody>
                 {rows.map(log => {
                   const cfg = actionCfg(log.action);
                   const deviceInfo = log.newValue?.deviceInfo as string | undefined;
                   const ipAddress  = log.newValue?.ipAddress as string | undefined;
                   return (
-                    <tr key={log.id} className="hover:bg-[#F7F7FB]/50 transition-colors">
+                    <tr key={log.id} style={{ borderBottom: "1px solid #F9FAFB" }}>
                       {/* Action */}
-                      <td className="px-4 py-3">
-                        <span className={`inline-flex items-center gap-1.5 h-[22px] px-2 rounded-full text-[11px] font-[500] ${cfg.bg} ${cfg.text}`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
+                      <td style={tdStyle}>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 5, height: 22, padding: "0 8px", borderRadius: 999, fontSize: 11, fontWeight: 500, background: cfg.bg, color: cfg.color }}>
+                          <span style={{ width: 6, height: 6, borderRadius: "50%", background: cfg.color, flexShrink: 0 }} />
                           {cfg.label}
                         </span>
                       </td>
                       {/* Performed by + device */}
-                      <td className="px-4 py-3">
+                      <td style={tdStyle}>
                         {log.user ? (
                           <div>
-                            <p className="text-[12px] font-[500] text-[#191A2E] truncate leading-none">{log.user.email}</p>
-                            <p className="text-[11px] text-[#62657A] mt-0.5 font-mono leading-none">{log.user.role}</p>
+                            <p style={{ fontSize: 12, fontWeight: 500, color: "#111827", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{log.user.email}</p>
+                            <p style={{ fontSize: 11, color: "#6B7280", marginTop: 2, fontFamily: "ui-monospace, monospace" }}>{log.user.role}</p>
                             {deviceInfo && <DeviceBadge ua={deviceInfo} />}
                             {ipAddress && !deviceInfo && (
-                              <p className="text-[11px] text-[#62657A] mt-1 font-mono">{ipAddress}</p>
+                              <p style={{ fontSize: 11, color: "#6B7280", marginTop: 4, fontFamily: "ui-monospace, monospace" }}>{ipAddress}</p>
                             )}
                           </div>
                         ) : (
-                          <span className="text-[11px] text-[#62657A]">System</span>
+                          <span style={{ fontSize: 11, color: "#6B7280" }}>System</span>
                         )}
                       </td>
                       {/* Entity type */}
-                      <td className="px-4 py-3">
-                        <span className="text-[11px] text-[#62657A] font-mono">{log.entityType ?? "—"}</span>
+                      <td style={tdStyle}>
+                        <span style={{ fontSize: 11, color: "#6B7280", fontFamily: "ui-monospace, monospace" }}>{log.entityType ?? "—"}</span>
                       </td>
                       {/* Entity ID */}
-                      <td className="px-4 py-3">
-                        <span
-                          className="text-[11px] text-[#62657A] font-mono truncate block cursor-default"
-                          title={log.entityId ?? ""}
-                        >
+                      <td style={tdStyle}>
+                        <span style={{ fontSize: 11, color: "#6B7280", fontFamily: "ui-monospace, monospace", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", cursor: "default" }} title={log.entityId ?? ""}>
                           {log.entityId ? `${log.entityId.slice(0, 8)}…` : "—"}
                         </span>
                       </td>
                       {/* Timestamp */}
-                      <td className="px-4 py-3">
-                        <span className="text-[11px] text-[#62657A]">{formatDate(log.createdAt)}</span>
+                      <td style={tdStyle}>
+                        <span style={{ fontSize: 11, color: "#6B7280" }}>{formatDate(log.createdAt)}</span>
                       </td>
                       {/* Relative */}
-                      <td className="px-4 py-3">
-                        <span className="text-[11px] text-[#62657A]">{timeAgo(log.createdAt)}</span>
+                      <td style={tdStyle}>
+                        <span style={{ fontSize: 11, color: "#6B7280" }}>{timeAgo(log.createdAt)}</span>
                       </td>
                     </tr>
                   );
@@ -313,30 +299,27 @@ export default function AuditLogsPage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between px-1">
-              <p className="text-[11px] text-[#62657A]">
-                Page {page} of {totalPages} &middot; {total.toLocaleString()} total events
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 4px" }}>
+              <p style={{ fontSize: 12, color: "#6B7280", margin: 0 }}>
+                Page {page} of {totalPages} · {total.toLocaleString()} total events
               </p>
-              <div className="flex items-center gap-1">
+              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                 <button
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="w-7 h-7 flex items-center justify-center rounded-md border border-[#E4E4EF] bg-white text-[#62657A] hover:bg-[#F7F7FB] disabled:opacity-30 disabled:cursor-not-allowed"
+                  style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid #E5E7EB", background: "white", color: "#6B7280", cursor: page === 1 ? "not-allowed" : "pointer", opacity: page === 1 ? 0.3 : 1 }}
                 >
                   <ChevronLeft size={13} />
                 </button>
                 {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                   const p = page <= 3 ? i + 1 : page - 2 + i;
                   if (p < 1 || p > totalPages) return null;
+                  const active = p === page;
                   return (
                     <button
                       key={p}
                       onClick={() => setPage(p)}
-                      className={`w-7 h-7 text-[11px] rounded-md border ${
-                        p === page
-                          ? "border-[#7679FF] bg-[#ECEBFF] text-[#7679FF] font-[600]"
-                          : "border-[#E4E4EF] bg-white text-[#62657A] hover:bg-[#F7F7FB]"
-                      }`}
+                      style={{ width: 28, height: 28, fontSize: 12, borderRadius: 8, border: active ? "1px solid #6C4CFF" : "1px solid #E5E7EB", background: active ? "#F3F0FF" : "white", color: active ? "#6C4CFF" : "#6B7280", fontWeight: active ? 600 : 400, cursor: "pointer", fontFamily: "inherit" }}
                     >
                       {p}
                     </button>
@@ -345,7 +328,7 @@ export default function AuditLogsPage() {
                 <button
                   onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  className="w-7 h-7 flex items-center justify-center rounded-md border border-[#E4E4EF] bg-white text-[#62657A] hover:bg-[#F7F7FB] disabled:opacity-30 disabled:cursor-not-allowed"
+                  style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid #E5E7EB", background: "white", color: "#6B7280", cursor: page === totalPages ? "not-allowed" : "pointer", opacity: page === totalPages ? 0.3 : 1 }}
                 >
                   <ChevronRight size={13} />
                 </button>

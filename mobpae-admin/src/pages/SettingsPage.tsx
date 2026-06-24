@@ -59,12 +59,11 @@ function Toggle({ on, loading, onChange }: { on: boolean; loading: boolean; onCh
     <button
       onClick={onChange}
       disabled={loading}
-      style={{ height: "20px", width: "36px" }}
-      className={`relative inline-flex items-center rounded-full transition-colors disabled:opacity-50 flex-shrink-0 ${on ? "bg-[#7679FF]" : "bg-[#E4E4EF]"}`}
+      style={{ position: "relative", display: "inline-flex", alignItems: "center", height: 20, width: 36, borderRadius: 999, background: on ? "#6C4CFF" : "#E5E7EB", border: "none", cursor: "pointer", flexShrink: 0, opacity: loading ? 0.5 : 1, transition: "background 0.2s" }}
     >
       {loading
-        ? <Loader2 size={10} className="absolute inset-0 m-auto text-white animate-spin" />
-        : <span className={`inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform ${on ? "translate-x-[18px]" : "translate-x-[3px]"}`} />
+        ? <Loader2 size={10} style={{ position: "absolute", inset: 0, margin: "auto", color: "white" }} className="animate-spin" />
+        : <span style={{ display: "inline-block", width: 14, height: 14, borderRadius: "50%", background: "white", boxShadow: "0 1px 3px rgba(0,0,0,0.2)", transform: on ? "translateX(18px)" : "translateX(3px)", transition: "transform 0.2s" }} />
       }
     </button>
   );
@@ -74,12 +73,12 @@ function SectionCard({ icon, color, title, children }: {
   icon: React.ReactNode; color: string; title: string; children: React.ReactNode;
 }) {
   return (
-    <div className="bg-white border border-[#E4E4EF] rounded-xl overflow-hidden">
-      <div className="px-5 py-3.5 border-b border-[#E4E4EF] flex items-center gap-2">
-        <div className={`w-6 h-6 rounded-md ${color} flex items-center justify-center`}>{icon}</div>
-        <p className="text-[13px] font-[500] text-[#191A2E]">{title}</p>
+    <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", overflow: "hidden" }}>
+      <div style={{ padding: "12px 20px", borderBottom: "1px solid #E5E7EB", display: "flex", alignItems: "center", gap: 8 }}>
+        <div style={{ width: 26, height: 26, borderRadius: 8, background: color, display: "flex", alignItems: "center", justifyContent: "center" }}>{icon}</div>
+        <p style={{ fontSize: 13, fontWeight: 600, color: "#111827", margin: 0 }}>{title}</p>
       </div>
-      <div className="divide-y divide-[#F0F0F8]">{children}</div>
+      <div>{children}</div>
     </div>
   );
 }
@@ -125,13 +124,13 @@ export default function SettingsPage() {
     const shown         = displayValue(raw, prefix, suffix);
 
     return (
-      <div className="flex items-center justify-between px-5 py-3 group min-h-[44px]">
-        <span className="text-[12px] text-[#62657A]">{label}</span>
-        <div className="flex items-center gap-2">
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", minHeight: 44, borderBottom: "1px solid #F3F4F6" }}>
+        <span style={{ fontSize: 13, color: "#6B7280" }}>{label}</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {isEditingThis ? (
             <>
-              <div className="flex items-center gap-1">
-                {prefix && <span className="text-[12px] text-[#62657A]">{prefix}</span>}
+              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                {prefix && <span style={{ fontSize: 12, color: "#6B7280" }}>{prefix}</span>}
                 <input
                   autoFocus
                   type="text"
@@ -141,32 +140,32 @@ export default function SettingsPage() {
                     if (e.key === "Enter") saveMutation.mutate(editing!);
                     if (e.key === "Escape") setEditing(null);
                   }}
-                  className="w-24 h-7 px-2 text-[12px] font-[500] text-[#191A2E] border border-[#E4E4EF] rounded-md outline-none focus:border-[#7679FF] tabular-nums text-right"
+                  style={{ width: 96, height: 28, padding: "0 8px", fontSize: 12, fontWeight: 500, color: "#111827", border: "1px solid #E5E7EB", borderRadius: 8, outline: "none", textAlign: "right", fontVariantNumeric: "tabular-nums", fontFamily: "inherit" }}
                 />
-                {suffix && <span className="text-[12px] text-[#62657A]">{suffix}</span>}
+                {suffix && <span style={{ fontSize: 12, color: "#6B7280" }}>{suffix}</span>}
               </div>
               <button
                 onClick={() => saveMutation.mutate(editing!)}
                 disabled={isSaving}
-                className="w-6 h-6 rounded-md bg-[#7679FF] text-white flex items-center justify-center hover:bg-[#5659D9] disabled:opacity-50"
+                style={{ width: 24, height: 24, borderRadius: 6, background: "#6C4CFF", color: "white", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", opacity: isSaving ? 0.5 : 1 }}
               >
                 {isSaving ? <Loader2 size={10} className="animate-spin" /> : <Check size={10} />}
               </button>
               <button
                 onClick={() => setEditing(null)}
-                className="w-6 h-6 rounded-md border border-[#E4E4EF] text-[#62657A] flex items-center justify-center hover:bg-[#F7F7FB]"
+                style={{ width: 24, height: 24, borderRadius: 6, background: "white", border: "1px solid #E5E7EB", color: "#6B7280", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
               >
                 <X size={10} />
               </button>
             </>
           ) : (
             <>
-              <span className="text-[12px] font-[600] text-[#191A2E] tabular-nums">
-                {shown ?? <span className="text-[#62657A] font-[400]">Not set</span>}
+              <span style={{ fontSize: 12, fontWeight: 600, color: "#111827", fontVariantNumeric: "tabular-nums" }}>
+                {shown ?? <span style={{ color: "#9CA3AF", fontWeight: 400 }}>Not set</span>}
               </span>
               <button
                 onClick={() => setEditing({ key: k, value: raw })}
-                className="w-5 h-5 rounded flex items-center justify-center text-[#62657A] hover:text-[#7679FF] opacity-40 group-hover:opacity-100 transition-opacity"
+                style={{ width: 20, height: 20, borderRadius: 4, background: "transparent", border: "none", display: "flex", alignItems: "center", justifyContent: "center", color: "#6B7280", cursor: "pointer", opacity: 0.4 }}
               >
                 <Pencil size={10} />
               </button>
@@ -179,8 +178,8 @@ export default function SettingsPage() {
 
   function ToggleRow({ k, label }: { k: string; label: string }) {
     return (
-      <div className="flex items-center justify-between px-5 py-3 min-h-[44px]">
-        <span className="text-[12px] text-[#62657A]">{label}</span>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", minHeight: 44, borderBottom: "1px solid #F3F4F6" }}>
+        <span style={{ fontSize: 13, color: "#6B7280" }}>{label}</span>
         <Toggle
           on={isOn(settings, k)}
           loading={toggling === k && saveMutation.isPending}
@@ -192,38 +191,38 @@ export default function SettingsPage() {
 
   if (isLoading) {
     return (
-      <div className="px-8 py-6">
-        <p className="text-[13px] text-[#62657A]">Loading settings…</p>
+      <div style={{ padding: "28px 32px" }}>
+        <p style={{ fontSize: 13, color: "#6B7280" }}>Loading settings…</p>
       </div>
     );
   }
 
   return (
-    <div className="px-8 py-6 space-y-5">
+    <div style={{ padding: "28px 32px", fontFamily: "Inter, ui-sans-serif, sans-serif", display: "flex", flexDirection: "column", gap: 20 }}>
       <div>
-        <h1 className="text-[22px] font-[600] text-[#191A2E] tracking-[-0.01em]">Settings</h1>
-        <p className="text-[13px] text-[#62657A] mt-0.5">Platform-wide configuration · hover any value to edit</p>
+        <h1 style={{ fontSize: 26, fontWeight: 700, color: "#111827", letterSpacing: "-0.025em", margin: 0 }}>Settings</h1>
+        <p style={{ fontSize: 14, color: "#6B7280", marginTop: 6 }}>Platform-wide configuration · hover any value to edit</p>
       </div>
 
       {/* Salary Advance Rules */}
-      <SectionCard icon={<Settings2 size={13} className="text-[#7679FF]" />} color="bg-[#ECEBFF]" title="Salary advance rules">
+      <SectionCard icon={<Settings2 size={13} color="#6C4CFF" />} color="#F3F0FF" title="Salary advance rules">
         {ADVANCE_RULES.map(r => <EditableRow key={r.key} k={r.key} label={r.label} prefix={r.prefix} suffix={r.suffix} />)}
       </SectionCard>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
         {/* Eligibility Rules */}
-        <SectionCard icon={<ShieldCheck size={13} className="text-red-500" />} color="bg-red-50" title="Eligibility rules">
+        <SectionCard icon={<ShieldCheck size={13} color="#EF4444" />} color="#FEE2E2" title="Eligibility rules">
           {ELIGIBILITY_RULES.map(r => <ToggleRow key={r.key} k={r.key} label={r.label} />)}
         </SectionCard>
 
         {/* Notifications */}
-        <SectionCard icon={<Bell size={13} className="text-[#7679FF]" />} color="bg-[#ECEBFF]" title="Notifications">
+        <SectionCard icon={<Bell size={13} color="#6C4CFF" />} color="#F3F0FF" title="Notifications">
           {NOTIFICATION_RULES.map(r => <ToggleRow key={r.key} k={r.key} label={r.label} />)}
         </SectionCard>
       </div>
 
       {/* Membership & Settlement */}
-      <SectionCard icon={<Coins size={13} className="text-amber-600" />} color="bg-amber-50" title="Membership & settlement">
+      <SectionCard icon={<Coins size={13} color="#D97706" />} color="#FEF3C7" title="Membership & settlement">
         {MEMBERSHIP_RULES.map(r => <EditableRow key={r.key} k={r.key} label={r.label} prefix={r.prefix} suffix={r.suffix} />)}
       </SectionCard>
     </div>

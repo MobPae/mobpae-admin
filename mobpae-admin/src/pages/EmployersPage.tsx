@@ -1,23 +1,23 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, Search } from "lucide-react";
+import { Building2, Download, Filter, Plus, Search, UserCheck, AlertCircle, PauseCircle } from "lucide-react";
 import EmployersTable from "../components/employers/EmployersTable";
 import EmployerManagementDrawer from "../components/employers/EmployerManagementDrawer";
 import CreateEmployerDrawer from "../components/employers/CreateEmployerDrawer";
 import type { Employer, EmployerStatus } from "../types/employer";
 import { getEmployers } from "../services/employerService";
+import { exportToCsv } from "../utils/exportCsv";
 
-const STATUS_CHIPS: { label: string; value: "ALL" | EmployerStatus }[] = [
-  { label: "All", value: "ALL" },
-  { label: "Active", value: "ACTIVE" },
-  { label: "Pending", value: "PENDING" },
+const P = "#6C4CFF";
+
+const STATUS_TABS: { label: string; value: "ALL" | EmployerStatus }[] = [
+  { label: "All",       value: "ALL"       },
+  { label: "Active",    value: "ACTIVE"    },
+  { label: "Pending",   value: "PENDING"   },
   { label: "Suspended", value: "SUSPENDED" },
-  { label: "Inactive", value: "INACTIVE" },
-  { label: "Rejected", value: "REJECTED" },
+  { label: "Inactive",  value: "INACTIVE"  },
+  { label: "Rejected",  value: "REJECTED"  },
 ];
-
-const CHIP_ON = "bg-[#191A2E] text-white border-[#191A2E]";
-const CHIP_OFF = "bg-white border-[#E4E4EF] text-[#62657A] hover:border-[#E4E4EF] hover:text-[#62657A]";
 
 export default function EmployersPage() {
   const queryClient = useQueryClient();
@@ -53,122 +53,137 @@ export default function EmployersPage() {
     return matchSearch && matchStatus;
   });
 
-  const pipeline = [
-    { label: "Active", key: "ACTIVE" as const, color: "bg-[#7679FF]", text: "text-[#7679FF]" },
-    { label: "Pending", key: "PENDING" as const, color: "bg-amber-400", text: "text-amber-600" },
-    { label: "Suspended", key: "SUSPENDED" as const, color: "bg-red-300", text: "text-red-500" },
-    { label: "Rejected", key: "REJECTED" as const, color: "bg-[#D4D5E0]", text: "text-[#62657A]" },
+  const handleExport = () => {
+    exportToCsv(
+      filtered.map(e => ({
+        "Company": e.companyName, "Code": e.companyCode, "Contact": e.contactPerson,
+        "Email": e.email, "Phone": e.phone, "Status": e.status, "Risk": e.riskStatus,
+      })),
+      "employers"
+    );
+  };
+
+  const kpis = [
+    { label: "Total Employers",    value: employers.length, icon: <Building2 size={18} color={P} strokeWidth={1.75} />,        bg: "#F3F0FF" },
+    { label: "Active",             value: counts.ACTIVE,    icon: <UserCheck size={18} color="#16A34A" strokeWidth={1.75} />,   bg: "#DCFCE7" },
+    { label: "Pending Onboarding", value: counts.PENDING,   icon: <AlertCircle size={18} color="#D97706" strokeWidth={1.75} />, bg: "#FEF3C7" },
+    { label: "Suspended",          value: counts.SUSPENDED, icon: <PauseCircle size={18} color="#EF4444" strokeWidth={1.75} />, bg: "#FEE2E2" },
   ];
 
-  const total = employers.length;
-
   return (
-    <div className="p-5 space-y-4">
-      {/* Page header */}
-      <div className="flex items-center justify-between">
+    <div style={{ padding: "28px 32px", fontFamily: "Inter, ui-sans-serif, sans-serif" }}>
+
+      {/* ── Page header ─────────────────────── */}
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28 }}>
         <div>
-          <h1 className="text-[15px] font-[500] text-[#191A2E] leading-none">Employers</h1>
-          <p className="text-[11px] text-[#62657A] mt-1.5">Manage employer accounts</p>
+          <h1 style={{ fontSize: 26, fontWeight: 700, color: "#111827", letterSpacing: "-0.025em", margin: 0 }}>Employers</h1>
+          <p style={{ fontSize: 14, color: "#6B7280", marginTop: 6 }}>Manage and monitor all partner organizations.</p>
         </div>
-        <button
-          onClick={() => setShowCreate(true)}
-          className="h-8 px-3.5 rounded-lg text-white text-[12px] font-[600] flex items-center gap-1.5 transition-colors"
-          style={{ background: "#7679FF" }}
-          onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "#5659D9"; }}
-          onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "#7679FF"; }}
-        >
-          <Plus size={13} />
-          Add Employer
-        </button>
+        <div style={{ display: "flex", gap: 10 }}>
+          <button
+            onClick={handleExport}
+            style={{ height: 40, padding: "0 16px", display: "flex", alignItems: "center", gap: 8, background: "white", border: "1px solid #E5E7EB", borderRadius: 12, fontSize: 13, fontWeight: 500, color: "#374151", cursor: "pointer", fontFamily: "inherit" }}
+          >
+            <Download size={14} />
+            Export
+          </button>
+          <button
+            onClick={() => setShowCreate(true)}
+            style={{ height: 40, padding: "0 16px", display: "flex", alignItems: "center", gap: 8, background: P, border: "none", borderRadius: 12, fontSize: 13, fontWeight: 600, color: "white", cursor: "pointer", fontFamily: "inherit", boxShadow: "0 4px 14px rgba(108,76,255,0.25)" }}
+          >
+            <Plus size={14} />
+            Add Employer
+          </button>
+        </div>
       </div>
 
       {isError && (
-        <div className="bg-red-50 border border-red-100 text-red-600 text-[12px] rounded-lg px-4 py-3 flex items-center justify-between gap-4">
+        <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 12, padding: "12px 16px", marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, color: "#DC2626" }}>
           <span>Could not load employers. Check that the backend is running.</span>
-          <button type="button" onClick={() => void refetch()} className="h-8 px-3 rounded-lg bg-white border border-red-200 font-[600] hover:bg-red-50">Try again</button>
+          <button onClick={() => void refetch()} style={{ padding: "6px 12px", background: "white", border: "1px solid #FECACA", borderRadius: 8, fontSize: 12, fontWeight: 600, color: "#DC2626", cursor: "pointer", fontFamily: "inherit" }}>Try again</button>
         </div>
       )}
 
-      {/* Pipeline strip */}
-      <div className="grid grid-cols-4 gap-3">
-        {pipeline.map(({ label, key, color, text }) => {
-          const count = counts[key];
-          const pct = total > 0 ? Math.round((count / total) * 100) : 0;
-          return (
-            <button
-              key={key}
-              onClick={() => setStatusFilter(statusFilter === key ? "ALL" : key)}
-              className={`bg-white border rounded-lg p-3.5 text-left transition-colors ${
-                statusFilter === key ? "border-[#E4E4EF]" : "border-[#E4E4EF] hover:border-[#E4E4EF]"
-              }`}
-            >
-              <p className="text-[11px] font-[500] uppercase tracking-[0.06em] text-[#62657A] leading-none">
-                {label}
-              </p>
-              <p className={`text-[22px] font-[500] tracking-tight leading-none mt-2.5 ${text} ${
-                isLoading ? "opacity-20 animate-pulse" : ""
-              }`}>
-                {count}
-              </p>
-              <div className="h-[3px] rounded-full bg-[#F0F0F8] mt-2.5">
-                <div className={`h-full rounded-full ${color} transition-all`} style={{ width: `${pct}%` }} />
+      {/* ── KPI cards ───────────────────────── */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 24 }}>
+        {kpis.map((kpi) => (
+          <div key={kpi.label} style={{ background: "white", borderRadius: 16, padding: "14px 16px", border: "1px solid #E5E7EB", boxShadow: "0 1px 4px rgba(17,24,39,0.04)", display: "flex", alignItems: "center", gap: 14 }}>
+            <div style={{ width: 40, height: 40, borderRadius: 12, background: kpi.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              {kpi.icon}
+            </div>
+            <div>
+              <div style={{ fontSize: 22, fontWeight: 700, color: "#111827", letterSpacing: "-0.02em", lineHeight: 1, opacity: isLoading ? 0.3 : 1 }}>
+                {kpi.value}
               </div>
-            </button>
-          );
-        })}
+              <div style={{ fontSize: 12, color: "#6B7280", marginTop: 3, fontWeight: 500 }}>{kpi.label}</div>
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* Filter bar */}
-      <div className="flex items-center gap-3">
-        <div className="relative">
-          <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#62657A]" />
+      {/* ── Filter bar ──────────────────────── */}
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, height: 40, padding: "0 14px", background: "white", border: "1px solid #E5E7EB", borderRadius: 12, minWidth: 240 }}>
+          <Search size={14} style={{ color: "#9CA3AF", flexShrink: 0 }} />
           <input
             type="text"
-            placeholder="Search company, code, contact…"
+            placeholder="Search employers..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="h-8 pl-8 pr-3 w-56 text-[12px] bg-white border border-[#E4E4EF] rounded-md outline-none focus:border-[#7679FF] transition-colors"
+            style={{ flex: 1, fontSize: 13.5, color: "#111827", background: "transparent", outline: "none", border: "none", fontFamily: "inherit" }}
           />
         </div>
-        <div className="flex items-center gap-1.5">
-          {STATUS_CHIPS.map((chip) => (
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+          {STATUS_TABS.map(tab => (
             <button
-              key={chip.value}
-              onClick={() => setStatusFilter(chip.value)}
-              className={`h-7 px-3 rounded-full text-[11px] font-[500] border transition-colors ${
-                statusFilter === chip.value ? CHIP_ON : CHIP_OFF
-              }`}
+              key={tab.value}
+              onClick={() => setStatusFilter(tab.value)}
+              style={{
+                height: 36, padding: "0 14px",
+                background: statusFilter === tab.value ? "#111827" : "white",
+                color: statusFilter === tab.value ? "white" : "#6B7280",
+                border: `1px solid ${statusFilter === tab.value ? "#111827" : "#E5E7EB"}`,
+                borderRadius: 10, fontSize: 13, fontWeight: statusFilter === tab.value ? 600 : 400,
+                cursor: "pointer", fontFamily: "inherit",
+              }}
             >
-              {chip.label}
-              {chip.value !== "ALL" && (
-                <span className="ml-1 opacity-60">· {counts[chip.value as EmployerStatus]}</span>
+              {tab.label}
+              {tab.value !== "ALL" && counts[tab.value as EmployerStatus] !== undefined && (
+                <span style={{ marginLeft: 6, opacity: 0.55, fontSize: 12 }}>
+                  · {counts[tab.value as EmployerStatus]}
+                </span>
               )}
             </button>
           ))}
         </div>
-        <div className="flex-1" />
-        <span className="text-[11px] text-[#62657A]">{filtered.length} result{filtered.length !== 1 ? "s" : ""}</span>
+        <div style={{ flex: 1 }} />
+        <button style={{ display: "flex", alignItems: "center", gap: 6, height: 36, padding: "0 14px", background: "white", border: "1px solid #E5E7EB", borderRadius: 10, fontSize: 13, color: "#6B7280", cursor: "pointer", fontFamily: "inherit" }}>
+          <Filter size={13} />
+          More Filters
+        </button>
+        <span style={{ fontSize: 12, color: "#9CA3AF" }}>{filtered.length} {filtered.length === 1 ? "employer" : "employers"}</span>
       </div>
 
-      {/* Table */}
+      {/* ── Table ───────────────────────────── */}
       {isLoading ? (
-        <div className="bg-white border border-[#E4E4EF] rounded-lg overflow-hidden">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="flex items-center gap-4 px-4 py-3 border-b border-[#F0F0F8] last:border-0">
-              <div className="w-7 h-7 rounded-lg bg-[#F0F0F8] animate-pulse flex-shrink-0" />
-              <div className="flex-1 space-y-1.5">
-                <div className="h-2.5 w-40 bg-[#F0F0F8] rounded animate-pulse" />
-                <div className="h-2 w-24 bg-[#F0F0F8] rounded animate-pulse" />
+        <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", overflow: "hidden" }}>
+          {[...Array(6)].map((_, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 16, padding: "18px 24px", borderBottom: "1px solid #F9FAFB" }}>
+              <div style={{ width: 38, height: 38, borderRadius: 10, background: "#F3F4F6", flexShrink: 0 }} className="animate-pulse" />
+              <div style={{ flex: 1 }}>
+                <div style={{ height: 12, background: "#F3F4F6", borderRadius: 4, width: 160, marginBottom: 6 }} className="animate-pulse" />
+                <div style={{ height: 10, background: "#F3F4F6", borderRadius: 4, width: 100 }} className="animate-pulse" />
               </div>
-              <div className="h-4 w-20 bg-[#F0F0F8] rounded animate-pulse" />
-              <div className="h-4 w-16 bg-[#F0F0F8] rounded-full animate-pulse" />
+              <div style={{ height: 22, background: "#F3F4F6", borderRadius: 999, width: 72 }} className="animate-pulse" />
+              <div style={{ height: 22, background: "#F3F4F6", borderRadius: 999, width: 80 }} className="animate-pulse" />
             </div>
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-white border border-[#E4E4EF] rounded-lg py-14 text-center">
-          <p className="text-[13px] font-[500] text-[#62657A]">No employers found</p>
-          <p className="text-[11px] text-[#62657A] mt-1">
+        <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", padding: "60px 24px", textAlign: "center" }}>
+          <Building2 size={36} style={{ color: "#E5E7EB", margin: "0 auto 12px" }} />
+          <p style={{ fontSize: 15, fontWeight: 600, color: "#111827", margin: 0 }}>No employers found</p>
+          <p style={{ fontSize: 13, color: "#9CA3AF", marginTop: 6 }}>
             {search || statusFilter !== "ALL" ? "Try adjusting your search or filter." : "No employers onboarded yet."}
           </p>
         </div>
@@ -191,7 +206,6 @@ export default function EmployersPage() {
         open={showCreate}
         onClose={() => setShowCreate(false)}
       />
-
     </div>
   );
 }

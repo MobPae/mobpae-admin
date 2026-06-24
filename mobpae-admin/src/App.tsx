@@ -21,7 +21,7 @@ const BankVerificationPage = lazy(() => import("./pages/BankVerificationPage"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
 const AuditLogsPage = lazy(() => import("./pages/AuditLogsPage"));
 const JobsPage = lazy(() => import("./pages/JobsPage"));
-const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
+const AppInformationPage = lazy(() => import("./pages/AppInformationPage").then(m => ({ default: m.AppInformationPage })));
 import ChangePasswordPage from "./pages/ChangePasswordPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
@@ -29,7 +29,7 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 export default function App() {
   return (
     <BrowserRouter>
-      <Suspense fallback={<div className="flex h-screen items-center justify-center bg-[#F7F7FB] text-sm font-medium text-[#62657A]">Loading workspace...</div>}>
+      <Suspense fallback={<div className="flex h-screen items-center justify-center bg-[#F8F9FC] text-sm font-medium text-[#6B7280]">Loading workspace...</div>}>
       <Routes>
         {/* Public */}
         <Route path="/login" element={<LoginPage />} />
@@ -72,7 +72,7 @@ export default function App() {
           <Route path="settings" element={<SettingsPage />} />
           <Route path="audit-logs" element={<AuditLogsPage />} />
           <Route path="jobs" element={<JobsPage />} />
-          <Route path="notifications" element={<NotificationsPage />} />
+          <Route path="app-information" element={<AppInformationPage />} />
 
           {/* Catch-all */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

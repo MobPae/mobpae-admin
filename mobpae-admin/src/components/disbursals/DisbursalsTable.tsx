@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { Disbursal } from "../../types/disbursal";
 
 interface Props {
@@ -7,111 +8,122 @@ interface Props {
 }
 
 const AVATAR_COLORS: Record<string, string> = {
-  A:"bg-rose-500",    B:"bg-pink-500",    C:"bg-fuchsia-500", D:"bg-[#ECEBFF]0",
-  E:"bg-[#ECEBFF]0",  F:"bg-[#ECEBFF]0",  G:"bg-[#ECEBFF]0",    H:"bg-sky-500",
-  I:"bg-cyan-500",    J:"bg-[#7679FF]",    K:"bg-[#7679FF]", L:"bg-[#ECEBFF]0",
-  M:"bg-lime-500",    N:"bg-yellow-500",  O:"bg-amber-500",   P:"bg-orange-500",
-  Q:"bg-red-500",     R:"bg-rose-600",    S:"bg-pink-600",    T:"bg-fuchsia-600",
-  U:"bg-[#7679FF]",  V:"bg-[#7679FF]",  W:"bg-[#7679FF]",  X:"bg-[#7679FF]",
-  Y:"bg-sky-600",     Z:"bg-cyan-600",
+  A: "#EF4444", B: "#EC4899", C: "#A855F7", D: "#6C4CFF",
+  E: "#6366F1", F: "#3B82F6", G: "#0EA5E9", H: "#06B6D4",
+  I: "#10B981", J: "#22C55E", K: "#84CC16", L: "#EAB308",
+  M: "#F59E0B", N: "#F97316", O: "#EF4444", P: "#6C4CFF",
+  Q: "#8B5CF6", R: "#D946EF", S: "#EC4899", T: "#F43F5E",
+  U: "#6C4CFF", V: "#6366F1", W: "#3B82F6", X: "#0EA5E9",
+  Y: "#14B8A6", Z: "#10B981",
+};
+const avatarColor = (n: string) => AVATAR_COLORS[n.charAt(0).toUpperCase()] ?? "#6C4CFF";
+
+const STATUS_CFG: Record<string, { label: string; color: string; bg: string }> = {
+  PENDING:   { label: "Pending",   color: "#D97706", bg: "#FEF3C7" },
+  DISBURSED: { label: "Disbursed", color: "#16A34A", bg: "#DCFCE7" },
+  FAILED:    { label: "Failed",    color: "#EF4444", bg: "#FEE2E2" },
 };
 
-const STATUS_CONFIG: Record<string, { dot: string; text: string; bg: string; label: string }> = {
-  PENDING:   { label: "Pending", dot: "bg-amber-400", text: "text-amber-700", bg: "bg-amber-50" },
-  DISBURSED: { label: "Disbursed", dot: "bg-[#4E8A18]", text: "text-[#3B6D11]", bg: "bg-[#EBF6E3]" },
-  FAILED:    { label: "Failed", dot: "bg-red-400", text: "text-red-600", bg: "bg-red-50" },
-};
+function Pill({ label, color, bg }: { label: string; color: string; bg: string }) {
+  return (
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 5, height: 24, padding: "0 10px", borderRadius: 999, background: bg, color, fontSize: 12, fontWeight: 600 }}>
+      <span style={{ width: 6, height: 6, borderRadius: "50%", background: color, flexShrink: 0 }} />
+      {label}
+    </span>
+  );
+}
 
 const fmt = (v: string) => `₹${Number(v).toLocaleString("en-IN")}`;
+const HEADERS = ["Employee", "Employer", "Amount", "Status", "Disbursed On", ""];
 
 export default function DisbursalsTable({ disbursals, selectedId, onSelect }: Props) {
+  const [hovered, setHovered] = useState<string | null>(null);
+
   return (
-    <div className="bg-white border border-[#E4E4EF] rounded-xl overflow-hidden">
-      <table className="w-full table-fixed">
-        <colgroup>
-          <col style={{ width: "19%" }} />
-          <col style={{ width: "17%" }} />
-          <col style={{ width: "18%" }} />
-          <col style={{ width: "11%" }} />
-          <col style={{ width: "11%" }} />
-          <col style={{ width: "14%" }} />
-          <col style={{ width: "10%" }} />
-        </colgroup>
+    <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", boxShadow: "0 2px 8px rgba(17,24,39,0.04)", overflow: "hidden" }}>
+      <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
-          <tr className="border-b border-[#E4E4EF] bg-[#F7F7FB]/60">
-            {["Employee", "Email", "Employer", "Amount", "Status", "Disbursed on", ""].map((h, i) => (
-              <th key={i} className="px-4 py-2.5 text-left text-[11px] font-[500] uppercase tracking-[0.06em] text-[#62657A]">
+          <tr style={{ borderBottom: "1px solid #F3F4F6", background: "#FAFAFA" }}>
+            {HEADERS.map((h, i) => (
+              <th key={i} style={{ padding: "14px 20px", textAlign: "left", fontSize: 11.5, fontWeight: 600, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.07em", whiteSpace: "nowrap" }}>
                 {h}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-[#F0F0F8]">
+        <tbody>
           {disbursals.map(d => {
-            const emp   = d.salaryRequest.employee;
-            const first = emp.name.charAt(0).toUpperCase();
-            const av    = AVATAR_COLORS[first] ?? "bg-[#F7F7FB]0";
-            const sc    = STATUS_CONFIG[d.status];
-            const sel   = selectedId === d.id;
+            const emp = d.salaryRequest.employee;
+            const isSelected = selectedId === d.id;
+            const s = STATUS_CFG[d.status] ?? { label: d.status, color: "#6B7280", bg: "#F3F4F6" };
+            const ac = avatarColor(emp.name);
+            const rowBg = isSelected ? "#F3F0FF" : hovered === d.id ? "#FAFAFC" : "transparent";
+
             return (
               <tr
                 key={d.id}
                 onClick={() => onSelect(d)}
-                className={`cursor-pointer transition-colors group ${sel ? "bg-[#ECEBFF]/60" : "hover:bg-[#F7F7FB]/80"}`}
+                onMouseEnter={() => setHovered(d.id)}
+                onMouseLeave={() => setHovered(null)}
+                style={{ borderBottom: "1px solid #F9FAFB", cursor: "pointer", background: rowBg, transition: "background 0.1s" }}
               >
                 {/* Employee */}
-                <td className="px-4 py-3">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className={`w-7 h-7 rounded-lg ${av} text-white flex-shrink-0 flex items-center justify-center text-[11px] font-[600]`}>
-                      {first}
+                <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{ width: 36, height: 36, borderRadius: 10, background: ac, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, flexShrink: 0 }}>
+                      {emp.name.charAt(0).toUpperCase()}
                     </div>
-                    <div className="min-w-0">
-                      <p className="text-[12px] font-[500] text-[#191A2E] truncate leading-none">{emp.name}</p>
-                      <p className="text-[11px] text-[#62657A] font-mono mt-0.5 leading-none">{emp.employeeCode}</p>
+                    <div>
+                      <p style={{ fontSize: 13.5, fontWeight: 600, color: "#111827", margin: 0 }}>{emp.name}</p>
+                      <p style={{ fontSize: 11.5, color: "#9CA3AF", margin: "2px 0 0", fontFamily: "ui-monospace, monospace" }}>{emp.employeeCode}</p>
                     </div>
                   </div>
                 </td>
-                {/* Email */}
-                <td className="px-4 py-3">
-                  <span className="text-[11px] text-[#62657A] truncate block">{emp.email}</span>
-                </td>
+
                 {/* Employer */}
-                <td className="px-4 py-3">
-                  <p className="text-[12px] font-[500] text-[#62657A] truncate leading-none">{emp.employer.companyName}</p>
-                  <p className="text-[11px] font-mono text-[#62657A] mt-0.5 leading-none">{emp.employer.companyCode}</p>
+                <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
+                  <p style={{ fontSize: 13.5, fontWeight: 500, color: "#374151", margin: 0 }}>{emp.employer.companyName}</p>
+                  <p style={{ fontSize: 11.5, color: "#9CA3AF", margin: "2px 0 0", fontFamily: "ui-monospace, monospace" }}>{emp.employer.companyCode}</p>
                 </td>
+
                 {/* Amount */}
-                <td className="px-4 py-3">
-                  <span className="text-[12px] font-[600] text-[#191A2E] tabular-nums">{fmt(d.amount)}</span>
+                <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
+                  <p style={{ fontSize: 13.5, fontWeight: 700, color: "#111827", margin: 0, fontVariantNumeric: "tabular-nums" }}>{fmt(d.amount)}</p>
                 </td>
+
                 {/* Status */}
-                <td className="px-4 py-3">
-                  {sc && (
-                    <span className={`inline-flex items-center gap-1.5 h-[22px] px-2.5 rounded-full text-[11px] font-[500] ${sc.bg} ${sc.text}`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${sc.dot}`} />
-                      {sc.label}
-                    </span>
-                  )}
+                <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
+                  <Pill {...s} />
                 </td>
-                {/* Disbursed on */}
-                <td className="px-4 py-3">
-                  <span className="text-[11px] text-[#62657A]">
+
+                {/* Disbursed On */}
+                <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
+                  <p style={{ fontSize: 13, color: "#9CA3AF", margin: 0, fontWeight: 500 }}>
                     {d.disbursedAt
                       ? new Date(d.disbursedAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
                       : "—"}
-                  </span>
+                  </p>
                 </td>
+
                 {/* Action */}
-                <td className="px-4 py-3 text-right">
-                  <span className={`text-[11px] font-[500] transition-colors ${sel ? "text-[#7679FF]" : "text-[#7679FF] group-hover:text-[#7679FF]"}`}>
-                    View →
-                  </span>
+                <td style={{ padding: "16px 20px", verticalAlign: "middle", textAlign: "right" }}>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onSelect(d); }}
+                    style={{ height: 30, padding: "0 14px", background: isSelected ? "#6C4CFF" : "#F3F0FF", color: isSelected ? "white" : "#6C4CFF", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
+                  >
+                    {isSelected ? "Close" : "View"}
+                  </button>
                 </td>
               </tr>
             );
           })}
         </tbody>
       </table>
+      <div style={{ padding: "12px 20px", borderTop: "1px solid #F3F4F6", background: "#FAFAFA" }}>
+        <p style={{ fontSize: 12, color: "#9CA3AF", margin: 0 }}>
+          {disbursals.length} {disbursals.length === 1 ? "disbursal" : "disbursals"}
+        </p>
+      </div>
     </div>
   );
 }

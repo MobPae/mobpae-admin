@@ -21,9 +21,9 @@ function timeAgo(iso: string) {
 function typeColor(type: string | null) {
   switch (type) {
     case "ALERT":   return "bg-red-100 text-red-600";
-    case "SUCCESS": return "bg-[#ECEBFF] text-[#7679FF]";
+    case "SUCCESS": return "bg-[#F3F0FF] text-[#6C4CFF]";
     case "WARNING": return "bg-amber-100 text-amber-600";
-    default:        return "bg-[#ECEBFF] text-[#7679FF]";
+    default:        return "bg-[#F3F0FF] text-[#6C4CFF]";
   }
 }
 
@@ -71,10 +71,10 @@ export function NotificationBell() {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(o => !o)}
-        className="w-10 h-10 rounded-xl border border-[#E4E4EF] flex items-center justify-center hover:bg-[#F7F7FB] relative transition-colors"
+        className="w-10 h-10 rounded-xl border border-[#E5E7EB] flex items-center justify-center hover:bg-[#F8F9FC] relative transition-colors"
         aria-label="Notifications"
       >
-        <Bell size={18} className="text-[#62657A]" />
+        <Bell size={18} className="text-[#6B7280]" />
         {unread > 0 && (
           <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[11px] font-[700] flex items-center justify-center">
             {unread > 99 ? "99+" : unread}
@@ -84,14 +84,14 @@ export function NotificationBell() {
 
       {open && (
         <div
-          className="absolute right-0 top-12 w-80 bg-white rounded-2xl shadow-xl border border-[#E4E4EF] z-50 overflow-hidden"
+          className="absolute right-0 top-12 w-80 bg-white rounded-2xl shadow-xl border border-[#E5E7EB] z-50 overflow-hidden"
           role="dialog"
           aria-label="Notifications"
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-[#E4E4EF]">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-[#E5E7EB]">
             <div className="flex items-center gap-2">
-              <h3 className="text-sm font-[700] text-[#191A2E]">Notifications</h3>
+              <h3 className="text-sm font-[700] text-[#111827]">Notifications</h3>
               {unread > 0 && (
                 <span className="px-1.5 py-0.5 rounded-full bg-red-50 text-red-600 text-[11px] font-[700]">{unread} new</span>
               )}
@@ -101,7 +101,7 @@ export function NotificationBell() {
                 <button
                   onClick={markAllRead}
                   title="Mark all as read"
-                  className="w-7 h-7 flex items-center justify-center rounded-lg text-[#62657A] hover:text-[#7679FF] hover:bg-[#ECEBFF] transition-colors"
+                  className="w-7 h-7 flex items-center justify-center rounded-lg text-[#6B7280] hover:text-[#6C4CFF] hover:bg-[#F3F0FF] transition-colors"
                 >
                   <CheckCheck size={14} />
                 </button>
@@ -109,7 +109,7 @@ export function NotificationBell() {
               <button
                 onClick={() => setOpen(false)}
                 aria-label="Close notifications"
-                className="w-7 h-7 flex items-center justify-center rounded-lg text-[#62657A] hover:text-[#62657A] hover:bg-[#F0F0F8] transition-colors"
+                className="w-7 h-7 flex items-center justify-center rounded-lg text-[#6B7280] hover:text-[#6B7280] hover:bg-[#F3F4F6] transition-colors"
               >
                 <X size={14} />
               </button>
@@ -117,10 +117,10 @@ export function NotificationBell() {
           </div>
 
           {/* List */}
-          <div className="max-h-[360px] overflow-y-auto divide-y divide-[#F0F0F8]">
+          <div className="max-h-[360px] overflow-y-auto divide-y divide-[#F3F4F6]">
             {isLoading ? (
               <div className="py-10 text-center" role="status">
-                <p className="text-sm text-[#62657A] font-[500]">Loading notifications...</p>
+                <p className="text-sm text-[#6B7280] font-[500]">Loading notifications...</p>
               </div>
             ) : isError ? (
               <div className="py-8 px-4 text-center" role="alert">
@@ -128,21 +128,21 @@ export function NotificationBell() {
                 <button
                   type="button"
                   onClick={() => void refetch()}
-                  className="mt-3 h-8 px-3 rounded-lg border border-[#E4E4EF] text-xs font-[600] text-[#62657A] hover:bg-[#F7F7FB]"
+                  className="mt-3 h-8 px-3 rounded-lg border border-[#E5E7EB] text-xs font-[600] text-[#6B7280] hover:bg-[#F8F9FC]"
                 >
                   Try again
                 </button>
               </div>
             ) : notifications.length === 0 ? (
               <div className="py-10 text-center">
-                <Bell size={24} className="mx-auto text-[#62657A] mb-2" />
-                <p className="text-sm text-[#62657A] font-[500]">No notifications</p>
+                <Bell size={24} className="mx-auto text-[#6B7280] mb-2" />
+                <p className="text-sm text-[#6B7280] font-[500]">No notifications</p>
               </div>
             ) : (
               notifications.slice(0, 20).map(n => (
                 <div
                   key={n.id}
-                  className={`flex gap-3 px-4 py-3 hover:bg-[#F7F7FB] transition-colors cursor-pointer ${!n.isRead ? "bg-[#ECEBFF]/40" : ""}`}
+                  className={`flex gap-3 px-4 py-3 hover:bg-[#F8F9FC] transition-colors cursor-pointer ${!n.isRead ? "bg-[#F3F0FF]/40" : ""}`}
                   onClick={() => { if (!n.isRead) markRead.mutate(n.id); }}
                 >
                   <div className={`mt-0.5 w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 text-[11px] font-[700] ${typeColor(n.type)}`}>
@@ -150,22 +150,22 @@ export function NotificationBell() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
-                      <p className={`text-[12px] leading-snug ${!n.isRead ? "font-[700] text-[#191A2E]" : "font-[500] text-[#62657A]"}`}>
+                      <p className={`text-[12px] leading-snug ${!n.isRead ? "font-[700] text-[#111827]" : "font-[500] text-[#6B7280]"}`}>
                         {n.title}
                       </p>
                       {!n.isRead && (
-                        <span className="w-2 h-2 rounded-full bg-[#ECEBFF]0 flex-shrink-0 mt-1" />
+                        <span className="w-2 h-2 rounded-full bg-[#6C4CFF] flex-shrink-0 mt-1" />
                       )}
                     </div>
-                    <p className="text-[11px] text-[#62657A] mt-0.5 line-clamp-2">{n.message}</p>
-                    <p className="text-[11px] text-[#62657A] mt-1">{timeAgo(n.createdAt)}</p>
+                    <p className="text-[11px] text-[#6B7280] mt-0.5 line-clamp-2">{n.message}</p>
+                    <p className="text-[11px] text-[#6B7280] mt-1">{timeAgo(n.createdAt)}</p>
                   </div>
                   {!n.isRead && (
                     <button
                       onClick={e => { e.stopPropagation(); markRead.mutate(n.id); }}
                       title="Mark as read"
                       aria-label={`Mark ${n.title} as read`}
-                      className="mt-1 flex-shrink-0 text-[#62657A] hover:text-[#7679FF] transition-colors"
+                      className="mt-1 flex-shrink-0 text-[#6B7280] hover:text-[#6C4CFF] transition-colors"
                     >
                       <Check size={13} />
                     </button>

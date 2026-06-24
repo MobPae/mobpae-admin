@@ -28,28 +28,28 @@ export function Pagination({ page, totalPages, total, limit, onPage }: Props) {
 
   return (
     <div className="flex items-center justify-between px-1 mt-4">
-      <p className="text-[12px] text-[#62657A]">
-        Showing <span className="font-[600] text-[#62657A]">{from}–{to}</span> of <span className="font-[600] text-[#62657A]">{total}</span>
+      <p className="text-[12px] text-[#6B7280]">
+        Showing <span className="font-[600] text-[#6B7280]">{from}–{to}</span> of <span className="font-[600] text-[#6B7280]">{total}</span>
       </p>
       <div className="flex items-center gap-1">
         <button
           onClick={() => onPage(page - 1)}
           disabled={page <= 1}
-          className="w-8 h-8 flex items-center justify-center rounded-lg border border-[#E4E4EF] text-[#62657A] hover:bg-[#F7F7FB] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-lg border border-[#E5E7EB] text-[#6B7280] hover:bg-[#F8F9FC] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
           <ChevronLeft size={14} />
         </button>
         {pages.map((p, i) =>
           p === "…" ? (
-            <span key={`ellipsis-${i}`} className="w-8 h-8 flex items-center justify-center text-[12px] text-[#62657A]">…</span>
+            <span key={`ellipsis-${i}`} className="w-8 h-8 flex items-center justify-center text-[12px] text-[#6B7280]">…</span>
           ) : (
             <button
               key={p}
               onClick={() => onPage(p as number)}
               className={`w-8 h-8 flex items-center justify-center rounded-lg text-[12px] font-[600] transition-colors ${
                 p === page
-                  ? "bg-[#191A2E] text-white"
-                  : "border border-[#E4E4EF] text-[#62657A] hover:bg-[#F7F7FB]"
+                  ? "bg-[#111827] text-white"
+                  : "border border-[#E5E7EB] text-[#6B7280] hover:bg-[#F8F9FC]"
               }`}
             >
               {p}
@@ -59,7 +59,7 @@ export function Pagination({ page, totalPages, total, limit, onPage }: Props) {
         <button
           onClick={() => onPage(page + 1)}
           disabled={page >= totalPages}
-          className="w-8 h-8 flex items-center justify-center rounded-lg border border-[#E4E4EF] text-[#62657A] hover:bg-[#F7F7FB] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-lg border border-[#E5E7EB] text-[#6B7280] hover:bg-[#F8F9FC] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
           <ChevronRight size={14} />
         </button>

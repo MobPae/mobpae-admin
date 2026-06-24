@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Download, Search, Calendar, X } from "lucide-react";
+import { Download, Search, Calendar, X, FileText, Zap, CheckCircle, RefreshCw } from "lucide-react";
 import { exportToCsv } from "../utils/exportCsv";
 import { getSalaryRequests } from "../services/salaryRequestService";
 import type { SalaryRequest, SalaryRequestStatus } from "../types/salary-request";
@@ -10,10 +10,10 @@ import { Pagination } from "../components/ui/Pagination";
 
 const PAGE_SIZE = 15;
 
-const CHIP_ON       = "bg-[#191A2E] text-white border-[#191A2E]";
-const CHIP_OFF      = "bg-white border-[#E4E4EF] text-[#62657A] hover:border-[#E4E4EF] hover:text-[#62657A]";
-const CHIP_ACTION   = "bg-[#7679FF] text-white border-[#5659D9]";
-const CHIP_ACTION_OFF = "bg-[#ECEBFF] border-[#E4E4EF] text-[#5659D9] hover:border-[#7679FF]";
+const CHIP_ON       = "bg-[#111827] text-white border-[#111827]";
+const CHIP_OFF      = "bg-white border-[#E5E7EB] text-[#6B7280] hover:border-[#E5E7EB] hover:text-[#6B7280]";
+const CHIP_ACTION   = "bg-[#6C4CFF] text-white border-[#5B34FF]";
+const CHIP_ACTION_OFF = "bg-[#F3F0FF] border-[#E5E7EB] text-[#5B34FF] hover:border-[#6C4CFF]";
 
 const NEEDS_ACTION_STATUSES: SalaryRequestStatus[] = ["EMPLOYER_APPROVED", "READY_FOR_DISBURSAL"];
 
@@ -70,156 +70,144 @@ export default function SalaryRequestsPage() {
   const safePage   = Math.min(page, totalPages);
   const paginated  = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
-  const pipeline = [
-    { label: "Submitted",   key: "SUBMITTED" as const,           color: "bg-amber-400",   text: "text-amber-600"   },
-    { label: "Emp Approved",key: "EMPLOYER_APPROVED" as const,   color: "bg-[#7679FF]",    text: "text-[#7679FF]"    },
-    { label: "Ready",       key: "READY_FOR_DISBURSAL" as const, color: "bg-[#7679FF]",  text: "text-[#7679FF]"  },
-    { label: "Disbursed",   key: "DISBURSED" as const,           color: "bg-[#7679FF]", text: "text-[#7679FF]" },
-  ];
-
+  const P = "#6C4CFF";
   const total = requests.length;
 
+  const kpis = [
+    { label: "Total Requests", value: total,                                                              icon: <FileText size={18} color={P} strokeWidth={1.75} />,            iconBg: "#F3F0FF" },
+    { label: "Needs Action",   value: needsActionCount,                                                   icon: <Zap size={18} color="#D97706" strokeWidth={1.75} />,            iconBg: "#FEF3C7" },
+    { label: "Disbursed",      value: counts["DISBURSED"] ?? 0,                                           icon: <CheckCircle size={18} color="#16A34A" strokeWidth={1.75} />,    iconBg: "#DCFCE7" },
+    { label: "Repaid",         value: (counts["REPAID"] ?? 0) + (counts["REPAYMENT_SCHEDULED"] ?? 0),    icon: <RefreshCw size={18} color="#2563EB" strokeWidth={1.75} />,       iconBg: "#DBEAFE" },
+  ];
+
+  const STATUS_TABS = [
+    { label: "All",           value: "ALL" as const           },
+    { label: "Needs Action",  value: "NEEDS_ACTION" as const  },
+    { label: "Submitted",     value: "SUBMITTED" as const     },
+    { label: "Emp. Approved", value: "EMPLOYER_APPROVED" as const },
+    { label: "Disbursed",     value: "DISBURSED" as const     },
+    { label: "Repaying",      value: "REPAYMENT_SCHEDULED" as const },
+    { label: "Repaid",        value: "REPAID" as const        },
+  ];
+
   return (
-    <div className="p-5 space-y-4">
-      <div>
-        <h1 className="text-[15px] font-[500] text-[#191A2E] leading-none">Salary Requests</h1>
-        <p className="text-[11px] text-[#62657A] mt-1.5">Review and process employee salary advance requests</p>
+    <div style={{ padding: "28px 32px", fontFamily: "Inter, ui-sans-serif, sans-serif" }}>
+
+      {/* ── Header ──────────────────────────── */}
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28 }}>
+        <div>
+          <h1 style={{ fontSize: 26, fontWeight: 700, color: "#111827", letterSpacing: "-0.025em", margin: 0 }}>Salary Advances</h1>
+          <p style={{ fontSize: 14, color: "#6B7280", marginTop: 6 }}>Review and process employee salary advance requests.</p>
+        </div>
+        <button
+          onClick={() => exportToCsv(filtered.map(r => ({
+            Employee: r.employee?.name ?? "", Code: r.employee?.employeeCode ?? "",
+            Company: r.employee?.employer?.companyName ?? "", Amount: r.amount,
+            Status: r.status, Date: r.createdAt ? new Date(r.createdAt).toLocaleDateString() : "",
+          })), "salary-requests")}
+          style={{ height: 40, padding: "0 16px", display: "flex", alignItems: "center", gap: 8, background: "white", border: "1px solid #E5E7EB", borderRadius: 12, fontSize: 13, fontWeight: 500, color: "#374151", cursor: "pointer", fontFamily: "inherit" }}
+        >
+          <Download size={14} />
+          Export
+        </button>
       </div>
 
       {isError && (
-        <div className="bg-white border border-red-100 rounded-xl px-6 py-14 text-center">
-          <p className="text-[13px] font-[500] text-red-600">Failed to load salary requests</p>
-          <p className="text-[12px] text-[#62657A] mt-1">Check your connection and try again.</p>
-          <button onClick={() => void refetch()} className="mt-4 h-8 px-4 text-[12px] font-[500] bg-white border border-[#E4E4EF] rounded-lg hover:bg-[#F7F7FB] transition-colors text-[#62657A]">
-            Retry
-          </button>
+        <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 12, padding: "12px 16px", marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, color: "#DC2626" }}>
+          <span>Failed to load salary requests.</span>
+          <button onClick={() => void refetch()} style={{ padding: "6px 12px", background: "white", border: "1px solid #FECACA", borderRadius: 8, fontSize: 12, fontWeight: 600, color: "#DC2626", cursor: "pointer", fontFamily: "inherit" }}>Retry</button>
         </div>
       )}
 
-      {/* Pipeline strip */}
-      <div className="grid grid-cols-4 gap-3">
-        {pipeline.map(({ label, key, color, text }) => {
-          const count = counts[key] ?? 0;
-          const pct = total > 0 ? Math.round((count / total) * 100) : 0;
-          return (
-            <button
-              key={key}
-              onClick={() => setStatusFilter(statusFilter === key ? "ALL" : key)}
-              className={`bg-white border rounded-lg p-3.5 text-left transition-colors ${statusFilter === key ? "border-[#E4E4EF]" : "border-[#E4E4EF] hover:border-[#E4E4EF]"}`}
-            >
-              <p className="text-[11px] font-[500] uppercase tracking-[0.06em] text-[#62657A] leading-none">{label}</p>
-              <p className={`text-[22px] font-[500] tracking-tight leading-none mt-2.5 ${text} ${isLoading ? "opacity-20 animate-pulse" : ""}`}>{count}</p>
-              <div className="h-[3px] rounded-full bg-[#F0F0F8] mt-2.5">
-                <div className={`h-full rounded-full ${color} transition-all`} style={{ width: `${pct}%` }} />
+      {/* ── KPI cards ───────────────────────── */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 24 }}>
+        {kpis.map((kpi) => (
+          <div key={kpi.label} style={{ background: "white", borderRadius: 16, padding: "14px 16px", border: "1px solid #E5E7EB", boxShadow: "0 1px 4px rgba(17,24,39,0.04)", display: "flex", alignItems: "center", gap: 14 }}>
+            <div style={{ width: 40, height: 40, borderRadius: 12, background: kpi.iconBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              {kpi.icon}
+            </div>
+            <div>
+              <div style={{ fontSize: 22, fontWeight: 700, color: "#111827", letterSpacing: "-0.02em", lineHeight: 1, opacity: isLoading ? 0.3 : 1 }}>
+                {kpi.value}
               </div>
-            </button>
-          );
-        })}
+              <div style={{ fontSize: 12, color: "#6B7280", marginTop: 3, fontWeight: 500 }}>{kpi.label}</div>
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* Filter bar */}
-      <div className="flex items-center gap-3 flex-wrap">
-        <div className="relative">
-          <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#62657A]" />
+      {/* ── Filter bar ──────────────────────── */}
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, height: 40, padding: "0 14px", background: "white", border: "1px solid #E5E7EB", borderRadius: 12, minWidth: 240 }}>
+          <Search size={14} style={{ color: "#9CA3AF", flexShrink: 0 }} />
           <input
             type="text"
-            placeholder="Search employee, company…"
+            placeholder="Search employee, company..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="h-8 pl-8 pr-3 w-56 text-[12px] bg-white border border-[#E4E4EF] rounded-md outline-none focus:border-[#7679FF] transition-colors"
+            style={{ flex: 1, fontSize: 13.5, color: "#111827", background: "transparent", outline: "none", border: "none", fontFamily: "inherit" }}
           />
         </div>
-
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <button
-            onClick={() => { setStatusFilter("ALL"); setPage(1); }}
-            className={`h-7 px-3 rounded-full text-[11px] font-[500] border transition-colors ${statusFilter === "ALL" ? CHIP_ON : CHIP_OFF}`}
-          >
-            All · {total}
-          </button>
-          {/* Needs Action quick-filter */}
-          <button
-            onClick={() => { setStatusFilter(statusFilter === "NEEDS_ACTION" ? "ALL" : "NEEDS_ACTION"); setPage(1); }}
-            className={`h-7 px-3 rounded-full text-[11px] font-[500] border transition-colors ${statusFilter === "NEEDS_ACTION" ? CHIP_ACTION : CHIP_ACTION_OFF}`}
-          >
-            ⚡ Needs Action · {needsActionCount}
-          </button>
-          <div className="w-px h-4 bg-[#E4E4EF] mx-1" />
-          {ALL_STATUSES.map((s) => (
-            <button
-              key={s}
-              onClick={() => { setStatusFilter(statusFilter === s ? "ALL" : s); setPage(1); }}
-              className={`h-7 px-3 rounded-full text-[11px] font-[500] border transition-colors ${statusFilter === s ? CHIP_ON : CHIP_OFF}`}
-            >
-              {STATUS_LABELS[s]} · {counts[s] ?? 0}
-            </button>
-          ))}
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+          {STATUS_TABS.map(tab => {
+            const active = statusFilter === tab.value;
+            const cnt = tab.value === "ALL" ? requests.length : tab.value === "NEEDS_ACTION" ? needsActionCount : (counts[tab.value as SalaryRequestStatus] ?? 0);
+            return (
+              <button
+                key={tab.value}
+                onClick={() => { setStatusFilter(tab.value); setPage(1); }}
+                style={{
+                  height: 36, padding: "0 14px",
+                  background: active ? "#111827" : "white",
+                  color: active ? "white" : "#6B7280",
+                  border: `1px solid ${active ? "#111827" : "#E5E7EB"}`,
+                  borderRadius: 10, fontSize: 12.5, fontWeight: active ? 600 : 400,
+                  cursor: "pointer", fontFamily: "inherit",
+                  display: "flex", alignItems: "center", gap: 6,
+                }}
+              >
+                {tab.label}
+                <span style={{ fontSize: 11, opacity: 0.6, fontWeight: 400 }}>{cnt}</span>
+              </button>
+            );
+          })}
         </div>
-
-        {/* Date range */}
-        <div className="flex items-center gap-1.5 ml-1">
-          <Calendar size={12} className="text-[#62657A]" />
-          <input
-            type="date"
-            value={dateFrom}
-            onChange={e => { setDateFrom(e.target.value); setPage(1); }}
-            className="h-7 px-2 text-[11px] bg-white border border-[#E4E4EF] rounded-md outline-none focus:border-[#7679FF] transition-colors text-[#62657A]"
-          />
-          <span className="text-[11px] text-[#62657A]">–</span>
-          <input
-            type="date"
-            value={dateTo}
-            onChange={e => { setDateTo(e.target.value); setPage(1); }}
-            className="h-7 px-2 text-[11px] bg-white border border-[#E4E4EF] rounded-md outline-none focus:border-[#7679FF] transition-colors text-[#62657A]"
-          />
+        <div style={{ display: "flex", alignItems: "center", gap: 6, marginLeft: 4 }}>
+          <Calendar size={13} style={{ color: "#9CA3AF" }} />
+          <input type="date" value={dateFrom} onChange={e => { setDateFrom(e.target.value); setPage(1); }}
+            style={{ height: 36, padding: "0 10px", background: "white", border: "1px solid #E5E7EB", borderRadius: 10, fontSize: 12.5, color: "#6B7280", outline: "none", fontFamily: "inherit" }} />
+          <span style={{ fontSize: 12, color: "#9CA3AF" }}>–</span>
+          <input type="date" value={dateTo} onChange={e => { setDateTo(e.target.value); setPage(1); }}
+            style={{ height: 36, padding: "0 10px", background: "white", border: "1px solid #E5E7EB", borderRadius: 10, fontSize: 12.5, color: "#6B7280", outline: "none", fontFamily: "inherit" }} />
           {(dateFrom || dateTo) && (
-            <button
-              onClick={() => { setDateFrom(""); setDateTo(""); setPage(1); }}
-              className="w-5 h-5 flex items-center justify-center rounded-full bg-[#F0F0F8] text-[#62657A] hover:bg-[#E4E4EF] transition-colors"
-            >
+            <button onClick={() => { setDateFrom(""); setDateTo(""); setPage(1); }}
+              style={{ width: 24, height: 24, borderRadius: "50%", background: "#F3F4F6", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#6B7280" }}>
               <X size={10} />
             </button>
           )}
         </div>
-
-        <div className="flex-1" />
-        <span className="text-[11px] text-[#62657A]">{filtered.length} result{filtered.length !== 1 ? "s" : ""}</span>
-        <button
-          onClick={() => exportToCsv(filtered.map(r => ({
-            RequestID:    r.id,
-            Employee:     r.employee?.name ?? "",
-            EmployeeCode: r.employee?.employeeCode ?? "",
-            Company:      r.employee?.employer?.companyName ?? "",
-            Requested:    r.amount,
-            Approved:     r.approvedAmount ?? "",
-            Status:       r.status,
-            Date:         r.createdAt ? new Date(r.createdAt).toLocaleDateString() : "",
-          })), `salary-requests-${Date.now()}`)}
-          className="h-8 px-3 flex items-center gap-1.5 text-[12px] font-[500] text-[#62657A] bg-white border border-[#E4E4EF] rounded-lg hover:bg-[#F7F7FB] transition-colors"
-        >
-          <Download size={13} /> Export CSV
-        </button>
+        <div style={{ flex: 1 }} />
+        <span style={{ fontSize: 12, color: "#9CA3AF" }}>{filtered.length} requests</span>
       </div>
 
-      {/* Table */}
+      {/* ── Table ───────────────────────────── */}
       {isLoading ? (
-        <div className="bg-white border border-[#E4E4EF] rounded-xl overflow-hidden">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="flex items-center gap-4 px-5 py-3.5 border-b border-[#F0F0F8] last:border-0">
-              <div className="w-7 h-7 rounded-lg bg-[#F0F0F8] animate-pulse flex-shrink-0" />
-              <div className="flex-1 space-y-1.5">
-                <div className="h-2.5 w-32 bg-[#F0F0F8] rounded animate-pulse" />
-                <div className="h-2 w-20 bg-[#F0F0F8] rounded animate-pulse" />
+        <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", overflow: "hidden" }}>
+          {[...Array(6)].map((_, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 16, padding: "18px 24px", borderBottom: "1px solid #F9FAFB" }}>
+              <div style={{ width: 38, height: 38, borderRadius: 10, background: "#F3F4F6", flexShrink: 0 }} className="animate-pulse" />
+              <div style={{ flex: 1 }}>
+                <div style={{ height: 12, background: "#F3F4F6", borderRadius: 4, width: 140, marginBottom: 6 }} className="animate-pulse" />
+                <div style={{ height: 10, background: "#F3F4F6", borderRadius: 4, width: 100 }} className="animate-pulse" />
               </div>
-              <div className="h-2.5 w-20 bg-[#F0F0F8] rounded animate-pulse" />
-              <div className="h-4 w-20 bg-[#F0F0F8] rounded-full animate-pulse" />
+              <div style={{ height: 22, background: "#F3F4F6", borderRadius: 999, width: 80 }} className="animate-pulse" />
             </div>
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-white border border-[#E4E4EF] rounded-xl py-14 text-center">
-          <p className="text-[13px] font-[500] text-[#62657A]">No requests found</p>
-          <p className="text-[11px] text-[#62657A] mt-1">
+        <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", padding: "60px 24px", textAlign: "center" }}>
+          <p style={{ fontSize: 15, fontWeight: 600, color: "#111827", margin: 0 }}>No requests found</p>
+          <p style={{ fontSize: 13, color: "#9CA3AF", marginTop: 6 }}>
             {search || statusFilter !== "ALL" ? "Try adjusting your search or filter." : "No salary requests submitted yet."}
           </p>
         </div>

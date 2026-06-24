@@ -1,8 +1,5 @@
-import type {
-  Employer,
-  EmployerStatus,
-  EmployerRiskStatus,
-} from "../../types/employer";
+import { useState } from "react";
+import type { Employer, EmployerStatus, EmployerRiskStatus } from "../../types/employer";
 
 interface Props {
   employers: Employer[];
@@ -11,182 +8,124 @@ interface Props {
 }
 
 const AVATAR_COLORS: Record<string, string> = {
-  A: "bg-rose-500",
-  B: "bg-pink-500",
-  C: "bg-fuchsia-500",
-  D: "bg-[#ECEBFF]0",
-  E: "bg-[#ECEBFF]0",
-  F: "bg-[#ECEBFF]0",
-  G: "bg-[#ECEBFF]0",
-  H: "bg-sky-500",
-  I: "bg-cyan-500",
-  J: "bg-[#7679FF]",
-  K: "bg-[#7679FF]",
-  L: "bg-[#ECEBFF]0",
-  M: "bg-lime-600",
-  N: "bg-yellow-600",
-  O: "bg-amber-500",
-  P: "bg-orange-500",
-  Q: "bg-red-500",
-  R: "bg-rose-600",
-  S: "bg-pink-600",
-  T: "bg-fuchsia-600",
-  U: "bg-[#7679FF]",
-  V: "bg-[#7679FF]",
-  W: "bg-[#7679FF]",
-  X: "bg-[#7679FF]",
-  Y: "bg-sky-600",
-  Z: "bg-cyan-600",
+  A: "#EF4444", B: "#EC4899", C: "#A855F7", D: "#6C4CFF",
+  E: "#6366F1", F: "#3B82F6", G: "#0EA5E9", H: "#06B6D4",
+  I: "#10B981", J: "#22C55E", K: "#84CC16", L: "#EAB308",
+  M: "#F59E0B", N: "#F97316", O: "#EF4444", P: "#6C4CFF",
+  Q: "#8B5CF6", R: "#D946EF", S: "#EC4899", T: "#F43F5E",
+  U: "#6C4CFF", V: "#6366F1", W: "#3B82F6", X: "#0EA5E9",
+  Y: "#14B8A6", Z: "#10B981",
 };
-const avatarBg = (n: string) =>
-  AVATAR_COLORS[n.charAt(0).toUpperCase()] ?? "bg-[#7679FF]";
+const avatarColor = (n: string) => AVATAR_COLORS[n.charAt(0).toUpperCase()] ?? "#6C4CFF";
 
-const STATUS_CONFIG: Record<
-  EmployerStatus,
-  { label: string; dot: string; text: string; bg: string }
-> = {
-  ACTIVE:   { label: "Active", dot: "bg-[#4E8A18]", text: "text-[#3B6D11]", bg: "bg-[#EBF6E3]" },
-  PENDING:  { label: "Pending", dot: "bg-amber-400", text: "text-amber-700", bg: "bg-amber-50" },
-  APPROVED: { label: "Approved", dot: "bg-[#4E8A18]", text: "text-[#3B6D11]", bg: "bg-[#EBF6E3]" },
-  REJECTED: { label: "Rejected", dot: "bg-red-400", text: "text-red-600", bg: "bg-red-50" },
-  INACTIVE:  { label: "Inactive",  dot: "bg-[#8D90A3]", text: "text-[#62657A]", bg: "bg-[#F0F0F8]"  },
-  SUSPENDED: { label: "Suspended", dot: "bg-[#D45F18]",  text: "text-[#9A4910]", bg: "bg-[#FEF1E7]"  },
+const STATUS_CFG: Record<EmployerStatus, { label: string; color: string; bg: string }> = {
+  ACTIVE:    { label: "Active",    color: "#16A34A", bg: "#DCFCE7" },
+  PENDING:   { label: "Pending",   color: "#D97706", bg: "#FEF3C7" },
+  APPROVED:  { label: "Approved",  color: "#16A34A", bg: "#DCFCE7" },
+  REJECTED:  { label: "Rejected",  color: "#EF4444", bg: "#FEE2E2" },
+  INACTIVE:  { label: "Inactive",  color: "#6B7280", bg: "#F3F4F6" },
+  SUSPENDED: { label: "Suspended", color: "#D97706", bg: "#FEF3C7" },
 };
 
-const RISK_CONFIG: Record<
-  EmployerRiskStatus,
-  { label: string; dot: string; text: string; bg: string }
-> = {
-  GOOD:    { label: "Good",    dot: "bg-[#4E8A18]", text: "text-[#3B6D11]", bg: "bg-[#EBF6E3]" },
-  WARNING: { label: "Warning", dot: "bg-[#D45F18]",  text: "text-[#9A4910]", bg: "bg-[#FEF1E7]"  },
-  BLOCKED: { label: "Blocked", dot: "bg-red-400",    text: "text-red-600",   bg: "bg-red-50"     },
+const RISK_CFG: Record<EmployerRiskStatus, { label: string; color: string; bg: string }> = {
+  GOOD:    { label: "Good",    color: "#16A34A", bg: "#DCFCE7" },
+  WARNING: { label: "Warning", color: "#D97706", bg: "#FEF3C7" },
+  BLOCKED: { label: "Blocked", color: "#EF4444", bg: "#FEE2E2" },
 };
 
-const TH =
-  "px-4 py-2.5 text-left text-[11px] font-[600] uppercase tracking-[0.08em] text-[#62657A] whitespace-nowrap";
-const TD = "px-4 py-3.5 align-middle";
-
-export default function EmployersTable({
-  employers,
-  selectedId,
-  onSelect,
-}: Props) {
+function Pill({ label, color, bg }: { label: string; color: string; bg: string }) {
   return (
-    <div className="bg-white rounded-xl border border-[#E4E4EF] overflow-hidden">
-      <table className="w-full table-fixed">
-        <colgroup>
-          <col style={{ width: "17%" }} />
-          <col style={{ width: "16%" }} />
-          <col style={{ width: "13%" }} />
-          <col style={{ width: "13%" }} />
-          <col style={{ width: "9%" }} />
-          <col style={{ width: "12%" }} />
-          <col style={{ width: "12%" }} />
-          <col style={{ width: "8%" }} />
-        </colgroup>
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 5, height: 24, padding: "0 10px", borderRadius: 999, background: bg, color, fontSize: 12, fontWeight: 600 }}>
+      <span style={{ width: 6, height: 6, borderRadius: "50%", background: color, flexShrink: 0 }} />
+      {label}
+    </span>
+  );
+}
+
+const HEADERS = ["Company", "Contact", "Payroll", "Status", "Risk", ""];
+
+export default function EmployersTable({ employers, selectedId, onSelect }: Props) {
+  const [hovered, setHovered] = useState<string | null>(null);
+
+  return (
+    <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", boxShadow: "0 2px 8px rgba(17,24,39,0.04)", overflow: "hidden" }}>
+      <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
-          <tr className="border-b border-[#E4E4EF] bg-[#F7F7FB]">
-            <th className={TH}>Company</th>
-            <th className={TH}>Email</th>
-            <th className={TH}>Contact</th>
-            <th className={TH}>Phone</th>
-            <th className={TH}>Payroll</th>
-            <th className={TH}>Status</th>
-            <th className={TH}>Risk</th>
-            <th className={TH}></th>
+          <tr style={{ borderBottom: "1px solid #F3F4F6", background: "#FAFAFA" }}>
+            {HEADERS.map((h, i) => (
+              <th key={i} style={{ padding: "14px 20px", textAlign: "left", fontSize: 11.5, fontWeight: 600, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.07em", whiteSpace: "nowrap" }}>
+                {h}
+              </th>
+            ))}
           </tr>
         </thead>
         <tbody>
           {employers.map((emp) => {
             const isSelected = selectedId === emp.id;
-            const s = STATUS_CONFIG[emp.status];
-            const r = RISK_CONFIG[emp.riskStatus];
+            const s = STATUS_CFG[emp.status] ?? { label: emp.status, color: "#6B7280", bg: "#F3F4F6" };
+            const r = RISK_CFG[emp.riskStatus] ?? { label: emp.riskStatus, color: "#6B7280", bg: "#F3F4F6" };
+            const ac = avatarColor(emp.companyName);
+            const rowBg = isSelected ? "#F3F0FF" : hovered === emp.id ? "#FAFAFC" : "transparent";
+
             return (
               <tr
                 key={emp.id}
                 onClick={() => onSelect(emp)}
-                className={`border-b border-[#F0F0F8] last:border-0 cursor-pointer transition-colors group ${
-                  isSelected ? "bg-[#ECEBFF]/60" : "hover:bg-[#F7F7FB]/70"
-                }`}
+                onMouseEnter={() => setHovered(emp.id)}
+                onMouseLeave={() => setHovered(null)}
+                style={{ borderBottom: "1px solid #F9FAFB", cursor: "pointer", background: rowBg, transition: "background 0.1s" }}
               >
-                <td className={TD}>
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div
-                      className={`w-7 h-7 rounded-lg ${avatarBg(
-                        emp.companyName
-                      )} text-white flex items-center justify-center text-[11px] font-[700] flex-shrink-0`}
-                    >
+                {/* Company */}
+                <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{ width: 36, height: 36, borderRadius: 10, background: ac, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, flexShrink: 0 }}>
                       {emp.companyName.charAt(0).toUpperCase()}
                     </div>
-                    <div className="min-w-0">
-                      <p className="text-[12px] font-[500] text-[#191A2E] leading-none truncate">
-                        {emp.companyName}
-                      </p>
-                      <span className="font-mono text-[11px] text-[#62657A]">
-                        {emp.companyCode}
-                      </span>
+                    <div>
+                      <p style={{ fontSize: 13.5, fontWeight: 600, color: "#111827", margin: 0 }}>{emp.companyName}</p>
+                      <p style={{ fontSize: 11.5, color: "#9CA3AF", margin: "2px 0 0", fontFamily: "ui-monospace, monospace" }}>{emp.companyCode}</p>
                     </div>
                   </div>
                 </td>
-                <td className={TD}>
-                  <p className="text-[12px] text-[#62657A] truncate">
-                    {emp.email}
-                  </p>
+
+                {/* Contact */}
+                <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
+                  <p style={{ fontSize: 13.5, fontWeight: 500, color: "#374151", margin: 0 }}>{emp.contactPerson}</p>
+                  <p style={{ fontSize: 12, color: "#9CA3AF", margin: "2px 0 0" }}>{emp.phone}</p>
                 </td>
-                <td className={TD}>
-                  <p className="text-[12px] font-[500] text-[#191A2E] truncate">
-                    {emp.contactPerson}
-                  </p>
+
+                {/* Payroll */}
+                <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
+                  <p style={{ fontSize: 13.5, fontWeight: 600, color: "#111827", margin: 0 }}>{emp.payrollDate}th</p>
+                  <p style={{ fontSize: 11.5, color: "#9CA3AF", margin: "2px 0 0" }}>cutoff {emp.payrollCutoffDate}th</p>
                 </td>
-                <td className={TD}>
-                  <p className="text-[12px] text-[#62657A] font-mono">
-                    {emp.phone}
-                  </p>
+
+                {/* Status */}
+                <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
+                  <Pill {...s} />
                 </td>
-                <td className={TD}>
-                  <p className="text-[12px] font-[500] text-[#191A2E]">
-                    {emp.payrollDate}th
-                  </p>
-                  <p className="text-[11px] text-[#62657A] mt-0.5">
-                    cutoff {emp.payrollCutoffDate}th
-                  </p>
+
+                {/* Risk */}
+                <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
+                  <Pill {...r} />
                 </td>
-                <td className={TD}>
-                  <span
-                    className={`inline-flex items-center gap-1.5 h-[22px] px-2.5 rounded-full text-[11px] font-[500] ${s.bg} ${s.text}`}
+
+                {/* Action */}
+                <td style={{ padding: "16px 20px", verticalAlign: "middle", textAlign: "right" }}>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onSelect(emp); }}
+                    style={{ height: 30, padding: "0 14px", background: isSelected ? "#6C4CFF" : "#F3F0FF", color: isSelected ? "white" : "#6C4CFF", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
                   >
-                    <span
-                      className={`w-[6px] h-[6px] rounded-full flex-shrink-0 ${s.dot}`}
-                    />
-                    {s.label}
-                  </span>
-                </td>
-                <td className={TD}>
-                  <span
-                    className={`inline-flex items-center gap-1.5 h-[22px] px-2.5 rounded-full text-[11px] font-[500] ${r.bg} ${r.text}`}
-                  >
-                    <span
-                      className={`w-[6px] h-[6px] rounded-full flex-shrink-0 ${r.dot}`}
-                    />
-                    {r.label}
-                  </span>
-                </td>
-                <td className={TD}>
-                  <span
-                    className={`text-[11px] font-[500] transition-colors ${
-                      isSelected ? "text-[#7679FF]" : "text-[#7679FF]"
-                    }`}
-                  >
-                    {isSelected ? "Close" : "Manage →"}
-                  </span>
+                    {isSelected ? "Close" : "Manage"}
+                  </button>
                 </td>
               </tr>
             );
           })}
         </tbody>
       </table>
-      <div className="px-5 py-2.5 border-t border-[#E4E4EF] bg-[#F7F7FB]/50">
-        <p className="text-[11px] text-[#62657A]">
+      <div style={{ padding: "12px 20px", borderTop: "1px solid #F3F4F6", background: "#FAFAFA" }}>
+        <p style={{ fontSize: 12, color: "#9CA3AF", margin: 0 }}>
           {employers.length} {employers.length === 1 ? "employer" : "employers"}
         </p>
       </div>

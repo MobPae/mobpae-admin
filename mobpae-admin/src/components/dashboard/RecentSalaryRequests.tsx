@@ -50,41 +50,41 @@ export default function RecentSalaryRequests() {
         return "bg-amber-100 text-amber-700";
 
       case "APPROVED":
-        return "bg-[#E7F1FC] text-[#185FA5]";
+        return "bg-[#DBEAFE] text-[#1D4ED8]";
 
       case "DISBURSED":
-        return "bg-[#EBF6E3] text-[#3B6D11]";
+        return "bg-[#DCFCE7] text-[#15803D]";
 
       case "REPAID":
-        return "bg-[#D4EDE5] text-[#1A5944]";
+        return "bg-[#DCFCE7] text-[#166534]";
 
       default:
-        return "bg-[#F0F0F8] text-[#62657A]";
+        return "bg-[#F3F4F6] text-[#6B7280]";
     }
   };
 
   return (
-    <div className="col-span-6 bg-white border border-[#E4E4EF] rounded-3xl shadow-sm">
+    <div className="col-span-6 bg-white border border-[#E5E7EB] rounded-3xl shadow-sm">
       {/* Header */}
-      <div className="px-6 py-5 border-b border-[#E4E4EF] flex items-center justify-between">
+      <div className="px-6 py-5 border-b border-[#E5E7EB] flex items-center justify-between">
         <div>
-          <h3 className="text-base font-semibold text-[#191A2E]">
+          <h3 className="text-base font-semibold text-[#111827]">
             Recent Salary Requests
           </h3>
 
-          <p className="text-xs text-[#62657A] mt-1">
+          <p className="text-xs text-[#6B7280] mt-1">
             Latest employee advance requests
           </p>
         </div>
 
-        <button className="text-xs font-medium text-[#7679FF] hover:text-[#5659D9] flex items-center gap-1">
+        <button className="text-xs font-medium text-[#6C4CFF] hover:text-[#5B34FF] flex items-center gap-1">
           View All
           <ArrowRight size={12} />
         </button>
       </div>
 
       {/* Rows */}
-      <div className="divide-y divide-[#E4E4EF]">
+      <div className="divide-y divide-[#E5E7EB]">
         {requests.slice(0, 3).map((request, index) => (
           <div
             key={index}
@@ -94,13 +94,13 @@ export default function RecentSalaryRequests() {
                 flex
                 items-center
                 justify-between
-                hover:bg-[#F7F7FB]
+                hover:bg-[#F8F9FC]
                 transition-all
               "
           >
             {/* Employee */}
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-[#F0F0F8] flex items-center justify-center text-xs font-semibold text-[#62657A]">
+              <div className="w-10 h-10 rounded-full bg-[#F3F4F6] flex items-center justify-center text-xs font-semibold text-[#6B7280]">
                 {request.employee.name
                   .split(" ")
                   .map((word) => word[0])
@@ -108,18 +108,18 @@ export default function RecentSalaryRequests() {
               </div>
 
               <div>
-                <p className="text-sm font-medium text-[#191A2E]">
+                <p className="text-sm font-medium text-[#111827]">
                   {request.employee.name}
                 </p>
 
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-[11px] text-[#62657A]">
+                  <span className="text-[11px] text-[#6B7280]">
                     {request.employee.code}
                   </span>
 
-                  <span className="w-1 h-1 rounded-full bg-[#D4D5E0]" />
+                  <span className="w-1 h-1 rounded-full bg-[#D1D5DB]" />
 
-                  <span className="text-[11px] text-[#62657A]">
+                  <span className="text-[11px] text-[#6B7280]">
                     {request.employee.employer}
                   </span>
                 </div>
@@ -130,14 +130,14 @@ export default function RecentSalaryRequests() {
             <div className="flex items-center gap-5">
               <div className="text-right">
                 <div className="flex items-center justify-end gap-1">
-                  <IndianRupee size={12} className="text-[#62657A]" />
+                  <IndianRupee size={12} className="text-[#6B7280]" />
 
-                  <span className="text-sm font-semibold text-[#191A2E]">
+                  <span className="text-sm font-semibold text-[#111827]">
                     {request.amount.replace("₹", "")}
                   </span>
                 </div>
 
-                <span className="text-[11px] text-[#62657A]">
+                <span className="text-[11px] text-[#6B7280]">
                   {request.requestedAt}
                 </span>
               </div>

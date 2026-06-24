@@ -26,7 +26,7 @@ export default function EmployerManagementCard({
       className="
         bg-white
         border
-        border-[#E4E4EF]
+        border-[#E5E7EB]
         rounded-3xl
         p-5
         shadow-sm
@@ -45,8 +45,8 @@ export default function EmployerManagementCard({
               h-12
               rounded-xl
               bg-gradient-to-br
-              from-[#7679FF]
-              to-[#5659D9]
+              from-[#6C4CFF]
+              to-[#5B34FF]
               text-white
               flex
               items-center
@@ -58,18 +58,18 @@ export default function EmployerManagementCard({
           </div>
 
           <div>
-            <h3 className="text-base font-semibold text-[#191A2E]">
+            <h3 className="text-base font-semibold text-[#111827]">
               {companyName}
             </h3>
 
-            <p className="text-xs text-[#62657A] mt-1">Code: {companyCode}</p>
+            <p className="text-xs text-[#6B7280] mt-1">Code: {companyCode}</p>
           </div>
         </div>
 
         <span
           className={`px-3 py-1 rounded-full text-xs font-medium ${
             status === "ACTIVE"
-              ? "bg-[#EBF6E3] text-[#3B6D11]"
+              ? "bg-[#DCFCE7] text-[#15803D]"
               : "bg-red-100 text-red-700"
           }`}
         >
@@ -80,30 +80,30 @@ export default function EmployerManagementCard({
       {/* Content */}
       <div className="mt-5 space-y-3">
         <div className="flex items-start gap-3">
-          <User size={18} className="text-[#62657A] mt-0.5" />
+          <User size={18} className="text-[#6B7280] mt-0.5" />
 
           <div>
-            <p className="text-[#191A2E] font-medium">{contactPerson}</p>
+            <p className="text-[#111827] font-medium">{contactPerson}</p>
 
-            <p className="text-sm text-[#62657A]">Primary Contact</p>
+            <p className="text-sm text-[#6B7280]">Primary Contact</p>
           </div>
         </div>
 
         <div className="flex items-start gap-3">
-          <Mail size={18} className="text-[#62657A] mt-0.5" />
+          <Mail size={18} className="text-[#6B7280] mt-0.5" />
 
-          <p className="text-[#62657A]">{email}</p>
+          <p className="text-[#6B7280]">{email}</p>
         </div>
 
         <div className="flex items-start gap-3">
-          <Building2 size={18} className="text-[#62657A] mt-0.5" />
+          <Building2 size={18} className="text-[#6B7280] mt-0.5" />
 
-          <p className="text-[#62657A]">Payroll Date: {payrollDate}</p>
+          <p className="text-[#6B7280]">Payroll Date: {payrollDate}</p>
         </div>
       </div>
 
       {/* Footer */}
-      <div className="mt-5 pt-4 border-t border-[#E4E4EF] flex items-center justify-end">
+      <div className="mt-5 pt-4 border-t border-[#E5E7EB] flex items-center justify-end">
         <button
           onClick={onView}
           className="
@@ -113,11 +113,11 @@ export default function EmployerManagementCard({
             px-4
             py-2
             border
-            border-[#E4E4EF]
+            border-[#E5E7EB]
             rounded-xl
-            text-[#7679FF]
+            text-[#6C4CFF]
             text-xs
-            hover:bg-[#F7F7FB]
+            hover:bg-[#F8F9FC]
           "
         >
           View Details

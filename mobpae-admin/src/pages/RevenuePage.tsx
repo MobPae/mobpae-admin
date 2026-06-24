@@ -8,40 +8,29 @@ const formatCurrency = (v: string | number | null | undefined) => {
   return fmt.format(Number.isFinite(n as number) ? (n as number) : 0);
 };
 
-function RevenueCard({
-  label,
-  value,
-  icon,
-  iconBg,
-  iconColor,
-  sub,
-  highlight,
-}: {
-  label: string;
-  value: string;
-  icon: React.ReactNode;
-  iconBg: string;
-  iconColor: string;
-  sub?: string;
-  highlight?: boolean;
+function RevenueCard({ label, value, icon, iconBg, sub, highlight }: {
+  label: string; value: string; icon: React.ReactNode;
+  iconBg: string; sub?: string; highlight?: boolean;
 }) {
-  return (
-    <div
-      className={`rounded-xl px-6 py-5 flex flex-col gap-3 ${
-        highlight
-          ? "bg-[#7679FF] border border-[#5659D9]"
-          : "bg-white border border-[#E4E4EF]"
-      }`}
-    >
-      <div className="flex items-center justify-between">
-        <span className={`text-[12px] font-[500] ${highlight ? "text-white/60" : "text-[#62657A]"}`}>{label}</span>
-        <div className={`w-8 h-8 rounded-lg ${iconBg} flex items-center justify-center ${iconColor}`}>{icon}</div>
+  if (highlight) {
+    return (
+      <div style={{ background: "linear-gradient(135deg, #5B34FF 0%, #6C4CFF 100%)", borderRadius: 16, padding: "14px 16px", border: "1px solid #5B34FF", boxShadow: "0 4px 20px rgba(108,76,255,0.25)", display: "flex", alignItems: "center", gap: 14 }}>
+        <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "white" }}>{icon}</div>
+        <div>
+          <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1, color: "white" }}>{value}</div>
+          <div style={{ fontSize: 12, marginTop: 3, fontWeight: 500, color: "rgba(255,255,255,0.75)" }}>{label}</div>
+          {sub && <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", marginTop: 2 }}>{sub}</div>}
+        </div>
       </div>
+    );
+  }
+  return (
+    <div style={{ background: "white", borderRadius: 16, padding: "14px 16px", border: "1px solid #E5E7EB", boxShadow: "0 1px 4px rgba(17,24,39,0.04)", display: "flex", alignItems: "center", gap: 14 }}>
+      <div style={{ width: 40, height: 40, borderRadius: 12, background: iconBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{icon}</div>
       <div>
-        <p className={`text-[28px] font-[700] tracking-[-0.02em] leading-none ${highlight ? "text-white" : "text-[#191A2E]"}`}>
-          {value}
-        </p>
-        {sub && <p className={`text-[11px] mt-1.5 ${highlight ? "text-white/40" : "text-[#62657A]"}`}>{sub}</p>}
+        <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1, color: "#111827" }}>{value}</div>
+        <div style={{ fontSize: 12, marginTop: 3, fontWeight: 500, color: "#6B7280" }}>{label}</div>
+        {sub && <div style={{ fontSize: 11, color: "#9CA3AF", marginTop: 2 }}>{sub}</div>}
       </div>
     </div>
   );
@@ -54,86 +43,80 @@ export default function RevenuePage() {
   });
 
   return (
-    <div className="px-8 py-6 space-y-6">
+    <div style={{ padding: "28px 32px", fontFamily: "Inter, ui-sans-serif, sans-serif" }}>
       {/* Header */}
-      <div>
-        <h1 className="text-[22px] font-[600] text-[#191A2E] tracking-[-0.01em]">Revenue</h1>
-        <p className="text-[13px] text-[#62657A] mt-0.5">Platform revenue from memberships and interest</p>
+      <div style={{ marginBottom: 28 }}>
+        <h1 style={{ fontSize: 26, fontWeight: 700, color: "#111827", letterSpacing: "-0.025em", margin: 0 }}>Revenue</h1>
+        <p style={{ fontSize: 14, color: "#6B7280", marginTop: 6 }}>Platform revenue from memberships and interest.</p>
       </div>
 
       {isLoading && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 24 }}>
           {[1, 2, 3].map(i => (
-            <div key={i} className="h-32 bg-white border border-[#E4E4EF] rounded-xl animate-pulse" />
+            <div key={i} style={{ height: 76, background: "white", border: "1px solid #E5E7EB", borderRadius: 16 }} className="animate-pulse" />
           ))}
         </div>
       )}
 
       {error && (
-        <div className="bg-red-50 border border-red-100 rounded-xl p-5">
-          <p className="text-[13px] font-[500] text-red-700">Failed to load revenue data</p>
-          <p className="text-[12px] text-red-500 mt-1">{error instanceof Error ? error.message : "Unknown error"}</p>
-          <button type="button" onClick={() => void refetch()} className="mt-3 h-8 px-3 rounded-lg bg-white border border-red-200 text-[12px] font-[600] text-red-700 hover:bg-red-50">Try again</button>
+        <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 16, padding: "20px 24px" }}>
+          <p style={{ fontSize: 13, fontWeight: 500, color: "#DC2626", margin: 0 }}>Failed to load revenue data</p>
+          <p style={{ fontSize: 12, color: "#EF4444", marginTop: 4 }}>{error instanceof Error ? error.message : "Unknown error"}</p>
+          <button type="button" onClick={() => void refetch()} style={{ marginTop: 12, height: 34, padding: "0 14px", borderRadius: 10, background: "white", border: "1px solid #FECACA", fontSize: 12, fontWeight: 600, color: "#DC2626", cursor: "pointer", fontFamily: "inherit" }}>Try again</button>
         </div>
       )}
 
       {revenue && (
         <>
-          {/* Revenue cards — GET /membership/revenue-summary */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Revenue cards */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 24 }}>
             <RevenueCard
               label="Total Revenue"
               value={formatCurrency(revenue.totalRevenue)}
-              icon={<TrendingUp size={16} />}
-              iconBg="bg-white/15"
-              iconColor="text-white/80"
+              icon={<TrendingUp size={18} color="white" strokeWidth={1.75} />}
+              iconBg="rgba(255,255,255,0.15)"
               sub="Membership + interest combined"
               highlight
             />
             <RevenueCard
               label="Membership Revenue"
               value={formatCurrency(revenue.membershipRevenue)}
-              icon={<CreditCard size={16} />}
-              iconBg="bg-[#ECEBFF]"
-              iconColor="text-[#7679FF]"
+              icon={<CreditCard size={18} color="#6C4CFF" strokeWidth={1.75} />}
+              iconBg="#F3F0FF"
               sub="From membership plan payments"
             />
             <RevenueCard
               label="Interest Revenue"
               value={formatCurrency(revenue.interestRevenue)}
-              icon={<CircleDollarSign size={16} />}
-              iconBg="bg-[#ECEBFF]"
-              iconColor="text-[#7679FF]"
+              icon={<CircleDollarSign size={18} color="#16A34A" strokeWidth={1.75} />}
+              iconBg="#DCFCE7"
               sub="From salary advance interest"
             />
           </div>
 
           {/* Breakdown */}
-          <div className="bg-white border border-[#E4E4EF] rounded-xl overflow-hidden">
-            <div className="px-5 py-3.5 border-b border-[#E4E4EF]">
-              <p className="text-[13px] font-[600] text-[#191A2E]">Revenue Breakdown</p>
+          <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", overflow: "hidden" }}>
+            <div style={{ padding: "14px 20px", borderBottom: "1px solid #E5E7EB" }}>
+              <p style={{ fontSize: 13, fontWeight: 600, color: "#111827", margin: 0 }}>Revenue Breakdown</p>
             </div>
-            <div className="px-5 py-4 space-y-3">
+            <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: 20 }}>
               {[
-                { label: "Membership revenue", value: revenue.membershipRevenue, color: "#7679FF" },
-                { label: "Interest revenue",   value: revenue.interestRevenue,   color: "#7679FF" },
+                { label: "Membership revenue", value: revenue.membershipRevenue, color: "#6C4CFF" },
+                { label: "Interest revenue",   value: revenue.interestRevenue,   color: "#16A34A" },
               ].map(({ label, value, color }) => {
                 const total = Number(revenue.totalRevenue) || 1;
                 const pct = Math.round((Number(value) / total) * 100);
                 return (
                   <div key={label}>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-[12px] text-[#62657A]">{label}</span>
-                      <span className="text-[12px] font-[600] text-[#191A2E]">
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                      <span style={{ fontSize: 13, color: "#6B7280" }}>{label}</span>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: "#111827" }}>
                         {formatCurrency(value)}
-                        <span className="text-[11px] font-[400] text-[#62657A] ml-1.5">({pct}%)</span>
+                        <span style={{ fontSize: 11, fontWeight: 400, color: "#9CA3AF", marginLeft: 6 }}>({pct}%)</span>
                       </span>
                     </div>
-                    <div className="h-1.5 rounded-full bg-[#F0F0F8] overflow-hidden">
-                      <div
-                        className="h-full rounded-full transition-all duration-500"
-                        style={{ width: `${pct}%`, background: color }}
-                      />
+                    <div style={{ height: 6, borderRadius: 999, background: "#F3F4F6", overflow: "hidden" }}>
+                      <div style={{ height: "100%", borderRadius: 999, background: color, width: `${pct}%`, transition: "width 0.5s ease" }} />
                     </div>
                   </div>
                 );

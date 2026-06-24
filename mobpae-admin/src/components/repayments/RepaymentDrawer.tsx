@@ -16,8 +16,8 @@ interface Props {
 }
 
 const STATUS_BADGE: Record<string, string> = {
-  SCHEDULED: "bg-[#FEF1E7] text-[#9A4910]",
-  PAID:      "bg-[#EBF6E3] text-[#3B6D11]",
+  SCHEDULED: "bg-[#FEF3C7] text-[#B45309]",
+  PAID:      "bg-[#DCFCE7] text-[#15803D]",
   OVERDUE:   "bg-red-50 text-red-600",
 };
 
@@ -50,23 +50,23 @@ export default function RepaymentDrawer({ open, repayment, onClose, onMutated }:
     <>
       <div className="fixed inset-0 bg-black/20 z-40" onClick={onClose} />
 
-      <div className="fixed top-0 right-0 h-full w-[440px] bg-white z-50 flex flex-col border-l border-[#E4E4EF] shadow-xl">
+      <div className="fixed top-0 right-0 h-full w-[440px] bg-white z-50 flex flex-col border-l border-[#E5E7EB] shadow-xl">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E4E4EF] flex-shrink-0">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E5E7EB] flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#191A2E] to-[#2A2C45] text-white flex items-center justify-center text-[12px] font-[600]">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#111827] to-[#2A2C45] text-white flex items-center justify-center text-[12px] font-[600]">
               {emp.name.charAt(0).toUpperCase()}
             </div>
             <div>
-              <p className="text-[13px] font-[500] text-[#191A2E] leading-none">{emp.name}</p>
-              <p className="text-[11px] text-[#62657A] mt-0.5 leading-none">{emp.employer.companyName}</p>
+              <p className="text-[13px] font-[500] text-[#111827] leading-none">{emp.name}</p>
+              <p className="text-[11px] text-[#6B7280] mt-0.5 leading-none">{emp.employer.companyName}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <span className={`inline-flex h-[18px] px-1.5 rounded-[3px] items-center text-[11px] font-[500] ${STATUS_BADGE[repayment.status] ?? "bg-[#F0F0F8] text-[#62657A]"}`}>
+            <span className={`inline-flex h-[18px] px-1.5 rounded-[3px] items-center text-[11px] font-[500] ${STATUS_BADGE[repayment.status] ?? "bg-[#F3F4F6] text-[#6B7280]"}`}>
               {repayment.status}
             </span>
-            <button onClick={onClose} className="w-6 h-6 rounded-md flex items-center justify-center text-[#62657A] hover:text-[#62657A] hover:bg-[#F0F0F8] transition-colors">
+            <button onClick={onClose} className="w-6 h-6 rounded-md flex items-center justify-center text-[#6B7280] hover:text-[#6B7280] hover:bg-[#F3F4F6] transition-colors">
               <X size={14} />
             </button>
           </div>
@@ -76,8 +76,8 @@ export default function RepaymentDrawer({ open, repayment, onClose, onMutated }:
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
           {/* Repayment details */}
           <section>
-            <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-[#62657A] mb-2">Repayment details</p>
-            <div className="border border-[#E4E4EF] rounded-lg divide-y divide-[#E4E4EF]">
+            <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-[#6B7280] mb-2">Repayment details</p>
+            <div className="border border-[#E5E7EB] rounded-lg divide-y divide-[#E5E7EB]">
               {[
                 { k: "Principal amount", v: fmt(repayment.principalAmount) },
                 { k: "Interest amount",  v: fmt(repayment.interestAmount)  },
@@ -89,8 +89,8 @@ export default function RepaymentDrawer({ open, repayment, onClose, onMutated }:
                 ...(repayment.remarks ? [{ k: "Remarks", v: repayment.remarks }] : []),
               ].map(({ k, v }) => (
                 <div key={k} className="flex items-center justify-between px-3 py-2.5">
-                  <span className="text-[11px] text-[#62657A]">{k}</span>
-                  <span className="text-[11px] font-[500] text-[#191A2E] text-right max-w-[60%] truncate">{v}</span>
+                  <span className="text-[11px] text-[#6B7280]">{k}</span>
+                  <span className="text-[11px] font-[500] text-[#111827] text-right max-w-[60%] truncate">{v}</span>
                 </div>
               ))}
             </div>
@@ -98,8 +98,8 @@ export default function RepaymentDrawer({ open, repayment, onClose, onMutated }:
 
           {/* Employee */}
           <section>
-            <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-[#62657A] mb-2">Employee</p>
-            <div className="border border-[#E4E4EF] rounded-lg divide-y divide-[#E4E4EF]">
+            <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-[#6B7280] mb-2">Employee</p>
+            <div className="border border-[#E5E7EB] rounded-lg divide-y divide-[#E5E7EB]">
               {[
                 { k: "Name",          v: emp.name },
                 { k: "Employee code", v: <span className="font-mono">{emp.employeeCode}</span> },
@@ -107,8 +107,8 @@ export default function RepaymentDrawer({ open, repayment, onClose, onMutated }:
                 { k: "Employer",      v: emp.employer.companyName },
               ].map(({ k, v }) => (
                 <div key={k} className="flex items-center justify-between px-3 py-2.5">
-                  <span className="text-[11px] text-[#62657A]">{k}</span>
-                  <span className="text-[11px] font-[500] text-[#191A2E] text-right max-w-[60%] truncate">{v}</span>
+                  <span className="text-[11px] text-[#6B7280]">{k}</span>
+                  <span className="text-[11px] font-[500] text-[#111827] text-right max-w-[60%] truncate">{v}</span>
                 </div>
               ))}
             </div>
@@ -116,15 +116,15 @@ export default function RepaymentDrawer({ open, repayment, onClose, onMutated }:
 
           {/* Original salary request */}
           <section>
-            <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-[#62657A] mb-2">Salary request</p>
-            <div className="border border-[#E4E4EF] rounded-lg divide-y divide-[#E4E4EF]">
+            <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-[#6B7280] mb-2">Salary request</p>
+            <div className="border border-[#E5E7EB] rounded-lg divide-y divide-[#E5E7EB]">
               {[
                 { k: "Request ID",     v: <span className="font-mono text-[11px]">{repayment.salaryRequestId}</span> },
                 { k: "Advance amount", v: fmt(repayment.salaryRequest.amount) },
               ].map(({ k, v }) => (
                 <div key={k} className="flex items-center justify-between px-3 py-2.5">
-                  <span className="text-[11px] text-[#62657A]">{k}</span>
-                  <span className="text-[11px] font-[500] text-[#191A2E] text-right max-w-[60%] truncate">{v}</span>
+                  <span className="text-[11px] text-[#6B7280]">{k}</span>
+                  <span className="text-[11px] font-[500] text-[#111827] text-right max-w-[60%] truncate">{v}</span>
                 </div>
               ))}
             </div>
@@ -133,11 +133,11 @@ export default function RepaymentDrawer({ open, repayment, onClose, onMutated }:
 
         {/* Footer — Mark Paid action */}
         {canMarkPaid && (
-          <div className="border-t border-[#E4E4EF] px-5 py-3.5 flex-shrink-0">
+          <div className="border-t border-[#E5E7EB] px-5 py-3.5 flex-shrink-0">
             <button
               onClick={() => setConfirmOpen(true)}
               disabled={markPaidMutation.isPending}
-              className="w-full h-8 rounded-md bg-[#7679FF] hover:bg-[#5659D9] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
+              className="w-full h-8 rounded-md bg-[#6C4CFF] hover:bg-[#5B34FF] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
             >
               {markPaidMutation.isPending
                 ? <Loader2 size={12} className="animate-spin" />
@@ -153,7 +153,7 @@ export default function RepaymentDrawer({ open, repayment, onClose, onMutated }:
         title="Mark repayment as paid"
         description={`This will record ${fmt(repayment.totalAmount)} from ${repayment.salaryRequest.employee.name} as received. This cannot be undone.`}
         confirmLabel="Mark Paid"
-        confirmClass="bg-[#7679FF] hover:bg-[#5659D9] text-white"
+        confirmClass="bg-[#6C4CFF] hover:bg-[#5B34FF] text-white"
         loading={markPaidMutation.isPending}
         onConfirm={() => { setConfirmOpen(false); markPaidMutation.mutate(); }}
         onCancel={() => setConfirmOpen(false)}

@@ -40,7 +40,7 @@ export function ConfirmModal({
       />
       {/* Modal */}
       <div
-        className="relative w-full max-w-sm bg-white rounded-2xl shadow-2xl border border-[#E4E4EF] p-6 animate-in fade-in zoom-in-95 duration-150"
+        className="relative w-full max-w-sm bg-white rounded-2xl shadow-2xl border border-[#E5E7EB] p-6 animate-in fade-in zoom-in-95 duration-150"
         role="alertdialog"
         aria-modal="true"
         aria-label={title}
@@ -50,15 +50,15 @@ export function ConfirmModal({
             <AlertTriangle size={16} className="text-red-500" />
           </div>
           <div>
-            <h3 className="text-[14px] font-[700] text-[#191A2E] leading-snug">{title}</h3>
-            <p className="text-[12px] text-[#62657A] mt-1 leading-relaxed">{description}</p>
+            <h3 className="text-[14px] font-[700] text-[#111827] leading-snug">{title}</h3>
+            <p className="text-[12px] text-[#6B7280] mt-1 leading-relaxed">{description}</p>
           </div>
         </div>
         <div className="flex gap-2 justify-end">
           <button
             onClick={onCancel}
             disabled={loading}
-            className="h-8 px-4 text-[12px] font-[500] text-[#62657A] bg-white border border-[#E4E4EF] rounded-lg hover:bg-[#F7F7FB] transition-colors disabled:opacity-50"
+            className="h-8 px-4 text-[12px] font-[500] text-[#6B7280] bg-white border border-[#E5E7EB] rounded-lg hover:bg-[#F8F9FC] transition-colors disabled:opacity-50"
           >
             Cancel
           </button>

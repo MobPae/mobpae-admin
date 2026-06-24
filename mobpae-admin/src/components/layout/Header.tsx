@@ -19,11 +19,11 @@ export default function Header() {
   };
 
   return (
-    <header className="h-16 bg-white border-b border-[#E4E4EF] px-8 flex items-center justify-end">
+    <header className="h-16 bg-white border-b border-[#E5E7EB] px-8 flex items-center justify-end">
       <div className="flex items-center gap-4">
         {/* Search */}
         <div className="relative">
-          <Search size={16} className="absolute left-3 top-3 text-[#62657A]" />
+          <Search size={16} className="absolute left-3 top-3 text-[#6B7280]" />
 
           <input
             placeholder="Search..."
@@ -33,12 +33,12 @@ export default function Header() {
               pr-4
               py-2.5
               text-sm
-              bg-[#F7F7FB]
+              bg-[#F8F9FC]
               border
-              border-[#E4E4EF]
+              border-[#E5E7EB]
               rounded-xl
               outline-none
-              focus:border-[#7679FF]
+              focus:border-[#6C4CFF]
             "
           />
         </div>
@@ -47,13 +47,13 @@ export default function Header() {
         <NotificationBell />
 
         {/* Profile */}
-        <div className="flex items-center gap-3 border-l border-[#E4E4EF] pl-4">
+        <div className="flex items-center gap-3 border-l border-[#E5E7EB] pl-4">
           <div
             className="
               w-10
               h-10
               rounded-full
-              bg-[#7679FF]
+              bg-[#6C4CFF]
               text-white
               flex
               items-center
@@ -65,9 +65,9 @@ export default function Header() {
           </div>
 
           <div>
-            <p className="text-sm font-medium text-[#191A2E]">Admin User</p>
+            <p className="text-sm font-medium text-[#111827]">Admin User</p>
 
-            <p className="text-xs text-[#62657A]">Super Admin</p>
+            <p className="text-xs text-[#6B7280]">Super Admin</p>
           </div>
         </div>
 
@@ -79,9 +79,9 @@ export default function Header() {
             px-4
             rounded-xl
             border
-            border-[#E4E4EF]
-            text-[#62657A]
-            hover:bg-[#F7F7FB]
+            border-[#E5E7EB]
+            text-[#6B7280]
+            hover:bg-[#F8F9FC]
             flex
             items-center
             gap-2

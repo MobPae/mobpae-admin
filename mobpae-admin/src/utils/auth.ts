@@ -40,6 +40,23 @@ export function getTokenRole(token = getToken()) {
   }
 }
 
+export function getTokenName(token = getToken()): string | null {
+  if (!token) return null;
+  try {
+    const [, payload] = token.split(".");
+    if (!payload) return null;
+    const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(
+      normalized.length + ((4 - (normalized.length % 4)) % 4),
+      "="
+    );
+    const decoded = JSON.parse(atob(padded)) as { name?: string; email?: string };
+    return decoded.name ?? decoded.email ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export function isAuthenticated() {
   const token = getToken();
   if (!token) return false;

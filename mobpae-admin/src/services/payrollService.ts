@@ -1,5 +1,5 @@
 // Payroll service — admin portal
-import { apiClient } from "../lib/api-client";
+import api from "../lib/axios";
 
 /**
  * POST /payroll/process-recovery/:employerId
@@ -7,5 +7,5 @@ import { apiClient } from "../lib/api-client";
  * creates a settlement, and re-enables employee eligibility.
  */
 export async function processRecovery(employerId: string): Promise<void> {
-  await apiClient.post(`/payroll/process-recovery/${employerId}`);
+  await api.post(`/payroll/process-recovery/${employerId}`);
 }

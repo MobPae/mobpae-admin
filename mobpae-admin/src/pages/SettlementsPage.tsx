@@ -39,18 +39,19 @@ const formatPayrollMonth = (raw: string) => {
 
 // ── status config ─────────────────────────────────────────────────────────────
 
-const STATUS_CFG: Record<EmployerSettlementStatus, { label: string; bg: string; text: string; dot: string }> = {
-  PENDING:        { label: "Pending", dot: "bg-amber-400", text: "text-amber-700", bg: "bg-amber-50" },
-  PARTIALLY_PAID: { label: "Partially Paid", dot: "bg-[#D45F18]", text: "text-[#9A4910]", bg: "bg-[#FEF1E7]" },
-  PAID:           { label: "Paid", dot: "bg-[#4E8A18]", text: "text-[#3B6D11]", bg: "bg-[#EBF6E3]" },
-  OVERDUE:        { label: "Overdue", dot: "bg-red-400", text: "text-red-600", bg: "bg-red-50" },
+const STATUS_CFG: Record<string, { label: string; color: string; bg: string }> = {
+  NO_DUES:        { label: "N/A",            color: "#6B7280", bg: "#F3F4F6" },
+  PENDING:        { label: "Pending",        color: "#D97706", bg: "#FEF3C7" },
+  PARTIALLY_PAID: { label: "Partially Paid", color: "#B45309", bg: "#FEF3C7" },
+  PAID:           { label: "Paid",           color: "#16A34A", bg: "#DCFCE7" },
+  OVERDUE:        { label: "Overdue",        color: "#DC2626", bg: "#FEE2E2" },
 };
 
-function StatusPill({ status }: { status: EmployerSettlementStatus }) {
-  const c = STATUS_CFG[status];
+function StatusPill({ status }: { status: string }) {
+  const c = STATUS_CFG[status] ?? { label: status, color: "#6B7280", bg: "#F3F4F6" };
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-[500] ${c.bg} ${c.text}`}>
-      <span className={`w-1.5 h-1.5 rounded-full ${c.dot}`} />
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 5, height: 24, padding: "0 10px", borderRadius: 999, background: c.bg, color: c.color, fontSize: 12, fontWeight: 600 }}>
+      <span style={{ width: 6, height: 6, borderRadius: "50%", background: c.color, flexShrink: 0 }} />
       {c.label}
     </span>
   );
@@ -76,22 +77,18 @@ let _toastId = 0;
 function ToastContainer({ toasts, onDismiss }: { toasts: Toast[]; onDismiss: (id: number) => void }) {
   if (!toasts.length) return null;
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none">
+    <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 50, display: "flex", flexDirection: "column", gap: 8, pointerEvents: "none" }}>
       {toasts.map(t => (
         <div
           key={t.id}
-          className={`pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-[13px] font-[500] border min-w-[260px] ${
-            t.kind === "success"
-              ? "bg-[#ECEBFF] border-[#C8C9FF] text-[#191A2E]"
-              : "bg-red-50 border-red-200 text-red-800"
-          }`}
+          style={{ pointerEvents: "auto", display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", borderRadius: 14, boxShadow: "0 4px 20px rgba(0,0,0,0.12)", fontSize: 13, fontWeight: 500, border: "1px solid", minWidth: 260, background: t.kind === "success" ? "#F3F0FF" : "#FEF2F2", borderColor: t.kind === "success" ? "#C8C9FF" : "#FECACA", color: t.kind === "success" ? "#111827" : "#991B1B" }}
         >
           {t.kind === "success"
-            ? <CheckCircle2 size={15} className="text-[#7679FF] flex-shrink-0" />
-            : <AlertTriangle size={15} className="text-red-500 flex-shrink-0" />
+            ? <CheckCircle2 size={15} color="#6C4CFF" style={{ flexShrink: 0 }} />
+            : <AlertTriangle size={15} color="#EF4444" style={{ flexShrink: 0 }} />
           }
-          <span className="flex-1">{t.message}</span>
-          <button onClick={() => onDismiss(t.id)} className="text-inherit opacity-40 hover:opacity-70">
+          <span style={{ flex: 1 }}>{t.message}</span>
+          <button onClick={() => onDismiss(t.id)} style={{ background: "none", border: "none", cursor: "pointer", opacity: 0.4, color: "inherit", padding: 0 }}>
             <X size={13} />
           </button>
         </div>
@@ -102,16 +99,27 @@ function ToastContainer({ toasts, onDismiss }: { toasts: Toast[]; onDismiss: (id
 
 // ── stat card ─────────────────────────────────────────────────────────────────
 
-function StatCard({ label, value, icon, iconBg, iconColor, highlight, sub }: {
+function StatCard({ label, value, icon, iconBg, iconColor, highlight }: {
   label: string; value: React.ReactNode; icon: React.ReactNode;
-  iconBg: string; iconColor: string; highlight?: boolean; sub?: string;
+  iconBg: string; iconColor: string; highlight?: boolean;
 }) {
+  if (highlight) {
+    return (
+      <div style={{ background: "linear-gradient(135deg, #5B34FF 0%, #6C4CFF 100%)", borderRadius: 16, padding: "14px 16px", border: "1px solid #5B34FF", boxShadow: "0 4px 20px rgba(108,76,255,0.25)", display: "flex", alignItems: "center", gap: 14 }}>
+        <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "white" }}>{icon}</div>
+        <div>
+          <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1, color: "white" }}>{value}</div>
+          <div style={{ fontSize: 12, marginTop: 3, fontWeight: 500, color: "rgba(255,255,255,0.75)" }}>{label}</div>
+        </div>
+      </div>
+    );
+  }
   return (
-    <div className={`rounded-xl px-4 py-3.5 flex items-center gap-3 border ${highlight ? "bg-[#7679FF] border-[#5659D9]" : "bg-white border-[#E4E4EF]"}`}>
-      <div className={`w-8 h-8 rounded-lg ${iconBg} flex items-center justify-center ${iconColor} flex-shrink-0`}>{icon}</div>
+    <div style={{ background: "white", borderRadius: 16, padding: "14px 16px", border: "1px solid #E5E7EB", boxShadow: "0 1px 4px rgba(17,24,39,0.04)", display: "flex", alignItems: "center", gap: 14 }}>
+      <div style={{ width: 40, height: 40, borderRadius: 12, background: iconBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: iconColor }}>{icon}</div>
       <div>
-        <p className={`text-[20px] font-[600] leading-none tabular-nums ${highlight ? "text-white" : "text-[#191A2E]"}`}>{value}</p>
-        <p className={`text-[11px] mt-0.5 ${highlight ? "text-white/40" : "text-[#62657A]"}`}>{label}{sub ? ` · ${sub}` : ""}</p>
+        <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1, color: "#111827" }}>{value}</div>
+        <div style={{ fontSize: 12, marginTop: 3, fontWeight: 500, color: "#6B7280" }}>{label}</div>
       </div>
     </div>
   );
@@ -121,9 +129,9 @@ function StatCard({ label, value, icon, iconBg, iconColor, highlight, sub }: {
 
 function InfoRow({ label, value, accent }: { label: string; value: React.ReactNode; accent?: boolean }) {
   return (
-    <div className="flex items-center justify-between py-2.5 border-b border-[#F0F0F8] last:border-0">
-      <span className="text-[12px] text-[#62657A]">{label}</span>
-      <span className={`text-[12px] font-[500] ${accent ? "text-red-600" : "text-[#191A2E]"}`}>{value}</span>
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #F3F4F6" }}>
+      <span style={{ fontSize: 12, color: "#6B7280" }}>{label}</span>
+      <span style={{ fontSize: 12, fontWeight: 500, color: accent ? "#DC2626" : "#111827" }}>{value}</span>
     </div>
   );
 }
@@ -137,20 +145,20 @@ function Timeline({ s }: { s: EmployerSettlement }) {
   ].filter(x => !x.skip);
 
   return (
-    <div className="space-y-0">
+    <div>
       {steps.map((step, i) => (
-        <div key={step.label} className="flex gap-3">
-          <div className="flex flex-col items-center">
-            <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 border-2 ${step.done ? "border-[#7679FF] bg-[#ECEBFF]" : "border-[#E4E4EF] bg-white"}`}>
+        <div key={step.label} style={{ display: "flex", gap: 12 }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <div style={{ width: 20, height: 20, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, border: `2px solid ${step.done ? "#6C4CFF" : "#E5E7EB"}`, background: step.done ? "#F3F0FF" : "white" }}>
               {step.done
-                ? <CheckCircle2 size={11} className="text-[#7679FF]" />
-                : <span className="w-1.5 h-1.5 rounded-full bg-[#D4D5E0]" />}
+                ? <CheckCircle2 size={11} color="#6C4CFF" />
+                : <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#D1D5DB" }} />}
             </div>
-            {i < steps.length - 1 && <div className={`w-px flex-1 my-1 ${step.done ? "bg-[#C8C9FF]" : "bg-[#F0F0F8]"}`} style={{ minHeight: 18 }} />}
+            {i < steps.length - 1 && <div style={{ width: 1, flex: 1, margin: "4px 0", background: step.done ? "#C8C9FF" : "#F3F4F6", minHeight: 18 }} />}
           </div>
-          <div className="pb-4">
-            <p className={`text-[12px] font-[500] leading-none ${step.done ? "text-[#191A2E]" : "text-[#62657A]"}`}>{step.label}</p>
-            {step.date && <p className="text-[11px] text-[#62657A] mt-0.5">{formatDate(step.date)}</p>}
+          <div style={{ paddingBottom: 16 }}>
+            <p style={{ fontSize: 12, fontWeight: 500, color: step.done ? "#111827" : "#6B7280", margin: 0, lineHeight: 1 }}>{step.label}</p>
+            {step.date && <p style={{ fontSize: 11, color: "#6B7280", marginTop: 2 }}>{formatDate(step.date)}</p>}
           </div>
         </div>
       ))}
@@ -247,156 +255,128 @@ export default function SettlementsPage() {
     s.status === "PENDING" || s.status === "PARTIALLY_PAID" || s.status === "OVERDUE";
 
   return (
-    <div className="px-8 py-6 space-y-5">
+    <div style={{ padding: "28px 32px" }}>
       {/* Toast container */}
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
 
       {/* Header */}
-      <div>
-        <h1 className="text-[22px] font-[600] text-[#191A2E] tracking-[-0.01em]">Settlements</h1>
-        <p className="text-[13px] text-[#62657A] mt-0.5">Track employer settlement obligations to MobPae</p>
+      <div style={{ marginBottom: 0 }}>
+        <h1 style={{ fontSize: 26, fontWeight: 700, color: "#111827", letterSpacing: "-0.025em", margin: 0, fontFamily: "Inter, ui-sans-serif, sans-serif" }}>Settlements</h1>
+        <p style={{ fontSize: 14, color: "#6B7280", marginTop: 6 }}>Track employer settlement obligations to MobPae.</p>
       </div>
 
       {/* Summary cards */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
-        <StatCard
-          label="Outstanding"
-          value={formatCurrency(totalOutstanding)}
-          icon={<CircleDollarSign size={15} />}
-          iconBg="bg-white/10" iconColor="text-white/80"
-          highlight
-          sub="owed to MobPae"
-        />
-        <StatCard
-          label="Pending"
-          value={counts["PENDING"] ?? 0}
-          icon={<Clock3 size={15} />}
-          iconBg="bg-amber-50" iconColor="text-amber-600"
-        />
-        <StatCard
-          label="Overdue"
-          value={counts["OVERDUE"] ?? 0}
-          icon={<AlertTriangle size={15} />}
-          iconBg="bg-red-50" iconColor="text-red-600"
-        />
-        <StatCard
-          label="Paid"
-          value={counts["PAID"] ?? 0}
-          icon={<CheckCircle2 size={15} />}
-          iconBg="bg-[#ECEBFF]" iconColor="text-[#7679FF]"
-        />
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 24, marginTop: 24 }}>
+        <StatCard label="Outstanding"  value={formatCurrency(totalOutstanding)} icon={<CircleDollarSign size={18} strokeWidth={1.75} />} iconBg="rgba(255,255,255,0.15)" iconColor="white"     highlight />
+        <StatCard label="Pending"      value={counts["PENDING"] ?? 0}           icon={<Clock3 size={18} strokeWidth={1.75} />}           iconBg="#FEF3C7"              iconColor="#D97706" />
+        <StatCard label="Overdue"      value={counts["OVERDUE"] ?? 0}           icon={<AlertTriangle size={18} strokeWidth={1.75} />}    iconBg="#FEE2E2"              iconColor="#EF4444" />
+        <StatCard label="Paid"         value={counts["PAID"] ?? 0}              icon={<CheckCircle2 size={18} strokeWidth={1.75} />}     iconBg="#F3F0FF"              iconColor="#6C4CFF" />
       </div>
 
       {/* Search + filter */}
-      <div className="flex items-center gap-3 flex-wrap">
-        <div className="relative">
-          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#62657A]" />
+      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 20 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, height: 40, padding: "0 14px", background: "white", border: "1px solid #E5E7EB", borderRadius: 12, minWidth: 240 }}>
+          <Search size={14} style={{ color: "#9CA3AF", flexShrink: 0 }} />
           <input
             type="text"
             placeholder="Search by employer, month, ref…"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="h-8 pl-8 pr-4 text-[12px] bg-white border border-[#E4E4EF] rounded-lg outline-none focus:border-[#7679FF] w-64 text-[#62657A] placeholder-[#B7B9C7]"
+            style={{ flex: 1, fontSize: 13.5, color: "#111827", background: "transparent", outline: "none", border: "none", fontFamily: "inherit" }}
           />
         </div>
-        <div className="flex items-center gap-1.5">
-          {FILTERS.map(f => (
-            <button
-              key={f.value}
-              onClick={() => setFilter(f.value)}
-              className={`h-7 px-3 rounded-full text-[12px] font-[500] transition-colors flex items-center gap-1.5 ${
-                filter === f.value
-                  ? "bg-[#191A2E] text-white"
-                  : "bg-white border border-[#E4E4EF] text-[#62657A] hover:border-[#E4E4EF]"
-              }`}
-            >
-              {f.label}
-              {counts[f.value] !== undefined && (
-                <span className={`text-[11px] font-[700] ${filter === f.value ? "text-white/60" : "text-[#62657A]"}`}>
-                  {counts[f.value]}
-                </span>
-              )}
-            </button>
-          ))}
+        <div style={{ display: "flex", gap: 6 }}>
+          {FILTERS.map(f => {
+            const active = filter === f.value;
+            return (
+              <button
+                key={f.value}
+                onClick={() => setFilter(f.value)}
+                style={{ height: 36, padding: "0 14px", background: active ? "#111827" : "white", color: active ? "white" : "#6B7280", border: `1px solid ${active ? "#111827" : "#E5E7EB"}`, borderRadius: 10, fontSize: 13, fontWeight: active ? 600 : 400, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6 }}
+              >
+                {f.label}
+                {counts[f.value] !== undefined && (
+                  <span style={{ fontSize: 11, opacity: 0.6, fontWeight: 400 }}>{counts[f.value]}</span>
+                )}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Table */}
-      <div className="bg-white border border-[#E4E4EF] rounded-xl overflow-hidden">
+      <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", overflow: "hidden" }}>
         {isError ? (
-          <div className="px-6 py-14 text-center">
-            <p className="text-[13px] font-[500] text-red-600">Failed to load settlements</p>
-            <p className="text-[12px] text-[#62657A] mt-1">Check your connection and try again.</p>
-            <button onClick={() => void refetch()} className="mt-4 h-8 px-4 text-[12px] font-[500] bg-white border border-[#E4E4EF] rounded-lg hover:bg-[#F7F7FB] transition-colors text-[#62657A]">
-              Retry
-            </button>
+          <div style={{ padding: "56px 24px", textAlign: "center" }}>
+            <p style={{ fontSize: 13, fontWeight: 500, color: "#DC2626", margin: 0 }}>Failed to load settlements</p>
+            <p style={{ fontSize: 12, color: "#6B7280", marginTop: 4 }}>Check your connection and try again.</p>
+            <button onClick={() => void refetch()} style={{ marginTop: 16, height: 34, padding: "0 16px", background: "white", border: "1px solid #E5E7EB", borderRadius: 10, fontSize: 12, fontWeight: 600, color: "#DC2626", cursor: "pointer", fontFamily: "inherit" }}>Retry</button>
           </div>
         ) : isLoading ? (
           <div>
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="flex items-center gap-4 px-5 py-3.5 border-b border-[#F0F0F8] last:border-0">
-                <div className="w-7 h-7 rounded-lg bg-[#F0F0F8] animate-pulse flex-shrink-0" />
-                <div className="flex-1 space-y-1.5">
-                  <div className="h-2.5 w-28 bg-[#F0F0F8] rounded animate-pulse" />
-                  <div className="h-2 w-20 bg-[#F0F0F8] rounded animate-pulse" />
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 20px", borderBottom: "1px solid #F9FAFB" }}>
+                <div style={{ width: 32, height: 32, borderRadius: 8, background: "#F3F4F6", flexShrink: 0 }} className="animate-pulse" />
+                <div style={{ flex: 1 }}>
+                  <div style={{ height: 12, background: "#F3F4F6", borderRadius: 4, width: 140, marginBottom: 6 }} className="animate-pulse" />
+                  <div style={{ height: 10, background: "#F3F4F6", borderRadius: 4, width: 100 }} className="animate-pulse" />
                 </div>
-                <div className="h-2.5 w-20 bg-[#F0F0F8] rounded animate-pulse" />
-                <div className="h-2.5 w-16 bg-[#F0F0F8] rounded animate-pulse" />
-                <div className="h-4 w-16 bg-[#F0F0F8] rounded-full animate-pulse" />
+                <div style={{ height: 12, background: "#F3F4F6", borderRadius: 4, width: 80 }} className="animate-pulse" />
+                <div style={{ height: 22, background: "#F3F4F6", borderRadius: 999, width: 70 }} className="animate-pulse" />
               </div>
             ))}
           </div>
         ) : !rows.length ? (
-          <div className="py-16 text-center">
-            <div className="w-10 h-10 rounded-xl bg-[#F0F0F8] flex items-center justify-center mb-3 mx-auto">
-              <CreditCard size={18} className="text-[#62657A]" />
+          <div style={{ padding: "60px 24px", textAlign: "center" }}>
+            <div style={{ width: 40, height: 40, borderRadius: 12, background: "#F3F4F6", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>
+              <CreditCard size={18} color="#6B7280" />
             </div>
-            <p className="text-[13px] font-[500] text-[#62657A]">No settlements found</p>
-            <p className="text-[12px] text-[#62657A] mt-1">Settlements appear once employer payroll recoveries are due</p>
+            <p style={{ fontSize: 13, fontWeight: 500, color: "#6B7280", margin: 0 }}>No settlements found</p>
+            <p style={{ fontSize: 12, color: "#9CA3AF", marginTop: 4 }}>Settlements appear once employer payroll recoveries are due</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-[12px]">
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
               <thead>
-                <tr className="border-b border-[#E4E4EF]">
+                <tr style={{ borderBottom: "1px solid #F3F4F6", background: "#FAFAFA" }}>
                   {["Employer", "Payroll Month", "Total", "Outstanding", "Late Fee", "Due Date", "Status", "Actions"].map(h => (
-                    <th key={h} className="px-4 py-3 text-left text-[11px] font-[500] text-[#62657A] whitespace-nowrap">{h}</th>
+                    <th key={h} style={{ padding: "14px 20px", textAlign: "left", fontSize: 11.5, fontWeight: 600, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.07em", whiteSpace: "nowrap" }}>{h}</th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#F0F0F8]">
+              <tbody>
                 {rows.map(s => (
                   <tr
                     key={s.id}
-                    className={`hover:bg-[#F7F7FB]/60 transition-colors ${selected?.id === s.id ? "bg-[#ECEBFF]/30" : ""} ${s.status === "OVERDUE" ? "bg-red-50/20" : ""}`}
+                    style={{ borderBottom: "1px solid #F9FAFB", background: selected?.id === s.id ? "#F3F0FF" : "transparent" }}
                   >
-                    <td className="px-4 py-3">
+                    <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
                       <div>
-                        <p className="font-[500] text-[#191A2E]">{s.employer.companyName}</p>
-                        <p className="text-[#62657A] text-[11px]">{s.employer.companyCode}</p>
+                        <p style={{ fontSize: 13.5, fontWeight: 600, color: "#111827", margin: 0 }}>{s.employer.companyName}</p>
+                        <p style={{ fontSize: 11.5, color: "#9CA3AF", margin: "2px 0 0", fontFamily: "ui-monospace, monospace" }}>{s.employer.companyCode}</p>
                       </div>
                     </td>
-                    <td className="px-4 py-3 font-[500] text-[#62657A] whitespace-nowrap">{formatPayrollMonth(s.payrollMonth)}</td>
-                    <td className="px-4 py-3 tabular-nums font-[600] text-[#191A2E] whitespace-nowrap">{formatCurrency(s.totalAmount)}</td>
-                    <td className={`px-4 py-3 tabular-nums font-[600] whitespace-nowrap ${parseFloat(s.outstandingAmount) > 0 ? "text-red-600" : "text-[#7679FF]"}`}>
+                    <td style={{ padding: "16px 20px", verticalAlign: "middle", fontWeight: 500, color: "#6B7280", whiteSpace: "nowrap" }}>{formatPayrollMonth(s.payrollMonth)}</td>
+                    <td style={{ padding: "16px 20px", verticalAlign: "middle", fontWeight: 600, color: "#111827", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>{formatCurrency(s.totalAmount)}</td>
+                    <td style={{ padding: "16px 20px", verticalAlign: "middle", fontWeight: 600, whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums", color: parseFloat(s.outstandingAmount) > 0 ? "#DC2626" : "#6C4CFF" }}>
                       {parseFloat(s.outstandingAmount) > 0 ? formatCurrency(s.outstandingAmount) : "No dues"}
                     </td>
-                    <td className="px-4 py-3 tabular-nums text-[#62657A] whitespace-nowrap">
-                      {parseFloat(s.lateFeeAmount) > 0 ? formatCurrency(s.lateFeeAmount) : <span className="text-[#62657A]">—</span>}
+                    <td style={{ padding: "16px 20px", verticalAlign: "middle", color: "#6B7280", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>
+                      {parseFloat(s.lateFeeAmount) > 0 ? formatCurrency(s.lateFeeAmount) : "—"}
                     </td>
-                    <td className={`px-4 py-3 tabular-nums font-[500] whitespace-nowrap ${s.status === "OVERDUE" ? "text-red-600" : "text-[#62657A]"}`}>
+                    <td style={{ padding: "16px 20px", verticalAlign: "middle", fontWeight: 500, whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums", color: s.status === "OVERDUE" ? "#DC2626" : "#9CA3AF" }}>
                       {formatDate(s.dueDate)}
                     </td>
-                    <td className="px-4 py-3"><StatusPill status={s.status} /></td>
+                    <td style={{ padding: "16px 20px", verticalAlign: "middle" }}><StatusPill status={s.status} /></td>
 
                     {/* ── Row actions ── */}
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-1.5">
+                    <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                         {/* View Report */}
                         <button
                           title="View Report"
                           onClick={() => { setSelected(s); setMarkError(""); }}
-                          className="h-7 w-7 flex items-center justify-center rounded-lg border border-[#E4E4EF] text-[#62657A] hover:border-[#7679FF] hover:text-[#7679FF] hover:bg-[#ECEBFF] transition-colors"
+                          style={{ height: 28, width: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid #E5E7EB", background: "white", color: "#6B7280", cursor: "pointer" }}
                         >
                           <Eye size={13} />
                         </button>
@@ -406,10 +386,10 @@ export default function SettlementsPage() {
                           title="Send Report"
                           disabled={sending === s.id}
                           onClick={e => handleSendReport(s, e)}
-                          className="h-7 w-7 flex items-center justify-center rounded-lg border border-[#E4E4EF] text-[#62657A] hover:border-[#7679FF] hover:text-[#7679FF] hover:bg-[#ECEBFF] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                          style={{ height: 28, width: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid #E5E7EB", background: "white", color: "#6B7280", cursor: "pointer", opacity: sending === s.id ? 0.5 : 1 }}
                         >
                           {sending === s.id
-                            ? <span className="w-3 h-3 border-2 border-[#7679FF]/30 border-t-[#7679FF] rounded-full animate-spin" />
+                            ? <span style={{ width: 12, height: 12, border: "2px solid rgba(108,76,255,0.3)", borderTopColor: "#6C4CFF", borderRadius: "50%" }} className="animate-spin" />
                             : <Send size={13} />
                           }
                         </button>
@@ -420,10 +400,10 @@ export default function SettlementsPage() {
                             title="Mark as Paid"
                             disabled={marking === s.id}
                             onClick={e => { e.stopPropagation(); void handleMarkPaid(s); }}
-                            className="h-7 px-2.5 flex items-center gap-1 rounded-lg border border-[#C8C9FF] text-[#5659D9] bg-[#ECEBFF] hover:bg-[#ECEBFF] disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-[11px] font-[500] whitespace-nowrap"
+                            style={{ height: 28, padding: "0 10px", display: "flex", alignItems: "center", gap: 4, borderRadius: 8, border: "1px solid #C8C9FF", background: "#F3F0FF", color: "#5B34FF", cursor: "pointer", fontSize: 11, fontWeight: 600, fontFamily: "inherit", whiteSpace: "nowrap", opacity: marking === s.id ? 0.5 : 1 }}
                           >
                             {marking === s.id
-                              ? <span className="w-3 h-3 border-2 border-[#7679FF]/40 border-t-[#7679FF] rounded-full animate-spin" />
+                              ? <span style={{ width: 12, height: 12, border: "2px solid rgba(108,76,255,0.3)", borderTopColor: "#6C4CFF", borderRadius: "50%" }} className="animate-spin" />
                               : <CheckCircle2 size={11} />
                             }
                             {marking === s.id ? "" : "Mark Paid"}
@@ -442,40 +422,38 @@ export default function SettlementsPage() {
       {/* Drawer — View Report detail */}
       {selected && (
         <>
-          <div className="fixed inset-0 z-30 bg-black/20 backdrop-blur-[1px]" onClick={() => setSelected(null)} />
-          <div className="fixed inset-y-0 right-0 z-40 w-[460px] bg-white border-l border-[#E4E4EF] shadow-xl flex flex-col">
+          <div style={{ position: "fixed", inset: 0, zIndex: 30, background: "rgba(0,0,0,0.2)", backdropFilter: "blur(1px)" }} onClick={() => setSelected(null)} />
+          <div style={{ position: "fixed", top: 0, bottom: 0, right: 0, zIndex: 40, width: 460, background: "white", borderLeft: "1px solid #E5E7EB", boxShadow: "0 20px 60px rgba(0,0,0,0.15)", display: "flex", flexDirection: "column" }}>
             {/* Header */}
-            <div className="px-5 pt-5 pb-4 border-b border-[#E4E4EF]">
-              <div className="flex items-start justify-between">
+            <div style={{ padding: "20px 20px 16px", borderBottom: "1px solid #E5E7EB" }}>
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
                 <div>
-                  <div className="flex items-center gap-2 mb-1.5">
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
                     <StatusPill status={selected.status} />
                     {selected.referenceNumber && (
-                      <span className="text-[11px] font-[500] text-[#62657A] bg-[#F0F0F8] px-2 py-0.5 rounded">
+                      <span style={{ fontSize: 11, fontWeight: 500, color: "#6B7280", background: "#F3F4F6", padding: "2px 8px", borderRadius: 6 }}>
                         Ref: {selected.referenceNumber}
                       </span>
                     )}
                   </div>
-                  <p className="text-[16px] font-[700] text-[#191A2E] leading-tight">{selected.employer.companyName}</p>
-                  <p className="text-[12px] text-[#62657A] mt-0.5">{formatPayrollMonth(selected.payrollMonth)} · {selected.employer.companyCode}</p>
+                  <p style={{ fontSize: 16, fontWeight: 700, color: "#111827", margin: 0, lineHeight: 1.2 }}>{selected.employer.companyName}</p>
+                  <p style={{ fontSize: 12, color: "#6B7280", marginTop: 2 }}>{formatPayrollMonth(selected.payrollMonth)} · {selected.employer.companyCode}</p>
                 </div>
-                <button
-                  onClick={() => setSelected(null)}
-                  className="w-7 h-7 flex items-center justify-center rounded-lg border border-[#E4E4EF] text-[#62657A] hover:text-[#62657A]"
-                >
+                <button onClick={() => setSelected(null)} style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid #E5E7EB", background: "white", color: "#6B7280", cursor: "pointer" }}>
                   <X size={14} />
                 </button>
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
+            {/* Body */}
+            <div style={{ flex: 1, overflowY: "auto", padding: "16px 20px", display: "flex", flexDirection: "column", gap: 20 }}>
               {/* Overdue warning */}
               {selected.status === "OVERDUE" && (
-                <div className="bg-red-50 border border-red-100 rounded-xl p-3.5 flex items-start gap-3">
-                  <AlertTriangle size={14} className="text-red-500 mt-0.5 flex-shrink-0" />
+                <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 14, padding: "12px 14px", display: "flex", alignItems: "flex-start", gap: 10 }}>
+                  <AlertTriangle size={14} color="#EF4444" style={{ flexShrink: 0, marginTop: 1 }} />
                   <div>
-                    <p className="text-[12px] font-[600] text-red-700">Payment overdue</p>
-                    <p className="text-[11px] text-red-500 mt-0.5 leading-relaxed">
+                    <p style={{ fontSize: 12, fontWeight: 600, color: "#B91C1C", margin: 0 }}>Payment overdue</p>
+                    <p style={{ fontSize: 11, color: "#EF4444", marginTop: 3, lineHeight: 1.5 }}>
                       This settlement is past its due date. Employer has not remitted payment. Late fees may apply.
                     </p>
                   </div>
@@ -484,29 +462,29 @@ export default function SettlementsPage() {
 
               {/* Risk badge */}
               {selected.employer.riskStatus && selected.employer.riskStatus !== "LOW" && (
-                <div className="bg-orange-50 border border-orange-100 rounded-xl px-4 py-3 flex items-center gap-2">
-                  <AlertTriangle size={13} className="text-orange-500 flex-shrink-0" />
-                  <p className="text-[12px] text-orange-700 font-[500]">Employer risk: <span className="font-[600]">{selected.employer.riskStatus}</span></p>
+                <div style={{ background: "#FFF7ED", border: "1px solid #FED7AA", borderRadius: 14, padding: "10px 14px", display: "flex", alignItems: "center", gap: 8 }}>
+                  <AlertTriangle size={13} color="#F97316" style={{ flexShrink: 0 }} />
+                  <p style={{ fontSize: 12, color: "#C2410C", fontWeight: 500, margin: 0 }}>Employer risk: <span style={{ fontWeight: 600 }}>{selected.employer.riskStatus}</span></p>
                 </div>
               )}
 
               {/* Amount breakdown */}
               <div>
-                <p className="text-[11px] font-[600] text-[#62657A] uppercase tracking-[0.07em] mb-2">Amount Breakdown</p>
-                <div className="bg-white border border-[#E4E4EF] rounded-xl px-4 py-1">
-                  <InfoRow label="Principal"  value={formatCurrency(selected.principalAmount)} />
-                  <InfoRow label="Interest"   value={formatCurrency(selected.interestAmount)} />
+                <p style={{ fontSize: 11, fontWeight: 600, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Amount Breakdown</p>
+                <div style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 16, padding: "0 16px" }}>
+                  <InfoRow label="Principal" value={formatCurrency(selected.principalAmount)} />
+                  <InfoRow label="Interest"  value={formatCurrency(selected.interestAmount)} />
                   {parseFloat(selected.lateFeeAmount) > 0 && (
                     <InfoRow label="Late fee" value={formatCurrency(selected.lateFeeAmount)} accent />
                   )}
-                  <div className="flex items-center justify-between py-3 border-t border-[#E4E4EF] mt-1">
-                    <span className="text-[12px] font-[600] text-[#191A2E]">Total</span>
-                    <span className="text-[14px] font-[700] text-[#191A2E] tabular-nums">{formatCurrency(selected.totalAmount)}</span>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderTop: "1px solid #E5E7EB", marginTop: 4 }}>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: "#111827" }}>Total</span>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: "#111827", fontVariantNumeric: "tabular-nums" }}>{formatCurrency(selected.totalAmount)}</span>
                   </div>
                   {parseFloat(selected.outstandingAmount) > 0 && (
-                    <div className="flex items-center justify-between py-2.5 border-t border-red-100">
-                      <span className="text-[12px] font-[600] text-red-600">Outstanding</span>
-                      <span className="text-[14px] font-[700] text-red-600 tabular-nums">{formatCurrency(selected.outstandingAmount)}</span>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderTop: "1px solid #FEE2E2" }}>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: "#DC2626" }}>Outstanding</span>
+                      <span style={{ fontSize: 14, fontWeight: 700, color: "#DC2626", fontVariantNumeric: "tabular-nums" }}>{formatCurrency(selected.outstandingAmount)}</span>
                     </div>
                   )}
                 </div>
@@ -514,46 +492,44 @@ export default function SettlementsPage() {
 
               {/* Key dates */}
               <div>
-                <p className="text-[11px] font-[600] text-[#62657A] uppercase tracking-[0.07em] mb-2">Key Dates</p>
-                <div className="bg-white border border-[#E4E4EF] rounded-xl px-4 py-1">
+                <p style={{ fontSize: 11, fontWeight: 600, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Key Dates</p>
+                <div style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 16, padding: "0 16px" }}>
                   <InfoRow label="Due date"          value={formatDate(selected.dueDate)} accent={selected.status === "OVERDUE"} />
                   {selected.gracePeriodEnd && <InfoRow label="Grace period ends" value={formatDate(selected.gracePeriodEnd)} />}
-                  {selected.paidDate && <InfoRow label="Paid on"            value={formatDate(selected.paidDate)} />}
-                  <InfoRow label="Created"            value={formatDate(selected.createdAt)} />
+                  {selected.paidDate && <InfoRow label="Paid on" value={formatDate(selected.paidDate)} />}
+                  <InfoRow label="Created" value={formatDate(selected.createdAt)} />
                 </div>
               </div>
 
               {/* Timeline */}
               <div>
-                <p className="text-[11px] font-[600] text-[#62657A] uppercase tracking-[0.07em] mb-3">Status Timeline</p>
+                <p style={{ fontSize: 11, fontWeight: 600, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 10 }}>Status Timeline</p>
                 <Timeline s={selected} />
               </div>
 
               {/* Notes */}
               {selected.notes && (
                 <div>
-                  <p className="text-[11px] font-[600] text-[#62657A] uppercase tracking-[0.07em] mb-2">Notes</p>
-                  <div className="bg-[#F7F7FB] border border-[#E4E4EF] rounded-xl px-4 py-3">
-                    <p className="text-[12px] text-[#62657A] leading-relaxed">{selected.notes}</p>
+                  <p style={{ fontSize: 11, fontWeight: 600, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Notes</p>
+                  <div style={{ background: "#F8F9FC", border: "1px solid #E5E7EB", borderRadius: 16, padding: "12px 16px" }}>
+                    <p style={{ fontSize: 12, color: "#6B7280", lineHeight: 1.6, margin: 0 }}>{selected.notes}</p>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Footer — drawer actions */}
-            <div className="px-5 py-4 border-t border-[#E4E4EF] space-y-2">
-              {markError && (
-                <p className="text-[11px] text-red-600 text-center">{markError}</p>
-              )}
+            {/* Footer */}
+            <div style={{ padding: "16px 20px", borderTop: "1px solid #E5E7EB", display: "flex", flexDirection: "column", gap: 8 }}>
+              {markError && <p style={{ fontSize: 11, color: "#DC2626", textAlign: "center", margin: 0 }}>{markError}</p>}
 
               {/* Send Report */}
               <button
                 onClick={() => handleSendReport(selected)}
                 disabled={sending === selected.id}
-                className="w-full h-10 flex items-center justify-center gap-2 rounded-lg border border-[#7679FF] text-[#7679FF] text-[13px] font-[600] hover:bg-[#ECEBFF] disabled:opacity-50 transition-colors"
+                style={{ width: "100%", height: 40, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, borderRadius: 10, border: "1px solid #6C4CFF", color: "#6C4CFF", fontSize: 13, fontWeight: 600, background: "white", cursor: sending === selected.id ? "not-allowed" : "pointer", opacity: sending === selected.id ? 0.5 : 1, fontFamily: "inherit" }}
               >
                 {sending === selected.id
-                  ? <span className="w-4 h-4 border-2 border-[#7679FF]/30 border-t-[#7679FF] rounded-full animate-spin" />
+                  ? <span style={{ width: 16, height: 16, border: "2px solid rgba(108,76,255,0.3)", borderTopColor: "#6C4CFF", borderRadius: "50%" }} className="animate-spin" />
                   : <Send size={15} />
                 }
                 {sending === selected.id ? "Sending…" : "Send Report"}
@@ -565,12 +541,12 @@ export default function SettlementsPage() {
                   <button
                     onClick={() => handleMarkPaid(selected)}
                     disabled={marking === selected.id}
-                    className="w-full h-10 flex items-center justify-center gap-2 rounded-lg bg-[#7679FF] hover:bg-[#5659D9] text-white text-[13px] font-[600] disabled:opacity-50 transition-colors"
+                    style={{ width: "100%", height: 40, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, borderRadius: 10, background: "#6C4CFF", color: "white", fontSize: 13, fontWeight: 600, border: "none", cursor: marking === selected.id ? "not-allowed" : "pointer", opacity: marking === selected.id ? 0.5 : 1, fontFamily: "inherit" }}
                   >
                     <CheckCircle2 size={15} />
                     {marking === selected.id ? "Processing…" : "Mark as Paid"}
                   </button>
-                  <p className="text-[11px] text-[#62657A] text-center">
+                  <p style={{ fontSize: 11, color: "#6B7280", textAlign: "center", margin: 0 }}>
                     Confirm receipt of {formatCurrency(selected.outstandingAmount || selected.totalAmount)} from {selected.employer.companyName}
                   </p>
                 </>

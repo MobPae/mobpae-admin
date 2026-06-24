@@ -1,11 +1,23 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff, KeyRound, Lock, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Lock, Shield, ShieldCheck } from "lucide-react";
 import { changePassword, logout } from "../services/authService";
 import { getApiErrorMessage } from "../utils/api-errors";
 
-const BRAND = "#7679FF";
-const BRAND_LIGHT = "#ECEBFF";
+const P  = "#6C4CFF";
+const PL = "#F3F0FF";
+
+function getStrength(pwd: string): number {
+  let s = 0;
+  if (pwd.length >= 8) s++;
+  if (/[A-Z]/.test(pwd) && /[a-z]/.test(pwd)) s++;
+  if (/\d/.test(pwd)) s++;
+  if (/[^A-Za-z0-9]/.test(pwd)) s++;
+  return s;
+}
+
+const STRENGTH_LABELS = ["", "Weak", "Fair", "Good", "Strong"];
+const STRENGTH_COLORS = ["", "#EF4444", "#F59E0B", "#3B82F6", "#22C55E"];
 
 export default function ChangePasswordPage() {
   const navigate = useNavigate();
@@ -19,119 +31,175 @@ export default function ChangePasswordPage() {
   const [error,    setError]    = useState("");
   const [success,  setSuccess]  = useState(false);
 
+  const strength = getStrength(next);
+
+  const checks = [
+    { label: "At least 8 characters",         ok: next.length >= 8 },
+    { label: "Includes uppercase and lowercase", ok: /[A-Z]/.test(next) && /[a-z]/.test(next) },
+    { label: "Includes a number",              ok: /\d/.test(next) },
+    { label: "Includes a special character",   ok: /[^A-Za-z0-9]/.test(next) },
+  ];
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    if (next !== confirm) {
-      setError("New password and confirm password do not match.");
-      return;
-    }
-    if (next.length < 8) {
-      setError("New password must be at least 8 characters.");
-      return;
-    }
+    if (next !== confirm) { setError("New password and confirm password do not match."); return; }
+    if (next.length < 8)  { setError("New password must be at least 8 characters."); return; }
 
     setLoading(true);
     try {
       await changePassword(current, next);
-      // Backend invalidates all sessions on password change — clear tokens and force re-login
       await logout();
       setSuccess(true);
-      setTimeout(() => navigate("/login"), 1500);
+      setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
       const msg = getApiErrorMessage(err, "Failed to change password.");
-      setError(msg.toLowerCase().includes("incorrect") || msg.toLowerCase().includes("wrong") ? "Current password is incorrect." : msg);
+      setError(msg.toLowerCase().includes("incorrect") || msg.toLowerCase().includes("wrong")
+        ? "Current password is incorrect."
+        : msg);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#fafafa] flex items-center justify-center px-4">
-      <div className="w-full max-w-[400px]">
-        {/* Icon */}
-        <div className="flex justify-center mb-6">
-          <div
-            className="w-14 h-14 rounded-2xl flex items-center justify-center"
-            style={{ background: BRAND_LIGHT, border: `1.5px solid ${BRAND}22` }}
-          >
-            <KeyRound size={26} style={{ color: BRAND }} />
+    <div style={{
+      minHeight: "100vh",
+      background: "#F8F9FC",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      padding: "24px 16px",
+      fontFamily: "Inter, ui-sans-serif, sans-serif",
+    }}>
+      <div style={{ width: "100%", maxWidth: 560 }}>
+
+        {/* Back link */}
+        <button
+          type="button"
+          onClick={() => navigate("/login")}
+          style={{
+            display: "flex", alignItems: "center", gap: 8,
+            fontSize: 13, color: "#6B7280", fontWeight: 500,
+            background: "none", border: "none", cursor: "pointer",
+            marginBottom: 28, padding: 0, fontFamily: "inherit",
+          }}
+        >
+          <ArrowLeft size={15} />
+          Back to login
+        </button>
+
+        <div style={{ background: "white", borderRadius: 24, padding: "40px 40px 36px", boxShadow: "0 2px 8px rgba(17,24,39,0.06), 0 0 0 1px #E5E7EB" }}>
+
+          {/* Icon + heading */}
+          <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 28 }}>
+            <div style={{
+              width: 56, height: 56, borderRadius: 16,
+              background: PL, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+            }}>
+              <Lock size={24} style={{ color: P }} />
+            </div>
+            <div>
+              <h1 style={{ fontSize: 22, fontWeight: 700, color: "#111827", letterSpacing: "-0.02em", margin: 0 }}>Change Password</h1>
+              <p style={{ fontSize: 13, color: "#6B7280", marginTop: 4, lineHeight: 1.5 }}>
+                For your security, please choose a strong password that you don't use on other sites.
+              </p>
+            </div>
           </div>
-        </div>
 
-        {/* Heading */}
-        <div className="text-center mb-7">
-          <h1 className="text-[22px] font-[700] text-[#191A2E] tracking-[-0.02em]">Change Password</h1>
-          <p className="text-[13px] text-[#62657A] mt-1.5 leading-relaxed">
-            Set a new password for your Admin account.
-          </p>
-        </div>
-
-        {success ? (
-          <div className="bg-[#ECEBFF] border border-[#C8C9FF] rounded-xl p-5 text-center">
-            <ShieldCheck size={28} className="text-[#7679FF] mx-auto mb-2" />
-            <p className="text-[14px] font-[600] text-[#191A2E]">Password changed successfully!</p>
-            <p className="text-[12px] text-[#7679FF] mt-1">Redirecting to dashboard…</p>
-          </div>
-        ) : (
-          <form
-            onSubmit={handleSubmit}
-            className="bg-white border border-[#E4E4EF] rounded-2xl p-6 shadow-sm space-y-4"
-          >
-            {/* Current password */}
-            <Field
-              label="Current Password"
-              value={current}
-              onChange={setCurrent}
-              show={showCur}
-              onToggle={() => setShowCur(v => !v)}
-              placeholder="Enter current password"
-              autoComplete="current-password"
-            />
-
-            {/* New password */}
-            <Field
-              label="New Password"
-              value={next}
-              onChange={setNext}
-              show={showNext}
-              onToggle={() => setShowNext(v => !v)}
-              placeholder="Minimum 8 characters"
-              autoComplete="new-password"
-            />
-
-            {/* Confirm */}
-            <Field
-              label="Confirm New Password"
-              value={confirm}
-              onChange={setConfirm}
-              show={showCon}
-              onToggle={() => setShowCon(v => !v)}
-              placeholder="Re-enter new password"
-              autoComplete="new-password"
-            />
-
-            {error && (
-              <div className="bg-red-50 border border-red-100 rounded-lg px-3 py-2.5">
-                <p className="text-[12px] text-red-600 font-[500]">{error}</p>
+          {success ? (
+            <div style={{ textAlign: "center", padding: "24px 0" }}>
+              <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#DCFCE7", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+                <ShieldCheck size={28} style={{ color: "#16A34A" }} />
               </div>
-            )}
+              <p style={{ fontSize: 16, fontWeight: 600, color: "#111827", marginBottom: 8 }}>Password changed successfully!</p>
+              <p style={{ fontSize: 13, color: "#6B7280" }}>Redirecting you to sign in…</p>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
 
-            <button
-              type="submit"
-              disabled={loading || !current || !next || !confirm}
-              className="w-full h-10 rounded-lg text-white text-[13px] font-[600] flex items-center justify-center gap-2 transition disabled:opacity-50 mt-1"
-              style={{ background: BRAND }}
-            >
-              {loading ? (
-                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <><Lock size={14} /> Update Password</>
+              <Field label="Current Password" value={current} onChange={setCurrent} show={showCur} onToggle={() => setShowCur(v => !v)} placeholder="Enter your current password" autoComplete="current-password" />
+
+              {/* New password + strength */}
+              <div>
+                <Field label="New Password" value={next} onChange={setNext} show={showNext} onToggle={() => setShowNext(v => !v)} placeholder="Enter your new password" autoComplete="new-password" />
+
+                {next.length > 0 && (
+                  <div style={{ marginTop: 10 }}>
+                    {/* Strength bar */}
+                    <div style={{ display: "flex", gap: 4, marginBottom: 8 }}>
+                      {[1, 2, 3, 4].map((i) => (
+                        <div key={i} style={{
+                          flex: 1, height: 4, borderRadius: 999,
+                          background: i <= strength ? STRENGTH_COLORS[strength] : "#E5E7EB",
+                          transition: "background 0.2s",
+                        }} />
+                      ))}
+                      <span style={{ fontSize: 11, fontWeight: 600, color: STRENGTH_COLORS[strength], minWidth: 42, textAlign: "right", lineHeight: "4px" }}>
+                        {STRENGTH_LABELS[strength]}
+                      </span>
+                    </div>
+                    {/* Checks */}
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 16px" }}>
+                      {checks.map((c) => (
+                        <div key={c.label} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: c.ok ? "#16A34A" : "#9CA3AF" }}>
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            {c.ok ? <polyline points="20 6 9 17 4 12" /> : <circle cx="12" cy="12" r="9" />}
+                          </svg>
+                          {c.label}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <Field label="Confirm New Password" value={confirm} onChange={setConfirm} show={showCon} onToggle={() => setShowCon(v => !v)} placeholder="Confirm your new password" autoComplete="new-password" />
+
+              {error && (
+                <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 10, padding: "10px 14px" }}>
+                  <p style={{ fontSize: 13, color: "#DC2626", fontWeight: 500 }}>{error}</p>
+                </div>
               )}
-            </button>
-          </form>
-        )}
+
+              <button
+                type="submit"
+                disabled={loading || !current || !next || !confirm}
+                style={{
+                  width: "100%", height: 48,
+                  background: (loading || !current || !next || !confirm)
+                    ? "#E5E7EB"
+                    : `linear-gradient(135deg, #5B34FF 0%, ${P} 100%)`,
+                  color: (loading || !current || !next || !confirm) ? "#9CA3AF" : "white",
+                  borderRadius: 12, border: "none",
+                  fontSize: 14, fontWeight: 600,
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                  cursor: (loading || !current || !next || !confirm) ? "not-allowed" : "pointer",
+                  boxShadow: (loading || !current || !next || !confirm) ? "none" : "0 4px 20px rgba(108,76,255,0.28)",
+                  transition: "all 0.15s",
+                  fontFamily: "inherit",
+                  marginTop: 4,
+                }}
+              >
+                {loading ? (
+                  <span style={{ width: 18, height: 18, border: "2.5px solid rgba(255,255,255,0.35)", borderTopColor: "white", borderRadius: "50%", display: "inline-block", animation: "spin 0.8s linear infinite" }} />
+                ) : (
+                  <>Update Password <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></>
+                )}
+                <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
+              </button>
+
+              {/* Security note */}
+              <div style={{ display: "flex", alignItems: "center", gap: 10, paddingTop: 12, borderTop: "1px solid #F3F4F6" }}>
+                <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#F3F0FF", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <Shield size={14} style={{ color: P }} />
+                </div>
+                <p style={{ fontSize: 12, color: "#9CA3AF", lineHeight: 1.5 }}>
+                  For your security, you will be signed out of all other active sessions.
+                </p>
+              </div>
+            </form>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -148,11 +216,18 @@ function Field({
   placeholder: string;
   autoComplete: string;
 }) {
+  const P = "#6C4CFF";
   return (
     <div>
-      <label className="block text-[12px] font-[500] text-[#62657A] mb-1.5">{label}</label>
-      <div className="relative">
-        <Lock size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#62657A]" />
+      <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#374151", marginBottom: 6 }}>{label}</label>
+      <div style={{
+        display: "flex", alignItems: "center", gap: 10,
+        background: "white", border: "1.5px solid #E5E7EB", borderRadius: 12, padding: "11px 14px",
+        transition: "border-color 0.15s, box-shadow 0.15s",
+      }}
+        onFocus={() => {}} // handled on input
+      >
+        <Lock size={14} style={{ color: "#D1D5DB", flexShrink: 0 }} />
         <input
           type={show ? "text" : "password"}
           value={value}
@@ -160,14 +235,24 @@ function Field({
           placeholder={placeholder}
           autoComplete={autoComplete}
           required
-          className="w-full h-10 pl-9 pr-10 text-[13px] bg-white border border-[#E4E4EF] rounded-lg text-[#191A2E] placeholder-[#B7B9C7] outline-none focus:border-[#7679FF] focus:ring-2 focus:ring-[#7679FF]/10 transition"
+          style={{ flex: 1, fontSize: 14, color: "#111827", background: "transparent", outline: "none", border: "none", minWidth: 0, fontFamily: "inherit" }}
+          onFocus={e  => {
+            const wrapper = e.target.closest("div") as HTMLElement;
+            wrapper.style.borderColor = P;
+            wrapper.style.boxShadow = "0 0 0 4px rgba(108,76,255,0.10)";
+          }}
+          onBlur={e   => {
+            const wrapper = e.target.closest("div") as HTMLElement;
+            wrapper.style.borderColor = "#E5E7EB";
+            wrapper.style.boxShadow = "none";
+          }}
         />
         <button
           type="button"
           onClick={onToggle}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-[#62657A] hover:text-[#62657A]"
+          style={{ color: "#D1D5DB", background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", flexShrink: 0 }}
         >
-          {show ? <EyeOff size={13} /> : <Eye size={13} />}
+          {show ? <EyeOff size={14} /> : <Eye size={14} />}
         </button>
       </div>
     </div>

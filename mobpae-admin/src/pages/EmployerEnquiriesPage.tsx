@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Search } from "lucide-react";
+import { Search, Building2, Phone, CheckCircle, XCircle, Plus } from "lucide-react";
 import EmployerEnquiriesTable from "../components/employer-enquiries/EmployerEnquiriesTable";
 import EmployerDetailsDrawer from "../components/employer-enquiries/EmployerDetailsDrawer";
 import CreateEmployerDrawer from "../components/employers/CreateEmployerDrawer";
@@ -8,7 +8,9 @@ import type { CreateEmployerPrefill } from "../components/employers/CreateEmploy
 import type { EmployerEnquiry, EmployerEnquiryStatus } from "../types/employer-enquiry";
 import { getEmployerEnquiries } from "../services/employerEnquiryService";
 
-const STATUS_CHIPS: { label: string; value: "ALL" | EmployerEnquiryStatus }[] = [
+const P = "#6C4CFF";
+
+const STATUS_TABS: { label: string; value: "ALL" | EmployerEnquiryStatus }[] = [
   { label: "All",       value: "ALL"       },
   { label: "New",       value: "NEW"       },
   { label: "Contacted", value: "CONTACTED" },
@@ -16,21 +18,17 @@ const STATUS_CHIPS: { label: string; value: "ALL" | EmployerEnquiryStatus }[] = 
   { label: "Rejected",  value: "REJECTED"  },
 ];
 
-const CHIP_ON  = "bg-[#191A2E] text-white border-[#191A2E]";
-const CHIP_OFF = "bg-white border-[#E4E4EF] text-[#62657A] hover:border-[#E4E4EF] hover:text-[#62657A]";
-
 export default function EmployerEnquiriesPage() {
   const { data: enquiries = [], isLoading, isError, refetch } = useQuery({
     queryKey: ["employer-enquiries"],
     queryFn: getEmployerEnquiries,
   });
 
-  const [search,       setSearch]       = useState("");
-  const [statusFilter, setStatusFilter] = useState<"ALL" | EmployerEnquiryStatus>("ALL");
-  const [selected,     setSelected]     = useState<EmployerEnquiry | null>(null);
+  const [search,        setSearch]        = useState("");
+  const [statusFilter,  setStatusFilter]  = useState<"ALL" | EmployerEnquiryStatus>("ALL");
+  const [selected,      setSelected]      = useState<EmployerEnquiry | null>(null);
   const [createPrefill, setCreatePrefill] = useState<CreateEmployerPrefill | undefined>(undefined);
 
-  // ONBOARDED counts both APPROVED (legacy) and ONBOARDED (current backend value)
   const counts: Record<EmployerEnquiryStatus, number> = {
     NEW:       enquiries.filter((e) => e.status === "NEW").length,
     CONTACTED: enquiries.filter((e) => e.status === "CONTACTED").length,
@@ -38,7 +36,6 @@ export default function EmployerEnquiriesPage() {
     ONBOARDED: enquiries.filter((e) => e.status === "ONBOARDED" || e.status === "APPROVED").length,
     REJECTED:  enquiries.filter((e) => e.status === "REJECTED").length,
   };
-  const total = enquiries.length;
 
   const filtered = enquiries.filter((e) => {
     const q = search.toLowerCase();
@@ -47,7 +44,6 @@ export default function EmployerEnquiriesPage() {
       e.companyName.toLowerCase().includes(q) ||
       e.contactPerson.toLowerCase().includes(q) ||
       e.email.toLowerCase().includes(q);
-    // "ONBOARDED" filter matches both ONBOARDED (current) and APPROVED (legacy)
     const matchStatus =
       statusFilter === "ALL" ||
       e.status === statusFilter ||
@@ -55,8 +51,8 @@ export default function EmployerEnquiriesPage() {
     return matchSearch && matchStatus;
   });
 
-  // Called from EmployerDetailsDrawer "Create Employer" button
   function handleCreateFromLead(enquiry: EmployerEnquiry) {
+    setSelected(null);
     setCreatePrefill({
       companyName:   enquiry.companyName,
       contactPerson: enquiry.contactPerson,
@@ -66,122 +62,132 @@ export default function EmployerEnquiriesPage() {
     });
   }
 
-  const pipeline = [
-    { label: "New",       status: "NEW"       as const, color: "bg-amber-400",  text: "text-amber-600"  },
-    { label: "Contacted", status: "CONTACTED" as const, color: "bg-[#7679FF]",   text: "text-[#7679FF]"   },
-    { label: "Onboarded", status: "ONBOARDED" as const, color: "bg-[#7679FF]",  text: "text-[#7679FF]"  },
-    { label: "Rejected",  status: "REJECTED"  as const, color: "bg-[#D4D5E0]",  text: "text-[#62657A]"  },
+  const kpis = [
+    { icon: <Building2 size={18} color="#D97706" strokeWidth={1.75} />, iconBg: "#FEF3C7", label: "New Leads",  val: counts["NEW"]       },
+    { icon: <Phone size={18} color={P} strokeWidth={1.75} />,           iconBg: "#F3F0FF", label: "Contacted", val: counts["CONTACTED"]  },
+    { icon: <CheckCircle size={18} color="#16A34A" strokeWidth={1.75}/>, iconBg: "#DCFCE7", label: "Onboarded", val: counts["ONBOARDED"]  },
+    { icon: <XCircle size={18} color="#EF4444" strokeWidth={1.75} />,   iconBg: "#FEE2E2", label: "Rejected",  val: counts["REJECTED"]   },
   ];
 
   return (
-    <div className="p-5 space-y-4">
-      {/* Page header */}
-      <div>
-        <h1 className="text-[15px] font-[500] text-[#191A2E] leading-none">Enquiries</h1>
-        <p className="text-[11px] text-[#62657A] mt-1.5">
-          Inbound leads from the website
-        </p>
+    <div style={{ padding: "28px 32px", fontFamily: "Inter, ui-sans-serif, sans-serif", minHeight: "100%" }}>
+
+      {/* ── Header ─────────────────────────────────── */}
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28 }}>
+        <div>
+          <h1 style={{ fontSize: 26, fontWeight: 700, color: "#111827", letterSpacing: "-0.025em", margin: 0 }}>
+            Enquiries
+          </h1>
+          <p style={{ fontSize: 14, color: "#6B7280", marginTop: 6 }}>
+            Inbound leads from the website
+          </p>
+        </div>
+        <button
+          onClick={() => setCreatePrefill({})}
+          style={{
+            height: 40, padding: "0 18px",
+            display: "flex", alignItems: "center", gap: 8,
+            background: P, border: "none", borderRadius: 12,
+            fontSize: 13.5, fontWeight: 600, color: "white",
+            cursor: "pointer", fontFamily: "inherit",
+          }}
+        >
+          <Plus size={15} />
+          Add Employer
+        </button>
       </div>
 
+      {/* ── Error banner ───────────────────────────── */}
       {isError && (
-        <div className="bg-white border border-red-100 rounded-xl px-6 py-14 text-center">
-          <p className="text-[13px] font-[500] text-red-600">Failed to load enquiries</p>
-          <p className="text-[12px] text-[#62657A] mt-1">Check your connection and try again.</p>
-          <button onClick={() => void refetch()} className="mt-4 h-8 px-4 text-[12px] font-[500] bg-white border border-[#E4E4EF] rounded-lg hover:bg-[#F7F7FB] transition-colors text-[#62657A]">
+        <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 12, padding: "12px 16px", marginBottom: 24, display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, color: "#DC2626" }}>
+          <span>Failed to load enquiries.</span>
+          <button onClick={() => void refetch()} style={{ padding: "6px 12px", background: "white", border: "1px solid #FECACA", borderRadius: 8, fontSize: 12, fontWeight: 600, color: "#DC2626", cursor: "pointer", fontFamily: "inherit" }}>
             Retry
           </button>
         </div>
       )}
 
-      {/* Pipeline strip */}
-      <div className="grid grid-cols-4 gap-3">
-        {pipeline.map(({ label, status, color, text }) => {
-          const count = counts[status];
-          const pct = total > 0 ? Math.round((count / total) * 100) : 0;
-          return (
-            <button
-              key={status}
-              onClick={() => setStatusFilter(statusFilter === status ? "ALL" : status)}
-              className={`bg-white border rounded-lg p-3.5 text-left transition-colors ${
-                statusFilter === status
-                  ? "border-[#E4E4EF]"
-                  : "border-[#E4E4EF] hover:border-[#E4E4EF]"
-              }`}
-            >
-              <p className="text-[11px] font-[500] uppercase tracking-[0.06em] text-[#62657A] leading-none">
-                {label}
-              </p>
-              <p className={`text-[22px] font-[500] tracking-tight leading-none mt-2.5 ${text} ${
-                isLoading ? "opacity-20 animate-pulse" : ""
-              }`}>
-                {count}
-              </p>
-              <div className="h-[3px] rounded-full bg-[#F0F0F8] mt-2.5">
-                <div
-                  className={`h-full rounded-full ${color} transition-all`}
-                  style={{ width: `${pct}%` }}
-                />
+      {/* ── KPI cards ──────────────────────────────── */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 24 }}>
+        {kpis.map(({ icon, iconBg, label, val }) => (
+          <div key={label} style={{ background: "white", borderRadius: 16, padding: "14px 16px", border: "1px solid #E5E7EB", boxShadow: "0 1px 4px rgba(17,24,39,0.04)", display: "flex", alignItems: "center", gap: 14 }}>
+            <div style={{ width: 40, height: 40, borderRadius: 12, background: iconBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              {icon}
+            </div>
+            <div>
+              <div style={{ fontSize: 22, fontWeight: 700, color: "#111827", letterSpacing: "-0.02em", lineHeight: 1, opacity: isLoading ? 0.3 : 1 }}>
+                {val}
               </div>
-            </button>
-          );
-        })}
+              <div style={{ fontSize: 12, color: "#6B7280", marginTop: 3, fontWeight: 500 }}>{label}</div>
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* Filter bar */}
-      <div className="flex items-center gap-3">
-        <div className="relative">
-          <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#62657A]" />
+      {/* ── Filter bar ─────────────────────────────── */}
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
+        {/* Search */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, height: 40, padding: "0 14px", background: "white", border: "1px solid #E5E7EB", borderRadius: 12, minWidth: 260 }}>
+          <Search size={14} style={{ color: "#9CA3AF", flexShrink: 0 }} />
           <input
             type="text"
             placeholder="Search company, contact, email…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="h-8 pl-8 pr-3 w-56 text-[12px] bg-white border border-[#E4E4EF] rounded-md outline-none focus:border-[#7679FF] transition-colors"
+            style={{ flex: 1, fontSize: 13.5, color: "#111827", background: "transparent", outline: "none", border: "none", fontFamily: "inherit" }}
           />
         </div>
 
-        <div className="flex items-center gap-1.5">
-          {STATUS_CHIPS.map((chip) => (
-            <button
-              key={chip.value}
-              onClick={() => setStatusFilter(chip.value)}
-              className={`h-7 px-3 rounded-full text-[11px] font-[500] border transition-colors ${
-                statusFilter === chip.value ? CHIP_ON : CHIP_OFF
-              }`}
-            >
-              {chip.label}
-              {chip.value !== "ALL" && (
-                <span className="ml-1 opacity-60">
-                  · {counts[chip.value as EmployerEnquiryStatus]}
-                </span>
-              )}
-            </button>
-          ))}
+        {/* Status tabs */}
+        <div style={{ display: "flex", gap: 6 }}>
+          {STATUS_TABS.map((tab) => {
+            const active = statusFilter === tab.value;
+            const cnt = tab.value !== "ALL" ? counts[tab.value as EmployerEnquiryStatus] : enquiries.length;
+            return (
+              <button
+                key={tab.value}
+                onClick={() => setStatusFilter(tab.value)}
+                style={{
+                  height: 36, padding: "0 14px",
+                  background: active ? "#111827" : "white",
+                  color: active ? "white" : "#6B7280",
+                  border: `1px solid ${active ? "#111827" : "#E5E7EB"}`,
+                  borderRadius: 10, fontSize: 13, fontWeight: active ? 600 : 400,
+                  cursor: "pointer", fontFamily: "inherit",
+                  display: "flex", alignItems: "center", gap: 6,
+                }}
+              >
+                {tab.label}
+                <span style={{ fontSize: 11, opacity: 0.6, fontWeight: 400 }}>{cnt}</span>
+              </button>
+            );
+          })}
         </div>
 
-        <div className="flex-1" />
-        <span className="text-[11px] text-[#62657A]">{filtered.length} result{filtered.length !== 1 ? "s" : ""}</span>
+        <div style={{ flex: 1 }} />
+        <span style={{ fontSize: 12, color: "#9CA3AF" }}>{filtered.length} result{filtered.length !== 1 ? "s" : ""}</span>
       </div>
 
-      {/* Table */}
+      {/* ── Table ──────────────────────────────────── */}
       {isLoading ? (
-        <div className="bg-white border border-[#E4E4EF] rounded-lg overflow-hidden">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="flex items-center gap-4 px-4 py-3 border-b border-[#F0F0F8] last:border-0">
-              <div className="w-7 h-7 rounded-lg bg-[#F0F0F8] animate-pulse flex-shrink-0" />
-              <div className="flex-1 space-y-1.5">
-                <div className="h-2.5 w-36 bg-[#F0F0F8] rounded animate-pulse" />
-                <div className="h-2 w-24 bg-[#F0F0F8] rounded animate-pulse" />
+        <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", overflow: "hidden" }}>
+          {[...Array(6)].map((_, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 16, padding: "18px 24px", borderBottom: "1px solid #F9FAFB" }}>
+              <div style={{ width: 38, height: 38, borderRadius: 10, background: "#F3F4F6", flexShrink: 0 }} className="animate-pulse" />
+              <div style={{ flex: 1 }}>
+                <div style={{ height: 12, background: "#F3F4F6", borderRadius: 4, width: 160, marginBottom: 8 }} className="animate-pulse" />
+                <div style={{ height: 10, background: "#F3F4F6", borderRadius: 4, width: 120 }} className="animate-pulse" />
               </div>
-              <div className="h-4 w-16 bg-[#F0F0F8] rounded-full animate-pulse" />
-              <div className="h-4 w-20 bg-[#F0F0F8] rounded animate-pulse" />
+              <div style={{ height: 24, background: "#F3F4F6", borderRadius: 999, width: 80 }} className="animate-pulse" />
+              <div style={{ height: 12, background: "#F3F4F6", borderRadius: 4, width: 60 }} className="animate-pulse" />
             </div>
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-white border border-[#E4E4EF] rounded-lg py-14 text-center">
-          <p className="text-[13px] font-[500] text-[#62657A]">No enquiries found</p>
-          <p className="text-[11px] text-[#62657A] mt-1">
+        <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", padding: "64px 24px", textAlign: "center" }}>
+          <Building2 size={36} style={{ color: "#E5E7EB", margin: "0 auto 12px" }} />
+          <p style={{ fontSize: 15, fontWeight: 600, color: "#111827", margin: 0 }}>No enquiries found</p>
+          <p style={{ fontSize: 13, color: "#9CA3AF", marginTop: 6 }}>
             {search || statusFilter !== "ALL"
               ? "Try adjusting your search or filter."
               : "No employer enquiries submitted yet."}
@@ -195,7 +201,7 @@ export default function EmployerEnquiriesPage() {
         />
       )}
 
-      {/* Lead detail drawer */}
+      {/* ── Drawers ────────────────────────────────── */}
       <EmployerDetailsDrawer
         open={selected !== null}
         employer={selected}
@@ -203,7 +209,6 @@ export default function EmployerEnquiriesPage() {
         onCreateEmployer={handleCreateFromLead}
       />
 
-      {/* Create employer drawer — opened from lead, stays on this page */}
       <CreateEmployerDrawer
         open={createPrefill !== undefined}
         prefill={createPrefill}

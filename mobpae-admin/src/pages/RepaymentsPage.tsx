@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Search, Calendar, CheckCircle, AlertTriangle, DollarSign, X, Download } from "lucide-react";
+import { Search, Calendar, CheckCircle, AlertTriangle, DollarSign, X, Download, RefreshCw } from "lucide-react";
 import { getRepayments } from "../services/repaymentService";
 import { exportToCsv } from "../utils/exportCsv";
 import RepaymentsTable from "../components/repayments/RepaymentsTable";
@@ -9,7 +9,7 @@ import type { Repayment, RepaymentStatus } from "../types/repayment";
 
 type FilterStatus = "ALL" | RepaymentStatus;
 
-const CHIPS: { key: FilterStatus; label: string }[] = [
+const STATUS_TABS: { key: FilterStatus; label: string }[] = [
   { key: "ALL",       label: "All"       },
   { key: "SCHEDULED", label: "Scheduled" },
   { key: "PAID",      label: "Paid"      },
@@ -35,9 +35,12 @@ export default function RepaymentsPage() {
   const overdue   = data.filter(r => r.status === "OVERDUE").length;
   const total     = data.length;
 
+  const counts: Record<FilterStatus, number> = { ALL: total, SCHEDULED: scheduled, PAID: paid, OVERDUE: overdue };
+
   const rows = data.filter(r => {
     const q = search.toLowerCase();
     const matchSearch =
+      !q ||
       r.salaryRequest.employee.name.toLowerCase().includes(q) ||
       r.salaryRequest.employee.employeeCode.toLowerCase().includes(q) ||
       r.salaryRequest.employee.employer.companyName.toLowerCase().includes(q);
@@ -48,139 +51,136 @@ export default function RepaymentsPage() {
     return matchSearch && matchFilter && matchFrom && matchTo;
   });
 
+  const kpis = [
+    { icon: <RefreshCw size={18} color="#6C4CFF" strokeWidth={1.75} />,       iconBg: "#F3F0FF", label: "Scheduled", val: scheduled },
+    { icon: <CheckCircle size={18} color="#16A34A" strokeWidth={1.75} />,     iconBg: "#DCFCE7", label: "Paid",      val: paid      },
+    { icon: <AlertTriangle size={18} color="#EF4444" strokeWidth={1.75} />,   iconBg: "#FEE2E2", label: "Overdue",   val: overdue   },
+    { icon: <DollarSign size={18} color="#D97706" strokeWidth={1.75} />,      iconBg: "#FEF3C7", label: "Total",     val: total     },
+  ];
+
   return (
-    <div className="px-8 py-6 space-y-5">
-      <div>
-        <h1 className="text-[22px] font-[600] text-[#191A2E] tracking-[-0.01em]">Repayments</h1>
-        <p className="text-[13px] text-[#62657A] mt-0.5">Track employee salary advance repayments</p>
+    <div style={{ padding: "28px 32px", fontFamily: "Inter, ui-sans-serif, sans-serif" }}>
+
+      {/* ── Header ──────────────────────────── */}
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28 }}>
+        <div>
+          <h1 style={{ fontSize: 26, fontWeight: 700, color: "#111827", letterSpacing: "-0.025em", margin: 0 }}>Repayments</h1>
+          <p style={{ fontSize: 14, color: "#6B7280", marginTop: 6 }}>Track employee salary advance repayments.</p>
+        </div>
+        <button
+          onClick={() => exportToCsv(rows.map(r => ({
+            Employee:  r.salaryRequest.employee.name,
+            Code:      r.salaryRequest.employee.employeeCode,
+            Company:   r.salaryRequest.employee.employer.companyName,
+            Principal: r.principalAmount,
+            Total:     r.totalAmount,
+            DueDate:   r.dueDate ? new Date(r.dueDate).toLocaleDateString() : "",
+            PaidDate:  r.paidDate ? new Date(r.paidDate).toLocaleDateString() : "",
+            Status:    r.status,
+          })), `repayments`)}
+          style={{ height: 40, padding: "0 16px", display: "flex", alignItems: "center", gap: 8, background: "white", border: "1px solid #E5E7EB", borderRadius: 12, fontSize: 13, fontWeight: 500, color: "#374151", cursor: "pointer", fontFamily: "inherit" }}
+        >
+          <Download size={14} />
+          Export
+        </button>
       </div>
 
-      {/* Pipeline strip */}
-      <div className="grid grid-cols-4 gap-3">
-        {[
-          { icon: <Calendar size={14} />,        color: "text-[#7679FF]",    bg: "bg-[#ECEBFF]",    label: "Scheduled", val: scheduled },
-          { icon: <CheckCircle size={14} />,     color: "text-[#7679FF]", bg: "bg-[#ECEBFF]", label: "Paid",      val: paid      },
-          { icon: <AlertTriangle size={14} />,   color: "text-red-500",     bg: "bg-red-50",     label: "Overdue",   val: overdue   },
-          { icon: <DollarSign size={14} />,      color: "text-[#62657A]",   bg: "bg-[#F7F7FB]",   label: "Total",     val: total     },
-        ].map(({ icon, color, bg, label, val }) => (
-          <div key={label} className="bg-white border border-[#E4E4EF] rounded-xl px-4 py-3.5 flex items-center gap-3">
-            <div className={`w-7 h-7 rounded-lg ${bg} ${color} flex items-center justify-center`}>{icon}</div>
+      {isError && (
+        <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 12, padding: "12px 16px", marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, color: "#DC2626" }}>
+          <span>Failed to load repayments.</span>
+          <button onClick={() => void refetch()} style={{ padding: "6px 12px", background: "white", border: "1px solid #FECACA", borderRadius: 8, fontSize: 12, fontWeight: 600, color: "#DC2626", cursor: "pointer", fontFamily: "inherit" }}>Retry</button>
+        </div>
+      )}
+
+      {/* ── KPI cards ───────────────────────── */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 24 }}>
+        {kpis.map(({ icon, iconBg, label, val }) => (
+          <div key={label} style={{ background: "white", borderRadius: 16, padding: "14px 16px", border: "1px solid #E5E7EB", boxShadow: "0 1px 4px rgba(17,24,39,0.04)", display: "flex", alignItems: "center", gap: 14 }}>
+            <div style={{ width: 40, height: 40, borderRadius: 12, background: iconBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{icon}</div>
             <div>
-              <p className="text-[20px] font-[600] text-[#191A2E] leading-none tabular-nums">{val}</p>
-              <p className="text-[11px] text-[#62657A] mt-0.5">{label}</p>
+              <div style={{ fontSize: 22, fontWeight: 700, color: "#111827", letterSpacing: "-0.02em", lineHeight: 1, opacity: isLoading ? 0.3 : 1 }}>{val}</div>
+              <div style={{ fontSize: 12, color: "#6B7280", marginTop: 3, fontWeight: 500 }}>{label}</div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Search + filters */}
-      <div className="flex items-center gap-3 flex-wrap">
-        <div className="relative">
-          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#62657A]" />
+      {/* ── Filter bar ──────────────────────── */}
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, height: 40, padding: "0 14px", background: "white", border: "1px solid #E5E7EB", borderRadius: 12, minWidth: 240 }}>
+          <Search size={14} style={{ color: "#9CA3AF", flexShrink: 0 }} />
           <input
             type="text"
-            placeholder="Search by name, code, employer…"
+            placeholder="Search name, code, employer..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="h-8 pl-8 pr-4 text-[12px] bg-white border border-[#E4E4EF] rounded-lg outline-none focus:border-[#7679FF] w-64 text-[#62657A] placeholder-[#B7B9C7]"
+            style={{ flex: 1, fontSize: 13.5, color: "#111827", background: "transparent", outline: "none", border: "none", fontFamily: "inherit" }}
           />
         </div>
-        <div className="flex items-center gap-1.5">
-          {CHIPS.map(c => {
-            const count = c.key === "ALL" ? total
-              : c.key === "SCHEDULED" ? scheduled
-              : c.key === "PAID" ? paid
-              : overdue;
-            const active = filter === c.key;
+        <div style={{ display: "flex", gap: 6 }}>
+          {STATUS_TABS.map(tab => {
+            const active = filter === tab.key;
             return (
               <button
-                key={c.key}
-                onClick={() => setFilter(c.key)}
-                className={`h-7 px-3 rounded-full text-[11px] font-[500] transition-colors ${
-                  active ? "bg-[#191A2E] text-white" : "bg-white border border-[#E4E4EF] text-[#62657A] hover:border-[#E4E4EF]"
-                }`}
+                key={tab.key}
+                onClick={() => setFilter(tab.key)}
+                style={{
+                  height: 36, padding: "0 14px",
+                  background: active ? "#111827" : "white",
+                  color: active ? "white" : "#6B7280",
+                  border: `1px solid ${active ? "#111827" : "#E5E7EB"}`,
+                  borderRadius: 10, fontSize: 13, fontWeight: active ? 600 : 400,
+                  cursor: "pointer", fontFamily: "inherit",
+                  display: "flex", alignItems: "center", gap: 6,
+                }}
               >
-                {c.label} · {count}
+                {tab.label}
+                <span style={{ fontSize: 11, opacity: 0.6, fontWeight: 400 }}>{counts[tab.key]}</span>
               </button>
             );
           })}
         </div>
-
-        {/* Date range (filters by dueDate) */}
-        <div className="flex items-center gap-1.5 ml-1">
-          <Calendar size={12} className="text-[#62657A]" />
-          <input
-            type="date"
-            value={dateFrom}
-            onChange={e => setDateFrom(e.target.value)}
-            className="h-7 px-2 text-[11px] bg-white border border-[#E4E4EF] rounded-md outline-none focus:border-[#7679FF] transition-colors text-[#62657A]"
-          />
-          <span className="text-[11px] text-[#62657A]">–</span>
-          <input
-            type="date"
-            value={dateTo}
-            onChange={e => setDateTo(e.target.value)}
-            className="h-7 px-2 text-[11px] bg-white border border-[#E4E4EF] rounded-md outline-none focus:border-[#7679FF] transition-colors text-[#62657A]"
-          />
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <Calendar size={13} style={{ color: "#9CA3AF" }} />
+          <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)}
+            style={{ height: 36, padding: "0 10px", background: "white", border: "1px solid #E5E7EB", borderRadius: 10, fontSize: 12.5, color: "#6B7280", outline: "none", fontFamily: "inherit" }} />
+          <span style={{ fontSize: 12, color: "#9CA3AF" }}>–</span>
+          <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)}
+            style={{ height: 36, padding: "0 10px", background: "white", border: "1px solid #E5E7EB", borderRadius: 10, fontSize: 12.5, color: "#6B7280", outline: "none", fontFamily: "inherit" }} />
           {(dateFrom || dateTo) && (
-            <button
-              onClick={() => { setDateFrom(""); setDateTo(""); }}
-              className="w-5 h-5 flex items-center justify-center rounded-full bg-[#F0F0F8] text-[#62657A] hover:bg-[#E4E4EF] transition-colors"
-            >
+            <button onClick={() => { setDateFrom(""); setDateTo(""); }}
+              style={{ width: 24, height: 24, borderRadius: "50%", background: "#F3F4F6", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#6B7280" }}>
               <X size={10} />
             </button>
           )}
         </div>
-
-        <div className="flex-1" />
-        <span className="text-[11px] text-[#62657A]">{rows.length} result{rows.length !== 1 ? "s" : ""}</span>
-        <button
-          onClick={() => exportToCsv(rows.map(r => ({
-            Employee:    r.salaryRequest.employee.name,
-            Code:        r.salaryRequest.employee.employeeCode,
-            Company:     r.salaryRequest.employee.employer.companyName,
-            Principal:   r.principalAmount,
-            Total:       r.totalAmount,
-            DueDate:     r.dueDate ? new Date(r.dueDate).toLocaleDateString() : "",
-            PaidDate:    r.paidDate ? new Date(r.paidDate).toLocaleDateString() : "",
-            Status:      r.status,
-          })), `repayments-${Date.now()}`)}
-          className="h-8 px-3 flex items-center gap-1.5 text-[12px] font-[500] text-[#62657A] bg-white border border-[#E4E4EF] rounded-lg hover:bg-[#F7F7FB] transition-colors"
-        >
-          <Download size={13} /> Export CSV
-        </button>
+        <div style={{ flex: 1 }} />
+        <span style={{ fontSize: 12, color: "#9CA3AF" }}>{rows.length} repayments</span>
       </div>
 
-      {isError ? (
-        <div className="bg-white border border-red-100 rounded-xl px-6 py-14 text-center">
-          <p className="text-[13px] font-[500] text-red-600">Failed to load repayments</p>
-          <p className="text-[12px] text-[#62657A] mt-1">Check your connection and try again.</p>
-          <button onClick={() => void refetch()} className="mt-4 h-8 px-4 text-[12px] font-[500] bg-white border border-[#E4E4EF] rounded-lg hover:bg-[#F7F7FB] transition-colors text-[#62657A]">
-            Retry
-          </button>
-        </div>
-      ) : isLoading ? (
-        <div className="bg-white border border-[#E4E4EF] rounded-xl overflow-hidden">
+      {/* ── Table ───────────────────────────── */}
+      {isLoading ? (
+        <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", overflow: "hidden" }}>
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="flex items-center gap-4 px-5 py-3.5 border-b border-[#F0F0F8] last:border-0">
-              <div className="w-7 h-7 rounded-lg bg-[#F0F0F8] animate-pulse flex-shrink-0" />
-              <div className="flex-1 space-y-1.5">
-                <div className="h-2.5 w-28 bg-[#F0F0F8] rounded animate-pulse" />
-                <div className="h-2 w-20 bg-[#F0F0F8] rounded animate-pulse" />
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 16, padding: "18px 24px", borderBottom: "1px solid #F9FAFB" }}>
+              <div style={{ width: 38, height: 38, borderRadius: 10, background: "#F3F4F6", flexShrink: 0 }} className="animate-pulse" />
+              <div style={{ flex: 1 }}>
+                <div style={{ height: 12, background: "#F3F4F6", borderRadius: 4, width: 140, marginBottom: 6 }} className="animate-pulse" />
+                <div style={{ height: 10, background: "#F3F4F6", borderRadius: 4, width: 100 }} className="animate-pulse" />
               </div>
-              <div className="h-2.5 w-16 bg-[#F0F0F8] rounded animate-pulse" />
-              <div className="h-2.5 w-20 bg-[#F0F0F8] rounded animate-pulse" />
-              <div className="h-4 w-16 bg-[#F0F0F8] rounded-full animate-pulse" />
+              <div style={{ height: 22, background: "#F3F4F6", borderRadius: 999, width: 80 }} className="animate-pulse" />
             </div>
           ))}
         </div>
       ) : rows.length === 0 ? (
-        <div className="bg-white border border-[#E4E4EF] rounded-xl px-6 py-14 text-center">
-          <div className="w-10 h-10 rounded-xl bg-[#F0F0F8] flex items-center justify-center mb-3 mx-auto">
-            <span className="text-[#62657A] text-lg">↩</span>
-          </div>
-          <p className="text-[13px] font-[500] text-[#62657A]">No repayments found</p>
-          <p className="text-[12px] text-[#62657A] mt-1">Repayments appear once salary advances are disbursed.</p>
+        <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", padding: "60px 24px", textAlign: "center" }}>
+          <RefreshCw size={36} style={{ color: "#E5E7EB", margin: "0 auto 12px" }} />
+          <p style={{ fontSize: 15, fontWeight: 600, color: "#111827", margin: 0 }}>No repayments found</p>
+          <p style={{ fontSize: 13, color: "#9CA3AF", marginTop: 6 }}>
+            {search || filter !== "ALL" || dateFrom || dateTo
+              ? "Try adjusting your search or filters."
+              : "Repayments appear once salary advances are disbursed."}
+          </p>
         </div>
       ) : (
         <RepaymentsTable

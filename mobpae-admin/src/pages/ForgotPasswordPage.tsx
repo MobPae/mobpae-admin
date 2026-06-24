@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { forgotPassword } from "../services/authService";
 
-const B  = "#7679FF";
-const BD = "#5659D9";
+const B  = "#6C4CFF";
+const BD = "#5B34FF";
 const CREAM = "#f8fafc";
 
 export default function ForgotPasswordPage() {
@@ -41,17 +41,17 @@ export default function ForgotPasswordPage() {
                 <rect x="13" y="7" width="3.5" height="12" rx="0.8" fill="white"/>
               </svg>
           </div>
-          <span style={{ fontSize: 15, fontWeight: 700, color: "#191A2E", letterSpacing: "-0.01em" }}>MobPae</span>
+          <span style={{ fontSize: 15, fontWeight: 700, color: "#111827", letterSpacing: "-0.01em" }}>MobPae</span>
         </div>
 
         {sent ? (
           <div>
-            <div style={{ width: 48, height: 48, borderRadius: 12, background: "#ECEBFF", border: "1px solid #C8C9FF", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7679FF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <div style={{ width: 48, height: 48, borderRadius: 12, background: "#F3F0FF", border: "1px solid #C8C9FF", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6C4CFF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
             <h2 style={{ fontSize: 26, fontWeight: 800, color: "#111", letterSpacing: "-0.025em", margin: "0 0 10px" }}>Check your inbox</h2>
-            <p style={{ fontSize: 14, color: "#8D90A3", lineHeight: 1.6, marginBottom: 28 }}>
-              If an account exists for <strong style={{ color: "#62657A" }}>{email}</strong>, you'll receive a password reset link shortly. The link expires in 15 minutes.
+            <p style={{ fontSize: 14, color: "#9CA3AF", lineHeight: 1.6, marginBottom: 28 }}>
+              If an account exists for <strong style={{ color: "#6B7280" }}>{email}</strong>, you'll receive a password reset link shortly. The link expires in 15 minutes.
             </p>
             <button
               onClick={() => navigate("/login")}
@@ -63,7 +63,7 @@ export default function ForgotPasswordPage() {
         ) : (
           <div>
             <h2 style={{ fontSize: 28, fontWeight: 800, color: "#111", letterSpacing: "-0.025em", margin: "0 0 10px" }}>Reset password</h2>
-            <p style={{ fontSize: 14, color: "#8D90A3", lineHeight: 1.6, marginBottom: 28 }}>
+            <p style={{ fontSize: 14, color: "#9CA3AF", lineHeight: 1.6, marginBottom: 28 }}>
               Enter your admin email and we'll send you a reset link.
             </p>
 
@@ -75,7 +75,7 @@ export default function ForgotPasswordPage() {
                   background: "white", border: "1.5px solid #e8e0d8", borderRadius: 10, padding: "11px 14px",
                   transition: "border-color 0.15s",
                 }}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8D90A3" strokeWidth="2" strokeLinecap="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
                   <input
                     type="email" value={email} onChange={e => setEmail(e.target.value)}
                     placeholder="admin@mobpae.com" required autoComplete="email"
@@ -101,7 +101,7 @@ export default function ForgotPasswordPage() {
                   fontSize: 14, fontWeight: 700,
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
                   cursor: loading ? "not-allowed" : "pointer",
-                  boxShadow: loading ? "none" : "0 4px 16px rgba(118,121,255,0.30)",
+                  boxShadow: loading ? "none" : "0 4px 16px rgba(108,76,255,0.30)",
                   transition: "all 0.15s",
                 }}
               >
@@ -109,7 +109,7 @@ export default function ForgotPasswordPage() {
               </button>
             </form>
 
-            <p style={{ marginTop: 20, fontSize: 13, color: "#8D90A3", textAlign: "center" }}>
+            <p style={{ marginTop: 20, fontSize: 13, color: "#9CA3AF", textAlign: "center" }}>
               <button onClick={() => navigate("/login")} style={{ color: B, fontWeight: 600, background: "none", border: "none", cursor: "pointer", fontSize: 13 }}>
                 ← Back to sign in
               </button>

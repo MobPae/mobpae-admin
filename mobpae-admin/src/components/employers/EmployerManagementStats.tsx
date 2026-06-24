@@ -12,8 +12,8 @@ const stats = [
     title: "Approved",
     value: 8,
     icon: CheckCircle2,
-    color: "text-[#7679FF]",
-    bg: "bg-[#ECEBFF]",
+    color: "text-[#6C4CFF]",
+    bg: "bg-[#F3F0FF]",
   },
   {
     title: "Rejected",
@@ -26,8 +26,8 @@ const stats = [
     title: "Total",
     value: 22,
     icon: Building2,
-    color: "text-[#7679FF]",
-    bg: "bg-[#ECEBFF]",
+    color: "text-[#6C4CFF]",
+    bg: "bg-[#F3F0FF]",
   },
 ];
 
@@ -40,11 +40,11 @@ export default function EmployerStats() {
         return (
           <div
             key={stat.title}
-            className="bg-white border border-[#E4E4EF] rounded-2xl p-6 shadow-sm"
+            className="bg-white border border-[#E5E7EB] rounded-2xl p-6 shadow-sm"
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[#62657A] text-sm">{stat.title}</p>
+                <p className="text-[#6B7280] text-sm">{stat.title}</p>
 
                 <h2 className="text-3xl font-bold mt-2">{stat.value}</h2>
               </div>
