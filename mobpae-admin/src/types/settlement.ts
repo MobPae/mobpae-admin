@@ -1,4 +1,25 @@
-export type EmployerSettlementStatus = "PENDING" | "PARTIALLY_PAID" | "PAID" | "OVERDUE";
+export type EmployerSettlementStatus = "NO_DUES" | "PENDING" | "PARTIALLY_PAID" | "PAID" | "OVERDUE";
+
+export interface SettlementRepayment {
+  id: string;
+  salaryRequestId: string;
+  principalAmount: string;
+  interestAmount: string;
+  totalAmount: string;
+  dueDate: string;
+  paidDate: string | null;
+  status: string;
+  salaryRequest?: {
+    id: string;
+    requestId?: string | null;
+    employee?: {
+      id: string;
+      name: string;
+      employeeCode: string;
+      email: string;
+    } | null;
+  } | null;
+}
 
 export interface EmployerSettlement {
   id: string;
@@ -17,6 +38,7 @@ export interface EmployerSettlement {
   notes: string | null;
   createdAt: string;
   updatedAt: string;
+  repayments?: SettlementRepayment[];
   employer: {
     id: string;
     companyName: string;

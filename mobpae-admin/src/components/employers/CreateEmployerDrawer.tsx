@@ -263,7 +263,7 @@ export default function CreateEmployerDrawer({ open, onClose, prefill }: Props) 
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <FormField
-                    label="Payroll date"
+                    label="Salary date"
                     type="number"
                     value={form.payrollDate > 0 ? String(form.payrollDate) : ""}
                     onChange={setNum("payrollDate", setPayrollDateErr)}

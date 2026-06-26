@@ -12,6 +12,7 @@ import {
   X,
 } from "lucide-react";
 import {
+  getSettlement,
   getSettlements,
   markSettlementPaid,
   sendSettlementReport,
@@ -173,6 +174,7 @@ export default function SettlementsPage() {
   const [search,    setSearch]    = useState("");
   const [filter,    setFilter]    = useState<"ALL" | EmployerSettlementStatus>("ALL");
   const [selected,  setSelected]  = useState<EmployerSettlement | null>(null);
+  const [loadingDetailId, setLoadingDetailId] = useState<string | null>(null);
   const [marking,   setMarking]   = useState<string | null>(null);   // settlement id being marked
   const [sending,   setSending]   = useState<string | null>(null);   // settlement id being reported
   const [markError, setMarkError] = useState("");
@@ -227,13 +229,27 @@ export default function SettlementsPage() {
     try {
       await markSettlementPaid(s.id);
       qc.invalidateQueries({ queryKey: ["settlements"] });
-      addToast("success", `${s.employer.companyName} marked as paid`);
+      addToast("success", `${s.employer.companyName} settlement marked as paid`);
       setSelected(null);
     } catch (err) {
       const msg = getApiErrorMessage(err, "Failed to mark as paid");
       setMarkError(msg);
     } finally {
       setMarking(null);
+    }
+  };
+
+  const openSettlement = async (s: EmployerSettlement) => {
+    setSelected(s);
+    setMarkError("");
+    setLoadingDetailId(s.id);
+    try {
+      const detail = await getSettlement(s.id);
+      setSelected(detail);
+    } catch (err) {
+      addToast("error", getApiErrorMessage(err, "Failed to load settlement recovery details"));
+    } finally {
+      setLoadingDetailId(null);
     }
   };
 
@@ -332,14 +348,14 @@ export default function SettlementsPage() {
               <CreditCard size={18} color="#6B7280" />
             </div>
             <p style={{ fontSize: 13, fontWeight: 500, color: "#6B7280", margin: 0 }}>No settlements found</p>
-            <p style={{ fontSize: 12, color: "#9CA3AF", marginTop: 4 }}>Settlements appear once employer payroll recoveries are due</p>
+            <p style={{ fontSize: 12, color: "#9CA3AF", marginTop: 4 }}>Settlements appear once employer recoveries are due to MobPae</p>
           </div>
         ) : (
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
               <thead>
                 <tr style={{ borderBottom: "1px solid #F3F4F6", background: "#FAFAFA" }}>
-                  {["Employer", "Payroll Month", "Total", "Outstanding", "Late Fee", "Due Date", "Status", "Actions"].map(h => (
+                  {["Employer", "Salary Cycle", "Total", "Outstanding", "Late Fee", "Due Date", "Status", "Actions"].map(h => (
                     <th key={h} style={{ padding: "14px 20px", textAlign: "left", fontSize: 11.5, fontWeight: 600, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.07em", whiteSpace: "nowrap" }}>{h}</th>
                   ))}
                 </tr>
@@ -372,10 +388,10 @@ export default function SettlementsPage() {
                     {/* ── Row actions ── */}
                     <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                        {/* View Report */}
+                        {/* View Details */}
                         <button
-                          title="View Report"
-                          onClick={() => { setSelected(s); setMarkError(""); }}
+                          title="View Details"
+                          onClick={() => void openSettlement(s)}
                           style={{ height: 28, width: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid #E5E7EB", background: "white", color: "#6B7280", cursor: "pointer" }}
                         >
                           <Eye size={13} />
@@ -419,7 +435,7 @@ export default function SettlementsPage() {
         )}
       </div>
 
-      {/* Drawer — View Report detail */}
+      {/* Drawer — settlement detail */}
       {selected && (
         <>
           <div style={{ position: "fixed", inset: 0, zIndex: 30, background: "rgba(0,0,0,0.2)", backdropFilter: "blur(1px)" }} onClick={() => setSelected(null)} />
@@ -507,6 +523,57 @@ export default function SettlementsPage() {
                 <Timeline s={selected} />
               </div>
 
+              {/* Linked recoveries */}
+              <div>
+                <p style={{ fontSize: 11, fontWeight: 600, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Linked Recoveries</p>
+                {loadingDetailId === selected.id ? (
+                  <div style={{ background: "#F8F9FC", border: "1px solid #E5E7EB", borderRadius: 16, padding: 16 }}>
+                    <p style={{ fontSize: 12, color: "#6B7280", margin: 0 }}>Loading recovery rows...</p>
+                  </div>
+                ) : selected.repayments?.length ? (
+                  <div style={{ border: "1px solid #E5E7EB", borderRadius: 16, overflow: "hidden", background: "white" }}>
+                    {selected.repayments.map((repayment) => {
+                      const employee = repayment.salaryRequest?.employee;
+                      const requestLabel = repayment.salaryRequest?.requestId ?? repayment.salaryRequestId.slice(0, 8);
+                      return (
+                        <div key={repayment.id} style={{ padding: "12px 14px", borderBottom: "1px solid #F3F4F6" }}>
+                          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
+                            <div style={{ minWidth: 0 }}>
+                              <p style={{ fontSize: 12.5, fontWeight: 600, color: "#111827", margin: 0 }}>{employee?.name ?? "Employee"}</p>
+                              <p style={{ fontSize: 11, color: "#6B7280", marginTop: 2 }}>
+                                {employee?.employeeCode ?? "Code unavailable"} · Req {requestLabel}
+                              </p>
+                            </div>
+                            <StatusPill status={repayment.status} />
+                          </div>
+                          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginTop: 10 }}>
+                            <div>
+                              <p style={{ fontSize: 10.5, color: "#9CA3AF", margin: 0 }}>Principal</p>
+                              <p style={{ fontSize: 12, fontWeight: 600, color: "#111827", marginTop: 2 }}>{formatCurrency(repayment.principalAmount)}</p>
+                            </div>
+                            <div>
+                              <p style={{ fontSize: 10.5, color: "#9CA3AF", margin: 0 }}>Interest</p>
+                              <p style={{ fontSize: 12, fontWeight: 600, color: "#111827", marginTop: 2 }}>{formatCurrency(repayment.interestAmount)}</p>
+                            </div>
+                            <div>
+                              <p style={{ fontSize: 10.5, color: "#9CA3AF", margin: 0 }}>Total</p>
+                              <p style={{ fontSize: 12, fontWeight: 700, color: "#111827", marginTop: 2 }}>{formatCurrency(repayment.totalAmount)}</p>
+                            </div>
+                          </div>
+                          <p style={{ fontSize: 11, color: "#6B7280", marginTop: 8 }}>Due {formatDate(repayment.dueDate)}</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div style={{ background: "#F8F9FC", border: "1px solid #E5E7EB", borderRadius: 16, padding: "12px 14px" }}>
+                    <p style={{ fontSize: 12, color: "#6B7280", lineHeight: 1.5, margin: 0 }}>
+                      No linked recovery rows were returned for this settlement. This can happen for older records or no-dues cycles.
+                    </p>
+                  </div>
+                )}
+              </div>
+
               {/* Notes */}
               {selected.notes && (
                 <div>
@@ -547,7 +614,7 @@ export default function SettlementsPage() {
                     {marking === selected.id ? "Processing…" : "Mark as Paid"}
                   </button>
                   <p style={{ fontSize: 11, color: "#6B7280", textAlign: "center", margin: 0 }}>
-                    Confirm receipt of {formatCurrency(selected.outstandingAmount || selected.totalAmount)} from {selected.employer.companyName}
+                    Confirm receipt of {formatCurrency(selected.outstandingAmount || selected.totalAmount)} from {selected.employer.companyName}. Linked recoveries will move to recovered.
                   </p>
                 </>
               )}

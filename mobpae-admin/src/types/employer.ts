@@ -13,6 +13,7 @@ export interface Employer {
   payrollCutoffDate: number;
   status: EmployerStatus;
   riskStatus: EmployerRiskStatus;
+  totalEmployees?: number;
   createdAt: string;
   updatedAt: string;
 }

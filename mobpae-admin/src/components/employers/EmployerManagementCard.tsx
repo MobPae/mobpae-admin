@@ -98,7 +98,7 @@ export default function EmployerManagementCard({
         <div className="flex items-start gap-3">
           <Building2 size={18} className="text-[#6B7280] mt-0.5" />
 
-          <p className="text-[#6B7280]">Payroll Date: {payrollDate}</p>
+          <p className="text-[#6B7280]">Salary Date: {payrollDate}</p>
         </div>
       </div>
 

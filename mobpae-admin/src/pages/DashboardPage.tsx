@@ -248,7 +248,7 @@ export default function DashboardPage() {
                   onClick={() => void navigate(item.to)}
                   style={{
                     width: "100%", display: "flex", alignItems: "center", gap: 12,
-                    padding: "14px 20px", borderBottom: "1px solid #F9FAFB",
+                    padding: "14px 20px",
                     background: "none", border: "none", borderBottom: "1px solid #F3F4F6",
                     cursor: "pointer", textAlign: "left",
                     transition: "background 0.12s",
@@ -557,7 +557,6 @@ export default function DashboardPage() {
                     style={{
                       width: "100%", display: "flex", alignItems: "center", gap: 10,
                       padding: "12px 20px",
-                      borderBottom: i < topEmployers.length - 1 ? "1px solid #F9FAFB" : "none",
                       background: "none", border: "none", borderBottom: i < topEmployers.length - 1 ? "1px solid #F9FAFB" : "none",
                       cursor: "pointer", textAlign: "left",
                       transition: "background 0.1s",

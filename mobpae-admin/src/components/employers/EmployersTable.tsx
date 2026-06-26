@@ -42,7 +42,7 @@ function Pill({ label, color, bg }: { label: string; color: string; bg: string }
   );
 }
 
-const HEADERS = ["Company", "Contact", "Payroll", "Status", "Risk", ""];
+const HEADERS = ["Company", "Contact", "Salary Cycle", "Status", "Risk", ""];
 
 export default function EmployersTable({ employers, selectedId, onSelect }: Props) {
   const [hovered, setHovered] = useState<string | null>(null);
@@ -94,7 +94,7 @@ export default function EmployersTable({ employers, selectedId, onSelect }: Prop
                   <p style={{ fontSize: 12, color: "#9CA3AF", margin: "2px 0 0" }}>{emp.phone}</p>
                 </td>
 
-                {/* Payroll */}
+                {/* Salary cycle */}
                 <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
                   <p style={{ fontSize: 13.5, fontWeight: 600, color: "#111827", margin: 0 }}>{emp.payrollDate}th</p>
                   <p style={{ fontSize: 11.5, color: "#9CA3AF", margin: "2px 0 0" }}>cutoff {emp.payrollCutoffDate}th</p>

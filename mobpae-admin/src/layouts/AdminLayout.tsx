@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import { Bell, Search, ChevronDown } from "lucide-react";
+import { Search, ChevronDown } from "lucide-react";
 import Sidebar from "../components/layout/Sidebar";
 import { NotificationBell } from "../components/layout/NotificationBell";
 import { getTokenName } from "../utils/auth";

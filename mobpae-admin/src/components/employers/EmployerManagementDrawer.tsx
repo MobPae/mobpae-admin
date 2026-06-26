@@ -92,14 +92,14 @@ export default function EmployerManagementDrawer({ open, onClose, onMutated, emp
   const recoveryMutation = useMutation({
     mutationFn: () => processRecovery(employer!.id),
     onSuccess: () => {
-      toast.success("Recovery processed", {
-        description: `All due repayments for ${employer?.companyName} have been processed.`,
+      toast.success("Settlement generated", {
+        description: `Due recoveries for ${employer?.companyName} have been grouped into a settlement.`,
       });
       setRecoveryConfirm(false);
       onMutated();
     },
     onError: (err: unknown) => {
-      toast.error("Recovery failed", { description: getApiErrorMessage(err) });
+      toast.error("Settlement generation failed", { description: getApiErrorMessage(err) });
       setRecoveryConfirm(false);
     },
   });
@@ -181,14 +181,14 @@ export default function EmployerManagementDrawer({ open, onClose, onMutated, emp
             </div>
           </section>
 
-          {/* Payroll */}
+          {/* Salary cycle */}
           <section>
             <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-[#6B7280] mb-2">
-              Payroll configuration
+              Salary cycle configuration
             </p>
             <div className="border border-[#E5E7EB] rounded-lg divide-y divide-[#E5E7EB]">
               {[
-                { k: "Payroll date", v: `${employer.payrollDate}th of month`         },
+                { k: "Salary date", v: `${employer.payrollDate}th of month`         },
                 { k: "Cutoff date",  v: `${employer.payrollCutoffDate}th of month`   },
               ].map(({ k, v }) => (
                 <div key={k} className="flex items-center justify-between px-3 py-2.5">
@@ -314,13 +314,13 @@ export default function EmployerManagementDrawer({ open, onClose, onMutated, emp
               </div>
             )}
 
-            {/* Process Recovery confirm */}
-            {recoveryConfirm && (
-              <div className="mb-3 rounded-lg bg-amber-50 border border-amber-200 p-3">
-                <p className="text-[12px] font-[600] text-amber-800 mb-1">Process recovery?</p>
+          {/* Generate settlement confirm */}
+          {recoveryConfirm && (
+            <div className="mb-3 rounded-lg bg-amber-50 border border-amber-200 p-3">
+                <p className="text-[12px] font-[600] text-amber-800 mb-1">Generate settlement?</p>
                 <p className="text-[11px] text-amber-700 mb-3">
-                  This will mark all due repayments for <strong>{employer.companyName}</strong> as paid,
-                  create a settlement, and re-enable employee eligibility.
+                  This will create a settlement for all due recoveries for <strong>{employer.companyName}</strong>.
+                  The employer can then pay MobPae and admin can mark the settlement paid.
                 </p>
                 <div className="flex gap-2">
                   <button
@@ -336,7 +336,7 @@ export default function EmployerManagementDrawer({ open, onClose, onMutated, emp
                     className="flex-1 h-7 rounded-md bg-amber-600 hover:bg-amber-700 text-[11px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-60"
                   >
                     {isRecovering ? <Loader2 size={11} className="animate-spin" /> : <RefreshCw size={11} />}
-                    Confirm
+                    Generate
                   </button>
                 </div>
               </div>
@@ -381,7 +381,7 @@ export default function EmployerManagementDrawer({ open, onClose, onMutated, emp
               </div>
             )}
 
-            {/* Process Recovery — available for any active employer */}
+            {/* Generate settlement — available for any active employer */}
             {!suspendConfirm && !recoveryConfirm && canSuspend && (
               <div className="mt-2">
                 <button
@@ -390,7 +390,7 @@ export default function EmployerManagementDrawer({ open, onClose, onMutated, emp
                   className="w-full h-8 rounded-md border border-[#E5E7EB] text-[12px] font-[500] text-[#6B7280] hover:border-amber-300 hover:text-amber-700 hover:bg-amber-50 transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
                 >
                   <RefreshCw size={12} />
-                  Process Recovery
+                  Generate Settlement
                 </button>
               </div>
             )}

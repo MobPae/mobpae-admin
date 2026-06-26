@@ -10,11 +10,6 @@ import { Pagination } from "../components/ui/Pagination";
 
 const PAGE_SIZE = 15;
 
-const CHIP_ON       = "bg-[#111827] text-white border-[#111827]";
-const CHIP_OFF      = "bg-white border-[#E5E7EB] text-[#6B7280] hover:border-[#E5E7EB] hover:text-[#6B7280]";
-const CHIP_ACTION   = "bg-[#6C4CFF] text-white border-[#5B34FF]";
-const CHIP_ACTION_OFF = "bg-[#F3F0FF] border-[#E5E7EB] text-[#5B34FF] hover:border-[#6C4CFF]";
-
 const NEEDS_ACTION_STATUSES: SalaryRequestStatus[] = ["EMPLOYER_APPROVED", "READY_FOR_DISBURSAL"];
 
 const STATUS_LABELS: Record<SalaryRequestStatus, string> = {
