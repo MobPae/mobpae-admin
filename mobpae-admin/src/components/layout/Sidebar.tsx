@@ -77,19 +77,6 @@ const SECTIONS: Section[] = [
   },
 ];
 
-// MobPae logo mark — SVG viewBox 1500×1500; logo content at x:319–1207, y:485–1015
-function MobPaeMark({ size = 28 }: { size?: number }) {
-  const scale  = size / 530;
-  const imgPx  = Math.round(1500 * scale);
-  const visW   = Math.round(888 * scale);
-  return (
-    <div style={{ width: visW, height: size, overflow: "hidden", flexShrink: 0, position: "relative" }}>
-      <img src="/logo-icon.svg" alt="MobPae"
-           style={{ position: "absolute", width: imgPx, height: imgPx, maxWidth: "none",
-                    top: -Math.round(485 * scale), left: -Math.round(319 * scale) }} />
-    </div>
-  );
-}
 
 export default function Sidebar() {
   const navigate = useNavigate();
@@ -109,7 +96,7 @@ export default function Sidebar() {
     >
       {/* Logo */}
       <div className="h-[60px] flex items-center px-5 gap-3 flex-shrink-0" style={{ borderBottom: "1px solid #E5E7EB" }}>
-        <MobPaeMark size={22} />
+        <img src="/logo-icon.svg" alt="MobPae" width="32" height="21" style={{ objectFit: "contain", flexShrink: 0 }} />
         <span style={{ fontSize: 15, fontWeight: 700, color: "#111827", letterSpacing: "-0.02em" }}>MobPae</span>
       </div>
 
