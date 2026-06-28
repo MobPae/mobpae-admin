@@ -23,9 +23,16 @@ export async function getKycDocuments(
   status?: KycStatusFilter,
   employeeId?: string
 ): Promise<KycDocument[]> {
+  if (employeeId) {
+    const response = await api.get(`/kyc-documents/employee/${employeeId}`);
+    const documents = unwrapList<KycDocument>(response.data, ["documents", "kycDocuments"]);
+    return status && status !== "ALL"
+      ? documents.filter((document) => document.status === status)
+      : documents;
+  }
+
   const params: Record<string, string> = {};
   if (status && status !== "ALL") params.status = status;
-  if (employeeId) params.employeeId = employeeId;
   const response = await api.get("/kyc-documents", { params });
   return unwrapList<KycDocument>(response.data, ["documents", "kycDocuments"]);
 }
