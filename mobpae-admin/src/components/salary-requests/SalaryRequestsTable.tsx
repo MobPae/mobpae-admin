@@ -20,9 +20,10 @@ const avatarColor = (n: string) => AVATAR_COLORS[n.charAt(0).toUpperCase()] ?? "
 
 const STATUS_CFG: Record<SalaryRequestStatus, { label: string; color: string; bg: string }> = {
   SUBMITTED:            { label: "Submitted",       color: "#D97706", bg: "#FEF3C7" },
-  EMPLOYER_APPROVED:    { label: "Emp. Approved",   color: "#2563EB", bg: "#DBEAFE" },
-  EMPLOYER_REJECTED:    { label: "Rejected",        color: "#EF4444", bg: "#FEE2E2" },
-  READY_FOR_DISBURSAL:  { label: "Ready",           color: "#16A34A", bg: "#DCFCE7" },
+  EMPLOYER_APPROVED:             { label: "Emp. Approved",   color: "#2563EB", bg: "#DBEAFE" },
+  EMPLOYER_REJECTED:             { label: "Rejected",        color: "#EF4444", bg: "#FEE2E2" },
+  AWAITING_MEMBERSHIP_PAYMENT:   { label: "Awaiting Membership", color: "#D97706", bg: "#FEF3C7" },
+  READY_FOR_DISBURSAL:           { label: "Ready",           color: "#16A34A", bg: "#DCFCE7" },
   DISBURSED:            { label: "Disbursed",       color: "#16A34A", bg: "#DCFCE7" },
   REPAYMENT_SCHEDULED:  { label: "Repaying",        color: "#D97706", bg: "#FEF3C7" },
   REPAID:               { label: "Repaid",          color: "#16A34A", bg: "#DCFCE7" },

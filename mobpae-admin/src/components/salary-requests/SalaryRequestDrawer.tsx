@@ -19,23 +19,25 @@ interface Props {
 }
 
 const STATUS_BADGE: Record<string, string> = {
-  SUBMITTED:           "bg-amber-50 text-amber-700",
-  EMPLOYER_APPROVED:   "bg-[#DBEAFE] text-[#1D4ED8]",
-  EMPLOYER_REJECTED:   "bg-red-50 text-red-600",
-  READY_FOR_DISBURSAL: "bg-lime-50 text-lime-700",
-  DISBURSED:           "bg-[#DCFCE7] text-[#15803D]",
-  REPAYMENT_SCHEDULED: "bg-[#FEF3C7] text-[#B45309]",
-  REPAID:              "bg-[#DCFCE7] text-[#166534]",
+  SUBMITTED:                    "bg-amber-50 text-amber-700",
+  EMPLOYER_APPROVED:            "bg-[#DBEAFE] text-[#1D4ED8]",
+  EMPLOYER_REJECTED:            "bg-red-50 text-red-600",
+  AWAITING_MEMBERSHIP_PAYMENT:  "bg-orange-50 text-orange-700",
+  READY_FOR_DISBURSAL:          "bg-lime-50 text-lime-700",
+  DISBURSED:                    "bg-[#DCFCE7] text-[#15803D]",
+  REPAYMENT_SCHEDULED:          "bg-[#FEF3C7] text-[#B45309]",
+  REPAID:                       "bg-[#DCFCE7] text-[#166534]",
 };
 
 const STATUS_LABEL: Record<string, string> = {
-  SUBMITTED:           "Submitted",
-  EMPLOYER_APPROVED:   "Employer Approved",
-  EMPLOYER_REJECTED:   "Rejected",
-  READY_FOR_DISBURSAL: "Ready for Disbursal",
-  DISBURSED:           "Disbursed",
-  REPAYMENT_SCHEDULED: "Repayment Scheduled",
-  REPAID:              "Repaid",
+  SUBMITTED:                    "Submitted",
+  EMPLOYER_APPROVED:            "Employer Approved",
+  EMPLOYER_REJECTED:            "Rejected",
+  AWAITING_MEMBERSHIP_PAYMENT:  "Awaiting Membership",
+  READY_FOR_DISBURSAL:          "Ready for Disbursal",
+  DISBURSED:                    "Disbursed",
+  REPAYMENT_SCHEDULED:          "Repayment Scheduled",
+  REPAID:                       "Repaid",
 };
 
 const fmt = (v: string | null | undefined) =>
@@ -109,7 +111,10 @@ export default function SalaryRequestDrawer({ open, request, onClose, onMutated 
 
   if (!open || !request) return null;
 
-  const canApprove  = request.status === "EMPLOYER_APPROVED";
+  // In the new flow, employer approval auto-transitions to READY_FOR_DISBURSAL
+  // (if membership is active) or AWAITING_MEMBERSHIP_PAYMENT (if not).
+  // Admin "approves" by creating the disbursal record from READY_FOR_DISBURSAL.
+  const canApprove  = request.status === "READY_FOR_DISBURSAL" && !request.disbursal;
   const canDisburse = request.status === "READY_FOR_DISBURSAL"
     && !!request.disbursal?.id
     && request.disbursal.status !== "DISBURSED";
@@ -171,6 +176,20 @@ export default function SalaryRequestDrawer({ open, request, onClose, onMutated 
 
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
+          {/* Awaiting membership banner */}
+          {request.status === "AWAITING_MEMBERSHIP_PAYMENT" && (
+            <div className="flex gap-2.5 rounded-lg bg-orange-50 border border-orange-200 px-3.5 py-3">
+              <span className="text-base">🔐</span>
+              <div>
+                <p className="text-[12px] font-[600] text-orange-800">Awaiting Membership Payment</p>
+                <p className="text-[11px] text-orange-700 mt-0.5">
+                  The employee's advance request was approved by their employer, but they don't have an active membership.
+                  This request will automatically advance to Ready for Disbursal once their membership is activated.
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Amount summary */}
           <section>
             <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-[#6B7280] mb-2">Request summary</p>

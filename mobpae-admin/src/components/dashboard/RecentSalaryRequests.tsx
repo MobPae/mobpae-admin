@@ -49,6 +49,15 @@ export default function RecentSalaryRequests() {
       case "SUBMITTED":
         return "bg-amber-100 text-amber-700";
 
+      case "EMPLOYER_APPROVED":
+        return "bg-[#DBEAFE] text-[#1D4ED8]";
+
+      case "AWAITING_MEMBERSHIP_PAYMENT":
+        return "bg-amber-100 text-amber-700";
+
+      case "READY_FOR_DISBURSAL":
+        return "bg-[#DCFCE7] text-[#15803D]";
+
       case "APPROVED":
         return "bg-[#DBEAFE] text-[#1D4ED8]";
 

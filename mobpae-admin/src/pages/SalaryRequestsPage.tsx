@@ -10,16 +10,17 @@ import { Pagination } from "../components/ui/Pagination";
 
 const PAGE_SIZE = 15;
 
-const NEEDS_ACTION_STATUSES: SalaryRequestStatus[] = ["EMPLOYER_APPROVED", "READY_FOR_DISBURSAL"];
+const NEEDS_ACTION_STATUSES: SalaryRequestStatus[] = ["EMPLOYER_APPROVED", "AWAITING_MEMBERSHIP_PAYMENT", "READY_FOR_DISBURSAL"];
 
 const STATUS_LABELS: Record<SalaryRequestStatus, string> = {
-  SUBMITTED:            "Submitted",
-  EMPLOYER_APPROVED:    "Employer approved",
-  EMPLOYER_REJECTED:    "Rejected",
-  READY_FOR_DISBURSAL:  "Ready for disbursal",
-  DISBURSED:            "Disbursed",
-  REPAYMENT_SCHEDULED:  "Payment scheduled",
-  REPAID:               "Repaid",
+  SUBMITTED:                   "Submitted",
+  EMPLOYER_APPROVED:           "Employer approved",
+  EMPLOYER_REJECTED:           "Rejected",
+  AWAITING_MEMBERSHIP_PAYMENT: "Awaiting membership",
+  READY_FOR_DISBURSAL:         "Ready for disbursal",
+  DISBURSED:                   "Disbursed",
+  REPAYMENT_SCHEDULED:         "Payment scheduled",
+  REPAID:                      "Repaid",
 };
 
 const ALL_STATUSES = Object.keys(STATUS_LABELS) as SalaryRequestStatus[];
@@ -80,6 +81,8 @@ export default function SalaryRequestsPage() {
     { label: "Needs Action",  value: "NEEDS_ACTION" as const  },
     { label: "Submitted",     value: "SUBMITTED" as const     },
     { label: "Emp. Approved", value: "EMPLOYER_APPROVED" as const },
+    { label: "Awaiting Mbr", value: "AWAITING_MEMBERSHIP_PAYMENT" as const },
+    { label: "Ready",         value: "READY_FOR_DISBURSAL" as const },
     { label: "Disbursed",     value: "DISBURSED" as const     },
     { label: "Repaying",      value: "REPAYMENT_SCHEDULED" as const },
     { label: "Repaid",        value: "REPAID" as const        },
