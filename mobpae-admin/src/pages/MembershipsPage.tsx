@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useSignedUrl } from "../hooks/useSignedUrl";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Building2,
@@ -140,6 +141,9 @@ export default function MembershipsPage() {
   const [acting,      setActing]      = useState<"approve" | "reject" | null>(null);
   const [remarks,     setRemarks]     = useState("");
   const [actionError, setActionError] = useState("");
+
+  // Signed URL for the selected membership's payment screenshot
+  const { url: screenshotUrl } = useSignedUrl(selected?.paymentScreenshot ?? null);
 
   // Coupon form state
   const [couponCode,     setCouponCode]     = useState("");
@@ -424,15 +428,17 @@ export default function MembershipsPage() {
                 <p style={{ fontSize: 11, fontWeight: 600, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Payment</p>
                 <div style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 16, padding: "0 16px" }}>
                   <InfoRow label="Reference" value={selected.paymentReference ?? "—"} />
-                  {selected.paymentScreenshot && (
+                  {selected.paymentScreenshot && screenshotUrl && (
                     <div style={{ padding: "10px 0", borderBottom: "1px solid #F3F4F6" }}>
                       <span style={{ fontSize: 12, color: "#6B7280", display: "block", marginBottom: 6 }}>Screenshot</span>
-                      <img
-                        src={selected.paymentScreenshot}
-                        alt="Payment screenshot"
-                        style={{ borderRadius: 10, border: "1px solid #E5E7EB", maxHeight: 176, objectFit: "contain" }}
-                        onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
-                      />
+                      <a href={screenshotUrl} target="_blank" rel="noopener noreferrer">
+                        <img
+                          src={screenshotUrl}
+                          alt="Payment screenshot"
+                          style={{ borderRadius: 10, border: "1px solid #E5E7EB", maxHeight: 176, objectFit: "contain" }}
+                          onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
+                        />
+                      </a>
                     </div>
                   )}
                 </div>

@@ -2,7 +2,7 @@ import { useEscKey } from "../../lib/useEscKey";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { CreditCard, Loader2, X } from "lucide-react";
+import { CreditCard, Crown, Loader2, X } from "lucide-react";
 import { getApiErrorMessage } from "../../utils/api-errors";
 import { processDisbursal } from "../../services/disbursalService";
 import type { Disbursal } from "../../types/disbursal";
@@ -45,7 +45,8 @@ export default function DisbursalDrawer({ open, disbursal, onClose, onMutated }:
   if (!open || !disbursal) return null;
 
   const emp = disbursal.salaryRequest.employee;
-  const canDisburse = disbursal.status === "PENDING";
+  const awaitingMembership = disbursal.salaryRequest.status === "AWAITING_MEMBERSHIP_PAYMENT";
+  const canDisburse = disbursal.status === "PENDING" && !awaitingMembership;
 
   return (
     <>
@@ -133,13 +134,22 @@ export default function DisbursalDrawer({ open, disbursal, onClose, onMutated }:
           </section>
         </div>
 
-        {/* Footer — shown only for PENDING disbursals */}
-        {canDisburse && (
-          <div className="border-t border-[#E5E7EB] px-5 py-3.5 flex-shrink-0">
+        {/* Footer — shown for PENDING disbursals */}
+        {disbursal.status === "PENDING" && (
+          <div className="border-t border-[#E5E7EB] px-5 py-3.5 flex-shrink-0 space-y-2.5">
+            {awaitingMembership && (
+              <div className="flex items-start gap-2 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2.5">
+                <Crown size={13} className="text-amber-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-[11px] font-[600] text-amber-800 leading-none mb-0.5">Membership required</p>
+                  <p className="text-[11px] text-amber-700 leading-relaxed">Employee must activate their membership before funds can be disbursed.</p>
+                </div>
+              </div>
+            )}
             <button
               onClick={() => setConfirmOpen(true)}
-              disabled={disburseMutation.isPending}
-              className="w-full h-8 rounded-md bg-[#6C4CFF] hover:bg-[#5B34FF] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
+              disabled={!canDisburse || disburseMutation.isPending}
+              className="w-full h-8 rounded-md bg-[#6C4CFF] hover:bg-[#5B34FF] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {disburseMutation.isPending
                 ? <Loader2 size={12} className="animate-spin" />

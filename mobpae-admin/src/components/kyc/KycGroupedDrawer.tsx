@@ -8,6 +8,7 @@ import { getKycDocuments, verifyKycDocument, rejectKycDocument } from "../../ser
 import { getEmployee, verifySelfie, rejectSelfie } from "../../services/employeeService";
 import type { KycDocument, KycEmployeeGroup } from "../../types/kyc";
 import type { Employee } from "../../types/employee";
+import { useSignedUrl } from "../../hooks/useSignedUrl";
 
 interface Props {
   open: boolean;
@@ -25,13 +26,15 @@ const DOC_LABEL: Record<string, string> = {
 
 const DOC_ORDER = ["PAN", "AADHAR", "SALARY_SLIP", "OTHER"];
 
+// Extension detection still works on R2 object keys (keys end with the original extension)
+function keyIsImage(key: string) { return /\.(jpg|jpeg|png|webp|gif)$/i.test(key); }
+function keyIsPdf(key: string)   { return /\.pdf$/i.test(key); }
+
 const STATUS_BADGE: Record<string, { dot: string; text: string; bg: string; label: string }> = {
   PENDING:  { dot: "bg-amber-400", text: "text-amber-700", bg: "bg-amber-50/80",   label: "Pending"  },
   VERIFIED: { dot: "bg-[#22C55E]", text: "text-[#15803D]", bg: "bg-[#DCFCE7]/80", label: "Verified" },
   REJECTED: { dot: "bg-red-400", text: "text-red-600", bg: "bg-red-50/80",     label: "Rejected" },
 };
-
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "/api";
 
 function DocCard({
   doc,
@@ -81,12 +84,9 @@ function DocCard({
   const isBusy = verifyMutation.isPending || rejectMutation.isPending;
   const canAct = doc.status === "PENDING";
 
-  const fileUrl = doc.filePath.startsWith("http")
-    ? doc.filePath
-    : `${API_BASE.replace(/\/api$/, "")}/${doc.filePath.replace(/^\//, "")}`;
-
-  const isImage = /\.(jpg|jpeg|png|webp|gif)$/i.test(doc.filePath);
-  const isPdf   = /\.pdf$/i.test(doc.filePath);
+  const { url: fileUrl } = useSignedUrl(doc.filePath);
+  const isImage = keyIsImage(doc.filePath);
+  const isPdf   = keyIsPdf(doc.filePath);
 
   return (
     <div className={`border rounded-xl overflow-hidden ${canAct ? "border-[#E5E7EB]" : "border-[#E5E7EB]"}`}>
@@ -212,12 +212,7 @@ function SelfieCard({
   const isBusy = verifyMut.isPending || rejectMut.isPending;
   const canAct = selfieStatus === "PENDING";
 
-  const API_BASE_CLEAN = API_BASE.replace(/\/api$/, "");
-  const selfieUrl = employee.selfieUrl
-    ? (employee.selfieUrl.startsWith("http")
-        ? employee.selfieUrl
-        : `${API_BASE_CLEAN}/${employee.selfieUrl.replace(/^\//, "")}`)
-    : null;
+  const { url: selfieUrl } = useSignedUrl(employee.selfieUrl ?? null);
 
   return (
     <div className="border rounded-xl overflow-hidden border-[#E5E7EB]">

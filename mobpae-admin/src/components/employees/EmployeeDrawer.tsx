@@ -3,6 +3,7 @@ import { useState } from "react";
 import { X, CheckCircle, XCircle, Camera } from "lucide-react";
 import type { Employee } from "../../types/employee";
 import { verifySelfie, rejectSelfie } from "../../services/employeeService";
+import { useSignedUrl } from "../../hooks/useSignedUrl";
 
 interface Props {
   open: boolean;
@@ -22,14 +23,6 @@ const SELFIE_BADGE: Record<string, string> = {
   REJECTED: "bg-red-50 text-red-600",
 };
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL as string ?? "";
-
-function buildUrl(path: string | undefined): string {
-  if (!path) return "";
-  if (path.startsWith("http")) return path;
-  return `${API_BASE}/${path.replace(/^\//, "")}`;
-}
-
 export default function EmployeeDrawer({ open, employee, onClose, onRefresh }: Props) {
   useEscKey(open, onClose);
   const [rejectRemarks, setRejectRemarks]     = useState("");
@@ -37,10 +30,12 @@ export default function EmployeeDrawer({ open, employee, onClose, onRefresh }: P
   const [selfieLoading, setSelfieLoading]     = useState(false);
   const [selfieError,   setSelfieError]       = useState("");
 
+  // Hook must be called before any early return to keep hook order stable
+  const { url: selfieImgUrl } = useSignedUrl(employee?.selfieUrl ?? null);
+
   if (!open || !employee) return null;
 
   const selfieStatus = employee.selfieStatus ?? "PENDING";
-  const selfieImgUrl = buildUrl(employee.selfieUrl);
 
   async function handleVerify() {
     setSelfieLoading(true);

@@ -1,10 +1,11 @@
 import { useEscKey } from "../../lib/useEscKey";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { X, CheckCircle2, XCircle, Loader2, FileText } from "lucide-react";
+import { X, CheckCircle2, XCircle, Loader2, FileText, ExternalLink } from "lucide-react";
 import { getApiErrorMessage } from "../../utils/api-errors";
 import { verifyKycDocument, rejectKycDocument } from "../../services/kycService";
 import type { KycDocument } from "../../types/kyc";
+import { useSignedUrl } from "../../hooks/useSignedUrl";
 
 interface Props {
   open: boolean;
@@ -28,6 +29,10 @@ const DOC_LABEL: Record<string, string> = {
 
 export default function KycDrawer({ open, document, onClose, onCompleted }: Props) {
   useEscKey(open, onClose);
+
+  // Fetch signed URL before early return so hook order is stable
+  const { url: fileUrl, isLoading: fileUrlLoading } = useSignedUrl(document?.filePath ?? null);
+
   const verifyMutation = useMutation({
     mutationFn: () => verifyKycDocument(document!.id),
     onSuccess: () => {
@@ -109,7 +114,21 @@ export default function KycDrawer({ open, document, onClose, onCompleted }: Prop
               <div className="w-7 h-7 rounded-lg bg-[#F3F4F6] flex items-center justify-center flex-shrink-0">
                 <FileText size={13} className="text-[#6B7280]" />
               </div>
-              <p className="text-[11px] text-[#6B7280] break-all leading-relaxed">{document.filePath}</p>
+              {fileUrlLoading ? (
+                <p className="text-[11px] text-[#6B7280]">Loading…</p>
+              ) : fileUrl ? (
+                <a
+                  href={fileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[11px] font-[500] text-[#6C4CFF] hover:underline flex items-center gap-1"
+                >
+                  <ExternalLink size={11} />
+                  {/\.pdf$/i.test(document.filePath) ? "Open PDF" : "View document"}
+                </a>
+              ) : (
+                <p className="text-[11px] text-[#6B7280] break-all leading-relaxed">{document.filePath}</p>
+              )}
             </div>
           </section>
 
