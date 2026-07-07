@@ -59,7 +59,7 @@ type FilterValue = "ALL" | "SCHEDULED" | "OVERDUE" | "PAID";
 
 interface RecoveryRow {
   id: string;
-  salaryRequestId: string;
+  loanApplicationId: string;
   employeeName: string;
   employeeCode: string;
   companyName: string;
@@ -76,11 +76,11 @@ interface RecoveryRow {
 function toRecoveryRow(r: Repayment): RecoveryRow {
   return {
     id: r.id,
-    salaryRequestId: r.salaryRequestId,
-    employeeName: r.salaryRequest.employee.name,
-    employeeCode: r.salaryRequest.employee.employeeCode,
-    companyName: r.salaryRequest.employee.employer.companyName,
-    companyCode: r.salaryRequest.employee.employer.companyCode,
+    loanApplicationId: r.loanApplicationId,
+    employeeName: r.loanApplication.employee.name,
+    employeeCode: r.loanApplication.employee.employeeCode,
+    companyName: r.loanApplication.employee.employer.companyName,
+    companyCode: r.loanApplication.employee.employer.companyCode,
     principalAmount: r.principalAmount,
     interestAmount: r.interestAmount,
     totalRecoveryAmount: r.totalAmount,
@@ -268,9 +268,9 @@ export default function RecoveriesPage() {
               <tbody className="divide-y divide-[#F3F4F6]">
                 {rows.map(r => (
                   <tr
-                    key={r.salaryRequestId}
+                    key={r.loanApplicationId}
                     onClick={() => setSelected(r)}
-                    className={`cursor-pointer hover:bg-[#F8F9FC]/60 transition-colors ${selected?.salaryRequestId === r.salaryRequestId ? "bg-[#F3F0FF]/30" : ""} ${r.status === "OVERDUE" ? "bg-red-50/20" : ""}`}
+                    className={`cursor-pointer hover:bg-[#F8F9FC]/60 transition-colors ${selected?.loanApplicationId === r.loanApplicationId ? "bg-[#F3F0FF]/30" : ""} ${r.status === "OVERDUE" ? "bg-red-50/20" : ""}`}
                   >
                     <td className="px-4 py-3">
                       <p className="font-[500] text-[#111827]">{r.employeeName}</p>

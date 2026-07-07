@@ -44,9 +44,9 @@ export default function DisbursalsPage() {
     const q = search.toLowerCase();
     return (
       !q ||
-      d.salaryRequest.employee.name.toLowerCase().includes(q) ||
-      d.salaryRequest.employee.employeeCode.toLowerCase().includes(q) ||
-      d.salaryRequest.employee.employer.companyName.toLowerCase().includes(q)
+      d.loanApplication.employee.name.toLowerCase().includes(q) ||
+      d.loanApplication.employee.employeeCode.toLowerCase().includes(q) ||
+      d.loanApplication.employee.employer.companyName.toLowerCase().includes(q)
     );
   });
 

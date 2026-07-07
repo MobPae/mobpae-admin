@@ -131,9 +131,9 @@ function DocCard({
       {/* File preview */}
       <div className="px-4 pb-3">
         {isImage ? (
-          <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="block mt-2">
+          <a href={fileUrl ?? undefined} target="_blank" rel="noopener noreferrer" className="block mt-2">
             <img
-              src={fileUrl}
+              src={fileUrl ?? undefined}
               alt={DOC_LABEL[doc.documentType]}
               className="w-full rounded-lg border border-[#E5E7EB] object-contain max-h-[120px]"
               onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
@@ -141,7 +141,7 @@ function DocCard({
           </a>
         ) : (
           <a
-            href={fileUrl}
+            href={fileUrl ?? undefined}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-2 flex items-center gap-2 text-[11px] font-[500] text-[#6C4CFF] hover:underline"

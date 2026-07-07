@@ -533,8 +533,8 @@ export default function SettlementsPage() {
                 ) : selected.repayments?.length ? (
                   <div style={{ border: "1px solid #E5E7EB", borderRadius: 16, overflow: "hidden", background: "white" }}>
                     {selected.repayments.map((repayment) => {
-                      const employee = repayment.salaryRequest?.employee;
-                      const requestLabel = repayment.salaryRequest?.requestId ?? repayment.salaryRequestId.slice(0, 8);
+                      const employee = repayment.loanApplication?.employee;
+                      const requestLabel = repayment.loanApplication?.applicationNumber ?? repayment.loanApplicationId.slice(0, 8);
                       return (
                         <div key={repayment.id} style={{ padding: "12px 14px", borderBottom: "1px solid #F3F4F6" }}>
                           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>

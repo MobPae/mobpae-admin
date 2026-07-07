@@ -32,11 +32,11 @@ export default function ActionQueue({ data, loading = false }: ActionQueueProps)
 
   const items: ActionItem[] = [
     {
-      label: "Salary Requests",
+      label: "Loan Applications",
       description: "Awaiting review",
       icon: FileText,
-      count: data.pendingSalaryRequests,
-      to: "/salary-requests",
+      count: data.pendingLoanApplications,
+      to: "/loan-applications",
       accentBg: "bg-amber-50",
       accentColor: "text-amber-600",
       countBg: "bg-amber-100",

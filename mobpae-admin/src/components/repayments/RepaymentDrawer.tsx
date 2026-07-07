@@ -31,7 +31,7 @@ export default function RepaymentDrawer({ open, repayment, onClose, onMutated }:
     mutationFn: () => markRepaymentPaid(repayment!.id),
     onSuccess: () => {
       toast.success("Repayment marked as paid", {
-        description: `${fmt(repayment!.totalAmount)} recovered from ${repayment!.salaryRequest.employee.name}.`,
+        description: `${fmt(repayment!.totalAmount)} recovered from ${repayment!.loanApplication.employee.name}.`,
       });
       onMutated();
       onClose();
@@ -43,7 +43,7 @@ export default function RepaymentDrawer({ open, repayment, onClose, onMutated }:
 
   if (!open || !repayment) return null;
 
-  const emp = repayment.salaryRequest.employee;
+  const emp = repayment.loanApplication.employee;
   const canMarkPaid = repayment.status === "SCHEDULED" || repayment.status === "OVERDUE";
 
   return (
@@ -114,13 +114,13 @@ export default function RepaymentDrawer({ open, repayment, onClose, onMutated }:
             </div>
           </section>
 
-          {/* Original salary request */}
+          {/* Original loan application */}
           <section>
-            <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-[#6B7280] mb-2">Salary request</p>
+            <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-[#6B7280] mb-2">Loan application</p>
             <div className="border border-[#E5E7EB] rounded-lg divide-y divide-[#E5E7EB]">
               {[
-                { k: "Request ID",     v: <span className="font-mono text-[11px]">{repayment.salaryRequestId}</span> },
-                { k: "Advance amount", v: fmt(repayment.salaryRequest.amount) },
+                { k: "Application ID",  v: <span className="font-mono text-[11px]">{repayment.loanApplicationId}</span> },
+                { k: "Advance amount",  v: fmt(repayment.loanApplication.requestedAmount) },
               ].map(({ k, v }) => (
                 <div key={k} className="flex items-center justify-between px-3 py-2.5">
                   <span className="text-[11px] text-[#6B7280]">{k}</span>
@@ -151,7 +151,7 @@ export default function RepaymentDrawer({ open, repayment, onClose, onMutated }:
       <ConfirmModal
         open={confirmOpen}
         title="Mark repayment as paid"
-        description={`This will record ${fmt(repayment.totalAmount)} from ${repayment.salaryRequest.employee.name} as received. This cannot be undone.`}
+        description={`This will record ${fmt(repayment.totalAmount)} from ${repayment.loanApplication.employee.name} as received. This cannot be undone.`}
         confirmLabel="Mark Paid"
         confirmClass="bg-[#6C4CFF] hover:bg-[#5B34FF] text-white"
         loading={markPaidMutation.isPending}

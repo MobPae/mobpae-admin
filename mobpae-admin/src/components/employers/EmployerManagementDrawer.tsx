@@ -6,9 +6,9 @@ import { X, Ban, CheckCircle2, Loader2, RotateCcw, Copy, Mail, RefreshCw } from 
 import { getApiErrorMessage } from "../../utils/api-errors";
 import { updateEmployerStatus } from "../../services/employerService";
 import { processRecovery } from "../../services/payrollService";
-import { getSalaryRequestsByEmployer } from "../../services/salaryRequestService";
+import { getLoanApplicationsByEmployer } from "../../services/loanApplicationService";
 import type { Employer } from "../../types/employer";
-import type { SalaryRequest } from "../../types/salary-request";
+import type { LoanApplication } from "../../types/loan-application";
 
 interface Props {
   open: boolean;
@@ -53,9 +53,9 @@ export default function EmployerManagementDrawer({ open, onClose, onMutated, emp
     if (open) { setSuspendConfirm(false); setRecoveryConfirm(false); setTempPassword(null); }
   }, [open, employer?.id]);
 
-  const { data: recentRequests = [], isLoading: reqLoading } = useQuery<SalaryRequest[]>({
-    queryKey: ["salary-requests-employer", employer?.id],
-    queryFn: () => getSalaryRequestsByEmployer(employer!.id, 10),
+  const { data: recentRequests = [], isLoading: reqLoading } = useQuery<LoanApplication[]>({
+    queryKey: ["loan-applications-employer", employer?.id],
+    queryFn: () => getLoanApplicationsByEmployer(employer!.id, 10),
     enabled: open && !!employer?.id,
     staleTime: 60_000,
   });
@@ -216,7 +216,7 @@ export default function EmployerManagementDrawer({ open, onClose, onMutated, emp
               </div>
             ) : recentRequests.length === 0 ? (
               <div className="border border-[#E5E7EB] rounded-lg px-3 py-4 text-center">
-                <p className="text-[11px] text-[#6B7280]">No salary requests found</p>
+                <p className="text-[11px] text-[#6B7280]">No loan applications found</p>
               </div>
             ) : (
               <div className="border border-[#E5E7EB] rounded-lg divide-y divide-[#F3F4F6]">
@@ -230,7 +230,7 @@ export default function EmployerManagementDrawer({ open, onClose, onMutated, emp
                       </div>
                       <div className="ml-auto flex items-center gap-2 flex-shrink-0">
                         <span className="text-[11px] font-[500] text-[#6B7280] tabular-nums">
-                          ₹{Number(r.amount ?? 0).toLocaleString("en-IN")}
+                          ₹{Number(r.requestedAmount ?? 0).toLocaleString("en-IN")}
                         </span>
                         <span className={`inline-flex h-[16px] px-1.5 rounded-[3px] items-center text-[11px] font-[500] ${cfg.cls}`}>
                           {cfg.label}

@@ -2,61 +2,68 @@ import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Download, Search, Calendar, X, FileText, Zap, CheckCircle, RefreshCw } from "lucide-react";
 import { exportToCsv } from "../utils/exportCsv";
-import { getSalaryRequests } from "../services/salaryRequestService";
-import type { SalaryRequest, SalaryRequestStatus } from "../types/salary-request";
-import SalaryRequestsTable from "../components/salary-requests/SalaryRequestsTable";
-import SalaryRequestDrawer from "../components/salary-requests/SalaryRequestDrawer";
+import { getLoanApplications } from "../services/loanApplicationService";
+import type { LoanApplication, LoanApplicationStatus } from "../types/loan-application";
+import LoanApplicationsTable from "../components/loan-applications/LoanApplicationsTable";
+import LoanApplicationDrawer from "../components/loan-applications/LoanApplicationDrawer";
 import { Pagination } from "../components/ui/Pagination";
 
 const PAGE_SIZE = 15;
 
-const NEEDS_ACTION_STATUSES: SalaryRequestStatus[] = ["EMPLOYER_APPROVED", "AWAITING_MEMBERSHIP_PAYMENT", "READY_FOR_DISBURSAL"];
+const NEEDS_ACTION_STATUSES: LoanApplicationStatus[] = [
+  "EMPLOYER_APPROVED",
+  "AWAITING_MEMBERSHIP_PAYMENT",
+  "READY_FOR_DISBURSAL",
+];
 
-const STATUS_LABELS: Record<SalaryRequestStatus, string> = {
+const STATUS_LABELS: Record<LoanApplicationStatus, string> = {
   SUBMITTED:                   "Submitted",
-  EMPLOYER_APPROVED:           "Employer approved",
+  EMPLOYER_APPROVED:           "Employer Approved",
   EMPLOYER_REJECTED:           "Rejected",
-  AWAITING_MEMBERSHIP_PAYMENT: "Awaiting membership",
-  READY_FOR_DISBURSAL:         "Ready for disbursal",
+  AWAITING_MEMBERSHIP_PAYMENT: "Awaiting Membership",
+  READY_FOR_DISBURSAL:         "Ready for Disbursal",
   DISBURSED:                   "Disbursed",
-  REPAYMENT_SCHEDULED:         "Payment scheduled",
+  REPAYMENT_SCHEDULED:         "Payment Scheduled",
   REPAID:                      "Repaid",
+  CANCELLED:                   "Cancelled",
+  EXPIRED:                     "Expired",
 };
 
-const ALL_STATUSES = Object.keys(STATUS_LABELS) as SalaryRequestStatus[];
+const ALL_STATUSES = Object.keys(STATUS_LABELS) as LoanApplicationStatus[];
 
-export default function SalaryRequestsPage() {
+export default function LoanApplicationsPage() {
   const queryClient = useQueryClient();
 
-  const { data: requests = [], isLoading, isError, refetch } = useQuery({
-    queryKey: ["salary-requests"],
-    queryFn: getSalaryRequests,
+  const { data: applications = [], isLoading, isError, refetch } = useQuery({
+    queryKey: ["loan-applications"],
+    queryFn: () => getLoanApplications(),
   });
 
   const [search, setSearch]               = useState("");
-  const [statusFilter, setStatusFilter]   = useState<"ALL" | "NEEDS_ACTION" | SalaryRequestStatus>("ALL");
-  const [selected, setSelected]           = useState<SalaryRequest | null>(null);
+  const [statusFilter, setStatusFilter]   = useState<"ALL" | "NEEDS_ACTION" | LoanApplicationStatus>("ALL");
+  const [selected, setSelected]           = useState<LoanApplication | null>(null);
   const [page, setPage]                   = useState(1);
   const [dateFrom, setDateFrom]           = useState("");
   const [dateTo,   setDateTo]             = useState("");
 
   const counts = ALL_STATUSES.reduce<Record<string, number>>((acc, s) => {
-    acc[s] = requests.filter((r) => r.status === s).length;
+    acc[s] = applications.filter((a) => a.status === s).length;
     return acc;
   }, {});
   const needsActionCount = NEEDS_ACTION_STATUSES.reduce((sum, s) => sum + (counts[s] ?? 0), 0);
 
-  const filtered = requests.filter((r) => {
+  const filtered = applications.filter((a) => {
     const q = search.toLowerCase();
     const matchSearch = !q ||
-      r.employee.name.toLowerCase().includes(q) ||
-      r.employee.employeeCode.toLowerCase().includes(q) ||
-      r.employee.employer.companyName.toLowerCase().includes(q);
+      a.employee.name.toLowerCase().includes(q) ||
+      a.employee.employeeCode.toLowerCase().includes(q) ||
+      a.employee.employer.companyName.toLowerCase().includes(q) ||
+      a.applicationNumber.toLowerCase().includes(q);
     const matchStatus =
       statusFilter === "ALL"          ? true :
-      statusFilter === "NEEDS_ACTION" ? NEEDS_ACTION_STATUSES.includes(r.status) :
-      r.status === statusFilter;
-    const created = r.createdAt ? new Date(r.createdAt) : null;
+      statusFilter === "NEEDS_ACTION" ? NEEDS_ACTION_STATUSES.includes(a.status) :
+      a.status === statusFilter;
+    const created = a.submittedAt ? new Date(a.submittedAt) : null;
     const matchFrom = !dateFrom || (created !== null && created >= new Date(dateFrom));
     const matchTo   = !dateTo   || (created !== null && created <= new Date(dateTo + "T23:59:59"));
     return matchSearch && matchStatus && matchFrom && matchTo;
@@ -67,42 +74,47 @@ export default function SalaryRequestsPage() {
   const paginated  = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   const P = "#6C4CFF";
-  const total = requests.length;
+  const total = applications.length;
 
   const kpis = [
-    { label: "Total Requests", value: total,                                                              icon: <FileText size={18} color={P} strokeWidth={1.75} />,            iconBg: "#F3F0FF" },
-    { label: "Needs Action",   value: needsActionCount,                                                   icon: <Zap size={18} color="#D97706" strokeWidth={1.75} />,            iconBg: "#FEF3C7" },
-    { label: "Disbursed",      value: counts["DISBURSED"] ?? 0,                                           icon: <CheckCircle size={18} color="#16A34A" strokeWidth={1.75} />,    iconBg: "#DCFCE7" },
-    { label: "Repaid",         value: (counts["REPAID"] ?? 0) + (counts["REPAYMENT_SCHEDULED"] ?? 0),    icon: <RefreshCw size={18} color="#2563EB" strokeWidth={1.75} />,       iconBg: "#DBEAFE" },
+    { label: "Total",        value: total,                                                                    icon: <FileText size={18} color={P} strokeWidth={1.75} />,         iconBg: "#F3F0FF" },
+    { label: "Needs Action", value: needsActionCount,                                                         icon: <Zap size={18} color="#D97706" strokeWidth={1.75} />,         iconBg: "#FEF3C7" },
+    { label: "Disbursed",    value: (counts["DISBURSED"] ?? 0) + (counts["REPAYMENT_SCHEDULED"] ?? 0),        icon: <CheckCircle size={18} color="#16A34A" strokeWidth={1.75} />, iconBg: "#DCFCE7" },
+    { label: "Repaid",       value: counts["REPAID"] ?? 0,                                                    icon: <RefreshCw size={18} color="#2563EB" strokeWidth={1.75} />,   iconBg: "#DBEAFE" },
   ];
 
   const STATUS_TABS = [
-    { label: "All",           value: "ALL" as const           },
-    { label: "Needs Action",  value: "NEEDS_ACTION" as const  },
-    { label: "Submitted",     value: "SUBMITTED" as const     },
-    { label: "Emp. Approved", value: "EMPLOYER_APPROVED" as const },
-    { label: "Awaiting Mbr", value: "AWAITING_MEMBERSHIP_PAYMENT" as const },
-    { label: "Ready",         value: "READY_FOR_DISBURSAL" as const },
-    { label: "Disbursed",     value: "DISBURSED" as const     },
-    { label: "Repaying",      value: "REPAYMENT_SCHEDULED" as const },
-    { label: "Repaid",        value: "REPAID" as const        },
+    { label: "All",           value: "ALL" as const                         },
+    { label: "Needs Action",  value: "NEEDS_ACTION" as const                },
+    { label: "Submitted",     value: "SUBMITTED" as const                   },
+    { label: "Emp. Approved", value: "EMPLOYER_APPROVED" as const           },
+    { label: "Awaiting Mbr",  value: "AWAITING_MEMBERSHIP_PAYMENT" as const },
+    { label: "Ready",         value: "READY_FOR_DISBURSAL" as const         },
+    { label: "Disbursed",     value: "DISBURSED" as const                   },
+    { label: "Repaying",      value: "REPAYMENT_SCHEDULED" as const         },
+    { label: "Repaid",        value: "REPAID" as const                      },
   ];
 
   return (
     <div style={{ padding: "28px 32px", fontFamily: "Inter, ui-sans-serif, sans-serif" }}>
 
-      {/* ── Header ──────────────────────────── */}
+      {/* ── Header ────────────────────────────── */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 26, fontWeight: 700, color: "#111827", letterSpacing: "-0.025em", margin: 0 }}>Salary Advances</h1>
-          <p style={{ fontSize: 14, color: "#6B7280", marginTop: 6 }}>Review and process employee salary advance requests.</p>
+          <p style={{ fontSize: 14, color: "#6B7280", marginTop: 6 }}>Review and process employee salary advance applications.</p>
         </div>
         <button
-          onClick={() => exportToCsv(filtered.map(r => ({
-            Employee: r.employee?.name ?? "", Code: r.employee?.employeeCode ?? "",
-            Company: r.employee?.employer?.companyName ?? "", Amount: r.amount,
-            Status: r.status, Date: r.createdAt ? new Date(r.createdAt).toLocaleDateString() : "",
-          })), "salary-requests")}
+          onClick={() => exportToCsv(filtered.map(a => ({
+            "Application No.": a.applicationNumber,
+            Employee: a.employee?.name ?? "",
+            Code: a.employee?.employeeCode ?? "",
+            Company: a.employee?.employer?.companyName ?? "",
+            "Requested": a.requestedAmount,
+            "Admin Approved": a.adminApprovedAmount ?? "",
+            Status: a.status,
+            Date: a.submittedAt ? new Date(a.submittedAt).toLocaleDateString() : "",
+          })), "loan-applications")}
           style={{ height: 40, padding: "0 16px", display: "flex", alignItems: "center", gap: 8, background: "white", border: "1px solid #E5E7EB", borderRadius: 12, fontSize: 13, fontWeight: 500, color: "#374151", cursor: "pointer", fontFamily: "inherit" }}
         >
           <Download size={14} />
@@ -112,12 +124,12 @@ export default function SalaryRequestsPage() {
 
       {isError && (
         <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 12, padding: "12px 16px", marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, color: "#DC2626" }}>
-          <span>Failed to load salary requests.</span>
+          <span>Failed to load applications.</span>
           <button onClick={() => void refetch()} style={{ padding: "6px 12px", background: "white", border: "1px solid #FECACA", borderRadius: 8, fontSize: 12, fontWeight: 600, color: "#DC2626", cursor: "pointer", fontFamily: "inherit" }}>Retry</button>
         </div>
       )}
 
-      {/* ── KPI cards ───────────────────────── */}
+      {/* ── KPI cards ─────────────────────────── */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 24 }}>
         {kpis.map((kpi) => (
           <div key={kpi.label} style={{ background: "white", borderRadius: 16, padding: "14px 16px", border: "1px solid #E5E7EB", boxShadow: "0 1px 4px rgba(17,24,39,0.04)", display: "flex", alignItems: "center", gap: 14 }}>
@@ -125,22 +137,20 @@ export default function SalaryRequestsPage() {
               {kpi.icon}
             </div>
             <div>
-              <div style={{ fontSize: 22, fontWeight: 700, color: "#111827", letterSpacing: "-0.02em", lineHeight: 1, opacity: isLoading ? 0.3 : 1 }}>
-                {kpi.value}
-              </div>
+              <div style={{ fontSize: 22, fontWeight: 700, color: "#111827", letterSpacing: "-0.02em", lineHeight: 1, opacity: isLoading ? 0.3 : 1 }}>{kpi.value}</div>
               <div style={{ fontSize: 12, color: "#6B7280", marginTop: 3, fontWeight: 500 }}>{kpi.label}</div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* ── Filter bar ──────────────────────── */}
+      {/* ── Filter bar ────────────────────────── */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, height: 40, padding: "0 14px", background: "white", border: "1px solid #E5E7EB", borderRadius: 12, minWidth: 240 }}>
           <Search size={14} style={{ color: "#9CA3AF", flexShrink: 0 }} />
           <input
             type="text"
-            placeholder="Search employee, company..."
+            placeholder="Search employee, company, app no..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
             style={{ flex: 1, fontSize: 13.5, color: "#111827", background: "transparent", outline: "none", border: "none", fontFamily: "inherit" }}
@@ -149,7 +159,7 @@ export default function SalaryRequestsPage() {
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           {STATUS_TABS.map(tab => {
             const active = statusFilter === tab.value;
-            const cnt = tab.value === "ALL" ? requests.length : tab.value === "NEEDS_ACTION" ? needsActionCount : (counts[tab.value as SalaryRequestStatus] ?? 0);
+            const cnt = tab.value === "ALL" ? total : tab.value === "NEEDS_ACTION" ? needsActionCount : (counts[tab.value as LoanApplicationStatus] ?? 0);
             return (
               <button
                 key={tab.value}
@@ -185,10 +195,10 @@ export default function SalaryRequestsPage() {
           )}
         </div>
         <div style={{ flex: 1 }} />
-        <span style={{ fontSize: 12, color: "#9CA3AF" }}>{filtered.length} requests</span>
+        <span style={{ fontSize: 12, color: "#9CA3AF" }}>{filtered.length} applications</span>
       </div>
 
-      {/* ── Table ───────────────────────────── */}
+      {/* ── Table ─────────────────────────────── */}
       {isLoading ? (
         <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", overflow: "hidden" }}>
           {[...Array(6)].map((_, i) => (
@@ -204,17 +214,17 @@ export default function SalaryRequestsPage() {
         </div>
       ) : filtered.length === 0 ? (
         <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", padding: "60px 24px", textAlign: "center" }}>
-          <p style={{ fontSize: 15, fontWeight: 600, color: "#111827", margin: 0 }}>No requests found</p>
+          <p style={{ fontSize: 15, fontWeight: 600, color: "#111827", margin: 0 }}>No applications found</p>
           <p style={{ fontSize: 13, color: "#9CA3AF", marginTop: 6 }}>
-            {search || statusFilter !== "ALL" ? "Try adjusting your search or filter." : "No salary requests submitted yet."}
+            {search || statusFilter !== "ALL" ? "Try adjusting your search or filter." : "No loan applications submitted yet."}
           </p>
         </div>
       ) : (
         <>
-          <SalaryRequestsTable
-            requests={paginated}
+          <LoanApplicationsTable
+            applications={paginated}
             selectedId={selected?.id ?? null}
-            onSelect={(r) => setSelected(selected?.id === r.id ? null : r)}
+            onSelect={(a) => setSelected(selected?.id === a.id ? null : a)}
           />
           <Pagination
             page={safePage}
@@ -226,12 +236,12 @@ export default function SalaryRequestsPage() {
         </>
       )}
 
-      <SalaryRequestDrawer
+      <LoanApplicationDrawer
         open={selected !== null}
-        request={selected}
+        application={selected}
         onClose={() => setSelected(null)}
         onMutated={() => {
-          void queryClient.invalidateQueries({ queryKey: ["salary-requests"] });
+          void queryClient.invalidateQueries({ queryKey: ["loan-applications"] });
           setSelected(null);
         }}
       />

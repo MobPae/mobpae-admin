@@ -32,7 +32,7 @@ export default function DisbursalDrawer({ open, disbursal, onClose, onMutated }:
     mutationFn: () => processDisbursal(disbursal!.id),
     onSuccess: () => {
       toast.success("Disbursal processed", {
-        description: `₹${Number(disbursal?.amount).toLocaleString("en-IN")} sent to ${disbursal?.salaryRequest.employee.name}.`,
+        description: `₹${Number(disbursal?.disbursedAmount).toLocaleString("en-IN")} sent to ${disbursal?.loanApplication.employee.name}.`,
       });
       onMutated();
       onClose();
@@ -44,8 +44,8 @@ export default function DisbursalDrawer({ open, disbursal, onClose, onMutated }:
 
   if (!open || !disbursal) return null;
 
-  const emp = disbursal.salaryRequest.employee;
-  const awaitingMembership = disbursal.salaryRequest.status === "AWAITING_MEMBERSHIP_PAYMENT";
+  const emp = disbursal.loanApplication.employee;
+  const awaitingMembership = disbursal.loanApplication.status === "AWAITING_MEMBERSHIP_PAYMENT";
   const canDisburse = disbursal.status === "PENDING" && !awaitingMembership;
 
   return (
@@ -81,7 +81,7 @@ export default function DisbursalDrawer({ open, disbursal, onClose, onMutated }:
             <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-[#6B7280] mb-2">Disbursal details</p>
             <div className="border border-[#E5E7EB] rounded-lg divide-y divide-[#E5E7EB]">
               {[
-                { k: "Amount",       v: fmt(disbursal.amount) },
+                { k: "Amount",       v: fmt(disbursal.disbursedAmount) },
                 { k: "Status",       v: disbursal.status },
                 { k: "Disbursed by", v: disbursal.disbursedBy ?? "System" },
                 { k: "Disbursed on", v: disbursal.disbursedAt
@@ -116,14 +116,15 @@ export default function DisbursalDrawer({ open, disbursal, onClose, onMutated }:
             </div>
           </section>
 
-          {/* Salary request */}
+          {/* Loan application */}
           <section>
-            <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-[#6B7280] mb-2">Salary request</p>
+            <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-[#6B7280] mb-2">Loan application</p>
             <div className="border border-[#E5E7EB] rounded-lg divide-y divide-[#E5E7EB]">
               {[
-                { k: "Request ID",       v: <span className="font-mono text-[11px]">{disbursal.salaryRequestId}</span> },
-                { k: "Requested amount", v: fmt(disbursal.salaryRequest.amount) },
-                { k: "Request status",   v: disbursal.salaryRequest.status },
+                { k: "Application No.",  v: <span className="font-mono text-[11px]">{disbursal.loanApplication.applicationNumber}</span> },
+                { k: "Requested amount", v: fmt(disbursal.loanApplication.requestedAmount) },
+                { k: "Approved amount",  v: fmt(disbursal.loanApplication.adminApprovedAmount) },
+                { k: "App status",       v: disbursal.loanApplication.status },
               ].map(({ k, v }) => (
                 <div key={k} className="flex items-center justify-between px-3 py-2.5">
                   <span className="text-[11px] text-[#6B7280]">{k}</span>
@@ -154,7 +155,7 @@ export default function DisbursalDrawer({ open, disbursal, onClose, onMutated }:
               {disburseMutation.isPending
                 ? <Loader2 size={12} className="animate-spin" />
                 : <CreditCard size={12} />}
-              {disburseMutation.isPending ? "Processing…" : `Disburse ${fmt(disbursal.amount)}`}
+              {disburseMutation.isPending ? "Processing…" : `Disburse ${fmt(disbursal.disbursedAmount)}`}
             </button>
           </div>
         )}
@@ -163,7 +164,7 @@ export default function DisbursalDrawer({ open, disbursal, onClose, onMutated }:
       <ConfirmModal
         open={confirmOpen}
         title="Disburse funds"
-        description={`This will send ${fmt(disbursal.amount)} to ${disbursal.salaryRequest.employee.name}'s bank account. This cannot be undone.`}
+        description={`This will send ${fmt(disbursal.disbursedAmount)} to ${disbursal.loanApplication.employee.name}'s bank account. This cannot be undone.`}
         confirmLabel="Disburse"
         confirmClass="bg-[#6C4CFF] hover:bg-[#5B34FF] text-white"
         loading={disburseMutation.isPending}

@@ -53,7 +53,7 @@ export default function RepaymentsTable({ repayments, selectedId, onSelect }: Pr
         </thead>
         <tbody>
           {repayments.map(r => {
-            const emp = r.salaryRequest.employee;
+            const emp = r.loanApplication.employee;
             const isSelected = selectedId === r.id;
             const s = STATUS_CFG[r.status] ?? { label: r.status, color: "#6B7280", bg: "#F3F4F6" };
             const ac = avatarColor(emp.name);

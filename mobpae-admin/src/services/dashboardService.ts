@@ -16,7 +16,7 @@ export async function getAdminDashboard(): Promise<AdminDashboard> {
     activeEmployees:      n(raw.activeEmployees),
     pendingKycDocuments:  n(raw.pendingKycDocuments ?? raw.pendingKyc),
     pendingBankAccounts:  n(raw.pendingBankVerification ?? raw.pendingBankAccounts ?? raw.pendingBanks),
-    pendingSalaryRequests:n(raw.pendingSalaryRequests ?? raw.pendingRequests),
+    pendingLoanApplications:n(raw.pendingLoanApplications ?? raw.pendingSalaryRequests ?? raw.pendingRequests),
     pendingDisbursals:    n(raw.pendingDisbursals),
     disbursedAmount:      n(raw.disbursedAmount ?? raw.totalDisbursed),
     recoveredAmount:      n(raw.recoveredAmount ?? raw.totalRecovered),

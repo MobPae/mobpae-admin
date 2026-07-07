@@ -51,7 +51,7 @@ const SECTIONS: Section[] = [
   {
     title: "Finance",
     items: [
-      { label: "Advances",     icon: Wallet,           to: "/salary-requests" },
+      { label: "Advances",     icon: Wallet,           to: "/loan-applications" },
       { label: "Disbursals",   icon: ArrowDownCircle,  to: "/disbursals"      },
       { label: "Repayments",   icon: RefreshCcw,       to: "/repayments"      },
       { label: "Settlements",  icon: CircleDollarSign, to: "/settlements"     },

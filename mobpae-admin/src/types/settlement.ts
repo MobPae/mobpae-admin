@@ -2,16 +2,16 @@ export type EmployerSettlementStatus = "NO_DUES" | "PENDING" | "PARTIALLY_PAID" 
 
 export interface SettlementRepayment {
   id: string;
-  salaryRequestId: string;
+  loanApplicationId: string;
   principalAmount: string;
   interestAmount: string;
   totalAmount: string;
   dueDate: string;
   paidDate: string | null;
   status: string;
-  salaryRequest?: {
+  loanApplication?: {
     id: string;
-    requestId?: string | null;
+    applicationNumber?: string | null;
     employee?: {
       id: string;
       name: string;

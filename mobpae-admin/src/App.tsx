@@ -9,7 +9,7 @@ const DashboardPage = lazy(() => import("./pages/DashboardPage"));
 const EmployerEnquiriesPage = lazy(() => import("./pages/EmployerEnquiriesPage"));
 const EmployersPage = lazy(() => import("./pages/EmployersPage"));
 const EmployeesPage = lazy(() => import("./pages/EmployeesPage"));
-const SalaryRequestsPage = lazy(() => import("./pages/SalaryRequestsPage"));
+const LoanApplicationsPage = lazy(() => import("./pages/LoanApplicationsPage"));
 const DisbursalsPage = lazy(() => import("./pages/DisbursalsPage"));
 const RecoveriesPage = lazy(() => import("./pages/RecoveriesPage"));
 const RepaymentsPage = lazy(() => import("./pages/RepaymentsPage"));
@@ -60,7 +60,7 @@ export default function App() {
           <Route path="employer-enquiries" element={<EmployerEnquiriesPage />} />
           <Route path="employers" element={<EmployersPage />} />
           <Route path="employees" element={<EmployeesPage />} />
-          <Route path="salary-requests" element={<SalaryRequestsPage />} />
+          <Route path="loan-applications" element={<LoanApplicationsPage />} />
           <Route path="disbursals" element={<DisbursalsPage />} />
           <Route path="recoveries" element={<RecoveriesPage />} />
           <Route path="repayments" element={<RepaymentsPage />} />

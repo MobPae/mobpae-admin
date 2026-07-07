@@ -41,9 +41,9 @@ export default function RepaymentsPage() {
     const q = search.toLowerCase();
     const matchSearch =
       !q ||
-      r.salaryRequest.employee.name.toLowerCase().includes(q) ||
-      r.salaryRequest.employee.employeeCode.toLowerCase().includes(q) ||
-      r.salaryRequest.employee.employer.companyName.toLowerCase().includes(q);
+      r.loanApplication.employee.name.toLowerCase().includes(q) ||
+      r.loanApplication.employee.employeeCode.toLowerCase().includes(q) ||
+      r.loanApplication.employee.employer.companyName.toLowerCase().includes(q);
     const matchFilter = filter === "ALL" || r.status === filter;
     const due = r.dueDate ? new Date(r.dueDate) : null;
     const matchFrom = !dateFrom || (due !== null && due >= new Date(dateFrom));
@@ -69,9 +69,9 @@ export default function RepaymentsPage() {
         </div>
         <button
           onClick={() => exportToCsv(rows.map(r => ({
-            Employee:  r.salaryRequest.employee.name,
-            Code:      r.salaryRequest.employee.employeeCode,
-            Company:   r.salaryRequest.employee.employer.companyName,
+            Employee:  r.loanApplication.employee.name,
+            Code:      r.loanApplication.employee.employeeCode,
+            Company:   r.loanApplication.employee.employer.companyName,
             Principal: r.principalAmount,
             Total:     r.totalAmount,
             DueDate:   r.dueDate ? new Date(r.dueDate).toLocaleDateString() : "",

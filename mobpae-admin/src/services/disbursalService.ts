@@ -42,8 +42,8 @@ export async function getDisbursals(filters?: DisbursalFilters): Promise<Disburs
   return unwrapList<Disbursal>(response.data, ["disbursals"]);
 }
 
-export async function createDisbursal(salaryRequestId: string): Promise<Disbursal> {
-  const response = await api.post("/disbursals", { salaryRequestId });
+export async function createDisbursal(loanApplicationId: string): Promise<Disbursal> {
+  const response = await api.post("/disbursals", { loanApplicationId });
   return unwrapItem<Disbursal>(response.data, ["disbursal"]);
 }
 

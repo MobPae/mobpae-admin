@@ -53,7 +53,7 @@ export default function DisbursalsTable({ disbursals, selectedId, onSelect }: Pr
         </thead>
         <tbody>
           {disbursals.map(d => {
-            const emp = d.salaryRequest.employee;
+            const emp = d.loanApplication.employee;
             const isSelected = selectedId === d.id;
             const s = STATUS_CFG[d.status] ?? { label: d.status, color: "#6B7280", bg: "#F3F4F6" };
             const ac = avatarColor(emp.name);
@@ -88,7 +88,7 @@ export default function DisbursalsTable({ disbursals, selectedId, onSelect }: Pr
 
                 {/* Amount */}
                 <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
-                  <p style={{ fontSize: 13.5, fontWeight: 700, color: "#111827", margin: 0, fontVariantNumeric: "tabular-nums" }}>{fmt(d.amount)}</p>
+                  <p style={{ fontSize: 13.5, fontWeight: 700, color: "#111827", margin: 0, fontVariantNumeric: "tabular-nums" }}>{fmt(d.disbursedAmount)}</p>
                 </td>
 
                 {/* Status */}

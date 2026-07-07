@@ -1,10 +1,10 @@
 import { useState } from "react";
-import type { SalaryRequest, SalaryRequestStatus } from "../../types/salary-request";
+import type { LoanApplication, LoanApplicationStatus } from "../../types/loan-application";
 
 interface Props {
-  requests: SalaryRequest[];
+  applications: LoanApplication[];
   selectedId: string | null;
-  onSelect: (r: SalaryRequest) => void;
+  onSelect: (a: LoanApplication) => void;
 }
 
 const AVATAR_COLORS: Record<string, string> = {
@@ -18,15 +18,17 @@ const AVATAR_COLORS: Record<string, string> = {
 };
 const avatarColor = (n: string) => AVATAR_COLORS[n.charAt(0).toUpperCase()] ?? "#6C4CFF";
 
-const STATUS_CFG: Record<SalaryRequestStatus, { label: string; color: string; bg: string }> = {
-  SUBMITTED:            { label: "Submitted",       color: "#D97706", bg: "#FEF3C7" },
-  EMPLOYER_APPROVED:             { label: "Emp. Approved",   color: "#2563EB", bg: "#DBEAFE" },
-  EMPLOYER_REJECTED:             { label: "Rejected",        color: "#EF4444", bg: "#FEE2E2" },
-  AWAITING_MEMBERSHIP_PAYMENT:   { label: "Awaiting Membership", color: "#D97706", bg: "#FEF3C7" },
-  READY_FOR_DISBURSAL:           { label: "Ready",           color: "#16A34A", bg: "#DCFCE7" },
-  DISBURSED:            { label: "Disbursed",       color: "#16A34A", bg: "#DCFCE7" },
-  REPAYMENT_SCHEDULED:  { label: "Repaying",        color: "#D97706", bg: "#FEF3C7" },
-  REPAID:               { label: "Repaid",          color: "#16A34A", bg: "#DCFCE7" },
+const STATUS_CFG: Record<LoanApplicationStatus, { label: string; color: string; bg: string }> = {
+  SUBMITTED:                   { label: "Submitted",          color: "#D97706", bg: "#FEF3C7" },
+  EMPLOYER_APPROVED:           { label: "Emp. Approved",      color: "#2563EB", bg: "#DBEAFE" },
+  EMPLOYER_REJECTED:           { label: "Rejected",           color: "#EF4444", bg: "#FEE2E2" },
+  AWAITING_MEMBERSHIP_PAYMENT: { label: "Awaiting Membership",color: "#D97706", bg: "#FEF3C7" },
+  READY_FOR_DISBURSAL:         { label: "Ready",              color: "#16A34A", bg: "#DCFCE7" },
+  DISBURSED:                   { label: "Disbursed",          color: "#16A34A", bg: "#DCFCE7" },
+  REPAYMENT_SCHEDULED:         { label: "Repaying",           color: "#D97706", bg: "#FEF3C7" },
+  REPAID:                      { label: "Repaid",             color: "#16A34A", bg: "#DCFCE7" },
+  CANCELLED:                   { label: "Cancelled",          color: "#6B7280", bg: "#F3F4F6" },
+  EXPIRED:                     { label: "Expired",            color: "#6B7280", bg: "#F3F4F6" },
 };
 
 function Pill({ label, color, bg }: { label: string; color: string; bg: string }) {
@@ -38,11 +40,10 @@ function Pill({ label, color, bg }: { label: string; color: string; bg: string }
   );
 }
 
-const fmt = (v: string | null) => v ? `₹${Number(v).toLocaleString("en-IN")}` : "—";
+const fmt = (v: string | null | undefined) => v ? `₹${Number(v).toLocaleString("en-IN")}` : "—";
+const HEADERS = ["Employee", "Company", "Requested", "Approved", "Status", "Submitted", ""];
 
-const HEADERS = ["Employee", "Company", "Amount", "Approved", "Status", "Requested", ""];
-
-export default function SalaryRequestsTable({ requests, selectedId, onSelect }: Props) {
+export default function LoanApplicationsTable({ applications, selectedId, onSelect }: Props) {
   const [hovered, setHovered] = useState<string | null>(null);
 
   return (
@@ -58,17 +59,17 @@ export default function SalaryRequestsTable({ requests, selectedId, onSelect }: 
           </tr>
         </thead>
         <tbody>
-          {requests.map((req) => {
-            const isSelected = selectedId === req.id;
-            const s = STATUS_CFG[req.status] ?? { label: req.status, color: "#6B7280", bg: "#F3F4F6" };
-            const ac = avatarColor(req.employee.name);
-            const rowBg = isSelected ? "#F3F0FF" : hovered === req.id ? "#FAFAFC" : "transparent";
+          {applications.map((app) => {
+            const isSelected = selectedId === app.id;
+            const s = STATUS_CFG[app.status] ?? { label: app.status, color: "#6B7280", bg: "#F3F4F6" };
+            const ac = avatarColor(app.employee.name);
+            const rowBg = isSelected ? "#F3F0FF" : hovered === app.id ? "#FAFAFC" : "transparent";
 
             return (
               <tr
-                key={req.id}
-                onClick={() => onSelect(req)}
-                onMouseEnter={() => setHovered(req.id)}
+                key={app.id}
+                onClick={() => onSelect(app)}
+                onMouseEnter={() => setHovered(app.id)}
                 onMouseLeave={() => setHovered(null)}
                 style={{ borderBottom: "1px solid #F9FAFB", cursor: "pointer", background: rowBg, transition: "background 0.1s" }}
               >
@@ -76,30 +77,30 @@ export default function SalaryRequestsTable({ requests, selectedId, onSelect }: 
                 <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                     <div style={{ width: 36, height: 36, borderRadius: 10, background: ac, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, flexShrink: 0 }}>
-                      {req.employee.name.charAt(0).toUpperCase()}
+                      {app.employee.name.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <p style={{ fontSize: 13.5, fontWeight: 600, color: "#111827", margin: 0 }}>{req.employee.name}</p>
-                      <p style={{ fontSize: 11.5, color: "#9CA3AF", margin: "2px 0 0", fontFamily: "ui-monospace, monospace" }}>{req.employee.employeeCode}</p>
+                      <p style={{ fontSize: 13.5, fontWeight: 600, color: "#111827", margin: 0 }}>{app.employee.name}</p>
+                      <p style={{ fontSize: 11.5, color: "#9CA3AF", margin: "2px 0 0", fontFamily: "ui-monospace, monospace" }}>{app.employee.employeeCode}</p>
                     </div>
                   </div>
                 </td>
 
                 {/* Company */}
                 <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
-                  <p style={{ fontSize: 13.5, fontWeight: 500, color: "#374151", margin: 0 }}>{req.employee.employer.companyName}</p>
-                  <p style={{ fontSize: 11.5, color: "#9CA3AF", margin: "2px 0 0", fontFamily: "ui-monospace, monospace" }}>{req.employee.employer.companyCode}</p>
+                  <p style={{ fontSize: 13.5, fontWeight: 500, color: "#374151", margin: 0 }}>{app.employee.employer.companyName}</p>
+                  <p style={{ fontSize: 11.5, color: "#9CA3AF", margin: "2px 0 0", fontFamily: "ui-monospace, monospace" }}>{app.employee.employer.companyCode}</p>
                 </td>
 
-                {/* Amount */}
+                {/* Requested */}
                 <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
-                  <p style={{ fontSize: 13.5, fontWeight: 700, color: "#111827", margin: 0, fontVariantNumeric: "tabular-nums" }}>{fmt(req.amount)}</p>
+                  <p style={{ fontSize: 13.5, fontWeight: 700, color: "#111827", margin: 0, fontVariantNumeric: "tabular-nums" }}>{fmt(app.requestedAmount)}</p>
                 </td>
 
                 {/* Approved */}
                 <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
-                  <p style={{ fontSize: 13.5, fontWeight: 500, color: req.approvedAmount ? "#111827" : "#D1D5DB", margin: 0, fontVariantNumeric: "tabular-nums" }}>
-                    {fmt(req.approvedAmount)}
+                  <p style={{ fontSize: 13.5, fontWeight: 500, color: app.adminApprovedAmount ? "#111827" : "#D1D5DB", margin: 0, fontVariantNumeric: "tabular-nums" }}>
+                    {fmt(app.adminApprovedAmount ?? app.employerApprovedAmount)}
                   </p>
                 </td>
 
@@ -108,17 +109,17 @@ export default function SalaryRequestsTable({ requests, selectedId, onSelect }: 
                   <Pill {...s} />
                 </td>
 
-                {/* Requested */}
+                {/* Submitted */}
                 <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
                   <p style={{ fontSize: 13, color: "#9CA3AF", margin: 0, fontWeight: 500 }}>
-                    {new Date(req.requestedAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+                    {new Date(app.submittedAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
                   </p>
                 </td>
 
                 {/* Action */}
                 <td style={{ padding: "16px 20px", verticalAlign: "middle", textAlign: "right" }}>
                   <button
-                    onClick={(e) => { e.stopPropagation(); onSelect(req); }}
+                    onClick={(e) => { e.stopPropagation(); onSelect(app); }}
                     style={{ height: 30, padding: "0 14px", background: isSelected ? "#6C4CFF" : "#F3F0FF", color: isSelected ? "white" : "#6C4CFF", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
                   >
                     {isSelected ? "Close" : "Review"}
@@ -131,7 +132,7 @@ export default function SalaryRequestsTable({ requests, selectedId, onSelect }: 
       </table>
       <div style={{ padding: "12px 20px", borderTop: "1px solid #F3F4F6", background: "#FAFAFA" }}>
         <p style={{ fontSize: 12, color: "#9CA3AF", margin: 0 }}>
-          {requests.length} {requests.length === 1 ? "request" : "requests"}
+          {applications.length} {applications.length === 1 ? "application" : "applications"}
         </p>
       </div>
     </div>

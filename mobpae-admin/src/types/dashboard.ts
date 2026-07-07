@@ -17,7 +17,7 @@ export interface AdminDashboard {
   // Pending queues
   pendingKycDocuments: number;
   pendingBankAccounts: number;
-  pendingSalaryRequests: number;
+  pendingLoanApplications: number;
   pendingDisbursals: number;
   // Financial
   disbursedAmount: number;
@@ -37,7 +37,7 @@ export interface EmployerDashboard {
   totalEmployees: number;
   activeEmployees: number;
   appActivatedEmployees: number;
-  pendingSalaryRequests: number;
+  pendingLoanApplications: number;
   approvedRequests: number;
   outstandingAmount: number;
 }

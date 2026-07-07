@@ -7,12 +7,12 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import { getAdminDashboard } from "../services/dashboardService";
-import { getSalaryRequests } from "../services/salaryRequestService";
+import { getLoanApplications } from "../services/loanApplicationService";
 import { getEmployers } from "../services/employerService";
 import { getAuditLogs } from "../services/auditService";
 import { getTokenName } from "../utils/auth";
 import type { AdminDashboard } from "../types/dashboard";
-import type { SalaryRequest } from "../types/salary-request";
+import type { LoanApplication, LoanApplicationStatus } from "../types/loan-application";
 
 const EMPTY_DASHBOARD: AdminDashboard = {
   totalEmployers: 0,
@@ -22,7 +22,7 @@ const EMPTY_DASHBOARD: AdminDashboard = {
   activeEmployees: 0,
   pendingKycDocuments: 0,
   pendingBankAccounts: 0,
-  pendingSalaryRequests: 0,
+  pendingLoanApplications: 0,
   pendingDisbursals: 0,
   disbursedAmount: 0,
   recoveredAmount: 0,
@@ -33,10 +33,10 @@ const EMPTY_DASHBOARD: AdminDashboard = {
   activeRepayments: 0,
 };
 
-type SRStatus = SalaryRequest["status"];
+type SRStatus = LoanApplicationStatus;
 
-function srStatusLabel(s: SRStatus) {
-  const map: Record<SRStatus, string> = {
+function srStatusLabel(s: SRStatus): string {
+  const map: Partial<Record<SRStatus, string>> = {
     SUBMITTED: "Pending",
     EMPLOYER_APPROVED: "Approved",
     READY_FOR_DISBURSAL: "Ready",
@@ -44,13 +44,15 @@ function srStatusLabel(s: SRStatus) {
     EMPLOYER_REJECTED: "Rejected",
     REPAYMENT_SCHEDULED: "Recovery",
     REPAID: "Repaid",
-    AWAITING_MEMBERSHIP_PAYMENT: "",
+    AWAITING_MEMBERSHIP_PAYMENT: "Awaiting Mbr",
+    CANCELLED: "Cancelled",
+    EXPIRED: "Expired",
   };
-  return map[s];
+  return map[s] ?? s;
 }
 
 function srStatusStyle(s: SRStatus): { bg: string; text: string } {
-  const map: Record<SRStatus, { bg: string; text: string }> = {
+  const map: Partial<Record<SRStatus, { bg: string; text: string }>> = {
     SUBMITTED: { bg: "#FEF3C7", text: "#D97706" },
     EMPLOYER_APPROVED: { bg: "#DBEAFE", text: "#1D4ED8" },
     READY_FOR_DISBURSAL: { bg: "#DCFCE7", text: "#16A34A" },
@@ -58,12 +60,11 @@ function srStatusStyle(s: SRStatus): { bg: string; text: string } {
     EMPLOYER_REJECTED: { bg: "#FEE2E2", text: "#DC2626" },
     REPAYMENT_SCHEDULED: { bg: "#FEF3C7", text: "#B45309" },
     REPAID: { bg: "#DCFCE7", text: "#166534" },
-    AWAITING_MEMBERSHIP_PAYMENT: {
-      bg: "#8B0000",
-      text: "#D97706",
-    },
+    AWAITING_MEMBERSHIP_PAYMENT: { bg: "#FEF3C7", text: "#D97706" },
+    CANCELLED: { bg: "#F3F4F6", text: "#6B7280" },
+    EXPIRED: { bg: "#F3F4F6", text: "#6B7280" },
   };
-  return map[s];
+  return map[s] ?? { bg: "#F3F4F6", text: "#6B7280" };
 }
 
 function fmt(n: number) {
@@ -180,9 +181,9 @@ export default function DashboardPage() {
     queryFn: getAdminDashboard,
   });
 
-  const { data: salaryRequests = [], isLoading: srLoading } = useQuery({
-    queryKey: ["salary-requests"],
-    queryFn: getSalaryRequests,
+  const { data: salaryRequests = [], isLoading: srLoading } = useQuery<LoanApplication[]>({
+    queryKey: ["loan-applications"],
+    queryFn: () => getLoanApplications(),
   });
 
   const { data: employers = [], isLoading: empLoading } = useQuery({
@@ -200,7 +201,7 @@ export default function DashboardPage() {
 
   const sorted = [...salaryRequests].sort(
     (a, b) =>
-      new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime()
+      new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()
   );
 
   const pendingSR = sorted.filter((r) => r.status === "SUBMITTED");
@@ -228,7 +229,7 @@ export default function DashboardPage() {
   };
 
   const totalAttention =
-    d.pendingSalaryRequests + d.pendingKycDocuments + d.pendingDisbursals;
+    d.pendingLoanApplications + d.pendingKycDocuments + d.pendingDisbursals;
 
   const kpis = [
     {
@@ -298,7 +299,7 @@ export default function DashboardPage() {
     },
     {
       label: "Items Need Attention",
-      value: totalAttention || d.pendingSalaryRequests,
+      value: totalAttention || d.pendingLoanApplications,
       iconBg: "#FEF3C7",
       accent: totalAttention > 0,
       icon: (
@@ -328,10 +329,10 @@ export default function DashboardPage() {
       color: "#6C4CFF",
     },
     {
-      label: "Salary Advances",
+      label: "Loan Applications",
       sub: "Awaiting approval",
-      count: d.pendingSalaryRequests,
-      to: "/salary-requests",
+      count: d.pendingLoanApplications,
+      to: "/loan-applications",
       color: "#F59E0B",
     },
     {
@@ -544,7 +545,7 @@ export default function DashboardPage() {
             </div>
             <div style={{ padding: "12px 20px" }}>
               <button
-                onClick={() => void navigate("/salary-requests")}
+                onClick={() => void navigate("/loan-applications")}
                 style={{
                   width: "100%",
                   height: 36,
@@ -944,7 +945,7 @@ export default function DashboardPage() {
                             color: "#111827",
                           }}
                         >
-                          ₹{parseFloat(req.amount).toLocaleString("en-IN")}
+                          ₹{parseFloat(req.requestedAmount).toLocaleString("en-IN")}
                         </td>
                         <td
                           style={{
@@ -962,7 +963,7 @@ export default function DashboardPage() {
                             color: "#6B7280",
                           }}
                         >
-                          {new Date(req.requestedAt).toLocaleDateString(
+                          {new Date(req.submittedAt).toLocaleDateString(
                             "en-IN",
                             { day: "numeric", month: "short", year: "numeric" }
                           )}
@@ -984,7 +985,7 @@ export default function DashboardPage() {
                         </td>
                         <td style={{ padding: "12px 16px" }}>
                           <button
-                            onClick={() => void navigate("/salary-requests")}
+                            onClick={() => void navigate("/loan-applications")}
                             style={{
                               height: 30,
                               padding: "0 14px",
@@ -1017,7 +1018,7 @@ export default function DashboardPage() {
 
           <div style={{ padding: "12px 20px", borderTop: "1px solid #F3F4F6" }}>
             <button
-              onClick={() => void navigate("/salary-requests")}
+              onClick={() => void navigate("/loan-applications")}
               style={{
                 fontSize: 13,
                 color: "#6C4CFF",

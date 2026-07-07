@@ -1,4 +1,4 @@
-export type SalaryRequestStatus =
+export type LoanApplicationStatus =
   | "SUBMITTED"
   | "EMPLOYER_APPROVED"
   | "EMPLOYER_REJECTED"
@@ -6,24 +6,26 @@ export type SalaryRequestStatus =
   | "READY_FOR_DISBURSAL"
   | "DISBURSED"
   | "REPAYMENT_SCHEDULED"
-  | "REPAID";
+  | "REPAID"
+  | "CANCELLED"
+  | "EXPIRED";
 
-export interface SalaryRequest {
+export interface LoanApplication {
   id: string;
-  amount: string;
-  approvedAmount: string | null;
-  approvedBy: string | null;
-  approvedAt: string | null;
-  reason: string | null;
+  applicationNumber: string;
+  requestedAmount: string;
+  employerApprovedAmount: string | null;
+  adminApprovedAmount: string | null;
+  purposeCategory: string;
+  purposeNote: string | null;
   remarks: string | null;
-  requestedAt: string;
-  repaymentDate: string | null;
-  status: SalaryRequestStatus;
+  submittedAt: string;
+  status: LoanApplicationStatus;
   createdAt: string;
   updatedAt: string;
   disbursal?: {
     id: string;
-    amount: string;
+    disbursedAmount: string;
     status: string;
     disbursedAt: string | null;
   } | null;

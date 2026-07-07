@@ -78,11 +78,11 @@ export default function RecentSalaryRequests() {
       <div className="px-6 py-5 border-b border-[#E5E7EB] flex items-center justify-between">
         <div>
           <h3 className="text-base font-semibold text-[#111827]">
-            Recent Salary Requests
+            Recent Loan Applications
           </h3>
 
           <p className="text-xs text-[#6B7280] mt-1">
-            Latest employee advance requests
+            Latest employee advance applications
           </p>
         </div>
 

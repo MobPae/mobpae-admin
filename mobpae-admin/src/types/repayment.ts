@@ -2,7 +2,7 @@ export type RepaymentStatus = "SCHEDULED" | "PAID" | "OVERDUE";
 
 export interface Repayment {
   id: string;
-  salaryRequestId: string;
+  loanApplicationId: string;
   principalAmount: string;
   totalAmount: string;
   interestAmount: string;
@@ -14,9 +14,9 @@ export interface Repayment {
   remarks: string | null;
   createdAt: string;
   updatedAt: string;
-  salaryRequest: {
+  loanApplication: {
     id: string;
-    amount: string;
+    requestedAmount: string;
     employee: {
       id: string;
       employeeCode: string;
