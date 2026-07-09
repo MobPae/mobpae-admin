@@ -1,10 +1,10 @@
 import { useEscKey } from "../../lib/useEscKey";
 import { useState, useEffect } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { X, Ban, CheckCircle2, Loader2, RotateCcw, Copy, Mail, RefreshCw } from "lucide-react";
+import { X, Ban, CheckCircle2, Loader2, RotateCcw, Copy, Mail, RefreshCw, Save } from "lucide-react";
 import { getApiErrorMessage } from "../../utils/api-errors";
-import { updateEmployerStatus } from "../../services/employerService";
+import { updateEmployerStatus, getEmployerProductConfigs, upsertEmployerProductConfig, type EmployerProductConfig } from "../../services/employerService";
 import { processRecovery } from "../../services/payrollService";
 import { getLoanApplicationsByEmployer } from "../../services/loanApplicationService";
 import type { Employer } from "../../types/employer";
@@ -44,10 +44,12 @@ const SR_STATUS: Record<string, { label: string; cls: string }> = {
 
 export default function EmployerManagementDrawer({ open, onClose, onMutated, employer }: Props) {
   useEscKey(open, onClose);
+  const qc = useQueryClient();
   const [suspendConfirm,    setSuspendConfirm]    = useState(false);
   const [recoveryConfirm,   setRecoveryConfirm]   = useState(false);
   const [tempPassword,      setTempPassword]      = useState<string | null>(null);
   const [copiedPassword,    setCopiedPassword]    = useState(false);
+  const [overrideInput,     setOverrideInput]     = useState<string>("");
 
   useEffect(() => {
     if (open) { setSuspendConfirm(false); setRecoveryConfirm(false); setTempPassword(null); }
@@ -58,6 +60,29 @@ export default function EmployerManagementDrawer({ open, onClose, onMutated, emp
     queryFn: () => getLoanApplicationsByEmployer(employer!.id, 10),
     enabled: open && !!employer?.id,
     staleTime: 60_000,
+  });
+
+  const { data: productConfigs = [] } = useQuery<EmployerProductConfig[]>({
+    queryKey: ["employer-product-configs", employer?.id],
+    queryFn: () => getEmployerProductConfigs(employer!.id),
+    enabled: open && !!employer?.id,
+    staleTime: 60_000,
+    select: (data) => {
+      const sa = data.find(c => c.product.productType === "SA");
+      if (sa) setOverrideInput(sa.maximumAdvanceAmountOverride != null ? String(sa.maximumAdvanceAmountOverride) : "");
+      return data;
+    },
+  });
+  const saConfig = productConfigs.find(c => c.product.productType === "SA");
+
+  const overrideMutation = useMutation({
+    mutationFn: (amount: number | null) =>
+      upsertEmployerProductConfig(employer!.id, "SA", { maximumAdvanceAmountOverride: amount }),
+    onSuccess: () => {
+      toast.success("Advance override saved");
+      qc.invalidateQueries({ queryKey: ["employer-product-configs", employer?.id] });
+    },
+    onError: (err: unknown) => toast.error("Save failed", { description: getApiErrorMessage(err) }),
   });
 
   const mutation = useMutation({
@@ -199,6 +224,58 @@ export default function EmployerManagementDrawer({ open, onClose, onMutated, emp
             </div>
           </section>
 
+          {/* Salary advance override */}
+          <section>
+            <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-[#6B7280] mb-2">
+              Salary advance override
+            </p>
+            <div className="border border-[#E5E7EB] rounded-lg overflow-hidden">
+              <div className="px-3 py-2.5 flex items-center justify-between border-b border-[#E5E7EB]">
+                <span className="text-[11px] text-[#6B7280]">Current override</span>
+                <span className="text-[11px] font-[500] text-[#111827]">
+                  {saConfig?.maximumAdvanceAmountOverride != null
+                    ? `₹${saConfig.maximumAdvanceAmountOverride.toLocaleString("en-IN")}`
+                    : <span className="text-[#9CA3AF]">Platform default</span>}
+                </span>
+              </div>
+              <div className="px-3 py-2.5 flex items-center gap-2">
+                <div className="relative flex-1">
+                  <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[11px] text-[#9CA3AF] pointer-events-none">₹</span>
+                  <input
+                    type="number"
+                    min={1000}
+                    step={500}
+                    value={overrideInput}
+                    onChange={e => setOverrideInput(e.target.value)}
+                    placeholder="e.g. 7000 (blank = platform default)"
+                    className="w-full h-7 pl-5 pr-2 text-[11.5px] border border-[#E5E7EB] rounded-md outline-none focus:border-[#315eff] bg-white text-[#111827]"
+                  />
+                </div>
+                <button
+                  onClick={() => {
+                    const raw = overrideInput.trim();
+                    const amount = raw === "" ? null : parseInt(raw, 10);
+                    if (amount !== null && (isNaN(amount) || amount < 1000)) {
+                      toast.error("Minimum override is ₹1,000");
+                      return;
+                    }
+                    overrideMutation.mutate(amount);
+                  }}
+                  disabled={overrideMutation.isPending}
+                  className="h-7 px-3 flex items-center gap-1.5 rounded-md text-[11.5px] font-[600] bg-[#315eff] text-white border-none cursor-pointer disabled:opacity-60"
+                >
+                  <Save size={10} />
+                  {overrideMutation.isPending ? "Saving…" : "Save"}
+                </button>
+              </div>
+              <div className="px-3 py-1.5 bg-[#F9FAFB] border-t border-[#F3F4F6]">
+                <p className="text-[10.5px] text-[#9CA3AF]">
+                  Blank = platform default: min(salary×10%, ₹5,000). Hard ceiling of salary×50% always applies.
+                </p>
+              </div>
+            </div>
+          </section>
+
           {/* Recent salary requests */}
           <section>
             <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-[#6B7280] mb-2">
@@ -270,7 +347,7 @@ export default function EmployerManagementDrawer({ open, onClose, onMutated, emp
                 }}
                 title="Copy to clipboard"
                 className="w-7 h-7 rounded-md bg-white border border-[#E5E7EB] flex items-center justify-center flex-shrink-0 transition-colors hover:border-[#E5E7EB]"
-                style={copiedPassword ? { borderColor: "#6C4CFF", color: "#6C4CFF" } : { color: "#94a3b8" }}
+                style={copiedPassword ? { borderColor: "#315eff", color: "#315eff" } : { color: "#94a3b8" }}
               >
                 <Copy size={12} />
               </button>

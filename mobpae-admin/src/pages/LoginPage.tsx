@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { login } from "../services/authService";
 import { getToken, setToken, setRefreshToken } from "../utils/auth";
 
-const P  = "#6C4CFF";
-const PD = "#5B34FF";
+const P  = "#315eff";
+const PD = "#2048EE";
 
 
 // Mini dashboard preview for right panel
@@ -32,7 +32,7 @@ function DashboardPreview() {
       {/* Stats row */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 12 }}>
         {[
-          { label: "Total Employers", value: "542", color: "#F3F0FF" },
+          { label: "Total Employers", value: "542", color: "#EEF2FF" },
           { label: "Total Employees", value: "32,489", color: "#DCFCE7" },
           { label: "Advances This Month", value: "₹2,48,75,000", color: "#FEF3C7" },
         ].map((s) => (
@@ -53,7 +53,7 @@ function DashboardPreview() {
           { name: "Sneha Iyer",    action: "Repayment received",         time: "11 May 2025", status: "Completed", color: "#DCFCE7", text: "#16A34A" },
         ].map((r) => (
           <div key={r.name} style={{ display: "flex", alignItems: "center", gap: 8, paddingBottom: 7, marginBottom: 7, borderBottom: "1px solid #E5E7EB" }}>
-            <div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg, #8B7CFF, #6C4CFF)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, color: "white", fontWeight: 700, flexShrink: 0 }}>
+            <div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg, #8B7CFF, #315eff)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, color: "white", fontWeight: 700, flexShrink: 0 }}>
               {r.name[0]}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
@@ -222,7 +222,7 @@ export default function LoginPage() {
                   fontSize: 14, fontWeight: 600, letterSpacing: "0.01em",
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
                   cursor: loading ? "not-allowed" : "pointer",
-                  boxShadow: loading ? "none" : "0 4px 20px rgba(108,76,255,0.30)",
+                  boxShadow: loading ? "none" : "0 4px 20px rgba(49,94,255,0.30)",
                   transition: "all 0.15s",
                   fontFamily: "inherit",
                 }}
@@ -286,7 +286,7 @@ export default function LoginPage() {
       {/* ── RIGHT — Brand panel ──────────────────────────────────── */}
       <div style={{
         flex: 1,
-        background: "linear-gradient(135deg, #8B7CFF 0%, #6C4CFF 50%, #5B34FF 100%)",
+        background: "linear-gradient(135deg, #8B7CFF 0%, #315eff 50%, #2048EE 100%)",
         display: "flex", flexDirection: "column",
         justifyContent: "center", alignItems: "center",
         padding: "48px 48px",

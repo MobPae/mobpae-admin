@@ -150,7 +150,7 @@ export default function DisbursalDrawer({ open, disbursal, onClose, onMutated }:
             <button
               onClick={() => setConfirmOpen(true)}
               disabled={!canDisburse || disburseMutation.isPending}
-              className="w-full h-8 rounded-md bg-[#6C4CFF] hover:bg-[#5B34FF] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-full h-8 rounded-md bg-[#315eff] hover:bg-[#2048EE] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {disburseMutation.isPending
                 ? <Loader2 size={12} className="animate-spin" />
@@ -166,7 +166,7 @@ export default function DisbursalDrawer({ open, disbursal, onClose, onMutated }:
         title="Disburse funds"
         description={`This will send ${fmt(disbursal.disbursedAmount)} to ${disbursal.loanApplication.employee.name}'s bank account. This cannot be undone.`}
         confirmLabel="Disburse"
-        confirmClass="bg-[#6C4CFF] hover:bg-[#5B34FF] text-white"
+        confirmClass="bg-[#315eff] hover:bg-[#2048EE] text-white"
         loading={disburseMutation.isPending}
         onConfirm={() => { setConfirmOpen(false); disburseMutation.mutate(); }}
         onCancel={() => setConfirmOpen(false)}

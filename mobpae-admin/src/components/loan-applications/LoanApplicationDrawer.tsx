@@ -157,19 +157,19 @@ export default function LoanApplicationDrawer({ open, application, onClose, onMu
       title: "Approve application",
       description: `This will approve ${application.employee.name}'s application (${displayAmount}) and mark it ready for disbursal.`,
       label: "Approve",
-      cls: "bg-[#6C4CFF] hover:bg-[#5B34FF] text-white",
+      cls: "bg-[#315eff] hover:bg-[#2048EE] text-white",
     },
     "approve-and-disburse": {
       title: "Approve & Disburse",
       description: `This will approve and immediately disburse ${displayAmount} to ${application.employee.name}'s bank account. This cannot be undone.`,
       label: "Approve & Disburse",
-      cls: "bg-[#6C4CFF] hover:bg-[#5B34FF] text-white",
+      cls: "bg-[#315eff] hover:bg-[#2048EE] text-white",
     },
     "disburse-only": {
       title: "Disburse funds",
       description: `This will send ${fmt(application.disbursal?.disbursedAmount)} to ${application.employee.name}'s bank account. This cannot be undone.`,
       label: "Disburse",
-      cls: "bg-[#6C4CFF] hover:bg-[#5B34FF] text-white",
+      cls: "bg-[#315eff] hover:bg-[#2048EE] text-white",
     },
   };
 
@@ -186,7 +186,7 @@ export default function LoanApplicationDrawer({ open, application, onClose, onMu
             </div>
             <div>
               <p className="text-[13px] font-[500] text-[#111827] leading-none">{application.employee.name}</p>
-              <p className="text-[11px] text-[#6B7280] mt-0.5 leading-none">{application.employee.employer.companyName}</p>
+              <p className="text-[11px] text-[#6B7280] mt-0.5 leading-none">{application.employer?.companyName ?? "—"}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -245,7 +245,7 @@ export default function LoanApplicationDrawer({ open, application, onClose, onMu
                 { k: "Name",          v: application.employee.name },
                 { k: "Employee code", v: <span className="font-mono">{application.employee.employeeCode}</span> },
                 { k: "Email",         v: application.employee.email },
-                { k: "Employer",      v: application.employee.employer.companyName },
+                { k: "Employer",      v: application.employer?.companyName ?? "—" },
               ].map(({ k, v }) => (
                 <div key={k} className="flex items-center justify-between px-3 py-2.5">
                   <span className="text-[11px] text-[#6B7280]">{k}</span>
@@ -319,7 +319,7 @@ export default function LoanApplicationDrawer({ open, application, onClose, onMu
               <button
                 onClick={() => setConfirm("approve-and-disburse")}
                 disabled={isBusy}
-                className="w-full h-8 rounded-md bg-[#6C4CFF] hover:bg-[#5B34FF] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
+                className="w-full h-8 rounded-md bg-[#315eff] hover:bg-[#2048EE] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
               >
                 {approveAndDisburseMutation.isPending
                   ? <Loader2 size={12} className="animate-spin" />
@@ -347,7 +347,7 @@ export default function LoanApplicationDrawer({ open, application, onClose, onMu
               <button
                 onClick={() => setConfirm("disburse-only")}
                 disabled={isBusy}
-                className="w-full h-8 rounded-md bg-[#6C4CFF] hover:bg-[#5B34FF] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
+                className="w-full h-8 rounded-md bg-[#315eff] hover:bg-[#2048EE] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
               >
                 {disburseMutation.isPending
                   ? <Loader2 size={12} className="animate-spin" />

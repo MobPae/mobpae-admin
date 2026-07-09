@@ -151,7 +151,7 @@ export default function CreateEmployerDrawer({ open, onClose, prefill }: Props) 
           <div className="flex items-center gap-2.5">
             <div
               className="w-7 h-7 rounded-lg flex items-center justify-center text-white"
-              style={{ background: "#6C4CFF" }}
+              style={{ background: "#315eff" }}
             >
               <Building2 size={13} />
             </div>
@@ -173,8 +173,8 @@ export default function CreateEmployerDrawer({ open, onClose, prefill }: Props) 
         {/* ── Credentials success view ── */}
         {credentials ? (
           <div className="flex-1 flex flex-col items-center justify-center px-6 py-10 text-center">
-            <div className="w-14 h-14 rounded-full bg-[#F3F0FF] flex items-center justify-center mb-4">
-              <CheckCircle2 size={28} className="text-[#6C4CFF]" />
+            <div className="w-14 h-14 rounded-full bg-[#EEF2FF] flex items-center justify-center mb-4">
+              <CheckCircle2 size={28} className="text-[#315eff]" />
             </div>
             <h2 className="text-[17px] font-[700] text-[#111827] tracking-tight mb-1">
               Employer Created
@@ -195,9 +195,9 @@ export default function CreateEmployerDrawer({ open, onClose, prefill }: Props) 
 
             <div
               className="w-full mt-5 rounded-lg px-4 py-3 text-left"
-              style={{ background: "#F3F0FF", border: "1px solid #C8C9FF" }}
+              style={{ background: "#EEF2FF", border: "1px solid #C8C9FF" }}
             >
-              <p className="text-[11px] leading-relaxed" style={{ color: "#5B34FF" }}>
+              <p className="text-[11px] leading-relaxed" style={{ color: "#2048EE" }}>
                 Status is <strong>PENDING</strong> by default. Go to{" "}
                 <strong>Employers</strong> and click <strong>Activate</strong> to allow employee logins.
               </p>
@@ -216,7 +216,7 @@ export default function CreateEmployerDrawer({ open, onClose, prefill }: Props) 
             <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
 
               {hasPrefill && (
-                <div className="bg-[#F3F0FF] border border-[#F3F0FF] rounded-lg px-4 py-3 text-[12px] text-[#5B34FF] leading-relaxed">
+                <div className="bg-[#EEF2FF] border border-[#EEF2FF] rounded-lg px-4 py-3 text-[12px] text-[#2048EE] leading-relaxed">
                   Fields pre-filled from the lead. Add a Company Code to complete.
                 </div>
               )}
@@ -303,9 +303,9 @@ export default function CreateEmployerDrawer({ open, onClose, prefill }: Props) 
                 type="submit"
                 disabled={isBusy || !allFilled}
                 className="w-full h-9 rounded-lg text-white text-[13px] font-[600] flex items-center justify-center gap-2 transition-colors disabled:opacity-40"
-                style={{ background: "#6C4CFF" }}
-                onMouseEnter={(e) => { if (!isBusy && allFilled) (e.currentTarget as HTMLButtonElement).style.background = "#5B34FF"; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "#6C4CFF"; }}
+                style={{ background: "#315eff" }}
+                onMouseEnter={(e) => { if (!isBusy && allFilled) (e.currentTarget as HTMLButtonElement).style.background = "#2048EE"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "#315eff"; }}
               >
                 {isBusy && <Loader2 size={13} className="animate-spin" />}
                 {isBusy ? "Creating…" : "Create Employer"}
@@ -352,8 +352,8 @@ function FormField({
         className="w-full h-9 px-3 text-[13px] bg-white border border-[#E5E7EB] rounded-lg text-[#111827] placeholder-[#D1D5DB] outline-none transition-colors"
         style={{ boxShadow: "none" }}
         onFocus={(e) => {
-          e.target.style.borderColor = "#6C4CFF";
-          e.target.style.boxShadow = "0 0 0 3px #F3F0FF";
+          e.target.style.borderColor = "#315eff";
+          e.target.style.boxShadow = "0 0 0 3px #EEF2FF";
         }}
         onBlur={(e) => {
           e.target.style.borderColor = "";
@@ -385,7 +385,7 @@ function CredRow({ label, value }: { label: string; value: string }) {
         onClick={copy}
         title="Copy to clipboard"
         className="w-7 h-7 rounded-md bg-white border border-[#E5E7EB] flex items-center justify-center flex-shrink-0 transition-colors hover:border-[#E5E7EB]"
-        style={copied ? { borderColor: "#6C4CFF", color: "#6C4CFF" } : { color: "#94a3b8" }}
+        style={copied ? { borderColor: "#315eff", color: "#315eff" } : { color: "#94a3b8" }}
       >
         <Copy size={12} />
       </button>

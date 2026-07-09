@@ -7,7 +7,7 @@ import EmployeesTable from "../components/employees/EmployeesTable";
 import EmployeeDrawer from "../components/employees/EmployeeDrawer";
 import { exportToCsv } from "../utils/exportCsv";
 
-const P = "#6C4CFF";
+const P = "#315eff";
 
 export default function EmployeesPage() {
   const { data: employees = [], isLoading, isError, refetch } = useQuery({
@@ -38,7 +38,7 @@ export default function EmployeesPage() {
   };
 
   const kpis = [
-    { label: "Total Employees", value: counts.total,    icon: <Users size={18} color={P} strokeWidth={1.75} />,             bg: "#F3F0FF", filter: null as EmploymentStatus | null },
+    { label: "Total Employees", value: counts.total,    icon: <Users size={18} color={P} strokeWidth={1.75} />,             bg: "#EEF2FF", filter: null as EmploymentStatus | null },
     { label: "Active",          value: counts.active,   icon: <UserCheck size={18} color="#16A34A" strokeWidth={1.75} />,   bg: "#DCFCE7", filter: "ACTIVE" as EmploymentStatus    },
     { label: "Inactive",        value: counts.inactive, icon: <UserMinus size={18} color="#EF4444" strokeWidth={1.75} />,   bg: "#FEE2E2", filter: "INACTIVE" as EmploymentStatus  },
     { label: "App Activated",   value: counts.app,      icon: <Smartphone size={18} color="#D97706" strokeWidth={1.75} />,  bg: "#FEF3C7", filter: null                            },

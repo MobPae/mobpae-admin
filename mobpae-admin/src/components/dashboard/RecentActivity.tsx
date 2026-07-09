@@ -11,7 +11,7 @@ export default function RecentActivity() {
       description: "Identity verification completed",
       time: "5 mins ago",
       icon: ShieldCheck,
-      color: "bg-[#F3F0FF] text-[#5B34FF]",
+      color: "bg-[#EEF2FF] text-[#2048EE]",
     },
     {
       employee: {
@@ -22,7 +22,7 @@ export default function RecentActivity() {
       description: "HDFC Bank account verified",
       time: "12 mins ago",
       icon: Landmark,
-      color: "bg-[#F3F0FF] text-[#5B34FF]",
+      color: "bg-[#EEF2FF] text-[#2048EE]",
     },
     {
       employee: {
@@ -33,7 +33,7 @@ export default function RecentActivity() {
       description: "₹15,000 request approved",
       time: "20 mins ago",
       icon: Wallet,
-      color: "bg-[#F3F0FF] text-[#5B34FF]",
+      color: "bg-[#EEF2FF] text-[#2048EE]",
     },
     {
       employee: {
@@ -44,7 +44,7 @@ export default function RecentActivity() {
       description: "Advance salary repaid",
       time: "1 hour ago",
       icon: CheckCircle2,
-      color: "bg-[#F3F0FF] text-[#5B34FF]",
+      color: "bg-[#EEF2FF] text-[#2048EE]",
     },
   ];
 
@@ -62,7 +62,7 @@ export default function RecentActivity() {
           </p>
         </div>
 
-        <button className="text-xs font-medium text-[#6C4CFF] hover:text-[#5B34FF]">
+        <button className="text-xs font-medium text-[#315eff] hover:text-[#2048EE]">
           View All
         </button>
       </div>

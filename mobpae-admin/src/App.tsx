@@ -19,6 +19,7 @@ const RevenuePage = lazy(() => import("./pages/RevenuePage"));
 const KycVerificationPage = lazy(() => import("./pages/KycVerificationPage"));
 const BankVerificationPage = lazy(() => import("./pages/BankVerificationPage"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
+const LoanProductPage = lazy(() => import("./pages/LoanProductPage"));
 const AuditLogsPage = lazy(() => import("./pages/AuditLogsPage"));
 const JobsPage = lazy(() => import("./pages/JobsPage"));
 const AppInformationPage = lazy(() => import("./pages/AppInformationPage").then(m => ({ default: m.AppInformationPage })));
@@ -70,6 +71,7 @@ export default function App() {
           <Route path="kyc" element={<KycVerificationPage />} />
           <Route path="bank-verification" element={<BankVerificationPage />} />
           <Route path="settings" element={<SettingsPage />} />
+          <Route path="loan-product" element={<LoanProductPage />} />
           <Route path="audit-logs" element={<AuditLogsPage />} />
           <Route path="jobs" element={<JobsPage />} />
           <Route path="app-information" element={<AppInformationPage />} />

@@ -18,6 +18,7 @@ import {
   KeyRound,
   LogOut,
   Smartphone,
+  Sliders,
   type LucideIcon,
 } from "lucide-react";
 import { useState } from "react";
@@ -70,6 +71,7 @@ const SECTIONS: Section[] = [
     title: "System",
     items: [
       { label: "App Content",     icon: Smartphone,    to: "/app-information" },
+      { label: "Loan Product",    icon: Sliders,       to: "/loan-product"    },
       { label: "Audit Logs",      icon: ScrollText,    to: "/audit-logs"      },
       { label: "Scheduled Jobs",  icon: CalendarClock, to: "/jobs"            },
       { label: "Settings",        icon: Settings,      to: "/settings"        },
@@ -112,15 +114,15 @@ export default function Sidebar() {
               }
               style={({ isActive }) => ({
                 height: 40,
-                background: isActive ? "#F3F0FF" : "transparent",
-                color: isActive ? "#6C4CFF" : "#6B7280",
+                background: isActive ? "#EEF2FF" : "transparent",
+                color: isActive ? "#315eff" : "#6B7280",
                 fontWeight: isActive ? 600 : 500,
                 fontSize: 13.5,
               })}
             >
               {({ isActive }) => (
                 <>
-                  <Icon size={16} style={{ color: isActive ? "#6C4CFF" : "#9CA3AF", flexShrink: 0 }} strokeWidth={isActive ? 2 : 1.75} />
+                  <Icon size={16} style={{ color: isActive ? "#315eff" : "#9CA3AF", flexShrink: 0 }} strokeWidth={isActive ? 2 : 1.75} />
                   <span>{label}</span>
                 </>
               )}
@@ -134,7 +136,7 @@ export default function Sidebar() {
         <div className="flex items-center gap-3 px-2">
           <div
             className="w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-[700] flex-shrink-0"
-            style={{ background: "linear-gradient(135deg, #8B7CFF 0%, #6C4CFF 100%)", color: "white" }}
+            style={{ background: "linear-gradient(135deg, #8B7CFF 0%, #315eff 100%)", color: "white" }}
           >
             {initials}
           </div>
@@ -145,7 +147,7 @@ export default function Sidebar() {
           <div className="flex items-center gap-0.5">
             <button
               onClick={() => navigate("/change-password")}
-              className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors hover:bg-[#F3F0FF]"
+              className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors hover:bg-[#EEF2FF]"
               title="Change password"
               style={{ color: "#9CA3AF" }}
             >

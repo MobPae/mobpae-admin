@@ -144,7 +144,7 @@ function DocCard({
             href={fileUrl ?? undefined}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-2 flex items-center gap-2 text-[11px] font-[500] text-[#6C4CFF] hover:underline"
+            className="mt-2 flex items-center gap-2 text-[11px] font-[500] text-[#315eff] hover:underline"
           >
             <ExternalLink size={11} />
             {isPdf ? "Open PDF" : "View file"}
@@ -364,7 +364,7 @@ export default function KycGroupedDrawer({ open, group, groupQueryKey, onClose }
           <div className="flex items-center gap-2">
             {!isLoading && (
               <div className="flex items-center gap-1.5 text-[11px] font-[500]">
-                {verifiedCount > 0 && <span className="text-[#6C4CFF]">{verifiedCount} verified</span>}
+                {verifiedCount > 0 && <span className="text-[#315eff]">{verifiedCount} verified</span>}
                 {pendingCount  > 0 && <span className="text-amber-600">{pendingCount} pending</span>}
                 {rejectedCount > 0 && <span className="text-red-500">{rejectedCount} rejected</span>}
               </div>

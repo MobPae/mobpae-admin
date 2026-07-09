@@ -10,35 +10,35 @@ input:-webkit-autofill:focus {
 }
 
 @theme inline {
-  --font-sans:    "Inter", ui-sans-serif, -apple-system, system-ui, sans-serif;
-  --font-display: "Inter", ui-sans-serif, -apple-system, system-ui, sans-serif;
-  --font-serif:   "Inter", ui-sans-serif, -apple-system, system-ui, sans-serif;
+  --font-sans:    "Tasa Orbiter Display", "TASA Orbiter Display Medium", sans-serif;
+  --font-display: "Tasa Orbiter Display", "TASA Orbiter Display Medium", sans-serif;
+  --font-serif:   "Tasa Orbiter Display", "TASA Orbiter Display Medium", sans-serif;
 
-  /* Remap Tailwind blue-* → MobPae brand palette */
-  --color-blue-50:  #F3F0FF;
-  --color-blue-100: #E9E5FF;
-  --color-blue-200: #D4CCFF;
-  --color-blue-300: #A89CFF;
-  --color-blue-400: #6C4CFF;
-  --color-blue-500: #5B34FF;
-  --color-blue-600: #4A24EE;
-  --color-blue-700: #3B18D4;
-  --color-blue-800: #2D12A8;
-  --color-blue-900: #1E0B7A;
-  --color-blue-950: #11064F;
+  /* Remap Tailwind blue-* → MobPae brand palette (Royal Blue #315eff) */
+  --color-blue-50:  #EEF2FF;
+  --color-blue-100: #E0E7FF;
+  --color-blue-200: #C7D2FE;
+  --color-blue-300: #A5B4FC;
+  --color-blue-400: #315EFF;
+  --color-blue-500: #2048EE;
+  --color-blue-600: #1A3CD4;
+  --color-blue-700: #152DB0;
+  --color-blue-800: #11238C;
+  --color-blue-900: #0C1A68;
+  --color-blue-950: #080F44;
 }
 
 /* ── MobPae Design System v3 ─────────────────────────────────── */
 :root {
   /* Brand */
-  --brand-primary:       #6C4CFF;
-  --brand-primary-dark:  #5B34FF;
-  --brand-primary-soft:  #F3F0FF;
+  --brand-primary:       #315eff;
+  --brand-primary-dark:  #2048EE;
+  --brand-primary-soft:  #EEF2FF;
 
   /* Legacy aliases */
-  --primary:        #6C4CFF;
-  --primary-dark:   #5B34FF;
-  --primary-light:  #F3F0FF;
+  --primary:        #315eff;
+  --primary-dark:   #2048EE;
+  --primary-light:  #EEF2FF;
 
   /* Surface */
   --background:     #F8F9FC;
@@ -51,7 +51,7 @@ input:-webkit-autofill:focus {
   --text-muted:     #9CA3AF;
   --text-disabled:  #D1D5DB;
   --text-on-brand:  #FFFFFF;
-  --text-link:      #5B34FF;
+  --text-link:      #315eff;
   --text-success:   #16A34A;
   --text-warning:   #D97706;
   --text-error:     #EF4444;
@@ -63,7 +63,7 @@ input:-webkit-autofill:focus {
 
   /* Card accents */
   --card-mint:      #DCFCE7;
-  --card-lavender:  #F3F0FF;
+  --card-lavender:  #EEF2FF;
   --card-warm:      #FEF3C7;
   --accent-coral:   #FCA5A5;
   --accent-aqua:    #6EE7B7;
@@ -75,7 +75,7 @@ body,
   margin: 0;
   width: 100%;
   height: 100%;
-  font-family: "Inter", ui-sans-serif, -apple-system, system-ui, sans-serif;
+  font-family: "Tasa Orbiter Display", "TASA Orbiter Display Medium", sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   font-variant-numeric: tabular-nums;
@@ -86,9 +86,9 @@ body {
   color: var(--text-primary);
 }
 
-.font-sans    { font-family: "Inter", ui-sans-serif, -apple-system, system-ui, sans-serif; }
-.font-display { font-family: "Inter", ui-sans-serif, -apple-system, system-ui, sans-serif; }
-.font-serif   { font-family: "Inter", ui-sans-serif, -apple-system, system-ui, sans-serif; }
+.font-sans    { font-family: "Tasa Orbiter Display", "TASA Orbiter Display Medium", sans-serif; }
+.font-display { font-family: "Tasa Orbiter Display", "TASA Orbiter Display Medium", sans-serif; }
+.font-serif   { font-family: "Tasa Orbiter Display", "TASA Orbiter Display Medium", sans-serif; }
 
 /* Admin portal focus ring */
 .admin-portal button:focus-visible,
@@ -96,7 +96,7 @@ body {
 .admin-portal input:focus-visible,
 .admin-portal select:focus-visible,
 .admin-portal textarea:focus-visible {
-  outline: 2px solid rgba(108, 76, 255, 0.4);
+  outline: 2px solid rgba(49, 94, 255, 0.4);
   outline-offset: 2px;
 }
 

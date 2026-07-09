@@ -8,7 +8,7 @@ import type { CreateEmployerPrefill } from "../components/employers/CreateEmploy
 import type { EmployerEnquiry, EmployerEnquiryStatus } from "../types/employer-enquiry";
 import { getEmployerEnquiries } from "../services/employerEnquiryService";
 
-const P = "#6C4CFF";
+const P = "#315eff";
 
 const STATUS_TABS: { label: string; value: "ALL" | EmployerEnquiryStatus }[] = [
   { label: "All",       value: "ALL"       },
@@ -64,7 +64,7 @@ export default function EmployerEnquiriesPage() {
 
   const kpis = [
     { icon: <Building2 size={18} color="#D97706" strokeWidth={1.75} />, iconBg: "#FEF3C7", label: "New Leads",  val: counts["NEW"]       },
-    { icon: <Phone size={18} color={P} strokeWidth={1.75} />,           iconBg: "#F3F0FF", label: "Contacted", val: counts["CONTACTED"]  },
+    { icon: <Phone size={18} color={P} strokeWidth={1.75} />,           iconBg: "#EEF2FF", label: "Contacted", val: counts["CONTACTED"]  },
     { icon: <CheckCircle size={18} color="#16A34A" strokeWidth={1.75}/>, iconBg: "#DCFCE7", label: "Onboarded", val: counts["ONBOARDED"]  },
     { icon: <XCircle size={18} color="#EF4444" strokeWidth={1.75} />,   iconBg: "#FEE2E2", label: "Rejected",  val: counts["REJECTED"]   },
   ];

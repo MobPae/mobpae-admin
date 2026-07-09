@@ -82,10 +82,10 @@ function ToastContainer({ toasts, onDismiss }: { toasts: Toast[]; onDismiss: (id
       {toasts.map(t => (
         <div
           key={t.id}
-          style={{ pointerEvents: "auto", display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", borderRadius: 14, boxShadow: "0 4px 20px rgba(0,0,0,0.12)", fontSize: 13, fontWeight: 500, border: "1px solid", minWidth: 260, background: t.kind === "success" ? "#F3F0FF" : "#FEF2F2", borderColor: t.kind === "success" ? "#C8C9FF" : "#FECACA", color: t.kind === "success" ? "#111827" : "#991B1B" }}
+          style={{ pointerEvents: "auto", display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", borderRadius: 14, boxShadow: "0 4px 20px rgba(0,0,0,0.12)", fontSize: 13, fontWeight: 500, border: "1px solid", minWidth: 260, background: t.kind === "success" ? "#EEF2FF" : "#FEF2F2", borderColor: t.kind === "success" ? "#C8C9FF" : "#FECACA", color: t.kind === "success" ? "#111827" : "#991B1B" }}
         >
           {t.kind === "success"
-            ? <CheckCircle2 size={15} color="#6C4CFF" style={{ flexShrink: 0 }} />
+            ? <CheckCircle2 size={15} color="#315eff" style={{ flexShrink: 0 }} />
             : <AlertTriangle size={15} color="#EF4444" style={{ flexShrink: 0 }} />
           }
           <span style={{ flex: 1 }}>{t.message}</span>
@@ -106,7 +106,7 @@ function StatCard({ label, value, icon, iconBg, iconColor, highlight }: {
 }) {
   if (highlight) {
     return (
-      <div style={{ background: "linear-gradient(135deg, #5B34FF 0%, #6C4CFF 100%)", borderRadius: 16, padding: "14px 16px", border: "1px solid #5B34FF", boxShadow: "0 4px 20px rgba(108,76,255,0.25)", display: "flex", alignItems: "center", gap: 14 }}>
+      <div style={{ background: "linear-gradient(135deg, #2048EE 0%, #315eff 100%)", borderRadius: 16, padding: "14px 16px", border: "1px solid #2048EE", boxShadow: "0 4px 20px rgba(49,94,255,0.25)", display: "flex", alignItems: "center", gap: 14 }}>
         <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "white" }}>{icon}</div>
         <div>
           <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1, color: "white" }}>{value}</div>
@@ -150,9 +150,9 @@ function Timeline({ s }: { s: EmployerSettlement }) {
       {steps.map((step, i) => (
         <div key={step.label} style={{ display: "flex", gap: 12 }}>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-            <div style={{ width: 20, height: 20, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, border: `2px solid ${step.done ? "#6C4CFF" : "#E5E7EB"}`, background: step.done ? "#F3F0FF" : "white" }}>
+            <div style={{ width: 20, height: 20, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, border: `2px solid ${step.done ? "#315eff" : "#E5E7EB"}`, background: step.done ? "#EEF2FF" : "white" }}>
               {step.done
-                ? <CheckCircle2 size={11} color="#6C4CFF" />
+                ? <CheckCircle2 size={11} color="#315eff" />
                 : <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#D1D5DB" }} />}
             </div>
             {i < steps.length - 1 && <div style={{ width: 1, flex: 1, margin: "4px 0", background: step.done ? "#C8C9FF" : "#F3F4F6", minHeight: 18 }} />}
@@ -286,7 +286,7 @@ export default function SettlementsPage() {
         <StatCard label="Outstanding"  value={formatCurrency(totalOutstanding)} icon={<CircleDollarSign size={18} strokeWidth={1.75} />} iconBg="rgba(255,255,255,0.15)" iconColor="white"     highlight />
         <StatCard label="Pending"      value={counts["PENDING"] ?? 0}           icon={<Clock3 size={18} strokeWidth={1.75} />}           iconBg="#FEF3C7"              iconColor="#D97706" />
         <StatCard label="Overdue"      value={counts["OVERDUE"] ?? 0}           icon={<AlertTriangle size={18} strokeWidth={1.75} />}    iconBg="#FEE2E2"              iconColor="#EF4444" />
-        <StatCard label="Paid"         value={counts["PAID"] ?? 0}              icon={<CheckCircle2 size={18} strokeWidth={1.75} />}     iconBg="#F3F0FF"              iconColor="#6C4CFF" />
+        <StatCard label="Paid"         value={counts["PAID"] ?? 0}              icon={<CheckCircle2 size={18} strokeWidth={1.75} />}     iconBg="#EEF2FF"              iconColor="#315eff" />
       </div>
 
       {/* Search + filter */}
@@ -364,7 +364,7 @@ export default function SettlementsPage() {
                 {rows.map(s => (
                   <tr
                     key={s.id}
-                    style={{ borderBottom: "1px solid #F9FAFB", background: selected?.id === s.id ? "#F3F0FF" : "transparent" }}
+                    style={{ borderBottom: "1px solid #F9FAFB", background: selected?.id === s.id ? "#EEF2FF" : "transparent" }}
                   >
                     <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
                       <div>
@@ -374,7 +374,7 @@ export default function SettlementsPage() {
                     </td>
                     <td style={{ padding: "16px 20px", verticalAlign: "middle", fontWeight: 500, color: "#6B7280", whiteSpace: "nowrap" }}>{formatPayrollMonth(s.payrollMonth)}</td>
                     <td style={{ padding: "16px 20px", verticalAlign: "middle", fontWeight: 600, color: "#111827", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>{formatCurrency(s.totalAmount)}</td>
-                    <td style={{ padding: "16px 20px", verticalAlign: "middle", fontWeight: 600, whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums", color: parseFloat(s.outstandingAmount) > 0 ? "#DC2626" : "#6C4CFF" }}>
+                    <td style={{ padding: "16px 20px", verticalAlign: "middle", fontWeight: 600, whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums", color: parseFloat(s.outstandingAmount) > 0 ? "#DC2626" : "#315eff" }}>
                       {parseFloat(s.outstandingAmount) > 0 ? formatCurrency(s.outstandingAmount) : "No dues"}
                     </td>
                     <td style={{ padding: "16px 20px", verticalAlign: "middle", color: "#6B7280", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>
@@ -405,7 +405,7 @@ export default function SettlementsPage() {
                           style={{ height: 28, width: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid #E5E7EB", background: "white", color: "#6B7280", cursor: "pointer", opacity: sending === s.id ? 0.5 : 1 }}
                         >
                           {sending === s.id
-                            ? <span style={{ width: 12, height: 12, border: "2px solid rgba(108,76,255,0.3)", borderTopColor: "#6C4CFF", borderRadius: "50%" }} className="animate-spin" />
+                            ? <span style={{ width: 12, height: 12, border: "2px solid rgba(49,94,255,0.3)", borderTopColor: "#315eff", borderRadius: "50%" }} className="animate-spin" />
                             : <Send size={13} />
                           }
                         </button>
@@ -416,10 +416,10 @@ export default function SettlementsPage() {
                             title="Mark as Paid"
                             disabled={marking === s.id}
                             onClick={e => { e.stopPropagation(); void handleMarkPaid(s); }}
-                            style={{ height: 28, padding: "0 10px", display: "flex", alignItems: "center", gap: 4, borderRadius: 8, border: "1px solid #C8C9FF", background: "#F3F0FF", color: "#5B34FF", cursor: "pointer", fontSize: 11, fontWeight: 600, fontFamily: "inherit", whiteSpace: "nowrap", opacity: marking === s.id ? 0.5 : 1 }}
+                            style={{ height: 28, padding: "0 10px", display: "flex", alignItems: "center", gap: 4, borderRadius: 8, border: "1px solid #C8C9FF", background: "#EEF2FF", color: "#2048EE", cursor: "pointer", fontSize: 11, fontWeight: 600, fontFamily: "inherit", whiteSpace: "nowrap", opacity: marking === s.id ? 0.5 : 1 }}
                           >
                             {marking === s.id
-                              ? <span style={{ width: 12, height: 12, border: "2px solid rgba(108,76,255,0.3)", borderTopColor: "#6C4CFF", borderRadius: "50%" }} className="animate-spin" />
+                              ? <span style={{ width: 12, height: 12, border: "2px solid rgba(49,94,255,0.3)", borderTopColor: "#315eff", borderRadius: "50%" }} className="animate-spin" />
                               : <CheckCircle2 size={11} />
                             }
                             {marking === s.id ? "" : "Mark Paid"}
@@ -593,10 +593,10 @@ export default function SettlementsPage() {
               <button
                 onClick={() => handleSendReport(selected)}
                 disabled={sending === selected.id}
-                style={{ width: "100%", height: 40, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, borderRadius: 10, border: "1px solid #6C4CFF", color: "#6C4CFF", fontSize: 13, fontWeight: 600, background: "white", cursor: sending === selected.id ? "not-allowed" : "pointer", opacity: sending === selected.id ? 0.5 : 1, fontFamily: "inherit" }}
+                style={{ width: "100%", height: 40, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, borderRadius: 10, border: "1px solid #315eff", color: "#315eff", fontSize: 13, fontWeight: 600, background: "white", cursor: sending === selected.id ? "not-allowed" : "pointer", opacity: sending === selected.id ? 0.5 : 1, fontFamily: "inherit" }}
               >
                 {sending === selected.id
-                  ? <span style={{ width: 16, height: 16, border: "2px solid rgba(108,76,255,0.3)", borderTopColor: "#6C4CFF", borderRadius: "50%" }} className="animate-spin" />
+                  ? <span style={{ width: 16, height: 16, border: "2px solid rgba(49,94,255,0.3)", borderTopColor: "#315eff", borderRadius: "50%" }} className="animate-spin" />
                   : <Send size={15} />
                 }
                 {sending === selected.id ? "Sending…" : "Send Report"}
@@ -608,7 +608,7 @@ export default function SettlementsPage() {
                   <button
                     onClick={() => handleMarkPaid(selected)}
                     disabled={marking === selected.id}
-                    style={{ width: "100%", height: 40, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, borderRadius: 10, background: "#6C4CFF", color: "white", fontSize: 13, fontWeight: 600, border: "none", cursor: marking === selected.id ? "not-allowed" : "pointer", opacity: marking === selected.id ? 0.5 : 1, fontFamily: "inherit" }}
+                    style={{ width: "100%", height: 40, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, borderRadius: 10, background: "#315eff", color: "white", fontSize: 13, fontWeight: 600, border: "none", cursor: marking === selected.id ? "not-allowed" : "pointer", opacity: marking === selected.id ? 0.5 : 1, fontFamily: "inherit" }}
                   >
                     <CheckCircle2 size={15} />
                     {marking === selected.id ? "Processing…" : "Mark as Paid"}

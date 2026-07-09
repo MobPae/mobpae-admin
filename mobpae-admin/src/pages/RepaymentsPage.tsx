@@ -52,7 +52,7 @@ export default function RepaymentsPage() {
   });
 
   const kpis = [
-    { icon: <RefreshCw size={18} color="#6C4CFF" strokeWidth={1.75} />,       iconBg: "#F3F0FF", label: "Scheduled", val: scheduled },
+    { icon: <RefreshCw size={18} color="#315eff" strokeWidth={1.75} />,       iconBg: "#EEF2FF", label: "Scheduled", val: scheduled },
     { icon: <CheckCircle size={18} color="#16A34A" strokeWidth={1.75} />,     iconBg: "#DCFCE7", label: "Paid",      val: paid      },
     { icon: <AlertTriangle size={18} color="#EF4444" strokeWidth={1.75} />,   iconBg: "#FEE2E2", label: "Overdue",   val: overdue   },
     { icon: <DollarSign size={18} color="#D97706" strokeWidth={1.75} />,      iconBg: "#FEF3C7", label: "Total",     val: total     },

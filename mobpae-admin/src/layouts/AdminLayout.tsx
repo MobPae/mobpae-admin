@@ -78,7 +78,7 @@ export default function AdminLayout() {
               <div
                 className="w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-[700] flex-shrink-0"
                 style={{
-                  background: "linear-gradient(135deg, #8B7CFF 0%, #6C4CFF 100%)",
+                  background: "linear-gradient(135deg, #8B7CFF 0%, #315eff 100%)",
                   color: "white",
                 }}
               >

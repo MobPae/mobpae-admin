@@ -121,7 +121,7 @@ export default function KycDrawer({ open, document, onClose, onCompleted }: Prop
                   href={fileUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[11px] font-[500] text-[#6C4CFF] hover:underline flex items-center gap-1"
+                  className="text-[11px] font-[500] text-[#315eff] hover:underline flex items-center gap-1"
                 >
                   <ExternalLink size={11} />
                   {/\.pdf$/i.test(document.filePath) ? "Open PDF" : "View document"}

@@ -319,7 +319,7 @@ export default function AuditLogsPage() {
                     <button
                       key={p}
                       onClick={() => setPage(p)}
-                      style={{ width: 28, height: 28, fontSize: 12, borderRadius: 8, border: active ? "1px solid #6C4CFF" : "1px solid #E5E7EB", background: active ? "#F3F0FF" : "white", color: active ? "#6C4CFF" : "#6B7280", fontWeight: active ? 600 : 400, cursor: "pointer", fontFamily: "inherit" }}
+                      style={{ width: 28, height: 28, fontSize: 12, borderRadius: 8, border: active ? "1px solid #315eff" : "1px solid #E5E7EB", background: active ? "#EEF2FF" : "white", color: active ? "#315eff" : "#6B7280", fontWeight: active ? 600 : 400, cursor: "pointer", fontFamily: "inherit" }}
                     >
                       {p}
                     </button>

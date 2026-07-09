@@ -3,8 +3,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { resetPassword } from "../services/authService";
 
-const B  = "#6C4CFF";
-const BD = "#5B34FF";
+const B  = "#315eff";
+const BD = "#2048EE";
 const CREAM = "#f8fafc";
 
 export default function ResetPasswordPage() {
@@ -70,8 +70,8 @@ export default function ResetPasswordPage() {
 
         {done ? (
           <div>
-            <div style={{ width: 48, height: 48, borderRadius: 12, background: "#F3F0FF", border: "1px solid #C8C9FF", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6C4CFF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <div style={{ width: 48, height: 48, borderRadius: 12, background: "#EEF2FF", border: "1px solid #C8C9FF", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#315eff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
             <h2 style={{ fontSize: 26, fontWeight: 800, color: "#111", letterSpacing: "-0.025em", margin: "0 0 10px" }}>Password reset</h2>
             <p style={{ fontSize: 14, color: "#9CA3AF", lineHeight: 1.6, marginBottom: 28 }}>
@@ -84,7 +84,7 @@ export default function ResetPasswordPage() {
                 background: `linear-gradient(135deg, ${BD} 0%, ${B} 100%)`,
                 color: "white", borderRadius: 10, border: "none",
                 fontSize: 14, fontWeight: 700, cursor: "pointer",
-                boxShadow: "0 4px 16px rgba(108,76,255,0.30)",
+                boxShadow: "0 4px 16px rgba(49,94,255,0.30)",
               }}
             >
               Sign in
@@ -149,7 +149,7 @@ export default function ResetPasswordPage() {
                   fontSize: 14, fontWeight: 700,
                   display: "flex", alignItems: "center", justifyContent: "center",
                   cursor: loading ? "not-allowed" : "pointer",
-                  boxShadow: loading ? "none" : "0 4px 16px rgba(108,76,255,0.30)",
+                  boxShadow: loading ? "none" : "0 4px 16px rgba(49,94,255,0.30)",
                   transition: "all 0.15s",
                 }}
               >

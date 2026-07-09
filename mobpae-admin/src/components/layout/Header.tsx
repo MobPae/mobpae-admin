@@ -38,7 +38,7 @@ export default function Header() {
               border-[#E5E7EB]
               rounded-xl
               outline-none
-              focus:border-[#6C4CFF]
+              focus:border-[#315eff]
             "
           />
         </div>
@@ -53,7 +53,7 @@ export default function Header() {
               w-10
               h-10
               rounded-full
-              bg-[#6C4CFF]
+              bg-[#315eff]
               text-white
               flex
               items-center

@@ -11,7 +11,7 @@ import {
 
 // ── constants ─────────────────────────────────────────────────────────────────
 
-const P  = "#6C4CFF";
+const P  = "#315eff";
 const T1 = "#111827";
 const T2 = "#6B7280";
 const T3 = "#9CA3AF";
@@ -246,7 +246,7 @@ function InfoCard({
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <p style={{ fontSize: 14, fontWeight: 700, color: T1, margin: 0 }}>{meta.label}</p>
             {entry?.version && (
-              <span style={{ fontSize: 11, fontWeight: 600, color: P, background: "#F3F0FF", padding: "1px 7px", borderRadius: 999 }}>
+              <span style={{ fontSize: 11, fontWeight: 600, color: P, background: "#EEF2FF", padding: "1px 7px", borderRadius: 999 }}>
                 v{entry.version}
               </span>
             )}
@@ -285,7 +285,7 @@ function InfoCard({
             onClick={onEdit}
             style={{
               height: 30, padding: "0 12px", borderRadius: 8,
-              border: "none", background: exists ? "#F3F0FF" : P,
+              border: "none", background: exists ? "#EEF2FF" : P,
               color: exists ? P : "white",
               fontSize: 12, fontWeight: 600, cursor: "pointer",
               fontFamily: "inherit", display: "flex", alignItems: "center", gap: 5,

@@ -137,7 +137,7 @@ export default function RepaymentDrawer({ open, repayment, onClose, onMutated }:
             <button
               onClick={() => setConfirmOpen(true)}
               disabled={markPaidMutation.isPending}
-              className="w-full h-8 rounded-md bg-[#6C4CFF] hover:bg-[#5B34FF] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
+              className="w-full h-8 rounded-md bg-[#315eff] hover:bg-[#2048EE] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
             >
               {markPaidMutation.isPending
                 ? <Loader2 size={12} className="animate-spin" />
@@ -153,7 +153,7 @@ export default function RepaymentDrawer({ open, repayment, onClose, onMutated }:
         title="Mark repayment as paid"
         description={`This will record ${fmt(repayment.totalAmount)} from ${repayment.loanApplication.employee.name} as received. This cannot be undone.`}
         confirmLabel="Mark Paid"
-        confirmClass="bg-[#6C4CFF] hover:bg-[#5B34FF] text-white"
+        confirmClass="bg-[#315eff] hover:bg-[#2048EE] text-white"
         loading={markPaidMutation.isPending}
         onConfirm={() => { setConfirmOpen(false); markPaidMutation.mutate(); }}
         onCancel={() => setConfirmOpen(false)}

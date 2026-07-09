@@ -235,14 +235,14 @@ export default function DashboardPage() {
     {
       label: "Disbursed Today",
       value: fmt(d.disbursedAmount),
-      iconBg: "#F3F0FF",
+      iconBg: "#EEF2FF",
       icon: (
         <svg
           width="18"
           height="18"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="#6C4CFF"
+          stroke="#315eff"
           strokeWidth="2"
           strokeLinecap="round"
         >
@@ -326,7 +326,7 @@ export default function DashboardPage() {
       sub: "Pending verification",
       count: d.pendingKycDocuments,
       to: "/kyc",
-      color: "#6C4CFF",
+      color: "#315eff",
     },
     {
       label: "Loan Applications",
@@ -347,7 +347,7 @@ export default function DashboardPage() {
       sub: "Awaiting activation",
       count: d.pendingEmployers,
       to: "/employers",
-      color: "#6C4CFF",
+      color: "#315eff",
     },
   ];
 
@@ -549,12 +549,12 @@ export default function DashboardPage() {
                 style={{
                   width: "100%",
                   height: 36,
-                  background: "#F3F0FF",
+                  background: "#EEF2FF",
                   border: "none",
                   borderRadius: 10,
                   fontSize: 13,
                   fontWeight: 600,
-                  color: "#6C4CFF",
+                  color: "#315eff",
                   cursor: "pointer",
                   fontFamily: "inherit",
                 }}
@@ -624,7 +624,7 @@ export default function DashboardPage() {
                   style={{
                     marginTop: 8,
                     height: 36,
-                    background: "#F3F0FF",
+                    background: "#EEF2FF",
                     borderRadius: 8,
                     position: "relative",
                     overflow: "hidden",
@@ -638,7 +638,7 @@ export default function DashboardPage() {
                     <polyline
                       points="0,28 40,22 80,30 120,14 160,18 200,8"
                       fill="none"
-                      stroke="#6C4CFF"
+                      stroke="#315eff"
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -765,13 +765,13 @@ export default function DashboardPage() {
                     padding: "8px 16px",
                     fontSize: 13,
                     fontWeight: srTab === tab.key ? 600 : 400,
-                    color: srTab === tab.key ? "#6C4CFF" : "#9CA3AF",
+                    color: srTab === tab.key ? "#315eff" : "#9CA3AF",
                     background: "none",
                     border: "none",
                     cursor: "pointer",
                     borderBottom:
                       srTab === tab.key
-                        ? "2px solid #6C4CFF"
+                        ? "2px solid #315eff"
                         : "2px solid transparent",
                     fontFamily: "inherit",
                     transition: "all 0.15s",
@@ -783,7 +783,7 @@ export default function DashboardPage() {
                       style={{
                         marginLeft: 6,
                         fontSize: 11,
-                        background: srTab === tab.key ? "#6C4CFF" : "#F3F4F6",
+                        background: srTab === tab.key ? "#315eff" : "#F3F4F6",
                         color: srTab === tab.key ? "white" : "#9CA3AF",
                         borderRadius: 999,
                         padding: "1px 6px",
@@ -893,7 +893,7 @@ export default function DashboardPage() {
                                 height: 32,
                                 borderRadius: "50%",
                                 background:
-                                  "linear-gradient(135deg, #8B7CFF, #6C4CFF)",
+                                  "linear-gradient(135deg, #8B7CFF, #315eff)",
                                 color: "white",
                                 display: "flex",
                                 alignItems: "center",
@@ -935,7 +935,7 @@ export default function DashboardPage() {
                             color: "#6B7280",
                           }}
                         >
-                          {req.employee.employer.companyName}
+                          {req.employer?.companyName ?? "—"}
                         </td>
                         <td
                           style={{
@@ -991,7 +991,7 @@ export default function DashboardPage() {
                               padding: "0 14px",
                               background:
                                 req.status === "SUBMITTED"
-                                  ? "#6C4CFF"
+                                  ? "#315eff"
                                   : "#F3F4F6",
                               color:
                                 req.status === "SUBMITTED"
@@ -1021,7 +1021,7 @@ export default function DashboardPage() {
               onClick={() => void navigate("/loan-applications")}
               style={{
                 fontSize: 13,
-                color: "#6C4CFF",
+                color: "#315eff",
                 fontWeight: 600,
                 background: "none",
                 border: "none",
@@ -1062,7 +1062,7 @@ export default function DashboardPage() {
                 onClick={() => void navigate("/audit-logs")}
                 style={{
                   fontSize: 12,
-                  color: "#6C4CFF",
+                  color: "#315eff",
                   fontWeight: 600,
                   background: "none",
                   border: "none",
@@ -1105,7 +1105,7 @@ export default function DashboardPage() {
                         width: 8,
                         height: 8,
                         borderRadius: "50%",
-                        background: "#6C4CFF",
+                        background: "#315eff",
                         marginTop: 4,
                         flexShrink: 0,
                       }}
@@ -1121,7 +1121,7 @@ export default function DashboardPage() {
                       >
                         {log.action}
                         {log.entityType && (
-                          <span style={{ color: "#6C4CFF" }}>
+                          <span style={{ color: "#315eff" }}>
                             {" "}
                             · {log.entityType}
                           </span>
@@ -1165,7 +1165,7 @@ export default function DashboardPage() {
                 onClick={() => void navigate("/employers")}
                 style={{
                   fontSize: 12,
-                  color: "#6C4CFF",
+                  color: "#315eff",
                   fontWeight: 600,
                   background: "none",
                   border: "none",
@@ -1266,8 +1266,8 @@ export default function DashboardPage() {
                           width: 30,
                           height: 30,
                           borderRadius: 8,
-                          background: "#F3F0FF",
-                          color: "#6C4CFF",
+                          background: "#EEF2FF",
+                          color: "#315eff",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",

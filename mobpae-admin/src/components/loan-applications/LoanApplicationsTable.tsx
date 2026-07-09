@@ -8,15 +8,15 @@ interface Props {
 }
 
 const AVATAR_COLORS: Record<string, string> = {
-  A: "#EF4444", B: "#EC4899", C: "#A855F7", D: "#6C4CFF",
+  A: "#EF4444", B: "#EC4899", C: "#A855F7", D: "#315eff",
   E: "#6366F1", F: "#3B82F6", G: "#0EA5E9", H: "#06B6D4",
   I: "#10B981", J: "#22C55E", K: "#84CC16", L: "#EAB308",
-  M: "#F59E0B", N: "#F97316", O: "#EF4444", P: "#6C4CFF",
+  M: "#F59E0B", N: "#F97316", O: "#EF4444", P: "#315eff",
   Q: "#8B5CF6", R: "#D946EF", S: "#EC4899", T: "#F43F5E",
-  U: "#6C4CFF", V: "#6366F1", W: "#3B82F6", X: "#0EA5E9",
+  U: "#315eff", V: "#6366F1", W: "#3B82F6", X: "#0EA5E9",
   Y: "#14B8A6", Z: "#10B981",
 };
-const avatarColor = (n: string) => AVATAR_COLORS[n.charAt(0).toUpperCase()] ?? "#6C4CFF";
+const avatarColor = (n: string) => AVATAR_COLORS[n.charAt(0).toUpperCase()] ?? "#315eff";
 
 const STATUS_CFG: Record<LoanApplicationStatus, { label: string; color: string; bg: string }> = {
   SUBMITTED:                   { label: "Submitted",          color: "#D97706", bg: "#FEF3C7" },
@@ -63,7 +63,7 @@ export default function LoanApplicationsTable({ applications, selectedId, onSele
             const isSelected = selectedId === app.id;
             const s = STATUS_CFG[app.status] ?? { label: app.status, color: "#6B7280", bg: "#F3F4F6" };
             const ac = avatarColor(app.employee.name);
-            const rowBg = isSelected ? "#F3F0FF" : hovered === app.id ? "#FAFAFC" : "transparent";
+            const rowBg = isSelected ? "#EEF2FF" : hovered === app.id ? "#FAFAFC" : "transparent";
 
             return (
               <tr
@@ -88,8 +88,8 @@ export default function LoanApplicationsTable({ applications, selectedId, onSele
 
                 {/* Company */}
                 <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
-                  <p style={{ fontSize: 13.5, fontWeight: 500, color: "#374151", margin: 0 }}>{app.employee.employer.companyName}</p>
-                  <p style={{ fontSize: 11.5, color: "#9CA3AF", margin: "2px 0 0", fontFamily: "ui-monospace, monospace" }}>{app.employee.employer.companyCode}</p>
+                  <p style={{ fontSize: 13.5, fontWeight: 500, color: "#374151", margin: 0 }}>{app.employer?.companyName ?? "—"}</p>
+                  <p style={{ fontSize: 11.5, color: "#9CA3AF", margin: "2px 0 0", fontFamily: "ui-monospace, monospace" }}>{app.employer?.companyCode ?? "—"}</p>
                 </td>
 
                 {/* Requested */}
@@ -120,7 +120,7 @@ export default function LoanApplicationsTable({ applications, selectedId, onSele
                 <td style={{ padding: "16px 20px", verticalAlign: "middle", textAlign: "right" }}>
                   <button
                     onClick={(e) => { e.stopPropagation(); onSelect(app); }}
-                    style={{ height: 30, padding: "0 14px", background: isSelected ? "#6C4CFF" : "#F3F0FF", color: isSelected ? "white" : "#6C4CFF", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
+                    style={{ height: 30, padding: "0 14px", background: isSelected ? "#315eff" : "#EEF2FF", color: isSelected ? "white" : "#315eff", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
                   >
                     {isSelected ? "Close" : "Review"}
                   </button>

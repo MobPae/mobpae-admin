@@ -57,7 +57,7 @@ export default function LoanApplicationsPage() {
     const matchSearch = !q ||
       a.employee.name.toLowerCase().includes(q) ||
       a.employee.employeeCode.toLowerCase().includes(q) ||
-      a.employee.employer.companyName.toLowerCase().includes(q) ||
+      (a.employer?.companyName ?? "").toLowerCase().includes(q) ||
       a.applicationNumber.toLowerCase().includes(q);
     const matchStatus =
       statusFilter === "ALL"          ? true :
@@ -73,11 +73,11 @@ export default function LoanApplicationsPage() {
   const safePage   = Math.min(page, totalPages);
   const paginated  = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
-  const P = "#6C4CFF";
+  const P = "#315eff";
   const total = applications.length;
 
   const kpis = [
-    { label: "Total",        value: total,                                                                    icon: <FileText size={18} color={P} strokeWidth={1.75} />,         iconBg: "#F3F0FF" },
+    { label: "Total",        value: total,                                                                    icon: <FileText size={18} color={P} strokeWidth={1.75} />,         iconBg: "#EEF2FF" },
     { label: "Needs Action", value: needsActionCount,                                                         icon: <Zap size={18} color="#D97706" strokeWidth={1.75} />,         iconBg: "#FEF3C7" },
     { label: "Disbursed",    value: (counts["DISBURSED"] ?? 0) + (counts["REPAYMENT_SCHEDULED"] ?? 0),        icon: <CheckCircle size={18} color="#16A34A" strokeWidth={1.75} />, iconBg: "#DCFCE7" },
     { label: "Repaid",       value: counts["REPAID"] ?? 0,                                                    icon: <RefreshCw size={18} color="#2563EB" strokeWidth={1.75} />,   iconBg: "#DBEAFE" },

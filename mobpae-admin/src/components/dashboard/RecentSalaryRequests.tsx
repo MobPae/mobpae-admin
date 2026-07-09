@@ -86,7 +86,7 @@ export default function RecentSalaryRequests() {
           </p>
         </div>
 
-        <button className="text-xs font-medium text-[#6C4CFF] hover:text-[#5B34FF] flex items-center gap-1">
+        <button className="text-xs font-medium text-[#315eff] hover:text-[#2048EE] flex items-center gap-1">
           View All
           <ArrowRight size={12} />
         </button>

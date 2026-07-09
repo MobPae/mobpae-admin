@@ -8,15 +8,15 @@ interface Props {
 }
 
 const AVATAR_COLORS: Record<string, string> = {
-  A: "#EF4444", B: "#EC4899", C: "#A855F7", D: "#6C4CFF",
+  A: "#EF4444", B: "#EC4899", C: "#A855F7", D: "#315eff",
   E: "#6366F1", F: "#3B82F6", G: "#0EA5E9", H: "#06B6D4",
   I: "#10B981", J: "#22C55E", K: "#84CC16", L: "#EAB308",
-  M: "#F59E0B", N: "#F97316", O: "#EF4444", P: "#6C4CFF",
+  M: "#F59E0B", N: "#F97316", O: "#EF4444", P: "#315eff",
   Q: "#8B5CF6", R: "#D946EF", S: "#EC4899", T: "#F43F5E",
-  U: "#6C4CFF", V: "#6366F1", W: "#3B82F6", X: "#0EA5E9",
+  U: "#315eff", V: "#6366F1", W: "#3B82F6", X: "#0EA5E9",
   Y: "#14B8A6", Z: "#10B981",
 };
-const avatarColor = (n: string) => AVATAR_COLORS[n.charAt(0).toUpperCase()] ?? "#6C4CFF";
+const avatarColor = (n: string) => AVATAR_COLORS[n.charAt(0).toUpperCase()] ?? "#315eff";
 
 const STATUS_CONFIG: Record<EmployerEnquiryStatus, { label: string; color: string; bg: string }> = {
   NEW:       { label: "New",       color: "#D97706", bg: "#FEF3C7" },
@@ -61,7 +61,7 @@ export default function EmployerEnquiriesTable({ enquiries, selectedId, onSelect
             const ac = avatarColor(enq.companyName);
 
             let rowBg = "transparent";
-            if (isSelected) rowBg = "#F3F0FF";
+            if (isSelected) rowBg = "#EEF2FF";
             else if (isHovered) rowBg = "#FAFAFC";
 
             return (

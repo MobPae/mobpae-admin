@@ -13,7 +13,7 @@ export default function EmployerFilters() {
           <input
             type="text"
             placeholder="Search employer..."
-            className="w-full border border-[#E5E7EB] rounded-xl pl-11 pr-4 py-3 outline-none focus:border-[#6C4CFF]"
+            className="w-full border border-[#E5E7EB] rounded-xl pl-11 pr-4 py-3 outline-none focus:border-[#315eff]"
           />
         </div>
 

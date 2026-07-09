@@ -45,8 +45,8 @@ export default function EmployerManagementCard({
               h-12
               rounded-xl
               bg-gradient-to-br
-              from-[#6C4CFF]
-              to-[#5B34FF]
+              from-[#315eff]
+              to-[#2048EE]
               text-white
               flex
               items-center
@@ -115,7 +115,7 @@ export default function EmployerManagementCard({
             border
             border-[#E5E7EB]
             rounded-xl
-            text-[#6C4CFF]
+            text-[#315eff]
             text-xs
             hover:bg-[#F8F9FC]
           "

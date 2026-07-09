@@ -4,8 +4,8 @@ import { ArrowLeft, Eye, EyeOff, Lock, Shield, ShieldCheck } from "lucide-react"
 import { changePassword, logout } from "../services/authService";
 import { getApiErrorMessage } from "../utils/api-errors";
 
-const P  = "#6C4CFF";
-const PL = "#F3F0FF";
+const P  = "#315eff";
+const PL = "#EEF2FF";
 
 function getStrength(pwd: string): number {
   let s = 0;
@@ -168,13 +168,13 @@ export default function ChangePasswordPage() {
                   width: "100%", height: 48,
                   background: (loading || !current || !next || !confirm)
                     ? "#E5E7EB"
-                    : `linear-gradient(135deg, #5B34FF 0%, ${P} 100%)`,
+                    : `linear-gradient(135deg, #2048EE 0%, ${P} 100%)`,
                   color: (loading || !current || !next || !confirm) ? "#9CA3AF" : "white",
                   borderRadius: 12, border: "none",
                   fontSize: 14, fontWeight: 600,
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
                   cursor: (loading || !current || !next || !confirm) ? "not-allowed" : "pointer",
-                  boxShadow: (loading || !current || !next || !confirm) ? "none" : "0 4px 20px rgba(108,76,255,0.28)",
+                  boxShadow: (loading || !current || !next || !confirm) ? "none" : "0 4px 20px rgba(49,94,255,0.28)",
                   transition: "all 0.15s",
                   fontFamily: "inherit",
                   marginTop: 4,
@@ -190,7 +190,7 @@ export default function ChangePasswordPage() {
 
               {/* Security note */}
               <div style={{ display: "flex", alignItems: "center", gap: 10, paddingTop: 12, borderTop: "1px solid #F3F4F6" }}>
-                <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#F3F0FF", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#EEF2FF", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                   <Shield size={14} style={{ color: P }} />
                 </div>
                 <p style={{ fontSize: 12, color: "#9CA3AF", lineHeight: 1.5 }}>
@@ -216,7 +216,7 @@ function Field({
   placeholder: string;
   autoComplete: string;
 }) {
-  const P = "#6C4CFF";
+  const P = "#315eff";
   return (
     <div>
       <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#374151", marginBottom: 6 }}>{label}</label>
@@ -239,7 +239,7 @@ function Field({
           onFocus={e  => {
             const wrapper = e.target.closest("div") as HTMLElement;
             wrapper.style.borderColor = P;
-            wrapper.style.boxShadow = "0 0 0 4px rgba(108,76,255,0.10)";
+            wrapper.style.boxShadow = "0 0 0 4px rgba(49,94,255,0.10)";
           }}
           onBlur={e   => {
             const wrapper = e.target.closest("div") as HTMLElement;

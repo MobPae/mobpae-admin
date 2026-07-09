@@ -23,8 +23,8 @@ const JOBS: JobDef[] = [
     schedule: "0 2 * * *",
     scheduleHuman: "Daily at 2:00 AM",
     icon: <Shield size={15} />,
-    color: "text-[#6C4CFF]",
-    bg: "bg-[#F3F0FF]",
+    color: "text-[#315eff]",
+    bg: "bg-[#EEF2FF]",
   },
   {
     id: "token-rotation",
@@ -33,8 +33,8 @@ const JOBS: JobDef[] = [
     schedule: "Per-request",
     scheduleHuman: "On every auth refresh",
     icon: <RefreshCcw size={15} />,
-    color: "text-[#6C4CFF]",
-    bg: "bg-[#F3F0FF]",
+    color: "text-[#315eff]",
+    bg: "bg-[#EEF2FF]",
   },
   {
     id: "password-reset-expiry",
@@ -77,13 +77,13 @@ export default function JobsPage() {
         </div>
         <div className={`flex items-center gap-1.5 h-6 px-2.5 rounded-md border ${
           healthLoading ? "bg-[#F8F9FC] border-[#E5E7EB]" :
-          systemOk      ? "bg-[#F3F0FF] border-[#F3F0FF]" : "bg-red-50 border-red-100"
+          systemOk      ? "bg-[#EEF2FF] border-[#EEF2FF]" : "bg-red-50 border-red-100"
         }`}>
           <span className={`w-1.5 h-1.5 rounded-full ${
-            healthLoading ? "bg-[#D1D5DB]" : systemOk ? "bg-[#6C4CFF]" : "bg-red-500"
+            healthLoading ? "bg-[#D1D5DB]" : systemOk ? "bg-[#315eff]" : "bg-red-500"
           }`} />
           <span className={`text-[11px] font-[500] ${
-            healthLoading ? "text-[#6B7280]" : systemOk ? "text-[#5B34FF]" : "text-red-700"
+            healthLoading ? "text-[#6B7280]" : systemOk ? "text-[#2048EE]" : "text-red-700"
           }`}>
             {healthLoading ? "Checking…" : systemOk ? "System healthy" : "System degraded"}
           </span>
@@ -91,9 +91,9 @@ export default function JobsPage() {
       </div>
 
       {/* Info banner */}
-      <div className="bg-[#F3F0FF] border border-[#E5E7EB] rounded-xl px-4 py-3 flex items-start gap-3">
-        <Zap size={14} className="text-[#6C4CFF] mt-0.5 flex-shrink-0" />
-        <p className="text-[12px] text-[#5B34FF] leading-relaxed">
+      <div className="bg-[#EEF2FF] border border-[#E5E7EB] rounded-xl px-4 py-3 flex items-start gap-3">
+        <Zap size={14} className="text-[#315eff] mt-0.5 flex-shrink-0" />
+        <p className="text-[12px] text-[#2048EE] leading-relaxed">
           These jobs are managed by the backend runtime. They run automatically on the configured schedule — no manual triggering is needed or supported via this interface. This page reflects the configured schedule only; individual run history is stored in server logs.
         </p>
       </div>

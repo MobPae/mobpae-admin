@@ -23,8 +23,8 @@ export default function DisbursalStats({ disbursals }: Props) {
       title: "Disbursed",
       value: disbursed,
       icon: CheckCircle2,
-      bg: "bg-[#F3F0FF]",
-      color: "text-[#6C4CFF]",
+      bg: "bg-[#EEF2FF]",
+      color: "text-[#315eff]",
     },
     {
       title: "Failed",
@@ -37,8 +37,8 @@ export default function DisbursalStats({ disbursals }: Props) {
       title: "Total",
       value: disbursals.length,
       icon: Wallet,
-      bg: "bg-[#F3F0FF]",
-      color: "text-[#6C4CFF]",
+      bg: "bg-[#EEF2FF]",
+      color: "text-[#315eff]",
     },
   ];
 

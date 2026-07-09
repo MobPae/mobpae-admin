@@ -97,8 +97,8 @@ export default function BankVerificationDrawer({ open, account, onClose, onCompl
           </section>
 
           {account.verified && (
-            <div className="bg-[#F3F0FF] rounded-md px-3 py-2.5 border border-[#F3F0FF]">
-              <p className="text-[11px] text-[#5B34FF]">This bank account has already been verified.</p>
+            <div className="bg-[#EEF2FF] rounded-md px-3 py-2.5 border border-[#EEF2FF]">
+              <p className="text-[11px] text-[#2048EE]">This bank account has already been verified.</p>
             </div>
           )}
         </div>

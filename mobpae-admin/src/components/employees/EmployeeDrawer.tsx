@@ -202,7 +202,7 @@ export default function EmployeeDrawer({ open, employee, onClose, onRefresh }: P
                     <button
                       onClick={() => void handleVerify()}
                       disabled={selfieLoading}
-                      className="flex-1 h-8 rounded-lg bg-[#6C4CFF] hover:bg-[#5B34FF] text-white text-[11px] font-[500] flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
+                      className="flex-1 h-8 rounded-lg bg-[#315eff] hover:bg-[#2048EE] text-white text-[11px] font-[500] flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
                     >
                       <CheckCircle size={12} /> Verify
                     </button>

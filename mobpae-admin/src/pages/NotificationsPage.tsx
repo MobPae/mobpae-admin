@@ -116,8 +116,8 @@ export default function NotificationsPage() {
 
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-xl bg-[#6C4CFF]/10 flex items-center justify-center">
-          <Bell size={18} className="text-[#6C4CFF]" />
+        <div className="w-9 h-9 rounded-xl bg-[#315eff]/10 flex items-center justify-center">
+          <Bell size={18} className="text-[#315eff]" />
         </div>
         <div>
           <h1 className="text-[16px] font-[700] text-[#111827] leading-none">Notifications</h1>
@@ -137,7 +137,7 @@ export default function NotificationsPage() {
               Recipient
             </label>
             {selected ? (
-              <div className="flex items-center justify-between px-3 py-2.5 border border-[#6C4CFF] rounded-lg bg-[#F3F0FF]/40">
+              <div className="flex items-center justify-between px-3 py-2.5 border border-[#315eff] rounded-lg bg-[#EEF2FF]/40">
                 <div>
                   <p className="text-[12px] font-[600] text-[#111827]">{selected.name}</p>
                   <p className="text-[11px] text-[#9CA3AF]">{selected.email} · {selected.employeeCode}</p>
@@ -160,7 +160,7 @@ export default function NotificationsPage() {
                   onFocus={() => setShowDrop(true)}
                   onBlur={() => setTimeout(() => setShowDrop(false), 150)}
                   onChange={e => { setSearch(e.target.value); setShowDrop(true); }}
-                  className="w-full h-9 pl-8 pr-3 border border-[#E5E7EB] rounded-lg text-[12px] text-[#111827] placeholder-[#D1D5DB] focus:outline-none focus:border-[#6C4CFF] focus:ring-1 focus:ring-[#6C4CFF]/20"
+                  className="w-full h-9 pl-8 pr-3 border border-[#E5E7EB] rounded-lg text-[12px] text-[#111827] placeholder-[#D1D5DB] focus:outline-none focus:border-[#315eff] focus:ring-1 focus:ring-[#315eff]/20"
                 />
                 {showDrop && filtered.length > 0 && (
                   <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-white border border-[#E5E7EB] rounded-lg shadow-lg overflow-hidden">
@@ -197,8 +197,8 @@ export default function NotificationsPage() {
                   onClick={() => setType(t)}
                   className={`flex-1 h-8 rounded-lg border text-[11px] font-[600] transition-all ${
                     type === t
-                      ? "border-[#6C4CFF] bg-[#F3F0FF] text-[#5B34FF]"
-                      : "border-[#E5E7EB] text-[#6B7280] hover:border-[#6C4CFF]/40"
+                      ? "border-[#315eff] bg-[#EEF2FF] text-[#2048EE]"
+                      : "border-[#E5E7EB] text-[#6B7280] hover:border-[#315eff]/40"
                   }`}
                 >
                   {TYPE_CONFIG[t].label}
@@ -218,7 +218,7 @@ export default function NotificationsPage() {
               onChange={e => setTitle(e.target.value)}
               placeholder="e.g. Your advance has been approved"
               maxLength={120}
-              className="w-full h-9 px-3 border border-[#E5E7EB] rounded-lg text-[12px] text-[#111827] placeholder-[#D1D5DB] focus:outline-none focus:border-[#6C4CFF] focus:ring-1 focus:ring-[#6C4CFF]/20"
+              className="w-full h-9 px-3 border border-[#E5E7EB] rounded-lg text-[12px] text-[#111827] placeholder-[#D1D5DB] focus:outline-none focus:border-[#315eff] focus:ring-1 focus:ring-[#315eff]/20"
             />
             <p className="text-[10px] text-[#D1D5DB] mt-1 text-right">{title.length}/120</p>
           </div>
@@ -234,7 +234,7 @@ export default function NotificationsPage() {
               placeholder="Write your notification message here…"
               rows={4}
               maxLength={500}
-              className="w-full px-3 py-2.5 border border-[#E5E7EB] rounded-lg text-[12px] text-[#111827] placeholder-[#D1D5DB] focus:outline-none focus:border-[#6C4CFF] focus:ring-1 focus:ring-[#6C4CFF]/20 resize-none"
+              className="w-full px-3 py-2.5 border border-[#E5E7EB] rounded-lg text-[12px] text-[#111827] placeholder-[#D1D5DB] focus:outline-none focus:border-[#315eff] focus:ring-1 focus:ring-[#315eff]/20 resize-none"
             />
             <p className="text-[10px] text-[#D1D5DB] mt-1 text-right">{message.length}/500</p>
           </div>
@@ -244,7 +244,7 @@ export default function NotificationsPage() {
             type="button"
             onClick={handleSend}
             disabled={!canSend}
-            className="w-full h-9 rounded-lg bg-[#6C4CFF] hover:bg-[#5B34FF] text-white text-[12px] font-[600] flex items-center justify-center gap-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-full h-9 rounded-lg bg-[#315eff] hover:bg-[#2048EE] text-white text-[12px] font-[600] flex items-center justify-center gap-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {mutation.isPending ? (
               <Loader2 size={13} className="animate-spin" />

@@ -40,10 +40,11 @@ export interface LoanApplication {
     employeeCode: string;
     name: string;
     email: string;
-    employer: {
-      id: string;
-      companyName: string;
-      companyCode: string;
-    };
+  };
+  /** Top-level on the backend response (sibling of employee, not nested inside it) */
+  employer?: {
+    id: string;
+    companyName: string;
+    companyCode?: string;
   };
 }

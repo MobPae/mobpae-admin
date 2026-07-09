@@ -56,7 +56,7 @@ export default function DisbursalsPage() {
     { icon: <Clock size={18} color="#D97706" strokeWidth={1.75} />,       iconBg: "#FEF3C7", label: "Pending",   val: pending   },
     { icon: <CheckCircle size={18} color="#16A34A" strokeWidth={1.75} />, iconBg: "#DCFCE7", label: "Disbursed", val: disbursed },
     { icon: <XCircle size={18} color="#EF4444" strokeWidth={1.75} />,     iconBg: "#FEE2E2", label: "Failed",    val: failed    },
-    { icon: <CreditCard size={18} color="#6C4CFF" strokeWidth={1.75} />,  iconBg: "#F3F0FF", label: "Total",     val: total     },
+    { icon: <CreditCard size={18} color="#315eff" strokeWidth={1.75} />,  iconBg: "#EEF2FF", label: "Total",     val: total     },
   ];
 
   return (

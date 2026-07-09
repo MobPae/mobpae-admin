@@ -117,9 +117,9 @@ export default function EmployerDetailsDrawer({ open, onClose, employer, onCreat
 
           {/* Status info */}
           {isOnboarded && (
-            <div className="rounded-lg bg-[#F3F0FF] border border-[#F3F0FF] px-4 py-3 flex items-start gap-3">
-              <CheckCircle2 size={15} className="text-[#6C4CFF] flex-shrink-0 mt-0.5" />
-              <p className="text-[11px] text-[#5B34FF] leading-relaxed">
+            <div className="rounded-lg bg-[#EEF2FF] border border-[#EEF2FF] px-4 py-3 flex items-start gap-3">
+              <CheckCircle2 size={15} className="text-[#315eff] flex-shrink-0 mt-0.5" />
+              <p className="text-[11px] text-[#2048EE] leading-relaxed">
                 This company has been onboarded. Their employer account is active in the{" "}
                 <span className="font-[600]">Employers</span> module.
               </p>
@@ -181,7 +181,7 @@ export default function EmployerDetailsDrawer({ open, onClose, employer, onCreat
         {/* Footer actions */}
         <div className="border-t border-[#E5E7EB] px-5 py-3.5 flex-shrink-0 space-y-2">
           {isOnboarded ? (
-            <div className="flex items-center justify-center gap-2 h-8 text-[12px] font-[500] text-[#6C4CFF]">
+            <div className="flex items-center justify-center gap-2 h-8 text-[12px] font-[500] text-[#315eff]">
               <CheckCircle2 size={13} />
               Onboarding complete
             </div>
@@ -207,7 +207,7 @@ export default function EmployerDetailsDrawer({ open, onClose, employer, onCreat
                   <button
                     onClick={() => statusMutation.mutate({ status: "CONTACTED" })}
                     disabled={isBusy}
-                    className="flex-1 h-7 rounded-md border border-[#E5E7EB] text-[11px] font-[500] text-[#6C4CFF] hover:bg-[#F3F0FF] flex items-center justify-center gap-1.5 disabled:opacity-50 transition-colors"
+                    className="flex-1 h-7 rounded-md border border-[#E5E7EB] text-[11px] font-[500] text-[#315eff] hover:bg-[#EEF2FF] flex items-center justify-center gap-1.5 disabled:opacity-50 transition-colors"
                   >
                     {isBusy && statusMutation.variables?.status === "CONTACTED"
                       ? <Loader2 size={11} className="animate-spin" />

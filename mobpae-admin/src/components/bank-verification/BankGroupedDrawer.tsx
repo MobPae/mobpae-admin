@@ -18,12 +18,12 @@ interface Props {
 }
 
 const AVATAR_COLORS: Record<string, string> = {
-  A:"bg-rose-500", B:"bg-pink-500", C:"bg-fuchsia-500", D:"bg-[#6C4CFF]",
+  A:"bg-rose-500", B:"bg-pink-500", C:"bg-fuchsia-500", D:"bg-[#315eff]",
   E:"bg-indigo-500", F:"bg-violet-500", G:"bg-purple-500", H:"bg-sky-500",
-  I:"bg-cyan-500", J:"bg-[#6C4CFF]", K:"bg-[#6C4CFF]", L:"bg-[#6C4CFF]",
+  I:"bg-cyan-500", J:"bg-[#315eff]", K:"bg-[#315eff]", L:"bg-[#315eff]",
   M:"bg-lime-500", N:"bg-yellow-500", O:"bg-amber-500", P:"bg-orange-500",
   Q:"bg-red-500", R:"bg-rose-600", S:"bg-pink-600", T:"bg-fuchsia-600",
-  U:"bg-[#6C4CFF]", V:"bg-indigo-600", W:"bg-violet-600", X:"bg-[#6C4CFF]",
+  U:"bg-[#315eff]", V:"bg-indigo-600", W:"bg-violet-600", X:"bg-[#315eff]",
   Y:"bg-sky-600", Z:"bg-cyan-600",
 };
 
@@ -73,7 +73,7 @@ function AccountRow({
   });
 
   const first = account.employee.name.charAt(0).toUpperCase();
-  const av    = AVATAR_COLORS[first] ?? "bg-[#6C4CFF]";
+  const av    = AVATAR_COLORS[first] ?? "bg-[#315eff]";
 
   return (
     <div className={`border rounded-xl overflow-hidden ${account.verified ? "border-[#E5E7EB]" : "border-[#E5E7EB]"}`}>
@@ -157,7 +157,7 @@ export default function BankGroupedDrawer({ open, group, queryKey, onClose }: Pr
   if (!open || !group) return null;
 
   const first = group.companyName.charAt(0).toUpperCase();
-  const av    = AVATAR_COLORS[first] ?? "bg-[#6C4CFF]";
+  const av    = AVATAR_COLORS[first] ?? "bg-[#315eff]";
 
   // Prefer fresh drill-down data; fall back to pre-loaded group.accounts
   const rawAccounts: BankAccount[] =
@@ -191,7 +191,7 @@ export default function BankGroupedDrawer({ open, group, queryKey, onClose }: Pr
                 <span className="text-amber-600 font-[600]">{group.pendingCount} pending</span>
               )}
               {group.verifiedCount > 0 && (
-                <span className="text-[#6C4CFF] font-[600]">{group.verifiedCount} verified</span>
+                <span className="text-[#315eff] font-[600]">{group.verifiedCount} verified</span>
               )}
             </div>
             <button

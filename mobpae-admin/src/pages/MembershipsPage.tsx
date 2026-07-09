@@ -109,16 +109,16 @@ function EmployerSummaryTable({ employers }: { employers: EmployerMembershipSumm
             <tr key={e.employerId} style={{ borderBottom: "1px solid #F9FAFB" }}>
               <td style={{ padding: "14px 20px", verticalAlign: "middle" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <div style={{ width: 26, height: 26, borderRadius: 8, background: "#F3F0FF", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <Building2 size={12} color="#6C4CFF" />
+                  <div style={{ width: 26, height: 26, borderRadius: 8, background: "#EEF2FF", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <Building2 size={12} color="#315eff" />
                   </div>
                   <span style={{ fontWeight: 600, color: "#111827" }}>{e.companyName}</span>
                 </div>
               </td>
               <td style={{ padding: "14px 20px", verticalAlign: "middle", color: "#6B7280", fontVariantNumeric: "tabular-nums" }}>{e.totalMembers}</td>
               <td style={{ padding: "14px 20px", verticalAlign: "middle" }}>
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 5, height: 24, padding: "0 10px", borderRadius: 999, background: "#F3F0FF", color: "#5B34FF", fontSize: 12, fontWeight: 600 }}>
-                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#6C4CFF" }} />
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 5, height: 24, padding: "0 10px", borderRadius: 999, background: "#EEF2FF", color: "#2048EE", fontSize: 12, fontWeight: 600 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#315eff" }} />
                   {e.activeMembers}
                 </span>
               </td>
@@ -258,12 +258,12 @@ export default function MembershipsPage() {
       {/* Summary cards — GET /membership/summary */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginTop: 24, marginBottom: 24 }}>
         {[
-          { icon: <Users size={18} color="white" strokeWidth={1.75} />,            iconBg: "linear-gradient(135deg,#5B34FF,#6C4CFF)", label: "Total Members",  val: summary?.totalMembers ?? "—" },
+          { icon: <Users size={18} color="white" strokeWidth={1.75} />,            iconBg: "linear-gradient(135deg,#2048EE,#315eff)", label: "Total Members",  val: summary?.totalMembers ?? "—" },
           { icon: <CreditCard size={18} color="#16A34A" strokeWidth={1.75} />,      iconBg: "#DCFCE7",                                  label: "Active",         val: summary?.active ?? "—"       },
           { icon: <CreditCard size={18} color="#D97706" strokeWidth={1.75} />,      iconBg: "#FEF3C7",                                  label: "Pending Review", val: summary?.pending ?? "—"      },
           { icon: <XCircle size={18} color="#EF4444" strokeWidth={1.75} />,         iconBg: "#FEE2E2",                                  label: "Rejected",       val: summary?.rejected ?? "—"     },
           { icon: <TimerOff size={18} color="#6B7280" strokeWidth={1.75} />,        iconBg: "#F3F4F6",                                  label: "Expired",        val: summary?.expired ?? "—"      },
-          { icon: <CircleDollarSign size={18} color="#6C4CFF" strokeWidth={1.75} />, iconBg: "#F3F0FF",                                 label: "Revenue",        val: formatCurrency(summary?.membershipRevenue ?? 0) },
+          { icon: <CircleDollarSign size={18} color="#315eff" strokeWidth={1.75} />, iconBg: "#EEF2FF",                                 label: "Revenue",        val: formatCurrency(summary?.membershipRevenue ?? 0) },
         ].map(({ icon, iconBg, label, val }) => (
           <div key={label} style={{ background: "white", borderRadius: 16, padding: "14px 16px", border: "1px solid #E5E7EB", boxShadow: "0 1px 4px rgba(17,24,39,0.04)", display: "flex", alignItems: "center", gap: 14 }}>
             <div style={{ width: 40, height: 40, borderRadius: 12, background: iconBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{icon}</div>
@@ -353,7 +353,7 @@ export default function MembershipsPage() {
                   <tr
                     key={ms.id}
                     onClick={() => { setSelected(ms); setRemarks(""); setActionError(""); }}
-                    style={{ borderBottom: "1px solid #F9FAFB", cursor: "pointer", background: selected?.id === ms.id ? "#F3F0FF" : "transparent" }}
+                    style={{ borderBottom: "1px solid #F9FAFB", cursor: "pointer", background: selected?.id === ms.id ? "#EEF2FF" : "transparent" }}
                   >
                     <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
                       <p style={{ fontSize: 13.5, fontWeight: 600, color: "#111827", margin: 0 }}>{ms.employee.name}</p>
@@ -367,7 +367,7 @@ export default function MembershipsPage() {
                     <td style={{ padding: "16px 20px", verticalAlign: "middle", color: "#9CA3AF", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>{formatDate(ms.endDate)}</td>
                     <td style={{ padding: "16px 20px", verticalAlign: "middle", color: "#9CA3AF", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>{formatDate(ms.createdAt)}</td>
                     <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
-                      <span style={{ display: "flex", alignItems: "center", gap: 2, fontSize: 12, fontWeight: 600, color: "#6C4CFF", whiteSpace: "nowrap" }}>
+                      <span style={{ display: "flex", alignItems: "center", gap: 2, fontSize: 12, fontWeight: 600, color: "#315eff", whiteSpace: "nowrap" }}>
                         View <ChevronRight size={12} />
                       </span>
                     </td>
@@ -394,7 +394,7 @@ export default function MembershipsPage() {
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
                     <StatusPill status={selected.status} />
                     {selected.couponCode && (
-                      <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 500, color: "#5B34FF", background: "#F3F0FF", padding: "2px 8px", borderRadius: 999 }}>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 500, color: "#2048EE", background: "#EEF2FF", padding: "2px 8px", borderRadius: 999 }}>
                         <Tag size={9} /> {selected.couponCode}
                       </span>
                     )}
@@ -492,7 +492,7 @@ export default function MembershipsPage() {
                   <button
                     onClick={() => handleAction("approve")}
                     disabled={acting !== null}
-                    style={{ flex: 1, height: 38, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, borderRadius: 10, background: "#6C4CFF", color: "white", fontSize: 12, fontWeight: 600, border: "none", cursor: acting !== null ? "not-allowed" : "pointer", opacity: acting !== null ? 0.5 : 1, fontFamily: "inherit" }}
+                    style={{ flex: 1, height: 38, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, borderRadius: 10, background: "#315eff", color: "white", fontSize: 12, fontWeight: 600, border: "none", cursor: acting !== null ? "not-allowed" : "pointer", opacity: acting !== null ? 0.5 : 1, fontFamily: "inherit" }}
                   >
                     <CheckCircle2 size={13} />
                     {acting === "approve" ? "Approving…" : "Approve"}
@@ -586,7 +586,7 @@ export default function MembershipsPage() {
                     </div>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: "#5B34FF" }}>-{formatCurrency(c.discountAmount)}</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: "#2048EE" }}>-{formatCurrency(c.discountAmount)}</span>
                     <span style={{ display: "inline-flex", alignItems: "center", height: 20, padding: "0 8px", borderRadius: 999, fontSize: 11, fontWeight: 500, background: c.isActive ? "#DCFCE7" : "#F3F4F6", color: c.isActive ? "#16A34A" : "#6B7280" }}>
                       {c.isActive ? "Active" : "Inactive"}
                     </span>

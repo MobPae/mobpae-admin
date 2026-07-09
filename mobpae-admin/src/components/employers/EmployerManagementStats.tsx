@@ -12,8 +12,8 @@ const stats = [
     title: "Approved",
     value: 8,
     icon: CheckCircle2,
-    color: "text-[#6C4CFF]",
-    bg: "bg-[#F3F0FF]",
+    color: "text-[#315eff]",
+    bg: "bg-[#EEF2FF]",
   },
   {
     title: "Rejected",
@@ -26,8 +26,8 @@ const stats = [
     title: "Total",
     value: 22,
     icon: Building2,
-    color: "text-[#6C4CFF]",
-    bg: "bg-[#F3F0FF]",
+    color: "text-[#315eff]",
+    bg: "bg-[#EEF2FF]",
   },
 ];
 

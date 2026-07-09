@@ -23,15 +23,15 @@ export default function BankVerificationStats({ accounts }: Props) {
       title: "Verified",
       value: verified,
       icon: CheckCircle2,
-      bg: "bg-[#F3F0FF]",
-      color: "text-[#6C4CFF]",
+      bg: "bg-[#EEF2FF]",
+      color: "text-[#315eff]",
     },
     {
       title: "Total",
       value: accounts.length,
       icon: Landmark,
-      bg: "bg-[#F3F0FF]",
-      color: "text-[#6C4CFF]",
+      bg: "bg-[#EEF2FF]",
+      color: "text-[#315eff]",
     },
   ];
 

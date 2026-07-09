@@ -8,7 +8,7 @@ import type { Employer, EmployerStatus } from "../types/employer";
 import { getEmployers } from "../services/employerService";
 import { exportToCsv } from "../utils/exportCsv";
 
-const P = "#6C4CFF";
+const P = "#315eff";
 
 const STATUS_TABS: { label: string; value: "ALL" | EmployerStatus }[] = [
   { label: "All",       value: "ALL"       },
@@ -64,7 +64,7 @@ export default function EmployersPage() {
   };
 
   const kpis = [
-    { label: "Total Employers",    value: employers.length, icon: <Building2 size={18} color={P} strokeWidth={1.75} />,        bg: "#F3F0FF" },
+    { label: "Total Employers",    value: employers.length, icon: <Building2 size={18} color={P} strokeWidth={1.75} />,        bg: "#EEF2FF" },
     { label: "Active",             value: counts.ACTIVE,    icon: <UserCheck size={18} color="#16A34A" strokeWidth={1.75} />,   bg: "#DCFCE7" },
     { label: "Pending Onboarding", value: counts.PENDING,   icon: <AlertCircle size={18} color="#D97706" strokeWidth={1.75} />, bg: "#FEF3C7" },
     { label: "Suspended",          value: counts.SUSPENDED, icon: <PauseCircle size={18} color="#EF4444" strokeWidth={1.75} />, bg: "#FEE2E2" },
@@ -89,7 +89,7 @@ export default function EmployersPage() {
           </button>
           <button
             onClick={() => setShowCreate(true)}
-            style={{ height: 40, padding: "0 16px", display: "flex", alignItems: "center", gap: 8, background: P, border: "none", borderRadius: 12, fontSize: 13, fontWeight: 600, color: "white", cursor: "pointer", fontFamily: "inherit", boxShadow: "0 4px 14px rgba(108,76,255,0.25)" }}
+            style={{ height: 40, padding: "0 16px", display: "flex", alignItems: "center", gap: 8, background: P, border: "none", borderRadius: 12, fontSize: 13, fontWeight: 600, color: "white", cursor: "pointer", fontFamily: "inherit", boxShadow: "0 4px 14px rgba(49,94,255,0.25)" }}
           >
             <Plus size={14} />
             Add Employer

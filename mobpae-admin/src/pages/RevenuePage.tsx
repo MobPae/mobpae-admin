@@ -14,7 +14,7 @@ function RevenueCard({ label, value, icon, iconBg, sub, highlight }: {
 }) {
   if (highlight) {
     return (
-      <div style={{ background: "linear-gradient(135deg, #5B34FF 0%, #6C4CFF 100%)", borderRadius: 16, padding: "14px 16px", border: "1px solid #5B34FF", boxShadow: "0 4px 20px rgba(108,76,255,0.25)", display: "flex", alignItems: "center", gap: 14 }}>
+      <div style={{ background: "linear-gradient(135deg, #2048EE 0%, #315eff 100%)", borderRadius: 16, padding: "14px 16px", border: "1px solid #2048EE", boxShadow: "0 4px 20px rgba(49,94,255,0.25)", display: "flex", alignItems: "center", gap: 14 }}>
         <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "white" }}>{icon}</div>
         <div>
           <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1, color: "white" }}>{value}</div>
@@ -81,8 +81,8 @@ export default function RevenuePage() {
             <RevenueCard
               label="Membership Revenue"
               value={formatCurrency(revenue.membershipRevenue)}
-              icon={<CreditCard size={18} color="#6C4CFF" strokeWidth={1.75} />}
-              iconBg="#F3F0FF"
+              icon={<CreditCard size={18} color="#315eff" strokeWidth={1.75} />}
+              iconBg="#EEF2FF"
               sub="From membership plan payments"
             />
             <RevenueCard
@@ -101,7 +101,7 @@ export default function RevenuePage() {
             </div>
             <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: 20 }}>
               {[
-                { label: "Membership revenue", value: revenue.membershipRevenue, color: "#6C4CFF" },
+                { label: "Membership revenue", value: revenue.membershipRevenue, color: "#315eff" },
                 { label: "Interest revenue",   value: revenue.interestRevenue,   color: "#16A34A" },
               ].map(({ label, value, color }) => {
                 const total = Number(revenue.totalRevenue) || 1;

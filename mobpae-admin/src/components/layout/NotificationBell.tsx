@@ -21,9 +21,9 @@ function timeAgo(iso: string) {
 function typeColor(type: string | null) {
   switch (type) {
     case "ALERT":   return "bg-red-100 text-red-600";
-    case "SUCCESS": return "bg-[#F3F0FF] text-[#6C4CFF]";
+    case "SUCCESS": return "bg-[#EEF2FF] text-[#315eff]";
     case "WARNING": return "bg-amber-100 text-amber-600";
-    default:        return "bg-[#F3F0FF] text-[#6C4CFF]";
+    default:        return "bg-[#EEF2FF] text-[#315eff]";
   }
 }
 
@@ -101,7 +101,7 @@ export function NotificationBell() {
                 <button
                   onClick={markAllRead}
                   title="Mark all as read"
-                  className="w-7 h-7 flex items-center justify-center rounded-lg text-[#6B7280] hover:text-[#6C4CFF] hover:bg-[#F3F0FF] transition-colors"
+                  className="w-7 h-7 flex items-center justify-center rounded-lg text-[#6B7280] hover:text-[#315eff] hover:bg-[#EEF2FF] transition-colors"
                 >
                   <CheckCheck size={14} />
                 </button>
@@ -142,7 +142,7 @@ export function NotificationBell() {
               notifications.slice(0, 20).map(n => (
                 <div
                   key={n.id}
-                  className={`flex gap-3 px-4 py-3 hover:bg-[#F8F9FC] transition-colors cursor-pointer ${!n.isRead ? "bg-[#F3F0FF]/40" : ""}`}
+                  className={`flex gap-3 px-4 py-3 hover:bg-[#F8F9FC] transition-colors cursor-pointer ${!n.isRead ? "bg-[#EEF2FF]/40" : ""}`}
                   onClick={() => { if (!n.isRead) markRead.mutate(n.id); }}
                 >
                   <div className={`mt-0.5 w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 text-[11px] font-[700] ${typeColor(n.type)}`}>
@@ -154,7 +154,7 @@ export function NotificationBell() {
                         {n.title}
                       </p>
                       {!n.isRead && (
-                        <span className="w-2 h-2 rounded-full bg-[#6C4CFF] flex-shrink-0 mt-1" />
+                        <span className="w-2 h-2 rounded-full bg-[#315eff] flex-shrink-0 mt-1" />
                       )}
                     </div>
                     <p className="text-[11px] text-[#6B7280] mt-0.5 line-clamp-2">{n.message}</p>
@@ -165,7 +165,7 @@ export function NotificationBell() {
                       onClick={e => { e.stopPropagation(); markRead.mutate(n.id); }}
                       title="Mark as read"
                       aria-label={`Mark ${n.title} as read`}
-                      className="mt-1 flex-shrink-0 text-[#6B7280] hover:text-[#6C4CFF] transition-colors"
+                      className="mt-1 flex-shrink-0 text-[#6B7280] hover:text-[#315eff] transition-colors"
                     >
                       <Check size={13} />
                     </button>

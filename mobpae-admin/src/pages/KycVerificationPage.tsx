@@ -76,7 +76,7 @@ export default function KycVerificationPage() {
           { icon: <Clock size={18} color="#D97706" strokeWidth={1.75} />,       iconBg: "#FEF3C7", label: "Pending",    val: pending  },
           { icon: <CheckCircle size={18} color="#16A34A" strokeWidth={1.75} />, iconBg: "#DCFCE7", label: "Verified",   val: verified },
           { icon: <XCircle size={18} color="#EF4444" strokeWidth={1.75} />,     iconBg: "#FEE2E2", label: "Rejected",   val: rejected },
-          { icon: <FileText size={18} color="#6C4CFF" strokeWidth={1.75} />,    iconBg: "#F3F0FF", label: "Total Docs", val: total    },
+          { icon: <FileText size={18} color="#315eff" strokeWidth={1.75} />,    iconBg: "#EEF2FF", label: "Total Docs", val: total    },
         ].map(({ icon, iconBg, label, val }) => (
           <div key={label} style={{ background: "white", borderRadius: 16, padding: "14px 16px", border: "1px solid #E5E7EB", boxShadow: "0 1px 4px rgba(17,24,39,0.04)", display: "flex", alignItems: "center", gap: 14 }}>
             <div style={{ width: 40, height: 40, borderRadius: 12, background: iconBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{icon}</div>

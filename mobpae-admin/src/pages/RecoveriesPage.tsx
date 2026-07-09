@@ -166,7 +166,7 @@ export default function RecoveriesPage() {
         {[
           { label: "Awaiting Payroll", val: counts["SCHEDULED"] ?? 0,  icon: <Clock3 size={14} />,          bg: "bg-sky-50",    color: "text-sky-600"   },
           { label: "Overdue",          val: counts["OVERDUE"]   ?? 0,  icon: <AlertTriangle size={14} />,   bg: "bg-red-50",    color: "text-red-600"   },
-          { label: "Recovered",        val: counts["PAID"]      ?? 0,  icon: <CheckCircle2 size={14} />,    bg: "bg-[#F3F0FF]", color: "text-[#6C4CFF]" },
+          { label: "Recovered",        val: counts["PAID"]      ?? 0,  icon: <CheckCircle2 size={14} />,    bg: "bg-[#EEF2FF]", color: "text-[#315eff]" },
           { label: "Total recovered", val: fmtCurrency(totalRecovered),                                  icon: <CircleDollarSign size={14} />,bg: "bg-[#F3F4F6]",  color: "text-[#6B7280]"   },
         ].map(({ label, val, icon, bg, color }) => (
           <div key={label} className="bg-white border border-[#E5E7EB] rounded-xl px-4 py-3.5 flex items-center gap-3">
@@ -198,7 +198,7 @@ export default function RecoveriesPage() {
             placeholder="Search employee, code, employer…"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="h-8 pl-8 pr-4 text-[12px] bg-white border border-[#E5E7EB] rounded-lg outline-none focus:border-[#6C4CFF] w-64 text-[#6B7280] placeholder-[#D1D5DB]"
+            className="h-8 pl-8 pr-4 text-[12px] bg-white border border-[#E5E7EB] rounded-lg outline-none focus:border-[#315eff] w-64 text-[#6B7280] placeholder-[#D1D5DB]"
           />
         </div>
         <div className="flex items-center gap-1.5 flex-wrap">
@@ -270,7 +270,7 @@ export default function RecoveriesPage() {
                   <tr
                     key={r.loanApplicationId}
                     onClick={() => setSelected(r)}
-                    className={`cursor-pointer hover:bg-[#F8F9FC]/60 transition-colors ${selected?.loanApplicationId === r.loanApplicationId ? "bg-[#F3F0FF]/30" : ""} ${r.status === "OVERDUE" ? "bg-red-50/20" : ""}`}
+                    className={`cursor-pointer hover:bg-[#F8F9FC]/60 transition-colors ${selected?.loanApplicationId === r.loanApplicationId ? "bg-[#EEF2FF]/30" : ""} ${r.status === "OVERDUE" ? "bg-red-50/20" : ""}`}
                   >
                     <td className="px-4 py-3">
                       <p className="font-[500] text-[#111827]">{r.employeeName}</p>
@@ -289,7 +289,7 @@ export default function RecoveriesPage() {
                       <StatusPill status={r.status} />
                     </td>
                     <td className="px-4 py-3">
-                      <span className="flex items-center gap-0.5 text-[12px] font-[500] text-[#6C4CFF] whitespace-nowrap">
+                      <span className="flex items-center gap-0.5 text-[12px] font-[500] text-[#315eff] whitespace-nowrap">
                         View <ChevronRight size={12} />
                       </span>
                     </td>

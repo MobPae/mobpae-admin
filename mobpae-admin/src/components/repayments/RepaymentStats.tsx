@@ -23,8 +23,8 @@ export default function RepaymentStats({ repayments }: Props) {
       title: "Paid",
       value: paid,
       icon: CheckCircle2,
-      bg: "bg-[#F3F0FF]",
-      color: "text-[#6C4CFF]",
+      bg: "bg-[#EEF2FF]",
+      color: "text-[#315eff]",
     },
     {
       title: "Overdue",
@@ -37,8 +37,8 @@ export default function RepaymentStats({ repayments }: Props) {
       title: "Total",
       value: repayments.length,
       icon: Receipt,
-      bg: "bg-[#F3F0FF]",
-      color: "text-[#6C4CFF]",
+      bg: "bg-[#EEF2FF]",
+      color: "text-[#315eff]",
     },
   ];
 

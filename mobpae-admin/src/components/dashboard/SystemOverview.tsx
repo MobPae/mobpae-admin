@@ -6,13 +6,13 @@ export default function SystemOverview() {
       label: "Employers",
       value: "12",
       icon: Building2,
-      className: "bg-[#F3F0FF] text-[#5B34FF] border border-[#E5E7EB]",
+      className: "bg-[#EEF2FF] text-[#2048EE] border border-[#E5E7EB]",
     },
     {
       label: "Employees",
       value: "1,248",
       icon: Users,
-      className: "bg-[#F3F0FF] text-[#5B34FF] border border-[#E5E7EB]",
+      className: "bg-[#EEF2FF] text-[#2048EE] border border-[#E5E7EB]",
     },
     {
       label: "Requests",
@@ -24,13 +24,13 @@ export default function SystemOverview() {
       label: "Disbursed",
       value: "₹4.2L",
       icon: Landmark,
-      className: "bg-[#F3F0FF] text-[#5B34FF] border border-[#E5E7EB]",
+      className: "bg-[#EEF2FF] text-[#2048EE] border border-[#E5E7EB]",
     },
     {
       label: "Repaid",
       value: "₹95K",
       icon: TrendingUp,
-      className: "bg-[#F3F0FF] text-[#5B34FF] border border-[#C8C9FF]",
+      className: "bg-[#EEF2FF] text-[#2048EE] border border-[#C8C9FF]",
     },
   ];
 

@@ -7,12 +7,12 @@ interface Props {
 }
 
 const AVATAR_COLORS: Record<string, string> = {
-  A:"bg-rose-500", B:"bg-pink-500", C:"bg-fuchsia-500", D:"bg-[#6C4CFF]",
+  A:"bg-rose-500", B:"bg-pink-500", C:"bg-fuchsia-500", D:"bg-[#315eff]",
   E:"bg-indigo-500", F:"bg-violet-500", G:"bg-purple-500", H:"bg-sky-500",
-  I:"bg-cyan-500", J:"bg-[#6C4CFF]", K:"bg-[#6C4CFF]", L:"bg-[#6C4CFF]",
+  I:"bg-cyan-500", J:"bg-[#315eff]", K:"bg-[#315eff]", L:"bg-[#315eff]",
   M:"bg-lime-500", N:"bg-yellow-500", O:"bg-amber-500", P:"bg-orange-500",
   Q:"bg-red-500", R:"bg-rose-600", S:"bg-pink-600", T:"bg-fuchsia-600",
-  U:"bg-[#6C4CFF]", V:"bg-indigo-600", W:"bg-violet-600", X:"bg-[#6C4CFF]",
+  U:"bg-[#315eff]", V:"bg-indigo-600", W:"bg-violet-600", X:"bg-[#315eff]",
   Y:"bg-sky-600", Z:"bg-cyan-600",
 };
 
@@ -50,14 +50,14 @@ export default function KycGroupedTable({ groups, selectedId, onSelect }: Props)
         <tbody className="divide-y divide-[#F3F4F6]">
           {groups.map(g => {
             const first = g.employeeName.charAt(0).toUpperCase();
-            const av    = AVATAR_COLORS[first] ?? "bg-[#6C4CFF]";
+            const av    = AVATAR_COLORS[first] ?? "bg-[#315eff]";
             const sc    = OVERALL_STATUS[g.overallStatus] ?? OVERALL_STATUS.NOT_SUBMITTED;
             const sel   = selectedId === g.employeeId;
             return (
               <tr
                 key={g.employeeId}
                 onClick={() => onSelect(g)}
-                className={`cursor-pointer transition-colors group ${sel ? "bg-[#F3F0FF]/60" : "hover:bg-[#F8F9FC]/80"}`}
+                className={`cursor-pointer transition-colors group ${sel ? "bg-[#EEF2FF]/60" : "hover:bg-[#F8F9FC]/80"}`}
               >
                 {/* Employee */}
                 <td className="px-4 py-3">
@@ -85,7 +85,7 @@ export default function KycGroupedTable({ groups, selectedId, onSelect }: Props)
                   </span>
                 </td>
                 <td className="px-4 py-3">
-                  <span className={`text-[13px] font-[600] tabular-nums ${g.verifiedCount > 0 ? "text-[#6C4CFF]" : "text-[#6B7280]"}`}>
+                  <span className={`text-[13px] font-[600] tabular-nums ${g.verifiedCount > 0 ? "text-[#315eff]" : "text-[#6B7280]"}`}>
                     {g.verifiedCount}
                   </span>
                 </td>
@@ -109,7 +109,7 @@ export default function KycGroupedTable({ groups, selectedId, onSelect }: Props)
                 </td>
                 {/* Action */}
                 <td className="px-4 py-3 text-right">
-                  <span className={`text-[11px] font-[500] transition-colors ${sel ? "text-[#6C4CFF]" : "text-[#6B7280] group-hover:text-[#6C4CFF]"}`}>
+                  <span className={`text-[11px] font-[500] transition-colors ${sel ? "text-[#315eff]" : "text-[#6B7280] group-hover:text-[#315eff]"}`}>
                     →
                   </span>
                 </td>
