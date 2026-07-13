@@ -30,7 +30,7 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 export default function App() {
   return (
     <BrowserRouter>
-      <Suspense fallback={<div className="flex h-screen items-center justify-center bg-[#F8F9FC] text-sm font-medium text-[#6B7280]">Loading workspace...</div>}>
+      <Suspense fallback={<div className="flex h-screen items-center justify-center bg-canvas text-sm font-medium text-ink-3">Loading workspace...</div>}>
       <Routes>
         {/* Public */}
         <Route path="/login" element={<LoginPage />} />

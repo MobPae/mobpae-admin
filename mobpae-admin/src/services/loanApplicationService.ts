@@ -1,5 +1,5 @@
 import api from "../lib/axios";
-import type { LoanApplication } from "../types/loan-application";
+import type { LoanApplication, PlatformFee } from "../types/loan-application";
 
 const PAGE_LIMIT = 100;
 
@@ -67,5 +67,13 @@ export async function adminApproveLoanApplication(id: string): Promise<LoanAppli
 
 export async function adminRejectLoanApplication(id: string, reason: string): Promise<LoanApplication> {
   const response = await api.post<LoanApplication>(`/loan-applications/${id}/admin-reject`, { reason });
+  return response.data;
+}
+
+export async function waivePlatformFee(id: string, remarks?: string): Promise<PlatformFee> {
+  const response = await api.post<PlatformFee>(
+    `/platform-fees/${id}/waive`,
+    remarks ? { remarks } : {},
+  );
   return response.data;
 }

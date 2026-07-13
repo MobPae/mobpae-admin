@@ -19,11 +19,11 @@ export default function Header() {
   };
 
   return (
-    <header className="h-16 bg-white border-b border-[#E5E7EB] px-8 flex items-center justify-end">
+    <header className="h-16 bg-white border-b border-edge px-8 flex items-center justify-end">
       <div className="flex items-center gap-4">
         {/* Search */}
         <div className="relative">
-          <Search size={16} className="absolute left-3 top-3 text-[#6B7280]" />
+          <Search size={16} className="absolute left-3 top-3 text-ink-3" />
 
           <input
             placeholder="Search..."
@@ -33,12 +33,12 @@ export default function Header() {
               pr-4
               py-2.5
               text-sm
-              bg-[#F8F9FC]
+              bg-canvas
               border
-              border-[#E5E7EB]
+              border-edge
               rounded-xl
               outline-none
-              focus:border-[#315eff]
+              focus:border-brand
             "
           />
         </div>
@@ -47,13 +47,13 @@ export default function Header() {
         <NotificationBell />
 
         {/* Profile */}
-        <div className="flex items-center gap-3 border-l border-[#E5E7EB] pl-4">
+        <div className="flex items-center gap-3 border-l border-edge pl-4">
           <div
             className="
               w-10
               h-10
               rounded-full
-              bg-[#315eff]
+              bg-brand
               text-white
               flex
               items-center
@@ -65,9 +65,9 @@ export default function Header() {
           </div>
 
           <div>
-            <p className="text-sm font-medium text-[#111827]">Admin User</p>
+            <p className="text-sm font-medium text-ink">Admin User</p>
 
-            <p className="text-xs text-[#6B7280]">Super Admin</p>
+            <p className="text-xs text-ink-3">Super Admin</p>
           </div>
         </div>
 
@@ -79,9 +79,9 @@ export default function Header() {
             px-4
             rounded-xl
             border
-            border-[#E5E7EB]
-            text-[#6B7280]
-            hover:bg-[#F8F9FC]
+            border-edge
+            text-ink-3
+            hover:bg-canvas
             flex
             items-center
             gap-2

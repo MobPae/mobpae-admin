@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { forgotPassword } from "../services/authService";
 
-const B  = "#315eff";
-const BD = "#2048EE";
-const CREAM = "#f8fafc";
+const B  = "var(--color-brand)";
+const BD = "var(--color-info)";
+
 
 export default function ForgotPasswordPage() {
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ export default function ForgotPasswordPage() {
     setError("");
     setLoading(true);
     try {
-      await forgotPassword(email);
+      await forgotPassword(email.trim().toLowerCase());
       setSent(true);
     } catch {
       // Always show success to prevent email enumeration
@@ -29,22 +29,22 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div style={{ display: "flex", height: "100vh", background: CREAM, alignItems: "center", justifyContent: "center" }}>
+    <div style={{ display: "flex", height: "100vh", background: "var(--color-canvas)", alignItems: "center", justifyContent: "center" }}>
       <div style={{ maxWidth: 400, width: "100%", padding: "0 24px" }}>
         {/* Logo */}
         <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 40 }}>
           <img src="/logo-icon.svg" alt="MobPae" width="32" height="21" style={{ objectFit: "contain", flexShrink: 0 }} />
-          <span style={{ fontSize: 15, fontWeight: 700, color: "#111827", letterSpacing: "-0.01em" }}>MobPae</span>
+          <span style={{ fontSize: 15, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.01em" }}>MobPae</span>
         </div>
 
         {sent ? (
           <div>
-            <div style={{ width: 48, height: 48, borderRadius: 12, background: "#EEF2FF", border: "1px solid #C8C9FF", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#315eff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <div style={{ width: 48, height: 48, borderRadius: 12, background: "var(--color-brand-soft)", border: "1px solid #C8C9FF", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
-            <h2 style={{ fontSize: 26, fontWeight: 800, color: "#111", letterSpacing: "-0.025em", margin: "0 0 10px" }}>Check your inbox</h2>
-            <p style={{ fontSize: 14, color: "#9CA3AF", lineHeight: 1.6, marginBottom: 28 }}>
-              If an account exists for <strong style={{ color: "#6B7280" }}>{email}</strong>, you'll receive a password reset link shortly. The link expires in 15 minutes.
+            <h2 style={{ fontSize: 26, fontWeight: 800, color: "var(--color-ink)", letterSpacing: "-0.025em", margin: "0 0 10px" }}>Check your inbox</h2>
+            <p style={{ fontSize: 14, color: "var(--color-ink-4)", lineHeight: 1.6, marginBottom: 28 }}>
+              If an account exists for <strong className="text-ink-3">{email}</strong>, you'll receive a password reset link shortly. The link expires in 15 minutes.
             </p>
             <button
               onClick={() => navigate("/login")}
@@ -55,32 +55,32 @@ export default function ForgotPasswordPage() {
           </div>
         ) : (
           <div>
-            <h2 style={{ fontSize: 28, fontWeight: 800, color: "#111", letterSpacing: "-0.025em", margin: "0 0 10px" }}>Reset password</h2>
-            <p style={{ fontSize: 14, color: "#9CA3AF", lineHeight: 1.6, marginBottom: 28 }}>
+            <h2 style={{ fontSize: 28, fontWeight: 800, color: "var(--color-ink)", letterSpacing: "-0.025em", margin: "0 0 10px" }}>Reset password</h2>
+            <p style={{ fontSize: 14, color: "var(--color-ink-4)", lineHeight: 1.6, marginBottom: 28 }}>
               Enter your admin email and we'll send you a reset link.
             </p>
 
             <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
-                <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#333", marginBottom: 8 }}>Admin Email</label>
+                <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--color-ink)", marginBottom: 8 }}>Admin Email</label>
                 <div style={{
                   display: "flex", alignItems: "center", gap: 10,
                   background: "white", border: "1.5px solid #e8e0d8", borderRadius: 10, padding: "11px 14px",
                   transition: "border-color 0.15s",
                 }}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--color-ink-4)" strokeWidth="2" strokeLinecap="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
                   <input
                     type="email" value={email} onChange={e => setEmail(e.target.value)}
                     placeholder="admin@mobpae.com" required autoComplete="email"
-                    style={{ flex: 1, fontSize: 14, color: "#111", background: "transparent", outline: "none", minWidth: 0 }}
+                    style={{ flex: 1, fontSize: 14, color: "var(--color-ink)", background: "transparent", outline: "none", minWidth: 0 }}
                     onFocus={e => { (e.target.closest("div") as HTMLElement).style.borderColor = B; }}
-                    onBlur={e  => { (e.target.closest("div") as HTMLElement).style.borderColor = "#e8e0d8"; }}
+                    onBlur={e  => { (e.target.closest("div") as HTMLElement).style.borderColor = "var(--color-edge)"; }}
                   />
                 </div>
               </div>
 
               {error && (
-                <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#fff1f2", border: "1px solid #fecdd3", borderRadius: 8, padding: "10px 14px", fontSize: 13, color: "#e11d48", fontWeight: 500 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, background: "var(--color-danger-soft)", border: "1px solid var(--color-danger-bg)", borderRadius: 8, padding: "10px 14px", fontSize: 13, color: "var(--color-danger)", fontWeight: 500 }}>
                   {error}
                 </div>
               )}
@@ -89,7 +89,7 @@ export default function ForgotPasswordPage() {
                 type="submit" disabled={loading}
                 style={{
                   width: "100%", height: 48, marginTop: 4,
-                  background: loading ? "#c4825e" : `linear-gradient(135deg, ${BD} 0%, ${B} 100%)`,
+                  background: loading ? "var(--color-brand-muted)" : `linear-gradient(135deg, ${BD} 0%, ${B} 100%)`,
                   color: "white", borderRadius: 10, border: "none",
                   fontSize: 14, fontWeight: 700,
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
@@ -102,7 +102,7 @@ export default function ForgotPasswordPage() {
               </button>
             </form>
 
-            <p style={{ marginTop: 20, fontSize: 13, color: "#9CA3AF", textAlign: "center" }}>
+            <p style={{ marginTop: 20, fontSize: 13, color: "var(--color-ink-4)", textAlign: "center" }}>
               <button onClick={() => navigate("/login")} style={{ color: B, fontWeight: 600, background: "none", border: "none", cursor: "pointer", fontSize: 13 }}>
                 ← Back to sign in
               </button>

@@ -17,28 +17,28 @@ export default function RepaymentStats({ repayments }: Props) {
       value: pending,
       icon: Clock3,
       bg: "bg-amber-50",
-      color: "text-amber-600",
+      color: "text-warning",
     },
     {
       title: "Paid",
       value: paid,
       icon: CheckCircle2,
-      bg: "bg-[#EEF2FF]",
-      color: "text-[#315eff]",
+      bg: "bg-brand-soft",
+      color: "text-brand",
     },
     {
       title: "Overdue",
       value: overdue,
       icon: AlertTriangle,
-      bg: "bg-red-50",
-      color: "text-red-600",
+      bg: "bg-danger-soft",
+      color: "text-danger",
     },
     {
       title: "Total",
       value: repayments.length,
       icon: Receipt,
-      bg: "bg-[#EEF2FF]",
-      color: "text-[#315eff]",
+      bg: "bg-brand-soft",
+      color: "text-brand",
     },
   ];
 
@@ -50,13 +50,13 @@ export default function RepaymentStats({ repayments }: Props) {
         return (
           <div
             key={stat.title}
-            className="bg-white border border-[#E5E7EB] rounded-2xl p-4"
+            className="bg-white border border-edge rounded-2xl p-4"
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-[#6B7280]">{stat.title}</p>
+                <p className="text-xs text-ink-3">{stat.title}</p>
 
-                <h3 className="text-xl font-semibold text-[#111827] mt-1">
+                <h3 className="text-xl font-semibold text-ink mt-1">
                   {stat.value}
                 </h3>
               </div>

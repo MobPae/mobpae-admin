@@ -38,8 +38,8 @@ export default function ActionQueue({ data, loading = false }: ActionQueueProps)
       count: data.pendingLoanApplications,
       to: "/loan-applications",
       accentBg: "bg-amber-50",
-      accentColor: "text-amber-600",
-      countBg: "bg-amber-100",
+      accentColor: "text-warning",
+      countBg: "bg-warning-bg",
       countColor: "text-amber-700",
     },
     {
@@ -48,9 +48,9 @@ export default function ActionQueue({ data, loading = false }: ActionQueueProps)
       icon: ShieldCheck,
       count: data.pendingKycDocuments,
       to: "/kyc",
-      accentBg: "bg-[#EEF2FF]",
-      accentColor: "text-[#315eff]",
-      countBg: "bg-[#EEF2FF]",
+      accentBg: "bg-brand-soft",
+      accentColor: "text-brand",
+      countBg: "bg-brand-soft",
       countColor: "text-[#2048EE]",
     },
     {
@@ -59,9 +59,9 @@ export default function ActionQueue({ data, loading = false }: ActionQueueProps)
       icon: ArrowDownCircle,
       count: data.pendingDisbursals,
       to: "/disbursals",
-      accentBg: "bg-[#EEF2FF]",
-      accentColor: "text-[#315eff]",
-      countBg: "bg-[#EEF2FF]",
+      accentBg: "bg-brand-soft",
+      accentColor: "text-brand",
+      countBg: "bg-brand-soft",
       countColor: "text-[#2048EE]",
     },
     {
@@ -70,9 +70,9 @@ export default function ActionQueue({ data, loading = false }: ActionQueueProps)
       icon: RefreshCcw,
       count: data.activeRepayments,
       to: "/repayments",
-      accentBg: "bg-[#EEF2FF]",
-      accentColor: "text-[#315eff]",
-      countBg: "bg-[#EEF2FF]",
+      accentBg: "bg-brand-soft",
+      accentColor: "text-brand",
+      countBg: "bg-brand-soft",
       countColor: "text-[#2048EE]",
     },
     {
@@ -81,10 +81,10 @@ export default function ActionQueue({ data, loading = false }: ActionQueueProps)
       icon: Landmark,
       count: 0,
       to: "/bank-verification",
-      accentBg: "bg-[#F8F9FC]",
-      accentColor: "text-[#6B7280]",
-      countBg: "bg-[#F3F4F6]",
-      countColor: "text-[#6B7280]",
+      accentBg: "bg-canvas",
+      accentColor: "text-ink-3",
+      countBg: "bg-surface-muted",
+      countColor: "text-ink-3",
     },
     {
       label: "Enquiries",
@@ -92,25 +92,25 @@ export default function ActionQueue({ data, loading = false }: ActionQueueProps)
       icon: Building2,
       count: 0,
       to: "/employer-enquiries",
-      accentBg: "bg-[#EEF2FF]",
-      accentColor: "text-[#315eff]",
-      countBg: "bg-[#EEF2FF]",
+      accentBg: "bg-brand-soft",
+      accentColor: "text-brand",
+      countBg: "bg-brand-soft",
       countColor: "text-[#2048EE]",
     },
   ];
 
   if (loading) {
     return (
-      <div className="bg-white border border-[#E5E7EB] rounded-2xl shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-[#E5E7EB]">
-          <div className="h-4 w-28 bg-[#F3F4F6] rounded animate-pulse" />
+      <div className="bg-white border border-edge rounded-2xl shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-edge">
+          <div className="h-4 w-28 bg-surface-muted rounded animate-pulse" />
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 divide-x divide-y divide-[#E5E7EB]">
+        <div className="grid grid-cols-2 sm:grid-cols-3 divide-x divide-y divide-edge">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="p-5">
-              <div className="w-8 h-8 rounded-xl bg-[#F3F4F6] animate-pulse mb-3" />
-              <div className="h-5 w-10 bg-[#F3F4F6] rounded animate-pulse mb-1.5" />
-              <div className="h-3 w-24 bg-[#F3F4F6] rounded animate-pulse" />
+              <div className="w-8 h-8 rounded-xl bg-surface-muted animate-pulse mb-3" />
+              <div className="h-5 w-10 bg-surface-muted rounded animate-pulse mb-1.5" />
+              <div className="h-3 w-24 bg-surface-muted rounded animate-pulse" />
             </div>
           ))}
         </div>
@@ -119,12 +119,12 @@ export default function ActionQueue({ data, loading = false }: ActionQueueProps)
   }
 
   return (
-    <div className="bg-white border border-[#E5E7EB] rounded-2xl shadow-sm overflow-hidden">
-      <div className="px-6 py-4 border-b border-[#E5E7EB] flex items-center justify-between">
-        <h2 className="text-[13px] font-semibold text-[#111827]">Action Queue</h2>
-        <span className="text-[11px] text-[#6B7280]">Click to navigate</span>
+    <div className="bg-white border border-edge rounded-2xl shadow-sm overflow-hidden">
+      <div className="px-6 py-4 border-b border-edge flex items-center justify-between">
+        <h2 className="text-[13px] font-semibold text-ink">Action Queue</h2>
+        <span className="text-[11px] text-ink-3">Click to navigate</span>
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 divide-x divide-y divide-[#E5E7EB]">
+      <div className="grid grid-cols-2 sm:grid-cols-3 divide-x divide-y divide-edge">
         {items.map((item) => {
           const Icon = item.icon;
           const hasCount = item.count > 0;
@@ -132,13 +132,13 @@ export default function ActionQueue({ data, loading = false }: ActionQueueProps)
             <button
               key={item.label}
               onClick={() => navigate(item.to)}
-              className="p-5 text-left hover:bg-[#F8F9FC] transition-colors group"
+              className="p-5 text-left hover:bg-canvas transition-colors group"
             >
               <div className={`w-8 h-8 rounded-xl flex items-center justify-center mb-3 ${item.accentBg} group-hover:scale-105 transition-transform`}>
                 <Icon size={15} className={item.accentColor} strokeWidth={2} />
               </div>
               <div className="flex items-baseline gap-2 mb-0.5">
-                <span className="text-[22px] font-[750] tracking-tight text-[#111827] leading-none">
+                <span className="text-[22px] font-[750] tracking-tight text-ink leading-none">
                   {item.count}
                 </span>
                 {hasCount && (
@@ -147,8 +147,8 @@ export default function ActionQueue({ data, loading = false }: ActionQueueProps)
                   </span>
                 )}
               </div>
-              <div className="text-[12px] font-medium text-[#6B7280]">{item.label}</div>
-              <div className="text-[11px] text-[#6B7280] mt-0.5">{item.description}</div>
+              <div className="text-[12px] font-medium text-ink-3">{item.label}</div>
+              <div className="text-[11px] text-ink-3 mt-0.5">{item.description}</div>
             </button>
           );
         })}

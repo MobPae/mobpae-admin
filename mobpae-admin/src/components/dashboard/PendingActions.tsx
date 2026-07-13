@@ -13,7 +13,7 @@ export default function PendingActionsTable() {
       priority: "HIGH",
       time: "10 mins ago",
       icon: ShieldCheck,
-      statusColor: "bg-red-50 text-red-600 border-red-100",
+      statusColor: "bg-danger-soft text-danger border-red-100",
     },
     {
       employee: {
@@ -26,7 +26,7 @@ export default function PendingActionsTable() {
       priority: "MEDIUM",
       time: "25 mins ago",
       icon: Landmark,
-      statusColor: "bg-[#FEF3C7] text-[#B45309] border-[#FEF3C7]",
+      statusColor: "bg-warning-bg text-warning-dark border-[#FEF3C7]",
     },
     {
       employee: {
@@ -44,20 +44,20 @@ export default function PendingActionsTable() {
   ];
 
   return (
-    <div className="col-span-8 bg-white border border-[#E5E7EB] rounded-3xl shadow-sm">
+    <div className="col-span-8 bg-white border border-edge rounded-3xl shadow-sm">
       {/* Header */}
-      <div className="px-6 py-5 border-b border-[#E5E7EB] flex items-center justify-between">
+      <div className="px-6 py-5 border-b border-edge flex items-center justify-between">
         <div>
-          <h3 className="text-base font-semibold text-[#111827]">
+          <h3 className="text-base font-semibold text-ink">
             Pending Actions
           </h3>
 
-          <p className="text-xs text-[#6B7280] mt-1">
+          <p className="text-xs text-ink-3 mt-1">
             Items requiring immediate attention
           </p>
         </div>
 
-        <span className="px-3 py-1 rounded-full bg-red-50 text-red-600 text-xs font-medium">
+        <span className="px-3 py-1 rounded-full bg-danger-soft text-danger text-xs font-medium">
           7 Urgent
         </span>
       </div>
@@ -66,24 +66,24 @@ export default function PendingActionsTable() {
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-[#E5E7EB] text-left">
-              <th className="px-6 py-3 text-xs font-medium text-[#6B7280] uppercase">
+            <tr className="border-b border-edge text-left">
+              <th className="px-6 py-3 text-xs font-medium text-ink-3 uppercase">
                 Employee
               </th>
 
-              <th className="px-6 py-3 text-xs font-medium text-[#6B7280] uppercase">
+              <th className="px-6 py-3 text-xs font-medium text-ink-3 uppercase">
                 Action Type
               </th>
 
-              <th className="px-6 py-3 text-xs font-medium text-[#6B7280] uppercase">
+              <th className="px-6 py-3 text-xs font-medium text-ink-3 uppercase">
                 Priority
               </th>
 
-              <th className="px-6 py-3 text-xs font-medium text-[#6B7280] uppercase">
+              <th className="px-6 py-3 text-xs font-medium text-ink-3 uppercase">
                 Time
               </th>
 
-              <th className="px-6 py-3 text-xs font-medium text-[#6B7280] uppercase">
+              <th className="px-6 py-3 text-xs font-medium text-ink-3 uppercase">
                 Action
               </th>
             </tr>
@@ -96,23 +96,23 @@ export default function PendingActionsTable() {
               return (
                 <tr
                   key={index}
-                  className="border-b border-[#E5E7EB] last:border-0 hover:bg-[#F8F9FC]"
+                  className="border-b border-edge last:border-0 hover:bg-canvas"
                 >
                   {/* Employee */}
                   <td className="px-6 py-4">
                     <div>
-                      <p className="text-sm font-medium text-[#111827]">
+                      <p className="text-sm font-medium text-ink">
                         {item.employee.name}
                       </p>
 
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-xs text-[#6B7280]">
+                        <span className="text-xs text-ink-3">
                           {item.employee.code}
                         </span>
 
                         <span className="w-1 h-1 rounded-full bg-[#D1D5DB]" />
 
-                        <span className="text-xs text-[#6B7280]">
+                        <span className="text-xs text-ink-3">
                           {item.employee.email}
                         </span>
                       </div>
@@ -122,16 +122,16 @@ export default function PendingActionsTable() {
                   {/* Action Type */}
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-[#F3F4F6] flex items-center justify-center">
-                        <Icon size={16} className="text-[#6B7280]" />
+                      <div className="w-9 h-9 rounded-xl bg-surface-muted flex items-center justify-center">
+                        <Icon size={16} className="text-ink-3" />
                       </div>
 
                       <div>
-                        <p className="text-sm font-medium text-[#111827]">
+                        <p className="text-sm font-medium text-ink">
                           {item.type}
                         </p>
 
-                        <p className="text-xs text-[#6B7280]">
+                        <p className="text-xs text-ink-3">
                           {item.description}
                         </p>
                       </div>
@@ -156,7 +156,7 @@ export default function PendingActionsTable() {
 
                   {/* Time */}
                   <td className="px-6 py-4">
-                    <span className="text-sm text-[#6B7280]">{item.time}</span>
+                    <span className="text-sm text-ink-3">{item.time}</span>
                   </td>
 
                   {/* Action */}

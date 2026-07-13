@@ -8,41 +8,41 @@ import type { AuditLog } from "../services/auditService";
 
 const ACTION_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
   // Auth
-  LOGIN_SUCCESS:             { label: "Login",              color: "#1D4ED8", bg: "#DBEAFE" },
-  LOGIN_FAILED:              { label: "Login failed",       color: "#DC2626", bg: "#FEE2E2" },
-  LOGOUT:                    { label: "Logout",             color: "#6B7280", bg: "#F3F4F6" },
-  LOGOUT_SUCCESS:            { label: "Logout",             color: "#6B7280", bg: "#F3F4F6" },
-  PASSWORD_CHANGED:          { label: "Password changed",   color: "#16A34A", bg: "#DCFCE7" },
-  PASSWORD_RESET_REQUESTED:  { label: "Reset requested",    color: "#D97706", bg: "#FEF3C7" },
-  PASSWORD_RESET_SUCCESS:    { label: "Password reset",     color: "#16A34A", bg: "#DCFCE7" },
+  LOGIN_SUCCESS:             { label: "Login",              color: "#1D4ED8", bg: "var(--color-info-bg)" },
+  LOGIN_FAILED:              { label: "Login failed",       color: "var(--color-danger)", bg: "var(--color-danger-bg)" },
+  LOGOUT:                    { label: "Logout",             color: "var(--color-ink-3)", bg: "var(--color-surface-muted)" },
+  LOGOUT_SUCCESS:            { label: "Logout",             color: "var(--color-ink-3)", bg: "var(--color-surface-muted)" },
+  PASSWORD_CHANGED:          { label: "Password changed",   color: "var(--color-success)", bg: "var(--color-success-bg)" },
+  PASSWORD_RESET_REQUESTED:  { label: "Reset requested",    color: "var(--color-warning)", bg: "var(--color-warning-bg)" },
+  PASSWORD_RESET_SUCCESS:    { label: "Password reset",     color: "var(--color-success)", bg: "var(--color-success-bg)" },
   // Employer
-  EMPLOYER_CREATED:          { label: "Employer created",   color: "#1D4ED8", bg: "#DBEAFE" },
-  EMPLOYER_STATUS_UPDATED:   { label: "Employer updated",   color: "#1D4ED8", bg: "#DBEAFE" },
-  EMPLOYER_APPROVED:         { label: "Employer approved",  color: "#16A34A", bg: "#DCFCE7" },
-  EMPLOYER_REJECTED:         { label: "Employer rejected",  color: "#DC2626", bg: "#FEE2E2" },
+  EMPLOYER_CREATED:          { label: "Employer created",   color: "#1D4ED8", bg: "var(--color-info-bg)" },
+  EMPLOYER_STATUS_UPDATED:   { label: "Employer updated",   color: "#1D4ED8", bg: "var(--color-info-bg)" },
+  EMPLOYER_APPROVED:         { label: "Employer approved",  color: "var(--color-success)", bg: "var(--color-success-bg)" },
+  EMPLOYER_REJECTED:         { label: "Employer rejected",  color: "var(--color-danger)", bg: "var(--color-danger-bg)" },
   // Employee
-  EMPLOYEE_CREATED:          { label: "Employee created",   color: "#1D4ED8", bg: "#DBEAFE" },
-  EMPLOYEE_UPDATED:          { label: "Employee updated",   color: "#1D4ED8", bg: "#DBEAFE" },
+  EMPLOYEE_CREATED:          { label: "Employee created",   color: "#1D4ED8", bg: "var(--color-info-bg)" },
+  EMPLOYEE_UPDATED:          { label: "Employee updated",   color: "#1D4ED8", bg: "var(--color-info-bg)" },
   // KYC / Bank
-  KYC_SUBMITTED:             { label: "KYC submitted",      color: "#D97706", bg: "#FEF3C7" },
-  KYC_APPROVED:              { label: "KYC approved",       color: "#16A34A", bg: "#DCFCE7" },
-  KYC_REJECTED:              { label: "KYC rejected",       color: "#DC2626", bg: "#FEE2E2" },
-  BANK_VERIFIED:             { label: "Bank verified",      color: "#16A34A", bg: "#DCFCE7" },
+  KYC_SUBMITTED:             { label: "KYC submitted",      color: "var(--color-warning)", bg: "var(--color-warning-bg)" },
+  KYC_APPROVED:              { label: "KYC approved",       color: "var(--color-success)", bg: "var(--color-success-bg)" },
+  KYC_REJECTED:              { label: "KYC rejected",       color: "var(--color-danger)", bg: "var(--color-danger-bg)" },
+  BANK_VERIFIED:             { label: "Bank verified",      color: "var(--color-success)", bg: "var(--color-success-bg)" },
   // Salary
-  SALARY_REQUEST_CREATED:    { label: "Request created",    color: "#D97706", bg: "#FEF3C7" },
-  SALARY_REQUEST_APPROVED:   { label: "Request approved",   color: "#1D4ED8", bg: "#DBEAFE" },
-  SALARY_REQUEST_REJECTED:   { label: "Request rejected",   color: "#DC2626", bg: "#FEE2E2" },
-  SALARY_REQUEST_DISBURSED:  { label: "Disbursed",          color: "#16A34A", bg: "#DCFCE7" },
+  SALARY_REQUEST_CREATED:    { label: "Request created",    color: "var(--color-warning)", bg: "var(--color-warning-bg)" },
+  SALARY_REQUEST_APPROVED:   { label: "Request approved",   color: "#1D4ED8", bg: "var(--color-info-bg)" },
+  SALARY_REQUEST_REJECTED:   { label: "Request rejected",   color: "var(--color-danger)", bg: "var(--color-danger-bg)" },
+  SALARY_REQUEST_DISBURSED:  { label: "Disbursed",          color: "var(--color-success)", bg: "var(--color-success-bg)" },
   // Disbursal & Repayment
-  DISBURSAL_CREATED:         { label: "Disbursal created",  color: "#1D4ED8", bg: "#DBEAFE" },
-  DISBURSAL_PROCESSED:       { label: "Disbursal processed",color: "#16A34A", bg: "#DCFCE7" },
-  REPAYMENT_CREATED:         { label: "Repayment created",  color: "#D97706", bg: "#FEF3C7" },
+  DISBURSAL_CREATED:         { label: "Disbursal created",  color: "#1D4ED8", bg: "var(--color-info-bg)" },
+  DISBURSAL_PROCESSED:       { label: "Disbursal processed",color: "var(--color-success)", bg: "var(--color-success-bg)" },
+  REPAYMENT_CREATED:         { label: "Repayment created",  color: "var(--color-warning)", bg: "var(--color-warning-bg)" },
   // Membership
-  MEMBERSHIP_ACTIVATED:      { label: "Membership activated",color: "#16A34A", bg: "#DCFCE7" },
-  MEMBERSHIP_EXPIRED:        { label: "Membership expired",  color: "#D97706", bg: "#FEF3C7" },
+  MEMBERSHIP_ACTIVATED:      { label: "Membership activated",color: "var(--color-success)", bg: "var(--color-success-bg)" },
+  MEMBERSHIP_EXPIRED:        { label: "Membership expired",  color: "var(--color-warning)", bg: "var(--color-warning-bg)" },
 };
 
-const FALLBACK = { label: "", color: "#6B7280", bg: "#F3F4F6" };
+const FALLBACK = { label: "", color: "var(--color-ink-3)", bg: "var(--color-surface-muted)" };
 
 function actionCfg(action: string) {
   return ACTION_CONFIG[action] ?? {
@@ -81,7 +81,7 @@ function parseUA(ua: string): DeviceInfo {
 function DeviceBadge({ ua }: { ua: string }) {
   const { os, browser, isMobile } = parseUA(ua);
   const Icon = isMobile ? Smartphone : Monitor;
-  const badgeStyle: React.CSSProperties = { display: "inline-flex", alignItems: "center", gap: 4, height: 18, padding: "0 6px", borderRadius: 4, background: "#F3F4F6", color: "#6B7280", fontSize: 11, fontWeight: 500 };
+  const badgeStyle: React.CSSProperties = { display: "inline-flex", alignItems: "center", gap: 4, height: 18, padding: "0 6px", borderRadius: 4, background: "var(--color-surface-muted)", color: "var(--color-ink-3)", fontSize: 11, fontWeight: 500 };
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6 }}>
       <span style={badgeStyle}><Icon size={9} />{os}</span>
@@ -160,8 +160,8 @@ export default function AuditLogsPage() {
     };
   }
 
-  const selectStyle: React.CSSProperties = { height: 40, padding: "0 12px", fontSize: 13, background: "white", border: "1px solid #E5E7EB", borderRadius: 10, outline: "none", color: "#6B7280", fontFamily: "inherit", cursor: "pointer" };
-  const thStyle: React.CSSProperties = { padding: "12px 16px", textAlign: "left", fontSize: 11.5, fontWeight: 600, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.07em", whiteSpace: "nowrap" };
+  const selectStyle: React.CSSProperties = { height: 40, padding: "0 12px", fontSize: 13, background: "white", border: "1px solid #E5E7EB", borderRadius: 10, outline: "none", color: "var(--color-ink-3)", fontFamily: "inherit", cursor: "pointer" };
+  const thStyle: React.CSSProperties = { padding: "12px 16px", textAlign: "left", fontSize: 11.5, fontWeight: 600, color: "var(--color-ink-4)", textTransform: "uppercase", letterSpacing: "0.07em", whiteSpace: "nowrap" };
   const tdStyle: React.CSSProperties = { padding: "12px 16px", verticalAlign: "top" };
 
   return (
@@ -169,25 +169,25 @@ export default function AuditLogsPage() {
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
-          <h1 style={{ fontSize: 26, fontWeight: 700, color: "#111827", letterSpacing: "-0.025em", margin: 0 }}>Audit Logs</h1>
-          <p style={{ fontSize: 14, color: "#6B7280", marginTop: 6 }}>Full audit trail — auth, employer, employee, salary, disbursal events</p>
+          <h1 style={{ fontSize: 26, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.025em", margin: 0 }}>Audit Logs</h1>
+          <p style={{ fontSize: 14, color: "var(--color-ink-3)", marginTop: 6 }}>Full audit trail — auth, employer, employee, salary, disbursal events</p>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, height: 32, padding: "0 12px", borderRadius: 8, background: "#F8F9FC", border: "1px solid #E5E7EB" }}>
-          <Shield size={12} color="#6B7280" />
-          <span style={{ fontSize: 12, color: "#6B7280", fontWeight: 500 }}>{total.toLocaleString()} events</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, height: 32, padding: "0 12px", borderRadius: 8, background: "var(--color-canvas)", border: "1px solid #E5E7EB" }}>
+          <Shield size={12} color="var(--color-ink-3)" />
+          <span style={{ fontSize: 12, color: "var(--color-ink-3)", fontWeight: 500 }}>{total.toLocaleString()} events</span>
         </div>
       </div>
 
       {/* Filters */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
         <div style={{ position: "relative", width: 288 }}>
-          <Search size={13} color="#9CA3AF" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }} />
+          <Search size={13} color="var(--color-ink-4)" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }} />
           <input
             type="text"
             placeholder="Search action, email, entity…"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            style={{ width: "100%", height: 40, paddingLeft: 36, paddingRight: 16, fontSize: 13, background: "white", border: "1px solid #E5E7EB", borderRadius: 10, outline: "none", color: "#111827", fontFamily: "inherit", boxSizing: "border-box" }}
+            style={{ width: "100%", height: 40, paddingLeft: 36, paddingRight: 16, fontSize: 13, background: "white", border: "1px solid #E5E7EB", borderRadius: 10, outline: "none", color: "var(--color-ink)", fontFamily: "inherit", boxSizing: "border-box" }}
           />
         </div>
         <select value={actionFilter} onChange={handleFilterChange(setActionFilter)} style={selectStyle}>
@@ -201,7 +201,7 @@ export default function AuditLogsPage() {
         {(actionFilter || entityFilter || search) && (
           <button
             onClick={() => { setSearch(""); setActionFilter(""); setEntityFilter(""); setPage(1); }}
-            style={{ height: 40, padding: "0 14px", fontSize: 13, color: "#6B7280", border: "1px solid #E5E7EB", borderRadius: 10, background: "white", cursor: "pointer", fontFamily: "inherit" }}
+            style={{ height: 40, padding: "0 14px", fontSize: 13, color: "var(--color-ink-3)", border: "1px solid #E5E7EB", borderRadius: 10, background: "white", cursor: "pointer", fontFamily: "inherit" }}
           >
             Clear filters
           </button>
@@ -211,18 +211,18 @@ export default function AuditLogsPage() {
       {/* States */}
       {isLoading ? (
         <div style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 20, padding: "40px 24px", textAlign: "center" }}>
-          <p style={{ fontSize: 13, color: "#6B7280" }}>Loading audit logs…</p>
+          <p style={{ fontSize: 13, color: "var(--color-ink-3)" }}>Loading audit logs…</p>
         </div>
       ) : isError ? (
         <div style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 20, padding: "40px 24px", textAlign: "center" }}>
-          <p style={{ fontSize: 13, fontWeight: 500, color: "#374151", margin: 0 }}>Could not load audit logs</p>
-          <p style={{ fontSize: 12, color: "#6B7280", marginTop: 4 }}>Ensure the backend exposes <code style={{ fontFamily: "ui-monospace, monospace", fontSize: 11, background: "#F3F4F6", padding: "2px 4px", borderRadius: 4 }}>GET /audit-logs</code> with admin auth.</p>
-          <button type="button" onClick={() => void refetch()} style={{ marginTop: 12, height: 36, padding: "0 14px", borderRadius: 10, border: "1px solid #E5E7EB", fontSize: 12, fontWeight: 600, color: "#6B7280", background: "white", cursor: "pointer", fontFamily: "inherit" }}>Try again</button>
+          <p style={{ fontSize: 13, fontWeight: 500, color: "var(--color-ink-2)", margin: 0 }}>Could not load audit logs</p>
+          <p style={{ fontSize: 12, color: "var(--color-ink-3)", marginTop: 4 }}>Ensure the backend exposes <code style={{ fontFamily: "ui-monospace, monospace", fontSize: 11, background: "var(--color-surface-muted)", padding: "2px 4px", borderRadius: 4 }}>GET /audit-logs</code> with admin auth.</p>
+          <button type="button" onClick={() => void refetch()} style={{ marginTop: 12, height: 36, padding: "0 14px", borderRadius: 10, border: "1px solid #E5E7EB", fontSize: 12, fontWeight: 600, color: "var(--color-ink-3)", background: "white", cursor: "pointer", fontFamily: "inherit" }}>Try again</button>
         </div>
       ) : rows.length === 0 ? (
         <div style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 20, padding: "40px 24px", textAlign: "center" }}>
-          <p style={{ fontSize: 13, fontWeight: 500, color: "#374151", margin: 0 }}>No audit events found</p>
-          <p style={{ fontSize: 12, color: "#6B7280", marginTop: 4 }}>Events are recorded as admin and user actions occur.</p>
+          <p style={{ fontSize: 13, fontWeight: 500, color: "var(--color-ink-2)", margin: 0 }}>No audit events found</p>
+          <p style={{ fontSize: 12, color: "var(--color-ink-3)", marginTop: 4 }}>Events are recorded as admin and user actions occur.</p>
         </div>
       ) : (
         <>
@@ -237,7 +237,7 @@ export default function AuditLogsPage() {
                 <col style={{ width: "12%" }} />
               </colgroup>
               <thead>
-                <tr style={{ borderBottom: "1px solid #F3F4F6", background: "#FAFAFA" }}>
+                <tr style={{ borderBottom: "1px solid #F3F4F6", background: "var(--color-surface-raised)" }}>
                   {["Action", "Performed by", "Entity type", "Entity ID", "Timestamp", "When"].map((h, i) => (
                     <th key={i} style={thStyle}>{h}</th>
                   ))}
@@ -261,34 +261,34 @@ export default function AuditLogsPage() {
                       <td style={tdStyle}>
                         {log.user ? (
                           <div>
-                            <p style={{ fontSize: 12, fontWeight: 500, color: "#111827", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{log.user.email}</p>
-                            <p style={{ fontSize: 11, color: "#6B7280", marginTop: 2, fontFamily: "ui-monospace, monospace" }}>{log.user.role}</p>
+                            <p style={{ fontSize: 12, fontWeight: 500, color: "var(--color-ink)", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{log.user.email}</p>
+                            <p style={{ fontSize: 11, color: "var(--color-ink-3)", marginTop: 2, fontFamily: "ui-monospace, monospace" }}>{log.user.role}</p>
                             {deviceInfo && <DeviceBadge ua={deviceInfo} />}
                             {ipAddress && !deviceInfo && (
-                              <p style={{ fontSize: 11, color: "#6B7280", marginTop: 4, fontFamily: "ui-monospace, monospace" }}>{ipAddress}</p>
+                              <p style={{ fontSize: 11, color: "var(--color-ink-3)", marginTop: 4, fontFamily: "ui-monospace, monospace" }}>{ipAddress}</p>
                             )}
                           </div>
                         ) : (
-                          <span style={{ fontSize: 11, color: "#6B7280" }}>System</span>
+                          <span style={{ fontSize: 11, color: "var(--color-ink-3)" }}>System</span>
                         )}
                       </td>
                       {/* Entity type */}
                       <td style={tdStyle}>
-                        <span style={{ fontSize: 11, color: "#6B7280", fontFamily: "ui-monospace, monospace" }}>{log.entityType ?? "—"}</span>
+                        <span style={{ fontSize: 11, color: "var(--color-ink-3)", fontFamily: "ui-monospace, monospace" }}>{log.entityType ?? "—"}</span>
                       </td>
                       {/* Entity ID */}
                       <td style={tdStyle}>
-                        <span style={{ fontSize: 11, color: "#6B7280", fontFamily: "ui-monospace, monospace", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", cursor: "default" }} title={log.entityId ?? ""}>
+                        <span style={{ fontSize: 11, color: "var(--color-ink-3)", fontFamily: "ui-monospace, monospace", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", cursor: "default" }} title={log.entityId ?? ""}>
                           {log.entityId ? `${log.entityId.slice(0, 8)}…` : "—"}
                         </span>
                       </td>
                       {/* Timestamp */}
                       <td style={tdStyle}>
-                        <span style={{ fontSize: 11, color: "#6B7280" }}>{formatDate(log.createdAt)}</span>
+                        <span style={{ fontSize: 11, color: "var(--color-ink-3)" }}>{formatDate(log.createdAt)}</span>
                       </td>
                       {/* Relative */}
                       <td style={tdStyle}>
-                        <span style={{ fontSize: 11, color: "#6B7280" }}>{timeAgo(log.createdAt)}</span>
+                        <span style={{ fontSize: 11, color: "var(--color-ink-3)" }}>{timeAgo(log.createdAt)}</span>
                       </td>
                     </tr>
                   );
@@ -300,14 +300,14 @@ export default function AuditLogsPage() {
           {/* Pagination */}
           {totalPages > 1 && (
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 4px" }}>
-              <p style={{ fontSize: 12, color: "#6B7280", margin: 0 }}>
+              <p style={{ fontSize: 12, color: "var(--color-ink-3)", margin: 0 }}>
                 Page {page} of {totalPages} · {total.toLocaleString()} total events
               </p>
               <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                 <button
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid #E5E7EB", background: "white", color: "#6B7280", cursor: page === 1 ? "not-allowed" : "pointer", opacity: page === 1 ? 0.3 : 1 }}
+                  style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid #E5E7EB", background: "white", color: "var(--color-ink-3)", cursor: page === 1 ? "not-allowed" : "pointer", opacity: page === 1 ? 0.3 : 1 }}
                 >
                   <ChevronLeft size={13} />
                 </button>
@@ -319,7 +319,7 @@ export default function AuditLogsPage() {
                     <button
                       key={p}
                       onClick={() => setPage(p)}
-                      style={{ width: 28, height: 28, fontSize: 12, borderRadius: 8, border: active ? "1px solid #315eff" : "1px solid #E5E7EB", background: active ? "#EEF2FF" : "white", color: active ? "#315eff" : "#6B7280", fontWeight: active ? 600 : 400, cursor: "pointer", fontFamily: "inherit" }}
+                      style={{ width: 28, height: 28, fontSize: 12, borderRadius: 8, border: active ? "1px solid #315eff" : "1px solid #E5E7EB", background: active ? "var(--color-brand-soft)" : "white", color: active ? "var(--color-brand)" : "var(--color-ink-3)", fontWeight: active ? 600 : 400, cursor: "pointer", fontFamily: "inherit" }}
                     >
                       {p}
                     </button>
@@ -328,7 +328,7 @@ export default function AuditLogsPage() {
                 <button
                   onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid #E5E7EB", background: "white", color: "#6B7280", cursor: page === totalPages ? "not-allowed" : "pointer", opacity: page === totalPages ? 0.3 : 1 }}
+                  style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid #E5E7EB", background: "white", color: "var(--color-ink-3)", cursor: page === totalPages ? "not-allowed" : "pointer", opacity: page === totalPages ? 0.3 : 1 }}
                 >
                   <ChevronRight size={13} />
                 </button>

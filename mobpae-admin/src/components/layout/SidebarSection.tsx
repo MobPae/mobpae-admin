@@ -9,7 +9,7 @@ export default function SidebarSection({
 }: SidebarSectionProps) {
   return (
     <div className="mb-5">
-      <p className="text-[11px] uppercase tracking-wider text-[#6B7280] px-4 mb-2 font-medium">
+      <p className="text-[11px] uppercase tracking-wider text-ink-3 px-4 mb-2 font-medium">
         {title}
       </p>
 

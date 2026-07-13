@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { login } from "../services/authService";
 import { getToken, setToken, setRefreshToken } from "../utils/auth";
 
-const P  = "#315eff";
-const PD = "#2048EE";
+const P  = "var(--color-brand)";
+const PD = "var(--color-info)";
 
 
 // Mini dashboard preview for right panel
@@ -26,42 +26,42 @@ function DashboardPreview() {
           <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#FDE68A" }} />
           <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#6EE7B7" }} />
         </div>
-        <div style={{ flex: 1, height: 6, background: "#F3F4F6", borderRadius: 4 }} />
+        <div style={{ flex: 1, height: 6, background: "var(--color-surface-muted)", borderRadius: 4 }} />
       </div>
 
       {/* Stats row */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 12 }}>
         {[
-          { label: "Total Employers", value: "542", color: "#EEF2FF" },
-          { label: "Total Employees", value: "32,489", color: "#DCFCE7" },
-          { label: "Advances This Month", value: "₹2,48,75,000", color: "#FEF3C7" },
+          { label: "Total Employers", value: "542", color: "var(--color-brand-soft)" },
+          { label: "Total Employees", value: "32,489", color: "var(--color-success-bg)" },
+          { label: "Advances This Month", value: "₹2,48,75,000", color: "var(--color-warning-bg)" },
         ].map((s) => (
           <div key={s.label} style={{ background: s.color, borderRadius: 10, padding: "10px 12px" }}>
-            <p style={{ fontSize: 9, color: "#6B7280", marginBottom: 4 }}>{s.label}</p>
-            <p style={{ fontSize: 13, fontWeight: 700, color: "#111827" }}>{s.value}</p>
+            <p style={{ fontSize: 9, color: "var(--color-ink-3)", marginBottom: 4 }}>{s.label}</p>
+            <p style={{ fontSize: 13, fontWeight: 700, color: "var(--color-ink)" }}>{s.value}</p>
           </div>
         ))}
       </div>
 
       {/* Recent activity */}
-      <div style={{ background: "#F8F9FC", borderRadius: 10, padding: "10px 12px" }}>
-        <p style={{ fontSize: 10, fontWeight: 600, color: "#111827", marginBottom: 8 }}>Recent Activity</p>
+      <div style={{ background: "var(--color-canvas)", borderRadius: 10, padding: "10px 12px" }}>
+        <p style={{ fontSize: 10, fontWeight: 600, color: "var(--color-ink)", marginBottom: 8 }}>Recent Activity</p>
         {[
-          { name: "Rahul Sharma",  action: "Advance request submitted", time: "12 May 2025", status: "Completed", color: "#DCFCE7", text: "#16A34A" },
-          { name: "Priya Nair",    action: "KYC verification approved",  time: "12 May 2025", status: "Approved",  color: "#DCFCE7", text: "#16A34A" },
-          { name: "Arjun Verma",   action: "Advance disbursed",          time: "11 May 2025", status: "Completed", color: "#DCFCE7", text: "#16A34A" },
-          { name: "Sneha Iyer",    action: "Repayment received",         time: "11 May 2025", status: "Completed", color: "#DCFCE7", text: "#16A34A" },
+          { name: "Rahul Sharma",  action: "Advance request submitted", time: "12 May 2025", status: "Completed", color: "var(--color-success-bg)", text: "var(--color-success)" },
+          { name: "Priya Nair",    action: "KYC verification approved",  time: "12 May 2025", status: "Approved",  color: "var(--color-success-bg)", text: "var(--color-success)" },
+          { name: "Arjun Verma",   action: "Advance disbursed",          time: "11 May 2025", status: "Completed", color: "var(--color-success-bg)", text: "var(--color-success)" },
+          { name: "Sneha Iyer",    action: "Repayment received",         time: "11 May 2025", status: "Completed", color: "var(--color-success-bg)", text: "var(--color-success)" },
         ].map((r) => (
           <div key={r.name} style={{ display: "flex", alignItems: "center", gap: 8, paddingBottom: 7, marginBottom: 7, borderBottom: "1px solid #E5E7EB" }}>
             <div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg, #8B7CFF, #315eff)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, color: "white", fontWeight: 700, flexShrink: 0 }}>
               {r.name[0]}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontSize: 9, fontWeight: 600, color: "#111827", lineHeight: 1.2 }}>{r.name}</p>
-              <p style={{ fontSize: 8, color: "#6B7280", lineHeight: 1.2 }}>{r.action}</p>
+              <p style={{ fontSize: 9, fontWeight: 600, color: "var(--color-ink)", lineHeight: 1.2 }}>{r.name}</p>
+              <p style={{ fontSize: 8, color: "var(--color-ink-3)", lineHeight: 1.2 }}>{r.action}</p>
             </div>
             <div>
-              <p style={{ fontSize: 8, color: "#9CA3AF", marginBottom: 2, textAlign: "right" }}>{r.time}</p>
+              <p style={{ fontSize: 8, color: "var(--color-ink-4)", marginBottom: 2, textAlign: "right" }}>{r.time}</p>
               <span style={{ fontSize: 8, fontWeight: 600, background: r.color, color: r.text, padding: "1px 6px", borderRadius: 999 }}>{r.status}</span>
             </div>
           </div>
@@ -95,7 +95,7 @@ export default function LoginPage() {
     loginAttempted.current = true;
     try {
       setLoading(true); setError("");
-      const res = await login(email, password);
+      const res = await login(email.trim().toLowerCase(), password);
       setToken(res.accessToken);
       if (res.refreshToken) setRefreshToken(res.refreshToken);
       navigate(res.passwordChanged === false ? "/change-password" : "/");
@@ -121,7 +121,7 @@ export default function LoginPage() {
         <div style={{ padding: "28px 40px", flexShrink: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <img src="/logo-icon.svg" alt="MobPae" width="44" height="28" style={{ objectFit: "contain", flexShrink: 0 }} />
-            <span style={{ fontSize: 16, fontWeight: 700, color: "#111827", letterSpacing: "-0.02em" }}>MobPae</span>
+            <span style={{ fontSize: 16, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.02em" }}>MobPae</span>
           </div>
         </div>
 
@@ -130,10 +130,10 @@ export default function LoginPage() {
           <div style={{ maxWidth: 380, width: "100%" }}>
 
             {/* Heading */}
-            <h1 style={{ fontSize: 28, fontWeight: 700, color: "#111827", letterSpacing: "-0.025em", lineHeight: 1.2, margin: "0 0 8px" }}>
+            <h1 style={{ fontSize: 28, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.025em", lineHeight: 1.2, margin: "0 0 8px" }}>
               Welcome back 👋
             </h1>
-            <p style={{ fontSize: 14, color: "#6B7280", lineHeight: 1.6, marginBottom: 32 }}>
+            <p style={{ fontSize: 14, color: "var(--color-ink-3)", lineHeight: 1.6, marginBottom: 32 }}>
               Sign in to access your MobPae admin dashboard
             </p>
 
@@ -141,7 +141,7 @@ export default function LoginPage() {
 
               {/* Email */}
               <div>
-                <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#374151", marginBottom: 6 }}>
+                <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "var(--color-ink-2)", marginBottom: 6 }}>
                   Email address
                 </label>
                 <div style={{
@@ -149,20 +149,20 @@ export default function LoginPage() {
                   background: "white", border: "1.5px solid #E5E7EB", borderRadius: 12, padding: "11px 14px",
                   transition: "border-color 0.15s",
                 }}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" strokeWidth="2" strokeLinecap="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--color-ink-disabled)" strokeWidth="2" strokeLinecap="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
                   <input
                     type="email" value={email} onChange={e => setEmail(e.target.value)}
                     placeholder="Enter your email" required autoComplete="email"
-                    style={{ flex: 1, fontSize: 14, color: "#111827", background: "transparent", outline: "none", border: "none", minWidth: 0, fontFamily: "inherit" }}
+                    style={{ flex: 1, fontSize: 14, color: "var(--color-ink)", background: "transparent", outline: "none", border: "none", minWidth: 0, fontFamily: "inherit" }}
                     onFocus={e  => { (e.target.closest("div") as HTMLElement).style.borderColor = P; }}
-                    onBlur={e   => { (e.target.closest("div") as HTMLElement).style.borderColor = "#E5E7EB"; }}
+                    onBlur={e   => { (e.target.closest("div") as HTMLElement).style.borderColor = "var(--color-edge)"; }}
                   />
                 </div>
               </div>
 
               {/* Password */}
               <div>
-                <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#374151", marginBottom: 6 }}>
+                <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "var(--color-ink-2)", marginBottom: 6 }}>
                   Password
                 </label>
                 <div style={{
@@ -170,15 +170,15 @@ export default function LoginPage() {
                   background: "white", border: "1.5px solid #E5E7EB", borderRadius: 12, padding: "11px 14px",
                   transition: "border-color 0.15s",
                 }}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" strokeWidth="2" strokeLinecap="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--color-ink-disabled)" strokeWidth="2" strokeLinecap="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                   <input
                     type={showPass ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)}
                     placeholder="Enter your password" required autoComplete="current-password"
-                    style={{ flex: 1, fontSize: 14, color: "#111827", background: "transparent", outline: "none", border: "none", minWidth: 0, fontFamily: "inherit" }}
+                    style={{ flex: 1, fontSize: 14, color: "var(--color-ink)", background: "transparent", outline: "none", border: "none", minWidth: 0, fontFamily: "inherit" }}
                     onFocus={e  => { (e.target.closest("div") as HTMLElement).style.borderColor = P; }}
-                    onBlur={e   => { (e.target.closest("div") as HTMLElement).style.borderColor = "#E5E7EB"; }}
+                    onBlur={e   => { (e.target.closest("div") as HTMLElement).style.borderColor = "var(--color-edge)"; }}
                   />
-                  <button type="button" onClick={() => setShowPass(v => !v)} style={{ color: "#D1D5DB", background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", flexShrink: 0 }}>
+                  <button type="button" onClick={() => setShowPass(v => !v)} style={{ color: "var(--color-ink-disabled)", background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", flexShrink: 0 }}>
                     {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
                   </button>
                 </div>
@@ -186,7 +186,7 @@ export default function LoginPage() {
 
               {/* Remember + Forgot */}
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: 13, color: "#6B7280" }}>
+                <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: 13, color: "var(--color-ink-3)" }}>
                   <input
                     type="checkbox"
                     checked={remember}
@@ -206,7 +206,7 @@ export default function LoginPage() {
 
               {/* Error */}
               {error && (
-                <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: "#DC2626", fontWeight: 500 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, background: "var(--color-danger-soft)", border: "1px solid #FECACA", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: "var(--color-danger)", fontWeight: 500 }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                   {error}
                 </div>
@@ -217,7 +217,7 @@ export default function LoginPage() {
                 type="submit" disabled={loading}
                 style={{
                   width: "100%", height: 48, marginTop: 4,
-                  background: loading ? "#A89CFF" : `linear-gradient(135deg, ${PD} 0%, ${P} 100%)`,
+                  background: loading ? "var(--color-brand-muted)" : `linear-gradient(135deg, ${PD} 0%, ${P} 100%)`,
                   color: "white", borderRadius: 12, border: "none",
                   fontSize: 14, fontWeight: 600, letterSpacing: "0.01em",
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
@@ -239,9 +239,9 @@ export default function LoginPage() {
 
               {/* Divider */}
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ flex: 1, height: 1, background: "#E5E7EB" }} />
-                <span style={{ fontSize: 12, color: "#9CA3AF" }}>or continue with</span>
-                <div style={{ flex: 1, height: 1, background: "#E5E7EB" }} />
+                <div style={{ flex: 1, height: 1, background: "var(--color-edge)" }} />
+                <span style={{ fontSize: 12, color: "var(--color-ink-4)" }}>or continue with</span>
+                <div style={{ flex: 1, height: 1, background: "var(--color-edge)" }} />
               </div>
 
               {/* Google button */}
@@ -250,12 +250,12 @@ export default function LoginPage() {
                 style={{
                   width: "100%", height: 46,
                   background: "white", border: "1.5px solid #E5E7EB", borderRadius: 12,
-                  fontSize: 14, fontWeight: 500, color: "#111827",
+                  fontSize: 14, fontWeight: 500, color: "var(--color-ink)",
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
                   cursor: "pointer", transition: "border-color 0.15s", fontFamily: "inherit",
                 }}
-                onMouseEnter={e => { (e.currentTarget).style.borderColor = "#D1D5DB"; }}
-                onMouseLeave={e => { (e.currentTarget).style.borderColor = "#E5E7EB"; }}
+                onMouseEnter={e => { (e.currentTarget).style.borderColor = "var(--color-ink-disabled)"; }}
+                onMouseLeave={e => { (e.currentTarget).style.borderColor = "var(--color-edge)"; }}
               >
                 {/* Google G */}
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -269,14 +269,14 @@ export default function LoginPage() {
             </form>
 
             {/* Trust note */}
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 28, padding: "12px 16px", background: "#F8F9FC", borderRadius: 10 }}>
-              <Shield size={14} style={{ color: "#9CA3AF", flexShrink: 0 }} />
-              <p style={{ fontSize: 12, color: "#9CA3AF", lineHeight: 1.5 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 28, padding: "12px 16px", background: "var(--color-canvas)", borderRadius: 10 }}>
+              <Shield size={14} style={{ color: "var(--color-ink-4)", flexShrink: 0 }} />
+              <p style={{ fontSize: 12, color: "var(--color-ink-4)", lineHeight: 1.5 }}>
                 Your data is protected with bank-grade encryption and security.
               </p>
             </div>
 
-            <p style={{ marginTop: 20, fontSize: 12, color: "#D1D5DB", textAlign: "center" }}>
+            <p style={{ marginTop: 20, fontSize: 12, color: "var(--color-ink-disabled)", textAlign: "center" }}>
               © {new Date().getFullYear()} MobPae Technologies Pvt. Ltd. All rights reserved.
             </p>
           </div>

@@ -7,7 +7,7 @@ export default function FinancialOverview() {
       value: "₹4.2L",
       subtitle: "This month",
       icon: Landmark,
-      bg: "bg-[#EEF2FF]",
+      bg: "bg-brand-soft",
       text: "text-[#2048EE]",
     },
     {
@@ -15,7 +15,7 @@ export default function FinancialOverview() {
       value: "₹95K",
       subtitle: "Recovery received",
       icon: TrendingUp,
-      bg: "bg-[#EEF2FF]",
+      bg: "bg-brand-soft",
       text: "text-[#2048EE]",
     },
     {
@@ -29,14 +29,14 @@ export default function FinancialOverview() {
   ];
 
   return (
-    <div className="col-span-4 bg-white border border-[#E5E7EB] rounded-3xl shadow-sm">
+    <div className="col-span-4 bg-white border border-edge rounded-3xl shadow-sm">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-[#E5E7EB]">
-        <h3 className="text-base font-semibold text-[#111827]">
+      <div className="px-6 py-4 border-b border-edge">
+        <h3 className="text-base font-semibold text-ink">
           Financial Overview
         </h3>
 
-        <p className="text-xs text-[#6B7280] mt-1">
+        <p className="text-xs text-ink-3 mt-1">
           Salary advance portfolio summary
         </p>
       </div>
@@ -56,8 +56,8 @@ export default function FinancialOverview() {
                   p-3
                   rounded-2xl
                   border
-                  border-[#E5E7EB]
-                  hover:bg-[#F8F9FC]
+                  border-edge
+                  hover:bg-canvas
                   transition-all
                 "
             >
@@ -77,15 +77,15 @@ export default function FinancialOverview() {
                 </div>
 
                 <div>
-                  <p className="text-xs text-[#6B7280]">{item.title}</p>
+                  <p className="text-xs text-ink-3">{item.title}</p>
 
-                  <p className="text-sm font-medium text-[#111827] mt-1">
+                  <p className="text-sm font-medium text-ink mt-1">
                     {item.subtitle}
                   </p>
                 </div>
               </div>
 
-              <h4 className="text-lg font-bold text-[#111827]">{item.value}</h4>
+              <h4 className="text-lg font-bold text-ink">{item.value}</h4>
             </div>
           );
         })}

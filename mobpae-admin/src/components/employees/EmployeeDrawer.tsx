@@ -13,14 +13,14 @@ interface Props {
 }
 
 const STATUS_BADGE: Record<string, string> = {
-  ACTIVE:   "bg-[#DCFCE7] text-[#15803D]",
-  INACTIVE: "bg-[#F3F4F6] text-[#6B7280]",
+  ACTIVE:   "bg-success-bg text-success-dark",
+  INACTIVE: "bg-surface-muted text-ink-3",
 };
 
 const SELFIE_BADGE: Record<string, string> = {
   PENDING:  "bg-amber-50 text-amber-700",
-  VERIFIED: "bg-[#DCFCE7] text-[#15803D]",
-  REJECTED: "bg-red-50 text-red-600",
+  VERIFIED: "bg-success-bg text-success-dark",
+  REJECTED: "bg-danger-soft text-danger",
 };
 
 export default function EmployeeDrawer({ open, employee, onClose, onRefresh }: Props) {
@@ -70,16 +70,16 @@ export default function EmployeeDrawer({ open, employee, onClose, onRefresh }: P
     <>
       <div className="fixed inset-0 bg-black/20 z-40" onClick={onClose} />
 
-      <div className="fixed top-0 right-0 h-full w-[440px] bg-white z-50 flex flex-col border-l border-[#E5E7EB] shadow-xl">
+      <div className="fixed top-0 right-0 h-full w-[440px] bg-white z-50 flex flex-col border-l border-edge shadow-overlay">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E5E7EB] flex-shrink-0">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-edge flex-shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#111827] to-[#2A2C45] text-white flex items-center justify-center text-[12px] font-[600]">
               {employee.name.charAt(0).toUpperCase()}
             </div>
             <div>
-              <p className="text-[13px] font-[500] text-[#111827] leading-none">{employee.name}</p>
-              <p className="text-[11px] text-[#6B7280] mt-0.5 leading-none">{employee.email}</p>
+              <p className="text-[13px] font-[500] text-ink leading-none">{employee.name}</p>
+              <p className="text-[11px] text-ink-3 mt-0.5 leading-none">{employee.email}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -88,7 +88,7 @@ export default function EmployeeDrawer({ open, employee, onClose, onRefresh }: P
             </span>
             <button
               onClick={onClose}
-              className="w-6 h-6 rounded-md flex items-center justify-center text-[#6B7280] hover:text-[#6B7280] hover:bg-[#F3F4F6] transition-colors"
+              className="w-6 h-6 rounded-md flex items-center justify-center text-ink-3 hover:text-ink-3 hover:bg-surface-muted transition-colors"
             >
               <X size={14} />
             </button>
@@ -99,18 +99,18 @@ export default function EmployeeDrawer({ open, employee, onClose, onRefresh }: P
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
           {/* Personal */}
           <section>
-            <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-[#6B7280] mb-2">
+            <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-ink-3 mb-2">
               Personal details
             </p>
-            <div className="border border-[#E5E7EB] rounded-lg divide-y divide-[#E5E7EB]">
+            <div className="border border-edge rounded-lg divide-y divide-edge">
               {[
                 { k: "Full name",  v: employee.name             },
                 { k: "Email",      v: employee.email            },
                 { k: "Phone",      v: employee.phone            },
               ].map(({ k, v }) => (
                 <div key={k} className="flex items-center justify-between px-3 py-2.5">
-                  <span className="text-[11px] text-[#6B7280]">{k}</span>
-                  <span className="text-[11px] font-[500] text-[#111827] truncate max-w-[60%] text-right">{v}</span>
+                  <span className="text-[11px] text-ink-3">{k}</span>
+                  <span className="text-[11px] font-[500] text-ink truncate max-w-[60%] text-right">{v}</span>
                 </div>
               ))}
             </div>
@@ -118,20 +118,20 @@ export default function EmployeeDrawer({ open, employee, onClose, onRefresh }: P
 
           {/* Employment */}
           <section>
-            <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-[#6B7280] mb-2">
+            <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-ink-3 mb-2">
               Employment details
             </p>
-            <div className="border border-[#E5E7EB] rounded-lg divide-y divide-[#E5E7EB]">
+            <div className="border border-edge rounded-lg divide-y divide-edge">
               {[
                 { k: "Employee code",  v: <span className="font-mono">{employee.employeeCode}</span> },
                 { k: "Salary in hand", v: `₹${Number(employee.salaryInHand).toLocaleString("en-IN")}` },
                 { k: "Joining date",   v: employee.joiningDate ? new Date(employee.joiningDate).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "Not set" },
-                { k: "App access",     v: <span className={`inline-flex h-[16px] px-1.5 rounded-[3px] items-center text-[11px] font-[500] ${employee.appActivated ? "bg-[#DBEAFE] text-[#1D4ED8]" : "bg-[#F3F4F6] text-[#6B7280]"}`}>{employee.appActivated ? "Enabled" : "Disabled"}</span> },
+                { k: "App access",     v: <span className={`inline-flex h-[16px] px-1.5 rounded-[3px] items-center text-[11px] font-[500] ${employee.appActivated ? "bg-[#DBEAFE] text-[#1D4ED8]" : "bg-surface-muted text-ink-3"}`}>{employee.appActivated ? "Enabled" : "Disabled"}</span> },
                 { k: "Member since",   v: new Date(employee.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) },
               ].map(({ k, v }) => (
                 <div key={k} className="flex items-center justify-between px-3 py-2.5">
-                  <span className="text-[11px] text-[#6B7280]">{k}</span>
-                  <span className="text-[11px] font-[500] text-[#111827]">{v}</span>
+                  <span className="text-[11px] text-ink-3">{k}</span>
+                  <span className="text-[11px] font-[500] text-ink">{v}</span>
                 </div>
               ))}
             </div>
@@ -139,17 +139,17 @@ export default function EmployeeDrawer({ open, employee, onClose, onRefresh }: P
 
           {/* Employer */}
           <section>
-            <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-[#6B7280] mb-2">
+            <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-ink-3 mb-2">
               Employer
             </p>
-            <div className="border border-[#E5E7EB] rounded-lg divide-y divide-[#E5E7EB]">
+            <div className="border border-edge rounded-lg divide-y divide-edge">
               {[
                 { k: "Company",      v: employee.employer.companyName },
                 { k: "Company code", v: <span className="font-mono">{employee.employer.companyCode}</span> },
               ].map(({ k, v }) => (
                 <div key={k} className="flex items-center justify-between px-3 py-2.5">
-                  <span className="text-[11px] text-[#6B7280]">{k}</span>
-                  <span className="text-[11px] font-[500] text-[#111827]">{v}</span>
+                  <span className="text-[11px] text-ink-3">{k}</span>
+                  <span className="text-[11px] font-[500] text-ink">{v}</span>
                 </div>
               ))}
             </div>
@@ -157,13 +157,13 @@ export default function EmployeeDrawer({ open, employee, onClose, onRefresh }: P
 
           {/* Selfie */}
           <section>
-            <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-[#6B7280] mb-2">
+            <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-ink-3 mb-2">
               Selfie verification
             </p>
-            <div className="border border-[#E5E7EB] rounded-lg p-3 space-y-3">
+            <div className="border border-edge rounded-lg p-3 space-y-3">
               {/* Status row */}
               <div className="flex items-center justify-between">
-                <span className="text-[11px] text-[#6B7280] flex items-center gap-1.5">
+                <span className="text-[11px] text-ink-3 flex items-center gap-1.5">
                   <Camera size={12} /> Status
                 </span>
                 <span className={`inline-flex h-[18px] px-1.5 rounded-[3px] items-center text-[11px] font-[500] ${SELFIE_BADGE[selfieStatus]}`}>
@@ -180,14 +180,14 @@ export default function EmployeeDrawer({ open, employee, onClose, onRefresh }: P
                   style={{ maxHeight: 200 }}
                 />
               ) : (
-                <div className="bg-[#F8F9FC] rounded-lg h-[100px] flex items-center justify-center">
-                  <p className="text-[11px] text-[#6B7280]">No selfie uploaded</p>
+                <div className="bg-canvas rounded-lg h-[100px] flex items-center justify-center">
+                  <p className="text-[11px] text-ink-3">No selfie uploaded</p>
                 </div>
               )}
 
               {/* Selfie verified at */}
               {employee.selfieVerifiedAt && (
-                <p className="text-[11px] text-[#6B7280]">
+                <p className="text-[11px] text-ink-3">
                   Verified {new Date(employee.selfieVerifiedAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
                 </p>
               )}
@@ -196,20 +196,20 @@ export default function EmployeeDrawer({ open, employee, onClose, onRefresh }: P
               {selfieStatus === "PENDING" && selfieImgUrl && (
                 <div className="space-y-2">
                   {selfieError && (
-                    <p className="text-[11px] text-red-600 bg-red-50 rounded px-2 py-1">{selfieError}</p>
+                    <p className="text-[11px] text-danger bg-danger-soft rounded px-2 py-1">{selfieError}</p>
                   )}
                   <div className="flex gap-2">
                     <button
                       onClick={() => void handleVerify()}
                       disabled={selfieLoading}
-                      className="flex-1 h-8 rounded-lg bg-[#315eff] hover:bg-[#2048EE] text-white text-[11px] font-[500] flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
+                      className="flex-1 h-8 rounded-lg bg-brand hover:bg-[#2048EE] text-white text-[11px] font-[500] flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
                     >
                       <CheckCircle size={12} /> Verify
                     </button>
                     <button
                       onClick={() => setShowRejectBox(v => !v)}
                       disabled={selfieLoading}
-                      className="flex-1 h-8 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 text-[11px] font-[500] flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
+                      className="flex-1 h-8 rounded-lg bg-danger-soft hover:bg-danger-bg text-red-700 text-[11px] font-[500] flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
                     >
                       <XCircle size={12} /> Reject
                     </button>
@@ -221,7 +221,7 @@ export default function EmployeeDrawer({ open, employee, onClose, onRefresh }: P
                         onChange={e => setRejectRemarks(e.target.value)}
                         placeholder="Reason for rejection…"
                         rows={2}
-                        className="w-full border border-[#E5E7EB] rounded-lg px-2 py-1.5 text-[11px] text-[#6B7280] resize-none focus:outline-none focus:border-red-400"
+                        className="w-full border border-edge rounded-lg px-2 py-1.5 text-[11px] text-ink-3 resize-none focus:outline-none focus:border-red-400"
                       />
                       <button
                         onClick={() => void handleReject()}

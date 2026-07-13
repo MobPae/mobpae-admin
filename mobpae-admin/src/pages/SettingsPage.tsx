@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
-  MonitorCog, QrCode, Building2, Bell,
+  MonitorCog, Building2, Bell,
   Pencil, Check, X, Loader2,
 } from "lucide-react";
 import { getSettings, updateSetting } from "../services/settingsService";
@@ -16,12 +16,6 @@ const APP_TOGGLES = [
 
 const APP_TEXT = [
   { key: "app.maintenance_message", label: "Maintenance message", wide: true },
-];
-
-const MEMBERSHIP_TEXT = [
-  { key: "membership.payment_upi_id",       label: "UPI ID",       placeholder: "e.g. mobpae@okicici" },
-  { key: "membership.payment_beneficiary",  label: "Beneficiary",  placeholder: "e.g. MobPae Fintech Pvt Ltd" },
-  { key: "membership.payment_instructions", label: "Instructions", placeholder: "e.g. Pay using any UPI app…", wide: true },
 ];
 
 const SETTLEMENT_FIELDS = [
@@ -59,7 +53,7 @@ function Toggle({ on, loading, onChange }: { on: boolean; loading: boolean; onCh
       style={{
         position: "relative", display: "inline-flex", alignItems: "center",
         height: 20, width: 36, borderRadius: 999,
-        background: on ? "#315eff" : "#E5E7EB",
+        background: on ? "var(--color-brand)" : "var(--color-edge)",
         border: "none", cursor: "pointer", flexShrink: 0,
         opacity: loading ? 0.5 : 1, transition: "background 0.2s",
       }}
@@ -81,7 +75,7 @@ function SectionCard({ icon, color, title, children }: {
         <div style={{ width: 26, height: 26, borderRadius: 8, background: color, display: "flex", alignItems: "center", justifyContent: "center" }}>
           {icon}
         </div>
-        <p style={{ fontSize: 13, fontWeight: 600, color: "#111827", margin: 0 }}>{title}</p>
+        <p style={{ fontSize: 13, fontWeight: 600, color: "var(--color-ink)", margin: 0 }}>{title}</p>
       </div>
       <div>{children}</div>
     </div>
@@ -94,7 +88,7 @@ interface ToggleRowProps { k: string; label: string; settings: SettingsRecord; o
 function ToggleRow({ k, label, settings, onToggle, toggling, isPending }: ToggleRowProps) {
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", minHeight: 44, borderBottom: "1px solid #F3F4F6" }}>
-      <span style={{ fontSize: 13, color: "#6B7280" }}>{label}</span>
+      <span style={{ fontSize: 13, color: "var(--color-ink-3)" }}>{label}</span>
       <Toggle
         on={isOn(settings, k)}
         loading={toggling === k && isPending}
@@ -119,7 +113,7 @@ function TextRow({ k, label, suffix, placeholder, wide, settings, editing, setEd
 
   return (
     <div style={{ display: "flex", alignItems: wide ? "flex-start" : "center", justifyContent: "space-between", padding: "12px 20px", minHeight: 44, borderBottom: "1px solid #F3F4F6", gap: 12 }}>
-      <span style={{ fontSize: 13, color: "#6B7280", flexShrink: 0, paddingTop: wide ? 2 : 0 }}>{label}</span>
+      <span style={{ fontSize: 13, color: "var(--color-ink-3)", flexShrink: 0, paddingTop: wide ? 2 : 0 }}>{label}</span>
       <div style={{ display: "flex", alignItems: "flex-start", gap: 6, flex: 1, justifyContent: "flex-end" }}>
         {isEditingThis ? (
           <>
@@ -130,7 +124,7 @@ function TextRow({ k, label, suffix, placeholder, wide, settings, editing, setEd
                   value={editing!.value}
                   onChange={e => setEditing({ key: k, value: e.target.value })}
                   rows={3}
-                  style={{ width: "100%", padding: "6px 10px", fontSize: 12, fontWeight: 500, color: "#111827", border: "1px solid #315eff", borderRadius: 8, outline: "none", resize: "vertical", fontFamily: "inherit" }}
+                  style={{ width: "100%", padding: "6px 10px", fontSize: 12, fontWeight: 500, color: "var(--color-ink)", border: "1px solid #315eff", borderRadius: 8, outline: "none", resize: "vertical", fontFamily: "inherit" }}
                 />
               ) : (
                 <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
@@ -144,22 +138,22 @@ function TextRow({ k, label, suffix, placeholder, wide, settings, editing, setEd
                       if (e.key === "Enter") onSave(editing!);
                       if (e.key === "Escape") setEditing(null);
                     }}
-                    style={{ width: 180, height: 28, padding: "0 8px", fontSize: 12, fontWeight: 500, color: "#111827", border: "1px solid #315eff", borderRadius: 8, outline: "none", fontFamily: "inherit" }}
+                    style={{ width: 180, height: 28, padding: "0 8px", fontSize: 12, fontWeight: 500, color: "var(--color-ink)", border: "1px solid #315eff", borderRadius: 8, outline: "none", fontFamily: "inherit" }}
                   />
-                  {suffix && <span style={{ fontSize: 12, color: "#6B7280", flexShrink: 0 }}>{suffix}</span>}
+                  {suffix && <span style={{ fontSize: 12, color: "var(--color-ink-3)", flexShrink: 0 }}>{suffix}</span>}
                 </div>
               )}
               <div style={{ display: "flex", gap: 4 }}>
                 <button
                   onClick={() => onSave(editing!)}
                   disabled={isSaving}
-                  style={{ width: 24, height: 24, borderRadius: 6, background: "#315eff", color: "white", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", opacity: isSaving ? 0.5 : 1 }}
+                  style={{ width: 24, height: 24, borderRadius: 6, background: "var(--color-brand)", color: "white", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", opacity: isSaving ? 0.5 : 1 }}
                 >
                   {isSaving ? <Loader2 size={10} className="animate-spin" /> : <Check size={10} />}
                 </button>
                 <button
                   onClick={() => setEditing(null)}
-                  style={{ width: 24, height: 24, borderRadius: 6, background: "white", border: "1px solid #E5E7EB", color: "#6B7280", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+                  style={{ width: 24, height: 24, borderRadius: 6, background: "white", border: "1px solid #E5E7EB", color: "var(--color-ink-3)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
                 >
                   <X size={10} />
                 </button>
@@ -168,12 +162,12 @@ function TextRow({ k, label, suffix, placeholder, wide, settings, editing, setEd
           </>
         ) : (
           <>
-            <span style={{ fontSize: 12, fontWeight: raw ? 600 : 400, color: raw ? "#111827" : "#9CA3AF", textAlign: "right", maxWidth: 260, wordBreak: "break-all" }}>
+            <span style={{ fontSize: 12, fontWeight: raw ? 600 : 400, color: raw ? "var(--color-ink)" : "var(--color-ink-4)", textAlign: "right", maxWidth: 260, wordBreak: "break-all" }}>
               {raw ? `${raw}${suffix ? ` ${suffix}` : ""}` : (placeholder ?? "Not set")}
             </span>
             <button
               onClick={() => setEditing({ key: k, value: raw })}
-              style={{ width: 20, height: 20, borderRadius: 4, background: "transparent", border: "none", display: "flex", alignItems: "center", justifyContent: "center", color: "#6B7280", cursor: "pointer", opacity: 0.4, flexShrink: 0 }}
+              style={{ width: 20, height: 20, borderRadius: 4, background: "transparent", border: "none", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--color-ink-3)", cursor: "pointer", opacity: 0.4, flexShrink: 0 }}
             >
               <Pencil size={10} />
             </button>
@@ -226,59 +220,65 @@ export default function SettingsPage() {
   if (isLoading) {
     return (
       <div style={{ padding: "28px 32px" }}>
-        <p style={{ fontSize: 13, color: "#6B7280" }}>Loading settings…</p>
+        <p style={{ fontSize: 13, color: "var(--color-ink-3)" }}>Loading settings…</p>
       </div>
     );
   }
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: "Inter, ui-sans-serif, sans-serif", display: "flex", flexDirection: "column", gap: 20, maxWidth: 760 }}>
-      <div>
-        <h1 style={{ fontSize: 26, fontWeight: 700, color: "#111827", letterSpacing: "-0.025em", margin: 0 }}>
+    <div style={{ padding: "28px 32px", fontFamily: "Inter, ui-sans-serif, sans-serif" }}>
+
+      {/* Header */}
+      <div style={{ marginBottom: 28 }}>
+        <h1 style={{ fontSize: 26, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.025em", margin: 0 }}>
           Global Settings
         </h1>
-        <p style={{ fontSize: 14, color: "#6B7280", marginTop: 6 }}>
+        <p style={{ fontSize: 14, color: "var(--color-ink-3)", marginTop: 6 }}>
           Platform-wide configuration — changes take effect immediately. Lending rules live in{" "}
-          <a href="/loan-product" style={{ color: "#315eff", textDecoration: "underline" }}>Loan Product Config</a>.
+          <a href="/loan-product" style={{ color: "var(--color-brand)", textDecoration: "underline" }}>Loan Product Config</a>.
         </p>
       </div>
 
-      {/* App */}
-      <SectionCard icon={<MonitorCog size={13} color="#315eff" />} color="#EEF2FF" title="App">
-        {APP_TOGGLES.map(r => (
-          <ToggleRow key={r.key} k={r.key} label={r.label} settings={settings} onToggle={handleToggle} toggling={toggling} isPending={saveMutation.isPending} />
-        ))}
-        {APP_TEXT.map(r => (
-          <TextRow key={r.key} k={r.key} label={r.label} wide={r.wide} {...sharedTextProps} />
-        ))}
-      </SectionCard>
+      {/* 2-column grid */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, alignItems: "start" }}>
 
-      {/* Membership Payment */}
-      <SectionCard icon={<QrCode size={13} color="#D97706" />} color="#FEF3C7" title="Membership payment">
-        <p style={{ fontSize: 11.5, color: "#9CA3AF", padding: "8px 20px 0", margin: 0 }}>
-          Shown to employees when paying for membership
-        </p>
-        {MEMBERSHIP_TEXT.map(r => (
-          <TextRow key={r.key} k={r.key} label={r.label} placeholder={r.placeholder} wide={r.wide} {...sharedTextProps} />
-        ))}
-      </SectionCard>
+        {/* Left column */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
 
-      {/* Employer Settlement */}
-      <SectionCard icon={<Building2 size={13} color="#EF4444" />} color="#FEE2E2" title="Employer settlement">
-        {SETTLEMENT_FIELDS.map(r => (
-          <TextRow key={r.key} k={r.key} label={r.label} suffix={r.suffix} {...sharedTextProps} />
-        ))}
-      </SectionCard>
+          {/* App */}
+          <SectionCard icon={<MonitorCog size={13} color="var(--color-brand)" />} color="var(--color-brand-soft)" title="App">
+            {APP_TOGGLES.map(r => (
+              <ToggleRow key={r.key} k={r.key} label={r.label} settings={settings} onToggle={handleToggle} toggling={toggling} isPending={saveMutation.isPending} />
+            ))}
+            {APP_TEXT.map(r => (
+              <TextRow key={r.key} k={r.key} label={r.label} wide={r.wide} {...sharedTextProps} />
+            ))}
+          </SectionCard>
 
-      {/* Notifications */}
-      <SectionCard icon={<Bell size={13} color="#315eff" />} color="#EEF2FF" title="Notifications">
-        {NOTIFICATION_TOGGLES.map(r => (
-          <ToggleRow key={r.key} k={r.key} label={r.label} settings={settings} onToggle={handleToggle} toggling={toggling} isPending={saveMutation.isPending} />
-        ))}
-        {NOTIFICATION_FIELDS.map(r => (
-          <TextRow key={r.key} k={r.key} label={r.label} suffix={r.suffix} {...sharedTextProps} />
-        ))}
-      </SectionCard>
+          {/* Employer Settlement */}
+          <SectionCard icon={<Building2 size={13} color="#EF4444" />} color="var(--color-danger-bg)" title="Employer settlement">
+            {SETTLEMENT_FIELDS.map(r => (
+              <TextRow key={r.key} k={r.key} label={r.label} suffix={r.suffix} {...sharedTextProps} />
+            ))}
+          </SectionCard>
+
+        </div>
+
+        {/* Right column */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+
+          {/* Notifications */}
+          <SectionCard icon={<Bell size={13} color="var(--color-brand)" />} color="var(--color-brand-soft)" title="Notifications">
+            {NOTIFICATION_TOGGLES.map(r => (
+              <ToggleRow key={r.key} k={r.key} label={r.label} settings={settings} onToggle={handleToggle} toggling={toggling} isPending={saveMutation.isPending} />
+            ))}
+            {NOTIFICATION_FIELDS.map(r => (
+              <TextRow key={r.key} k={r.key} label={r.label} suffix={r.suffix} {...sharedTextProps} />
+            ))}
+          </SectionCard>
+
+        </div>
+      </div>
     </div>
   );
 }

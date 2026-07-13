@@ -44,15 +44,15 @@ const formatDate = (s: string | null | undefined) => {
 // ── status config ─────────────────────────────────────────────────────────────
 
 const STATUS_CFG: Record<MembershipStatus, { label: string; color: string; bg: string }> = {
-  PENDING:   { label: "Pending",   color: "#D97706", bg: "#FEF3C7" },
-  ACTIVE:    { label: "Active",    color: "#16A34A", bg: "#DCFCE7" },
-  REJECTED:  { label: "Rejected",  color: "#DC2626", bg: "#FEE2E2" },
-  EXPIRED:   { label: "Expired",   color: "#B45309", bg: "#FEF3C7" },
-  CANCELLED: { label: "Cancelled", color: "#6B7280", bg: "#F3F4F6" },
+  PENDING:   { label: "Pending",   color: "var(--color-warning)", bg: "var(--color-warning-bg)" },
+  ACTIVE:    { label: "Active",    color: "var(--color-success)", bg: "var(--color-success-bg)" },
+  REJECTED:  { label: "Rejected",  color: "var(--color-danger)", bg: "var(--color-danger-bg)" },
+  EXPIRED:   { label: "Expired",   color: "var(--color-warning-dark)", bg: "var(--color-warning-bg)" },
+  CANCELLED: { label: "Cancelled", color: "var(--color-ink-3)", bg: "var(--color-surface-muted)" },
 };
 
 function StatusPill({ status }: { status: MembershipStatus }) {
-  const c = STATUS_CFG[status] ?? { label: status, color: "#6B7280", bg: "#F3F4F6" };
+  const c = STATUS_CFG[status] ?? { label: status, color: "var(--color-ink-3)", bg: "var(--color-surface-muted)" };
   return (
     <span style={{ display: "inline-flex", alignItems: "center", gap: 5, height: 24, padding: "0 10px", borderRadius: 999, background: c.bg, color: c.color, fontSize: 12, fontWeight: 600 }}>
       <span style={{ width: 6, height: 6, borderRadius: "50%", background: c.color, flexShrink: 0 }} />
@@ -77,8 +77,8 @@ const FILTERS: { label: string; value: "ALL" | MembershipStatus }[] = [
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #F3F4F6" }}>
-      <span style={{ fontSize: 12, color: "#6B7280" }}>{label}</span>
-      <span style={{ fontSize: 12, fontWeight: 500, color: "#111827" }}>{value}</span>
+      <span style={{ fontSize: 12, color: "var(--color-ink-3)" }}>{label}</span>
+      <span style={{ fontSize: 12, fontWeight: 500, color: "var(--color-ink)" }}>{value}</span>
     </div>
   );
 }
@@ -89,7 +89,7 @@ function EmployerSummaryTable({ employers }: { employers: EmployerMembershipSumm
   if (!employers.length) {
     return (
       <div style={{ padding: "40px 24px", textAlign: "center" }}>
-        <p style={{ fontSize: 12, color: "#6B7280" }}>No employer data available</p>
+        <p style={{ fontSize: 12, color: "var(--color-ink-3)" }}>No employer data available</p>
       </div>
     );
   }
@@ -98,9 +98,9 @@ function EmployerSummaryTable({ employers }: { employers: EmployerMembershipSumm
     <div style={{ overflowX: "auto" }}>
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
         <thead>
-          <tr style={{ borderBottom: "1px solid #F3F4F6", background: "#FAFAFA" }}>
+          <tr style={{ borderBottom: "1px solid #F3F4F6", background: "var(--color-surface-raised)" }}>
             {["Company", "Total Members", "Active Members", "Revenue"].map(h => (
-              <th key={h} style={{ padding: "14px 20px", textAlign: "left", fontSize: 11.5, fontWeight: 600, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.07em", whiteSpace: "nowrap" }}>{h}</th>
+              <th key={h} style={{ padding: "14px 20px", textAlign: "left", fontSize: 11.5, fontWeight: 600, color: "var(--color-ink-4)", textTransform: "uppercase", letterSpacing: "0.07em", whiteSpace: "nowrap" }}>{h}</th>
             ))}
           </tr>
         </thead>
@@ -109,20 +109,20 @@ function EmployerSummaryTable({ employers }: { employers: EmployerMembershipSumm
             <tr key={e.employerId} style={{ borderBottom: "1px solid #F9FAFB" }}>
               <td style={{ padding: "14px 20px", verticalAlign: "middle" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <div style={{ width: 26, height: 26, borderRadius: 8, background: "#EEF2FF", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <Building2 size={12} color="#315eff" />
+                  <div style={{ width: 26, height: 26, borderRadius: 8, background: "var(--color-brand-soft)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <Building2 size={12} color="var(--color-brand)" />
                   </div>
-                  <span style={{ fontWeight: 600, color: "#111827" }}>{e.companyName}</span>
+                  <span style={{ fontWeight: 600, color: "var(--color-ink)" }}>{e.companyName}</span>
                 </div>
               </td>
-              <td style={{ padding: "14px 20px", verticalAlign: "middle", color: "#6B7280", fontVariantNumeric: "tabular-nums" }}>{e.totalMembers}</td>
+              <td style={{ padding: "14px 20px", verticalAlign: "middle", color: "var(--color-ink-3)", fontVariantNumeric: "tabular-nums" }}>{e.totalMembers}</td>
               <td style={{ padding: "14px 20px", verticalAlign: "middle" }}>
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 5, height: 24, padding: "0 10px", borderRadius: 999, background: "#EEF2FF", color: "#2048EE", fontSize: 12, fontWeight: 600 }}>
-                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#315eff" }} />
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 5, height: 24, padding: "0 10px", borderRadius: 999, background: "var(--color-brand-soft)", color: "var(--color-info)", fontSize: 12, fontWeight: 600 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--color-brand)" }} />
                   {e.activeMembers}
                 </span>
               </td>
-              <td style={{ padding: "14px 20px", verticalAlign: "middle", fontWeight: 600, color: "#111827", fontVariantNumeric: "tabular-nums" }}>{formatCurrency(e.membershipRevenue)}</td>
+              <td style={{ padding: "14px 20px", verticalAlign: "middle", fontWeight: 600, color: "var(--color-ink)", fontVariantNumeric: "tabular-nums" }}>{formatCurrency(e.membershipRevenue)}</td>
             </tr>
           ))}
         </tbody>
@@ -251,25 +251,25 @@ export default function MembershipsPage() {
     <div style={{ padding: "28px 32px" }}>
       {/* Header */}
       <div>
-        <h1 style={{ fontSize: 26, fontWeight: 700, color: "#111827", letterSpacing: "-0.025em", margin: 0 }}>Memberships</h1>
-        <p style={{ fontSize: 14, color: "#6B7280", marginTop: 6 }}>Employee membership plans and verification</p>
+        <h1 style={{ fontSize: 26, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.025em", margin: 0 }}>Memberships</h1>
+        <p style={{ fontSize: 14, color: "var(--color-ink-3)", marginTop: 6 }}>Employee membership plans and verification</p>
       </div>
 
       {/* Summary cards — GET /membership/summary */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginTop: 24, marginBottom: 24 }}>
         {[
           { icon: <Users size={18} color="white" strokeWidth={1.75} />,            iconBg: "linear-gradient(135deg,#2048EE,#315eff)", label: "Total Members",  val: summary?.totalMembers ?? "—" },
-          { icon: <CreditCard size={18} color="#16A34A" strokeWidth={1.75} />,      iconBg: "#DCFCE7",                                  label: "Active",         val: summary?.active ?? "—"       },
-          { icon: <CreditCard size={18} color="#D97706" strokeWidth={1.75} />,      iconBg: "#FEF3C7",                                  label: "Pending Review", val: summary?.pending ?? "—"      },
-          { icon: <XCircle size={18} color="#EF4444" strokeWidth={1.75} />,         iconBg: "#FEE2E2",                                  label: "Rejected",       val: summary?.rejected ?? "—"     },
-          { icon: <TimerOff size={18} color="#6B7280" strokeWidth={1.75} />,        iconBg: "#F3F4F6",                                  label: "Expired",        val: summary?.expired ?? "—"      },
-          { icon: <CircleDollarSign size={18} color="#315eff" strokeWidth={1.75} />, iconBg: "#EEF2FF",                                 label: "Revenue",        val: formatCurrency(summary?.membershipRevenue ?? 0) },
+          { icon: <CreditCard size={18} color="var(--color-success)" strokeWidth={1.75} />,      iconBg: "var(--color-success-bg)",                                  label: "Active",         val: summary?.active ?? "—"       },
+          { icon: <CreditCard size={18} color="var(--color-warning)" strokeWidth={1.75} />,      iconBg: "var(--color-warning-bg)",                                  label: "Pending Review", val: summary?.pending ?? "—"      },
+          { icon: <XCircle size={18} color="#EF4444" strokeWidth={1.75} />,         iconBg: "var(--color-danger-bg)",                                  label: "Rejected",       val: summary?.rejected ?? "—"     },
+          { icon: <TimerOff size={18} color="var(--color-ink-3)" strokeWidth={1.75} />,        iconBg: "var(--color-surface-muted)",                                  label: "Expired",        val: summary?.expired ?? "—"      },
+          { icon: <CircleDollarSign size={18} color="var(--color-brand)" strokeWidth={1.75} />, iconBg: "var(--color-brand-soft)",                                 label: "Revenue",        val: formatCurrency(summary?.membershipRevenue ?? 0) },
         ].map(({ icon, iconBg, label, val }) => (
           <div key={label} style={{ background: "white", borderRadius: 16, padding: "14px 16px", border: "1px solid #E5E7EB", boxShadow: "0 1px 4px rgba(17,24,39,0.04)", display: "flex", alignItems: "center", gap: 14 }}>
             <div style={{ width: 40, height: 40, borderRadius: 12, background: iconBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{icon}</div>
             <div>
-              <div style={{ fontSize: 22, fontWeight: 700, color: "#111827", letterSpacing: "-0.02em", lineHeight: 1 }}>{val}</div>
-              <div style={{ fontSize: 12, color: "#6B7280", marginTop: 3, fontWeight: 500 }}>{label}</div>
+              <div style={{ fontSize: 22, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.02em", lineHeight: 1 }}>{val}</div>
+              <div style={{ fontSize: 12, color: "var(--color-ink-3)", marginTop: 3, fontWeight: 500 }}>{label}</div>
             </div>
           </div>
         ))}
@@ -279,8 +279,8 @@ export default function MembershipsPage() {
       {employerSummary.length > 0 && (
         <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", overflow: "hidden", marginBottom: 20 }}>
           <div style={{ padding: "14px 20px", borderBottom: "1px solid #E5E7EB" }}>
-            <p style={{ fontSize: 13, fontWeight: 600, color: "#111827", margin: 0 }}>By Employer</p>
-            <p style={{ fontSize: 11, color: "#6B7280", marginTop: 2 }}>Membership breakdown per company</p>
+            <p style={{ fontSize: 13, fontWeight: 600, color: "var(--color-ink)", margin: 0 }}>By Employer</p>
+            <p style={{ fontSize: 11, color: "var(--color-ink-3)", marginTop: 2 }}>Membership breakdown per company</p>
           </div>
           <EmployerSummaryTable employers={employerSummary} />
         </div>
@@ -289,13 +289,13 @@ export default function MembershipsPage() {
       {/* Search + filter */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 20 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, height: 40, padding: "0 14px", background: "white", border: "1px solid #E5E7EB", borderRadius: 12, minWidth: 260 }}>
-          <Search size={14} style={{ color: "#9CA3AF", flexShrink: 0 }} />
+          <Search size={14} style={{ color: "var(--color-ink-4)", flexShrink: 0 }} />
           <input
             type="text"
             placeholder="Search employee, employer, plan…"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            style={{ flex: 1, fontSize: 13.5, color: "#111827", background: "transparent", outline: "none", border: "none", fontFamily: "inherit" }}
+            style={{ flex: 1, fontSize: 13.5, color: "var(--color-ink)", background: "transparent", outline: "none", border: "none", fontFamily: "inherit" }}
           />
         </div>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
@@ -305,7 +305,7 @@ export default function MembershipsPage() {
               <button
                 key={f.value}
                 onClick={() => setFilter(f.value)}
-                style={{ height: 36, padding: "0 14px", background: active ? "#111827" : "white", color: active ? "white" : "#6B7280", border: `1px solid ${active ? "#111827" : "#E5E7EB"}`, borderRadius: 10, fontSize: 13, fontWeight: active ? 600 : 400, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6 }}
+                style={{ height: 36, padding: "0 14px", background: active ? "var(--color-ink)" : "white", color: active ? "white" : "var(--color-ink-3)", border: `1px solid ${active ? "var(--color-ink)" : "var(--color-edge)"}`, borderRadius: 10, fontSize: 13, fontWeight: active ? 600 : 400, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6 }}
               >
                 {f.label}
                 {counts[f.value] !== undefined && (
@@ -324,27 +324,27 @@ export default function MembershipsPage() {
             {[...Array(5)].map((_, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 16, padding: "18px 24px", borderBottom: "1px solid #F9FAFB" }}>
                 <div style={{ flex: 1 }}>
-                  <div style={{ height: 12, background: "#F3F4F6", borderRadius: 4, width: 140, marginBottom: 6 }} className="animate-pulse" />
-                  <div style={{ height: 10, background: "#F3F4F6", borderRadius: 4, width: 100 }} className="animate-pulse" />
+                  <div style={{ height: 12, background: "var(--color-surface-muted)", borderRadius: 4, width: 140, marginBottom: 6 }} className="animate-pulse" />
+                  <div style={{ height: 10, background: "var(--color-surface-muted)", borderRadius: 4, width: 100 }} className="animate-pulse" />
                 </div>
-                <div style={{ height: 22, background: "#F3F4F6", borderRadius: 999, width: 80 }} className="animate-pulse" />
+                <div style={{ height: 22, background: "var(--color-surface-muted)", borderRadius: 999, width: 80 }} className="animate-pulse" />
               </div>
             ))}
           </div>
         ) : !rows.length ? (
           <div style={{ padding: "60px 24px", textAlign: "center" }}>
-            <div style={{ width: 40, height: 40, borderRadius: 12, background: "#F3F4F6", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>
-              <CreditCard size={18} color="#6B7280" />
+            <div style={{ width: 40, height: 40, borderRadius: 12, background: "var(--color-surface-muted)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>
+              <CreditCard size={18} color="var(--color-ink-3)" />
             </div>
-            <p style={{ fontSize: 13, fontWeight: 500, color: "#6B7280", margin: 0 }}>No memberships found</p>
+            <p style={{ fontSize: 13, fontWeight: 500, color: "var(--color-ink-3)", margin: 0 }}>No memberships found</p>
           </div>
         ) : (
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
               <thead>
-                <tr style={{ borderBottom: "1px solid #F3F4F6", background: "#FAFAFA" }}>
+                <tr style={{ borderBottom: "1px solid #F3F4F6", background: "var(--color-surface-raised)" }}>
                   {["Employee", "Employer", "Plan Name", "Amount", "Status", "Start Date", "End Date", "Created", ""].map(h => (
-                    <th key={h} style={{ padding: "14px 20px", textAlign: "left", fontSize: 11.5, fontWeight: 600, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.07em", whiteSpace: "nowrap" }}>{h}</th>
+                    <th key={h} style={{ padding: "14px 20px", textAlign: "left", fontSize: 11.5, fontWeight: 600, color: "var(--color-ink-4)", textTransform: "uppercase", letterSpacing: "0.07em", whiteSpace: "nowrap" }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -353,21 +353,21 @@ export default function MembershipsPage() {
                   <tr
                     key={ms.id}
                     onClick={() => { setSelected(ms); setRemarks(""); setActionError(""); }}
-                    style={{ borderBottom: "1px solid #F9FAFB", cursor: "pointer", background: selected?.id === ms.id ? "#EEF2FF" : "transparent" }}
+                    style={{ borderBottom: "1px solid #F9FAFB", cursor: "pointer", background: selected?.id === ms.id ? "var(--color-brand-soft)" : "transparent" }}
                   >
                     <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
-                      <p style={{ fontSize: 13.5, fontWeight: 600, color: "#111827", margin: 0 }}>{ms.employee.name}</p>
-                      <p style={{ fontSize: 11.5, color: "#9CA3AF", margin: "2px 0 0", fontFamily: "ui-monospace, monospace" }}>{ms.employee.employeeCode}</p>
+                      <p style={{ fontSize: 13.5, fontWeight: 600, color: "var(--color-ink)", margin: 0 }}>{ms.employee.name}</p>
+                      <p style={{ fontSize: 11.5, color: "var(--color-ink-4)", margin: "2px 0 0", fontFamily: "ui-monospace, monospace" }}>{ms.employee.employeeCode}</p>
                     </td>
-                    <td style={{ padding: "16px 20px", verticalAlign: "middle", color: "#6B7280", whiteSpace: "nowrap" }}>{ms.employee.employer.companyName}</td>
-                    <td style={{ padding: "16px 20px", verticalAlign: "middle", fontWeight: 500, color: "#6B7280" }}>{ms.planName}</td>
-                    <td style={{ padding: "16px 20px", verticalAlign: "middle", fontWeight: 600, color: "#111827", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>{formatCurrency(ms.amount)}</td>
+                    <td style={{ padding: "16px 20px", verticalAlign: "middle", color: "var(--color-ink-3)", whiteSpace: "nowrap" }}>{ms.employee.employer.companyName}</td>
+                    <td style={{ padding: "16px 20px", verticalAlign: "middle", fontWeight: 500, color: "var(--color-ink-3)" }}>{ms.planName}</td>
+                    <td style={{ padding: "16px 20px", verticalAlign: "middle", fontWeight: 600, color: "var(--color-ink)", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>{formatCurrency(ms.amount)}</td>
                     <td style={{ padding: "16px 20px", verticalAlign: "middle" }}><StatusPill status={ms.status} /></td>
-                    <td style={{ padding: "16px 20px", verticalAlign: "middle", color: "#9CA3AF", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>{formatDate(ms.startDate)}</td>
-                    <td style={{ padding: "16px 20px", verticalAlign: "middle", color: "#9CA3AF", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>{formatDate(ms.endDate)}</td>
-                    <td style={{ padding: "16px 20px", verticalAlign: "middle", color: "#9CA3AF", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>{formatDate(ms.createdAt)}</td>
+                    <td style={{ padding: "16px 20px", verticalAlign: "middle", color: "var(--color-ink-4)", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>{formatDate(ms.startDate)}</td>
+                    <td style={{ padding: "16px 20px", verticalAlign: "middle", color: "var(--color-ink-4)", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>{formatDate(ms.endDate)}</td>
+                    <td style={{ padding: "16px 20px", verticalAlign: "middle", color: "var(--color-ink-4)", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>{formatDate(ms.createdAt)}</td>
                     <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
-                      <span style={{ display: "flex", alignItems: "center", gap: 2, fontSize: 12, fontWeight: 600, color: "#315eff", whiteSpace: "nowrap" }}>
+                      <span style={{ display: "flex", alignItems: "center", gap: 2, fontSize: 12, fontWeight: 600, color: "var(--color-brand)", whiteSpace: "nowrap" }}>
                         View <ChevronRight size={12} />
                       </span>
                     </td>
@@ -375,8 +375,8 @@ export default function MembershipsPage() {
                 ))}
               </tbody>
             </table>
-            <div style={{ padding: "12px 20px", borderTop: "1px solid #F3F4F6", background: "#FAFAFA" }}>
-              <p style={{ fontSize: 12, color: "#9CA3AF", margin: 0 }}>{rows.length} membership{rows.length !== 1 ? "s" : ""}</p>
+            <div style={{ padding: "12px 20px", borderTop: "1px solid #F3F4F6", background: "var(--color-surface-raised)" }}>
+              <p style={{ fontSize: 12, color: "var(--color-ink-4)", margin: 0 }}>{rows.length} membership{rows.length !== 1 ? "s" : ""}</p>
             </div>
           </div>
         )}
@@ -394,15 +394,15 @@ export default function MembershipsPage() {
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
                     <StatusPill status={selected.status} />
                     {selected.couponCode && (
-                      <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 500, color: "#2048EE", background: "#EEF2FF", padding: "2px 8px", borderRadius: 999 }}>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 500, color: "var(--color-info)", background: "var(--color-brand-soft)", padding: "2px 8px", borderRadius: 999 }}>
                         <Tag size={9} /> {selected.couponCode}
                       </span>
                     )}
                   </div>
-                  <p style={{ fontSize: 16, fontWeight: 700, color: "#111827", margin: 0 }}>{selected.employee.name}</p>
-                  <p style={{ fontSize: 12, color: "#6B7280", marginTop: 2 }}>{selected.employee.employeeCode} · {selected.employee.employer.companyName}</p>
+                  <p style={{ fontSize: 16, fontWeight: 700, color: "var(--color-ink)", margin: 0 }}>{selected.employee.name}</p>
+                  <p style={{ fontSize: 12, color: "var(--color-ink-3)", marginTop: 2 }}>{selected.employee.employeeCode} · {selected.employee.employer.companyName}</p>
                 </div>
-                <button onClick={() => setSelected(null)} style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid #E5E7EB", background: "white", color: "#6B7280", cursor: "pointer" }}>
+                <button onClick={() => setSelected(null)} style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid #E5E7EB", background: "white", color: "var(--color-ink-3)", cursor: "pointer" }}>
                   <X size={14} />
                 </button>
               </div>
@@ -411,7 +411,7 @@ export default function MembershipsPage() {
             {/* Drawer body */}
             <div style={{ flex: 1, overflowY: "auto", padding: "16px 20px", display: "flex", flexDirection: "column", gap: 20 }}>
               <div>
-                <p style={{ fontSize: 11, fontWeight: 600, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Plan Details</p>
+                <p style={{ fontSize: 11, fontWeight: 600, color: "var(--color-ink-4)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Plan Details</p>
                 <div style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 16, padding: "0 16px" }}>
                   <InfoRow label="Plan name"        value={selected.planName} />
                   <InfoRow label="Amount"           value={formatCurrency(selected.amount)} />
@@ -425,12 +425,12 @@ export default function MembershipsPage() {
               </div>
 
               <div>
-                <p style={{ fontSize: 11, fontWeight: 600, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Payment</p>
+                <p style={{ fontSize: 11, fontWeight: 600, color: "var(--color-ink-4)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Payment</p>
                 <div style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 16, padding: "0 16px" }}>
                   <InfoRow label="Reference" value={selected.paymentReference ?? "—"} />
                   {selected.paymentScreenshot && screenshotUrl && (
                     <div style={{ padding: "10px 0", borderBottom: "1px solid #F3F4F6" }}>
-                      <span style={{ fontSize: 12, color: "#6B7280", display: "block", marginBottom: 6 }}>Screenshot</span>
+                      <span style={{ fontSize: 12, color: "var(--color-ink-3)", display: "block", marginBottom: 6 }}>Screenshot</span>
                       <a href={screenshotUrl} target="_blank" rel="noopener noreferrer">
                         <img
                           src={screenshotUrl}
@@ -446,7 +446,7 @@ export default function MembershipsPage() {
 
               {(selected.verifiedBy || selected.verifiedAt) && (
                 <div>
-                  <p style={{ fontSize: 11, fontWeight: 600, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Verification</p>
+                  <p style={{ fontSize: 11, fontWeight: 600, color: "var(--color-ink-4)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Verification</p>
                   <div style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 16, padding: "0 16px" }}>
                     <InfoRow label="Verified by" value={selected.verifiedBy ?? "—"} />
                     <InfoRow label="Verified at" value={formatDate(selected.verifiedAt)} />
@@ -456,22 +456,22 @@ export default function MembershipsPage() {
 
               {selected.remarks && (
                 <div>
-                  <p style={{ fontSize: 11, fontWeight: 600, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Remarks</p>
-                  <div style={{ background: "#F8F9FC", border: "1px solid #E5E7EB", borderRadius: 16, padding: "12px 16px" }}>
-                    <p style={{ fontSize: 12, color: "#6B7280", lineHeight: 1.6, margin: 0 }}>{selected.remarks}</p>
+                  <p style={{ fontSize: 11, fontWeight: 600, color: "var(--color-ink-4)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Remarks</p>
+                  <div style={{ background: "var(--color-canvas)", border: "1px solid #E5E7EB", borderRadius: 16, padding: "12px 16px" }}>
+                    <p style={{ fontSize: 12, color: "var(--color-ink-3)", lineHeight: 1.6, margin: 0 }}>{selected.remarks}</p>
                   </div>
                 </div>
               )}
 
               {selected.status === "PENDING" && (
                 <div>
-                  <p style={{ fontSize: 11, fontWeight: 600, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Add Remarks (optional)</p>
+                  <p style={{ fontSize: 11, fontWeight: 600, color: "var(--color-ink-4)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Add Remarks (optional)</p>
                   <textarea
                     value={remarks}
                     onChange={e => setRemarks(e.target.value)}
                     placeholder="Add a note before approving or rejecting…"
                     rows={3}
-                    style={{ width: "100%", fontSize: 12, background: "white", border: "1px solid #E5E7EB", borderRadius: 12, padding: "10px 12px", color: "#6B7280", outline: "none", resize: "none", fontFamily: "inherit", boxSizing: "border-box" }}
+                    style={{ width: "100%", fontSize: 12, background: "white", border: "1px solid #E5E7EB", borderRadius: 12, padding: "10px 12px", color: "var(--color-ink-3)", outline: "none", resize: "none", fontFamily: "inherit", boxSizing: "border-box" }}
                   />
                 </div>
               )}
@@ -479,12 +479,12 @@ export default function MembershipsPage() {
 
             {selected.status === "PENDING" && (
               <div style={{ padding: "16px 20px", borderTop: "1px solid #E5E7EB", display: "flex", flexDirection: "column", gap: 8 }}>
-                {actionError && <p style={{ fontSize: 11, color: "#DC2626", textAlign: "center", margin: 0 }}>{actionError}</p>}
+                {actionError && <p style={{ fontSize: 11, color: "var(--color-danger)", textAlign: "center", margin: 0 }}>{actionError}</p>}
                 <div style={{ display: "flex", gap: 8 }}>
                   <button
                     onClick={() => handleAction("reject")}
                     disabled={acting !== null}
-                    style={{ flex: 1, height: 38, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, borderRadius: 10, border: "1px solid #E5E7EB", color: "#6B7280", fontSize: 12, fontWeight: 500, background: "white", cursor: acting !== null ? "not-allowed" : "pointer", opacity: acting !== null ? 0.5 : 1, fontFamily: "inherit" }}
+                    style={{ flex: 1, height: 38, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, borderRadius: 10, border: "1px solid #E5E7EB", color: "var(--color-ink-3)", fontSize: 12, fontWeight: 500, background: "white", cursor: acting !== null ? "not-allowed" : "pointer", opacity: acting !== null ? 0.5 : 1, fontFamily: "inherit" }}
                   >
                     <XCircle size={13} />
                     {acting === "reject" ? "Rejecting…" : "Reject"}
@@ -492,7 +492,7 @@ export default function MembershipsPage() {
                   <button
                     onClick={() => handleAction("approve")}
                     disabled={acting !== null}
-                    style={{ flex: 1, height: 38, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, borderRadius: 10, background: "#315eff", color: "white", fontSize: 12, fontWeight: 600, border: "none", cursor: acting !== null ? "not-allowed" : "pointer", opacity: acting !== null ? 0.5 : 1, fontFamily: "inherit" }}
+                    style={{ flex: 1, height: 38, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, borderRadius: 10, background: "var(--color-brand)", color: "white", fontSize: 12, fontWeight: 600, border: "none", cursor: acting !== null ? "not-allowed" : "pointer", opacity: acting !== null ? 0.5 : 1, fontFamily: "inherit" }}
                   >
                     <CheckCircle2 size={13} />
                     {acting === "approve" ? "Approving…" : "Approve"}
@@ -509,50 +509,50 @@ export default function MembershipsPage() {
         {/* Create coupon */}
         <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", overflow: "hidden" }}>
           <div style={{ padding: "14px 20px", borderBottom: "1px solid #E5E7EB", display: "flex", alignItems: "center", gap: 10 }}>
-            <Tag size={14} color="#6B7280" />
+            <Tag size={14} color="var(--color-ink-3)" />
             <div>
-              <p style={{ fontSize: 13, fontWeight: 600, color: "#111827", margin: 0 }}>Create Coupon</p>
-              <p style={{ fontSize: 11, color: "#6B7280", marginTop: 2 }}>Issue a discount coupon for membership upgrades</p>
+              <p style={{ fontSize: 13, fontWeight: 600, color: "var(--color-ink)", margin: 0 }}>Create Coupon</p>
+              <p style={{ fontSize: 11, color: "var(--color-ink-3)", marginTop: 2 }}>Issue a discount coupon for membership upgrades</p>
             </div>
           </div>
           <form onSubmit={handleCreateCoupon} style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: 12 }}>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               <div>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 500, color: "#6B7280", marginBottom: 4 }}>Coupon code</label>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 500, color: "var(--color-ink-3)", marginBottom: 4 }}>Coupon code</label>
                 <input
                   type="text"
                   value={couponCode}
                   onChange={e => setCouponCode(e.target.value.toUpperCase())}
                   placeholder="e.g. MOBPAE50"
-                  style={{ width: "100%", height: 36, padding: "0 12px", fontSize: 12, background: "white", border: "1px solid #E5E7EB", borderRadius: 10, color: "#111827", fontFamily: "ui-monospace, monospace", outline: "none", boxSizing: "border-box" }}
+                  style={{ width: "100%", height: 36, padding: "0 12px", fontSize: 12, background: "white", border: "1px solid #E5E7EB", borderRadius: 10, color: "var(--color-ink)", fontFamily: "ui-monospace, monospace", outline: "none", boxSizing: "border-box" }}
                 />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 500, color: "#6B7280", marginBottom: 4 }}>Discount (₹)</label>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 500, color: "var(--color-ink-3)", marginBottom: 4 }}>Discount (₹)</label>
                 <input
                   type="number"
                   min={1}
                   value={couponDiscount}
                   onChange={e => setCouponDiscount(e.target.value)}
                   placeholder="100"
-                  style={{ width: "100%", height: 36, padding: "0 12px", fontSize: 12, background: "white", border: "1px solid #E5E7EB", borderRadius: 10, color: "#111827", outline: "none", boxSizing: "border-box", fontFamily: "inherit" }}
+                  style={{ width: "100%", height: 36, padding: "0 12px", fontSize: 12, background: "white", border: "1px solid #E5E7EB", borderRadius: 10, color: "var(--color-ink)", outline: "none", boxSizing: "border-box", fontFamily: "inherit" }}
                 />
               </div>
             </div>
             <div>
-              <label style={{ display: "block", fontSize: 11, fontWeight: 500, color: "#6B7280", marginBottom: 4 }}>Valid till <span style={{ fontWeight: 400 }}>(optional)</span></label>
+              <label style={{ display: "block", fontSize: 11, fontWeight: 500, color: "var(--color-ink-3)", marginBottom: 4 }}>Valid till <span style={{ fontWeight: 400 }}>(optional)</span></label>
               <input
                 type="date"
                 value={couponExpiry}
                 onChange={e => setCouponExpiry(e.target.value)}
-                style={{ width: "100%", height: 36, padding: "0 12px", fontSize: 12, background: "white", border: "1px solid #E5E7EB", borderRadius: 10, color: "#6B7280", outline: "none", boxSizing: "border-box", fontFamily: "inherit" }}
+                style={{ width: "100%", height: 36, padding: "0 12px", fontSize: 12, background: "white", border: "1px solid #E5E7EB", borderRadius: 10, color: "var(--color-ink-3)", outline: "none", boxSizing: "border-box", fontFamily: "inherit" }}
               />
             </div>
-            {couponError && <p style={{ fontSize: 11, color: "#DC2626", margin: 0 }}>{couponError}</p>}
+            {couponError && <p style={{ fontSize: 11, color: "var(--color-danger)", margin: 0 }}>{couponError}</p>}
             <button
               type="submit"
               disabled={createCouponMutation.isPending}
-              style={{ height: 36, padding: "0 16px", display: "flex", alignItems: "center", gap: 6, borderRadius: 10, background: "#111827", color: "white", fontSize: 12, fontWeight: 600, border: "none", cursor: "pointer", fontFamily: "inherit", opacity: createCouponMutation.isPending ? 0.5 : 1, width: "fit-content" }}
+              style={{ height: 36, padding: "0 16px", display: "flex", alignItems: "center", gap: 6, borderRadius: 10, background: "var(--color-ink)", color: "white", fontSize: 12, fontWeight: 600, border: "none", cursor: "pointer", fontFamily: "inherit", opacity: createCouponMutation.isPending ? 0.5 : 1, width: "fit-content" }}
             >
               <Plus size={13} />
               {createCouponMutation.isPending ? "Creating…" : "Create coupon"}
@@ -563,31 +563,31 @@ export default function MembershipsPage() {
         {/* Coupon list */}
         <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", overflow: "hidden" }}>
           <div style={{ padding: "14px 20px", borderBottom: "1px solid #E5E7EB" }}>
-            <p style={{ fontSize: 13, fontWeight: 600, color: "#111827", margin: 0 }}>Active Coupons</p>
-            <p style={{ fontSize: 11, color: "#6B7280", marginTop: 2 }}>{coupons.length} coupon{coupons.length !== 1 ? "s" : ""} total</p>
+            <p style={{ fontSize: 13, fontWeight: 600, color: "var(--color-ink)", margin: 0 }}>Active Coupons</p>
+            <p style={{ fontSize: 11, color: "var(--color-ink-3)", marginTop: 2 }}>{coupons.length} coupon{coupons.length !== 1 ? "s" : ""} total</p>
           </div>
           {couponsLoading ? (
-            <div style={{ padding: "32px 24px", textAlign: "center", fontSize: 12, color: "#6B7280" }}>Loading…</div>
+            <div style={{ padding: "32px 24px", textAlign: "center", fontSize: 12, color: "var(--color-ink-3)" }}>Loading…</div>
           ) : coupons.length === 0 ? (
-            <div style={{ padding: "32px 24px", textAlign: "center", fontSize: 12, color: "#6B7280" }}>No coupons yet. Create one above.</div>
+            <div style={{ padding: "32px 24px", textAlign: "center", fontSize: 12, color: "var(--color-ink-3)" }}>No coupons yet. Create one above.</div>
           ) : (
             <div style={{ maxHeight: 280, overflowY: "auto" }}>
               {coupons.map(c => (
                 <div key={c.id} style={{ padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #F3F4F6" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
-                    <div style={{ width: 30, height: 30, borderRadius: 8, background: "#F8F9FC", border: "1px solid #E5E7EB", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                      <Tag size={12} color="#6B7280" />
+                    <div style={{ width: 30, height: 30, borderRadius: 8, background: "var(--color-canvas)", border: "1px solid #E5E7EB", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <Tag size={12} color="var(--color-ink-3)" />
                     </div>
                     <div style={{ minWidth: 0 }}>
-                      <p style={{ fontSize: 12, fontWeight: 600, color: "#111827", margin: 0, fontFamily: "ui-monospace, monospace" }}>{c.code}</p>
-                      <p style={{ fontSize: 11, color: "#6B7280", marginTop: 2 }}>
+                      <p style={{ fontSize: 12, fontWeight: 600, color: "var(--color-ink)", margin: 0, fontFamily: "ui-monospace, monospace" }}>{c.code}</p>
+                      <p style={{ fontSize: 11, color: "var(--color-ink-3)", marginTop: 2 }}>
                         {c.validTill ? `Expires ${formatDate(c.validTill)}` : "No expiry"} · Used {c.usedCount}x
                       </p>
                     </div>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: "#2048EE" }}>-{formatCurrency(c.discountAmount)}</span>
-                    <span style={{ display: "inline-flex", alignItems: "center", height: 20, padding: "0 8px", borderRadius: 999, fontSize: 11, fontWeight: 500, background: c.isActive ? "#DCFCE7" : "#F3F4F6", color: c.isActive ? "#16A34A" : "#6B7280" }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: "var(--color-info)" }}>-{formatCurrency(c.discountAmount)}</span>
+                    <span style={{ display: "inline-flex", alignItems: "center", height: 20, padding: "0 8px", borderRadius: 999, fontSize: 11, fontWeight: 500, background: c.isActive ? "var(--color-success-bg)" : "var(--color-surface-muted)", color: c.isActive ? "var(--color-success)" : "var(--color-ink-3)" }}>
                       {c.isActive ? "Active" : "Inactive"}
                     </span>
                   </div>

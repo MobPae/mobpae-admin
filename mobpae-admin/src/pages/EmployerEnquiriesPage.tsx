@@ -8,7 +8,7 @@ import type { CreateEmployerPrefill } from "../components/employers/CreateEmploy
 import type { EmployerEnquiry, EmployerEnquiryStatus } from "../types/employer-enquiry";
 import { getEmployerEnquiries } from "../services/employerEnquiryService";
 
-const P = "#315eff";
+const P = "var(--color-brand)";
 
 const STATUS_TABS: { label: string; value: "ALL" | EmployerEnquiryStatus }[] = [
   { label: "All",       value: "ALL"       },
@@ -63,10 +63,10 @@ export default function EmployerEnquiriesPage() {
   }
 
   const kpis = [
-    { icon: <Building2 size={18} color="#D97706" strokeWidth={1.75} />, iconBg: "#FEF3C7", label: "New Leads",  val: counts["NEW"]       },
-    { icon: <Phone size={18} color={P} strokeWidth={1.75} />,           iconBg: "#EEF2FF", label: "Contacted", val: counts["CONTACTED"]  },
-    { icon: <CheckCircle size={18} color="#16A34A" strokeWidth={1.75}/>, iconBg: "#DCFCE7", label: "Onboarded", val: counts["ONBOARDED"]  },
-    { icon: <XCircle size={18} color="#EF4444" strokeWidth={1.75} />,   iconBg: "#FEE2E2", label: "Rejected",  val: counts["REJECTED"]   },
+    { icon: <Building2 size={18} color="var(--color-warning)" strokeWidth={1.75} />, iconBg: "var(--color-warning-bg)", label: "New Leads",  val: counts["NEW"]       },
+    { icon: <Phone size={18} color={P} strokeWidth={1.75} />,           iconBg: "var(--color-brand-soft)", label: "Contacted", val: counts["CONTACTED"]  },
+    { icon: <CheckCircle size={18} color="var(--color-success)" strokeWidth={1.75}/>, iconBg: "var(--color-success-bg)", label: "Onboarded", val: counts["ONBOARDED"]  },
+    { icon: <XCircle size={18} color="#EF4444" strokeWidth={1.75} />,   iconBg: "var(--color-danger-bg)", label: "Rejected",  val: counts["REJECTED"]   },
   ];
 
   return (
@@ -75,10 +75,10 @@ export default function EmployerEnquiriesPage() {
       {/* ── Header ─────────────────────────────────── */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28 }}>
         <div>
-          <h1 style={{ fontSize: 26, fontWeight: 700, color: "#111827", letterSpacing: "-0.025em", margin: 0 }}>
+          <h1 style={{ fontSize: 26, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.025em", margin: 0 }}>
             Enquiries
           </h1>
-          <p style={{ fontSize: 14, color: "#6B7280", marginTop: 6 }}>
+          <p style={{ fontSize: 14, color: "var(--color-ink-3)", marginTop: 6 }}>
             Inbound leads from the website
           </p>
         </div>
@@ -99,9 +99,9 @@ export default function EmployerEnquiriesPage() {
 
       {/* ── Error banner ───────────────────────────── */}
       {isError && (
-        <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 12, padding: "12px 16px", marginBottom: 24, display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, color: "#DC2626" }}>
+        <div style={{ background: "var(--color-danger-soft)", border: "1px solid #FECACA", borderRadius: 12, padding: "12px 16px", marginBottom: 24, display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, color: "var(--color-danger)" }}>
           <span>Failed to load enquiries.</span>
-          <button onClick={() => void refetch()} style={{ padding: "6px 12px", background: "white", border: "1px solid #FECACA", borderRadius: 8, fontSize: 12, fontWeight: 600, color: "#DC2626", cursor: "pointer", fontFamily: "inherit" }}>
+          <button onClick={() => void refetch()} style={{ padding: "6px 12px", background: "white", border: "1px solid #FECACA", borderRadius: 8, fontSize: 12, fontWeight: 600, color: "var(--color-danger)", cursor: "pointer", fontFamily: "inherit" }}>
             Retry
           </button>
         </div>
@@ -115,10 +115,10 @@ export default function EmployerEnquiriesPage() {
               {icon}
             </div>
             <div>
-              <div style={{ fontSize: 22, fontWeight: 700, color: "#111827", letterSpacing: "-0.02em", lineHeight: 1, opacity: isLoading ? 0.3 : 1 }}>
+              <div style={{ fontSize: 22, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.02em", lineHeight: 1, opacity: isLoading ? 0.3 : 1 }}>
                 {val}
               </div>
-              <div style={{ fontSize: 12, color: "#6B7280", marginTop: 3, fontWeight: 500 }}>{label}</div>
+              <div style={{ fontSize: 12, color: "var(--color-ink-3)", marginTop: 3, fontWeight: 500 }}>{label}</div>
             </div>
           </div>
         ))}
@@ -128,13 +128,13 @@ export default function EmployerEnquiriesPage() {
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
         {/* Search */}
         <div style={{ display: "flex", alignItems: "center", gap: 8, height: 40, padding: "0 14px", background: "white", border: "1px solid #E5E7EB", borderRadius: 12, minWidth: 260 }}>
-          <Search size={14} style={{ color: "#9CA3AF", flexShrink: 0 }} />
+          <Search size={14} style={{ color: "var(--color-ink-4)", flexShrink: 0 }} />
           <input
             type="text"
             placeholder="Search company, contact, email…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            style={{ flex: 1, fontSize: 13.5, color: "#111827", background: "transparent", outline: "none", border: "none", fontFamily: "inherit" }}
+            style={{ flex: 1, fontSize: 13.5, color: "var(--color-ink)", background: "transparent", outline: "none", border: "none", fontFamily: "inherit" }}
           />
         </div>
 
@@ -149,9 +149,9 @@ export default function EmployerEnquiriesPage() {
                 onClick={() => setStatusFilter(tab.value)}
                 style={{
                   height: 36, padding: "0 14px",
-                  background: active ? "#111827" : "white",
-                  color: active ? "white" : "#6B7280",
-                  border: `1px solid ${active ? "#111827" : "#E5E7EB"}`,
+                  background: active ? "var(--color-ink)" : "white",
+                  color: active ? "white" : "var(--color-ink-3)",
+                  border: `1px solid ${active ? "var(--color-ink)" : "var(--color-edge)"}`,
                   borderRadius: 10, fontSize: 13, fontWeight: active ? 600 : 400,
                   cursor: "pointer", fontFamily: "inherit",
                   display: "flex", alignItems: "center", gap: 6,
@@ -165,7 +165,7 @@ export default function EmployerEnquiriesPage() {
         </div>
 
         <div style={{ flex: 1 }} />
-        <span style={{ fontSize: 12, color: "#9CA3AF" }}>{filtered.length} result{filtered.length !== 1 ? "s" : ""}</span>
+        <span style={{ fontSize: 12, color: "var(--color-ink-4)" }}>{filtered.length} result{filtered.length !== 1 ? "s" : ""}</span>
       </div>
 
       {/* ── Table ──────────────────────────────────── */}
@@ -173,21 +173,21 @@ export default function EmployerEnquiriesPage() {
         <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", overflow: "hidden" }}>
           {[...Array(6)].map((_, i) => (
             <div key={i} style={{ display: "flex", alignItems: "center", gap: 16, padding: "18px 24px", borderBottom: "1px solid #F9FAFB" }}>
-              <div style={{ width: 38, height: 38, borderRadius: 10, background: "#F3F4F6", flexShrink: 0 }} className="animate-pulse" />
+              <div style={{ width: 38, height: 38, borderRadius: 10, background: "var(--color-surface-muted)", flexShrink: 0 }} className="animate-pulse" />
               <div style={{ flex: 1 }}>
-                <div style={{ height: 12, background: "#F3F4F6", borderRadius: 4, width: 160, marginBottom: 8 }} className="animate-pulse" />
-                <div style={{ height: 10, background: "#F3F4F6", borderRadius: 4, width: 120 }} className="animate-pulse" />
+                <div style={{ height: 12, background: "var(--color-surface-muted)", borderRadius: 4, width: 160, marginBottom: 8 }} className="animate-pulse" />
+                <div style={{ height: 10, background: "var(--color-surface-muted)", borderRadius: 4, width: 120 }} className="animate-pulse" />
               </div>
-              <div style={{ height: 24, background: "#F3F4F6", borderRadius: 999, width: 80 }} className="animate-pulse" />
-              <div style={{ height: 12, background: "#F3F4F6", borderRadius: 4, width: 60 }} className="animate-pulse" />
+              <div style={{ height: 24, background: "var(--color-surface-muted)", borderRadius: 999, width: 80 }} className="animate-pulse" />
+              <div style={{ height: 12, background: "var(--color-surface-muted)", borderRadius: 4, width: 60 }} className="animate-pulse" />
             </div>
           ))}
         </div>
       ) : filtered.length === 0 ? (
         <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", padding: "64px 24px", textAlign: "center" }}>
-          <Building2 size={36} style={{ color: "#E5E7EB", margin: "0 auto 12px" }} />
-          <p style={{ fontSize: 15, fontWeight: 600, color: "#111827", margin: 0 }}>No enquiries found</p>
-          <p style={{ fontSize: 13, color: "#9CA3AF", marginTop: 6 }}>
+          <Building2 size={36} style={{ color: "var(--color-edge)", margin: "0 auto 12px" }} />
+          <p style={{ fontSize: 15, fontWeight: 600, color: "var(--color-ink)", margin: 0 }}>No enquiries found</p>
+          <p style={{ fontSize: 13, color: "var(--color-ink-4)", marginTop: 6 }}>
             {search || statusFilter !== "ALL"
               ? "Try adjusting your search or filter."
               : "No employer enquiries submitted yet."}

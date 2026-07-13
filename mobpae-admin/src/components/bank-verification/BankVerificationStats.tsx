@@ -17,21 +17,21 @@ export default function BankVerificationStats({ accounts }: Props) {
       value: pending,
       icon: Clock3,
       bg: "bg-amber-50",
-      color: "text-amber-600",
+      color: "text-warning",
     },
     {
       title: "Verified",
       value: verified,
       icon: CheckCircle2,
-      bg: "bg-[#EEF2FF]",
-      color: "text-[#315eff]",
+      bg: "bg-brand-soft",
+      color: "text-brand",
     },
     {
       title: "Total",
       value: accounts.length,
       icon: Landmark,
-      bg: "bg-[#EEF2FF]",
-      color: "text-[#315eff]",
+      bg: "bg-brand-soft",
+      color: "text-brand",
     },
   ];
 
@@ -43,13 +43,13 @@ export default function BankVerificationStats({ accounts }: Props) {
         return (
           <div
             key={stat.title}
-            className="bg-white border border-[#E5E7EB] rounded-2xl p-4"
+            className="bg-white border border-edge rounded-2xl p-4"
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-[#6B7280]">{stat.title}</p>
+                <p className="text-xs text-ink-3">{stat.title}</p>
 
-                <h3 className="text-xl font-semibold text-[#111827] mt-1">
+                <h3 className="text-xl font-semibold text-ink mt-1">
                   {stat.value}
                 </h3>
               </div>

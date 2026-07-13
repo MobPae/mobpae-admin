@@ -17,9 +17,9 @@ interface Props {
 const STATUS_CONFIG: Record<string, { cls: string; label: string }> = {
   NEW:       { cls: "bg-amber-50 text-amber-700", label: "New" },
   CONTACTED: { cls: "bg-[#DBEAFE] text-[#1D4ED8]", label: "Contacted" },
-  APPROVED:  { cls: "bg-[#DCFCE7] text-[#15803D]", label: "Onboarded" },
-  ONBOARDED: { cls: "bg-[#DCFCE7] text-[#15803D]", label: "Onboarded" },
-  REJECTED:  { cls: "bg-red-50 text-red-600", label: "Rejected" },
+  APPROVED:  { cls: "bg-success-bg text-success-dark", label: "Onboarded" },
+  ONBOARDED: { cls: "bg-success-bg text-success-dark", label: "Onboarded" },
+  REJECTED:  { cls: "bg-danger-soft text-danger", label: "Rejected" },
 };
 
 export default function EmployerDetailsDrawer({ open, onClose, employer, onCreateEmployer }: Props) {
@@ -52,7 +52,7 @@ export default function EmployerDetailsDrawer({ open, onClose, employer, onCreat
 
   if (!open || !employer) return null;
 
-  const statusCfg = STATUS_CONFIG[employer.status] ?? { cls: "bg-[#F3F4F6] text-[#6B7280]", label: employer.status };
+  const statusCfg = STATUS_CONFIG[employer.status] ?? { cls: "bg-surface-muted text-ink-3", label: employer.status };
   const isOnboarded = employer.status === "ONBOARDED" || employer.status === "APPROVED";
   const isRejected  = employer.status === "REJECTED";
   const canContact  = employer.status === "NEW";
@@ -65,17 +65,17 @@ export default function EmployerDetailsDrawer({ open, onClose, employer, onCreat
       <div className="fixed inset-0 bg-black/20 z-40" onClick={onClose} />
 
       {/* Drawer */}
-      <div className="fixed top-0 right-0 h-full w-[440px] bg-white z-50 flex flex-col border-l border-[#E5E7EB] shadow-xl">
+      <div className="fixed top-0 right-0 h-full w-[440px] bg-white z-50 flex flex-col border-l border-edge shadow-overlay">
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E5E7EB] flex-shrink-0">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-edge flex-shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#111827] to-[#2A2C45] text-white flex items-center justify-center text-[12px] font-[600]">
               {employer.companyName.charAt(0).toUpperCase()}
             </div>
             <div>
-              <p className="text-[13px] font-[500] text-[#111827] leading-none">{employer.companyName}</p>
-              <p className="text-[11px] text-[#6B7280] mt-0.5 leading-none">{employer.email}</p>
+              <p className="text-[13px] font-[500] text-ink leading-none">{employer.companyName}</p>
+              <p className="text-[11px] text-ink-3 mt-0.5 leading-none">{employer.email}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -84,7 +84,7 @@ export default function EmployerDetailsDrawer({ open, onClose, employer, onCreat
             </span>
             <button
               onClick={onClose}
-              className="w-6 h-6 rounded-md flex items-center justify-center text-[#6B7280] hover:text-[#6B7280] hover:bg-[#F3F4F6] transition-colors"
+              className="w-6 h-6 rounded-md flex items-center justify-center text-ink-3 hover:text-ink-3 hover:bg-surface-muted transition-colors"
             >
               <X size={14} />
             </button>
@@ -95,10 +95,10 @@ export default function EmployerDetailsDrawer({ open, onClose, employer, onCreat
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
           {/* Lead details */}
           <section>
-            <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-[#6B7280] mb-2">
+            <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-ink-3 mb-2">
               Lead details
             </p>
-            <div className="border border-[#E5E7EB] rounded-lg divide-y divide-[#E5E7EB]">
+            <div className="border border-edge rounded-lg divide-y divide-edge">
               {[
                 { k: "Contact person", v: employer.contactPerson },
                 { k: "Email",          v: employer.email         },
@@ -108,8 +108,8 @@ export default function EmployerDetailsDrawer({ open, onClose, employer, onCreat
                 ...(employer.remarks ? [{ k: "Remarks", v: employer.remarks }] : []),
               ].map(({ k, v }) => (
                 <div key={k} className="flex items-center justify-between px-3 py-2.5">
-                  <span className="text-[11px] text-[#6B7280]">{k}</span>
-                  <span className="text-[11px] font-[500] text-[#111827] text-right max-w-[60%] truncate">{String(v)}</span>
+                  <span className="text-[11px] text-ink-3">{k}</span>
+                  <span className="text-[11px] font-[500] text-ink text-right max-w-[60%] truncate">{String(v)}</span>
                 </div>
               ))}
             </div>
@@ -117,8 +117,8 @@ export default function EmployerDetailsDrawer({ open, onClose, employer, onCreat
 
           {/* Status info */}
           {isOnboarded && (
-            <div className="rounded-lg bg-[#EEF2FF] border border-[#EEF2FF] px-4 py-3 flex items-start gap-3">
-              <CheckCircle2 size={15} className="text-[#315eff] flex-shrink-0 mt-0.5" />
+            <div className="rounded-lg bg-brand-soft border border-[#EEF2FF] px-4 py-3 flex items-start gap-3">
+              <CheckCircle2 size={15} className="text-brand flex-shrink-0 mt-0.5" />
               <p className="text-[11px] text-[#2048EE] leading-relaxed">
                 This company has been onboarded. Their employer account is active in the{" "}
                 <span className="font-[600]">Employers</span> module.
@@ -127,9 +127,9 @@ export default function EmployerDetailsDrawer({ open, onClose, employer, onCreat
           )}
 
           {isRejected && (
-            <div className="rounded-lg bg-red-50 border border-red-100 px-4 py-3 flex items-start gap-3">
-              <Ban size={15} className="text-red-500 flex-shrink-0 mt-0.5" />
-              <p className="text-[11px] text-red-600 leading-relaxed">
+            <div className="rounded-lg bg-danger-soft border border-red-100 px-4 py-3 flex items-start gap-3">
+              <Ban size={15} className="text-danger flex-shrink-0 mt-0.5" />
+              <p className="text-[11px] text-danger leading-relaxed">
                 This enquiry has been rejected.
               </p>
             </div>
@@ -137,14 +137,14 @@ export default function EmployerDetailsDrawer({ open, onClose, employer, onCreat
 
           {/* Reject inline form */}
           {rejectMode && (
-            <div className="rounded-lg bg-red-50 border border-red-100 px-4 py-4 space-y-3">
+            <div className="rounded-lg bg-danger-soft border border-red-100 px-4 py-4 space-y-3">
               <p className="text-[12px] font-[600] text-red-800">Reject this enquiry</p>
               <textarea
                 value={rejectRemarks}
                 onChange={e => setRejectRemarks(e.target.value)}
                 placeholder="Reason for rejection (optional)…"
                 rows={3}
-                className="w-full px-3 py-2 text-[12px] bg-white border border-red-200 rounded-lg text-[#111827] placeholder-[#D1D5DB] focus:outline-none focus:border-red-400 resize-none transition"
+                className="w-full px-3 py-2 text-[12px] bg-white border border-red-200 rounded-lg text-ink placeholder-[#D1D5DB] focus:outline-none focus:border-red-400 resize-none transition"
               />
               <div className="flex gap-2">
                 <button
@@ -158,7 +158,7 @@ export default function EmployerDetailsDrawer({ open, onClose, employer, onCreat
                 <button
                   onClick={() => { setRejectMode(false); setRejectRemarks(""); }}
                   disabled={isBusy}
-                  className="px-3 h-8 rounded-md border border-[#E5E7EB] text-[12px] text-[#6B7280] hover:bg-[#F8F9FC] disabled:opacity-50 transition-colors"
+                  className="px-3 h-8 rounded-md border border-edge text-[12px] text-ink-3 hover:bg-canvas disabled:opacity-50 transition-colors"
                 >
                   Cancel
                 </button>
@@ -168,8 +168,8 @@ export default function EmployerDetailsDrawer({ open, onClose, employer, onCreat
 
           {/* Action hints for actionable states */}
           {!isOnboarded && !isRejected && !rejectMode && (
-            <div className="rounded-lg bg-[#F8F9FC] border border-[#E5E7EB] px-4 py-3">
-              <p className="text-[11px] text-[#6B7280] leading-relaxed">
+            <div className="rounded-lg bg-canvas border border-edge px-4 py-3">
+              <p className="text-[11px] text-ink-3 leading-relaxed">
                 {employer.status === "CONTACTED"
                   ? "Lead has been contacted. Create an employer account to onboard them."
                   : "Create an employer account using the lead details above. The form will be pre-filled for you."}
@@ -179,14 +179,14 @@ export default function EmployerDetailsDrawer({ open, onClose, employer, onCreat
         </div>
 
         {/* Footer actions */}
-        <div className="border-t border-[#E5E7EB] px-5 py-3.5 flex-shrink-0 space-y-2">
+        <div className="border-t border-edge px-5 py-3.5 flex-shrink-0 space-y-2">
           {isOnboarded ? (
-            <div className="flex items-center justify-center gap-2 h-8 text-[12px] font-[500] text-[#315eff]">
+            <div className="flex items-center justify-center gap-2 h-8 text-[12px] font-[500] text-brand">
               <CheckCircle2 size={13} />
               Onboarding complete
             </div>
           ) : isRejected ? (
-            <div className="flex items-center justify-center gap-2 h-8 text-[12px] font-[500] text-[#6B7280]">
+            <div className="flex items-center justify-center gap-2 h-8 text-[12px] font-[500] text-ink-3">
               <Ban size={13} />
               Enquiry rejected
             </div>
@@ -207,7 +207,7 @@ export default function EmployerDetailsDrawer({ open, onClose, employer, onCreat
                   <button
                     onClick={() => statusMutation.mutate({ status: "CONTACTED" })}
                     disabled={isBusy}
-                    className="flex-1 h-7 rounded-md border border-[#E5E7EB] text-[11px] font-[500] text-[#315eff] hover:bg-[#EEF2FF] flex items-center justify-center gap-1.5 disabled:opacity-50 transition-colors"
+                    className="flex-1 h-7 rounded-md border border-edge text-[11px] font-[500] text-brand hover:bg-brand-soft flex items-center justify-center gap-1.5 disabled:opacity-50 transition-colors"
                   >
                     {isBusy && statusMutation.variables?.status === "CONTACTED"
                       ? <Loader2 size={11} className="animate-spin" />
@@ -219,7 +219,7 @@ export default function EmployerDetailsDrawer({ open, onClose, employer, onCreat
                   <button
                     onClick={() => setRejectMode(true)}
                     disabled={isBusy}
-                    className="flex-1 h-7 rounded-md border border-red-100 text-[11px] font-[500] text-red-500 hover:bg-red-50 flex items-center justify-center gap-1.5 disabled:opacity-50 transition-colors"
+                    className="flex-1 h-7 rounded-md border border-red-100 text-[11px] font-[500] text-danger hover:bg-danger-soft flex items-center justify-center gap-1.5 disabled:opacity-50 transition-colors"
                   >
                     <Ban size={11} />
                     Reject

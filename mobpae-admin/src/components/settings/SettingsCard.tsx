@@ -4,7 +4,7 @@ type SettingsCardProps = {
 
 export default function SettingsCard({ children }: SettingsCardProps) {
   return (
-    <div className="bg-white border border-[#E5E7EB] rounded-3xl shadow-sm">
+    <div className="bg-white border border-edge rounded-3xl shadow-sm">
       {children}
     </div>
   );

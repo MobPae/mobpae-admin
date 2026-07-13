@@ -31,25 +31,29 @@ const formatDate = (s: string | null | undefined) => {
   catch { return s; }
 };
 
-const formatPayrollMonth = (raw: string) => {
+/** Format cycleDate (ISO DateTime, first of month) as "July 2026" */
+const formatCycleDate = (raw: string | null | undefined): string => {
   if (!raw) return "—";
-  const m = raw.match(/^(\d{4})-(\d{2})$/);
-  if (m) return new Date(Number(m[1]), Number(m[2]) - 1).toLocaleDateString("en-IN", { month: "long", year: "numeric" });
-  return raw;
+  try {
+    return new Date(raw).toLocaleDateString("en-IN", { month: "long", year: "numeric" });
+  } catch {
+    return raw;
+  }
 };
 
 // ── status config ─────────────────────────────────────────────────────────────
 
 const STATUS_CFG: Record<string, { label: string; color: string; bg: string }> = {
-  NO_DUES:        { label: "N/A",            color: "#6B7280", bg: "#F3F4F6" },
-  PENDING:        { label: "Pending",        color: "#D97706", bg: "#FEF3C7" },
-  PARTIALLY_PAID: { label: "Partially Paid", color: "#B45309", bg: "#FEF3C7" },
-  PAID:           { label: "Paid",           color: "#16A34A", bg: "#DCFCE7" },
-  OVERDUE:        { label: "Overdue",        color: "#DC2626", bg: "#FEE2E2" },
+  DRAFT:          { label: "Draft",          color: "var(--color-ink-3)", bg: "var(--color-surface-muted)" },
+  GENERATED:      { label: "Generated",      color: "var(--color-warning)", bg: "var(--color-warning-bg)" },
+  PARTIALLY_PAID: { label: "Partially Paid", color: "var(--color-warning-dark)", bg: "var(--color-warning-bg)" },
+  PAID:           { label: "Paid",           color: "var(--color-success)", bg: "var(--color-success-bg)" },
+  OVERDUE:        { label: "Overdue",        color: "var(--color-danger)", bg: "var(--color-danger-bg)" },
+  CANCELLED:      { label: "Cancelled",      color: "var(--color-ink-3)", bg: "var(--color-surface-muted)" },
 };
 
 function StatusPill({ status }: { status: string }) {
-  const c = STATUS_CFG[status] ?? { label: status, color: "#6B7280", bg: "#F3F4F6" };
+  const c = STATUS_CFG[status] ?? { label: status, color: "var(--color-ink-3)", bg: "var(--color-surface-muted)" };
   return (
     <span style={{ display: "inline-flex", alignItems: "center", gap: 5, height: 24, padding: "0 10px", borderRadius: 999, background: c.bg, color: c.color, fontSize: 12, fontWeight: 600 }}>
       <span style={{ width: 6, height: 6, borderRadius: "50%", background: c.color, flexShrink: 0 }} />
@@ -62,7 +66,7 @@ function StatusPill({ status }: { status: string }) {
 
 const FILTERS: { label: string; value: "ALL" | EmployerSettlementStatus }[] = [
   { label: "All",            value: "ALL"           },
-  { label: "Pending",        value: "PENDING"       },
+  { label: "Generated",      value: "GENERATED"     },
   { label: "Overdue",        value: "OVERDUE"       },
   { label: "Partially Paid", value: "PARTIALLY_PAID"},
   { label: "Paid",           value: "PAID"          },
@@ -82,10 +86,10 @@ function ToastContainer({ toasts, onDismiss }: { toasts: Toast[]; onDismiss: (id
       {toasts.map(t => (
         <div
           key={t.id}
-          style={{ pointerEvents: "auto", display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", borderRadius: 14, boxShadow: "0 4px 20px rgba(0,0,0,0.12)", fontSize: 13, fontWeight: 500, border: "1px solid", minWidth: 260, background: t.kind === "success" ? "#EEF2FF" : "#FEF2F2", borderColor: t.kind === "success" ? "#C8C9FF" : "#FECACA", color: t.kind === "success" ? "#111827" : "#991B1B" }}
+          style={{ pointerEvents: "auto", display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", borderRadius: 14, boxShadow: "0 4px 20px rgba(0,0,0,0.12)", fontSize: 13, fontWeight: 500, border: "1px solid", minWidth: 260, background: t.kind === "success" ? "var(--color-brand-soft)" : "var(--color-danger-soft)", borderColor: t.kind === "success" ? "var(--color-brand-muted)" : "var(--color-danger-bg)", color: t.kind === "success" ? "var(--color-ink)" : "#991B1B" }}
         >
           {t.kind === "success"
-            ? <CheckCircle2 size={15} color="#315eff" style={{ flexShrink: 0 }} />
+            ? <CheckCircle2 size={15} color="var(--color-brand)" style={{ flexShrink: 0 }} />
             : <AlertTriangle size={15} color="#EF4444" style={{ flexShrink: 0 }} />
           }
           <span style={{ flex: 1 }}>{t.message}</span>
@@ -119,8 +123,8 @@ function StatCard({ label, value, icon, iconBg, iconColor, highlight }: {
     <div style={{ background: "white", borderRadius: 16, padding: "14px 16px", border: "1px solid #E5E7EB", boxShadow: "0 1px 4px rgba(17,24,39,0.04)", display: "flex", alignItems: "center", gap: 14 }}>
       <div style={{ width: 40, height: 40, borderRadius: 12, background: iconBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: iconColor }}>{icon}</div>
       <div>
-        <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1, color: "#111827" }}>{value}</div>
-        <div style={{ fontSize: 12, marginTop: 3, fontWeight: 500, color: "#6B7280" }}>{label}</div>
+        <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1, color: "var(--color-ink)" }}>{value}</div>
+        <div style={{ fontSize: 12, marginTop: 3, fontWeight: 500, color: "var(--color-ink-3)" }}>{label}</div>
       </div>
     </div>
   );
@@ -131,8 +135,8 @@ function StatCard({ label, value, icon, iconBg, iconColor, highlight }: {
 function InfoRow({ label, value, accent }: { label: string; value: React.ReactNode; accent?: boolean }) {
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #F3F4F6" }}>
-      <span style={{ fontSize: 12, color: "#6B7280" }}>{label}</span>
-      <span style={{ fontSize: 12, fontWeight: 500, color: accent ? "#DC2626" : "#111827" }}>{value}</span>
+      <span style={{ fontSize: 12, color: "var(--color-ink-3)" }}>{label}</span>
+      <span style={{ fontSize: 12, fontWeight: 500, color: accent ? "var(--color-danger)" : "var(--color-ink)" }}>{value}</span>
     </div>
   );
 }
@@ -140,7 +144,7 @@ function InfoRow({ label, value, accent }: { label: string; value: React.ReactNo
 function Timeline({ s }: { s: EmployerSettlement }) {
   const steps = [
     { label: "Created",           date: s.createdAt,       done: true },
-    { label: "Payment due",       date: s.dueDate,         done: s.status !== "PENDING" },
+    { label: "Payment due",       date: s.dueDate,         done: s.status !== "GENERATED" && s.status !== "DRAFT" },
     { label: "Grace period ends", date: s.gracePeriodEnd,  done: s.status === "OVERDUE" || s.status === "PAID" || s.status === "PARTIALLY_PAID", skip: !s.gracePeriodEnd },
     { label: "Settled",           date: s.paidDate,        done: s.status === "PAID" },
   ].filter(x => !x.skip);
@@ -150,16 +154,16 @@ function Timeline({ s }: { s: EmployerSettlement }) {
       {steps.map((step, i) => (
         <div key={step.label} style={{ display: "flex", gap: 12 }}>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-            <div style={{ width: 20, height: 20, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, border: `2px solid ${step.done ? "#315eff" : "#E5E7EB"}`, background: step.done ? "#EEF2FF" : "white" }}>
+            <div style={{ width: 20, height: 20, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, border: `2px solid ${step.done ? "var(--color-brand)" : "var(--color-edge)"}`, background: step.done ? "var(--color-brand-soft)" : "white" }}>
               {step.done
-                ? <CheckCircle2 size={11} color="#315eff" />
-                : <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#D1D5DB" }} />}
+                ? <CheckCircle2 size={11} color="var(--color-brand)" />
+                : <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--color-ink-disabled)" }} />}
             </div>
-            {i < steps.length - 1 && <div style={{ width: 1, flex: 1, margin: "4px 0", background: step.done ? "#C8C9FF" : "#F3F4F6", minHeight: 18 }} />}
+            {i < steps.length - 1 && <div style={{ width: 1, flex: 1, margin: "4px 0", background: step.done ? "var(--color-brand-muted)" : "var(--color-surface-muted)", minHeight: 18 }} />}
           </div>
           <div style={{ paddingBottom: 16 }}>
-            <p style={{ fontSize: 12, fontWeight: 500, color: step.done ? "#111827" : "#6B7280", margin: 0, lineHeight: 1 }}>{step.label}</p>
-            {step.date && <p style={{ fontSize: 11, color: "#6B7280", marginTop: 2 }}>{formatDate(step.date)}</p>}
+            <p style={{ fontSize: 12, fontWeight: 500, color: step.done ? "var(--color-ink)" : "var(--color-ink-3)", margin: 0, lineHeight: 1 }}>{step.label}</p>
+            {step.date && <p style={{ fontSize: 11, color: "var(--color-ink-3)", marginTop: 2 }}>{formatDate(step.date)}</p>}
           </div>
         </div>
       ))}
@@ -175,8 +179,8 @@ export default function SettlementsPage() {
   const [filter,    setFilter]    = useState<"ALL" | EmployerSettlementStatus>("ALL");
   const [selected,  setSelected]  = useState<EmployerSettlement | null>(null);
   const [loadingDetailId, setLoadingDetailId] = useState<string | null>(null);
-  const [marking,   setMarking]   = useState<string | null>(null);   // settlement id being marked
-  const [sending,   setSending]   = useState<string | null>(null);   // settlement id being reported
+  const [marking,   setMarking]   = useState<string | null>(null);
+  const [sending,   setSending]   = useState<string | null>(null);
   const [markError, setMarkError] = useState("");
   const [toasts,    setToasts]    = useState<Toast[]>([]);
 
@@ -214,8 +218,8 @@ export default function SettlementsPage() {
       const matchSearch = !q ||
         s.employer.companyName.toLowerCase().includes(q) ||
         s.employer.companyCode.toLowerCase().includes(q) ||
-        s.payrollMonth.toLowerCase().includes(q) ||
-        (s.referenceNumber ?? "").toLowerCase().includes(q);
+        (s.settlementNumber ?? "").toLowerCase().includes(q) ||
+        formatCycleDate(s.cycleDate).toLowerCase().includes(q);
       const matchFilter = filter === "ALL" || s.status === filter;
       return matchSearch && matchFilter;
     }),
@@ -247,7 +251,7 @@ export default function SettlementsPage() {
       const detail = await getSettlement(s.id);
       setSelected(detail);
     } catch (err) {
-      addToast("error", getApiErrorMessage(err, "Failed to load settlement recovery details"));
+      addToast("error", getApiErrorMessage(err, "Failed to load settlement details"));
     } finally {
       setLoadingDetailId(null);
     }
@@ -268,7 +272,7 @@ export default function SettlementsPage() {
   };
 
   const canPay = (s: EmployerSettlement) =>
-    s.status === "PENDING" || s.status === "PARTIALLY_PAID" || s.status === "OVERDUE";
+    s.status === "GENERATED" || s.status === "PARTIALLY_PAID" || s.status === "OVERDUE";
 
   return (
     <div style={{ padding: "28px 32px" }}>
@@ -277,28 +281,28 @@ export default function SettlementsPage() {
 
       {/* Header */}
       <div style={{ marginBottom: 0 }}>
-        <h1 style={{ fontSize: 26, fontWeight: 700, color: "#111827", letterSpacing: "-0.025em", margin: 0, fontFamily: "Inter, ui-sans-serif, sans-serif" }}>Settlements</h1>
-        <p style={{ fontSize: 14, color: "#6B7280", marginTop: 6 }}>Track employer settlement obligations to MobPae.</p>
+        <h1 style={{ fontSize: 26, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.025em", margin: 0, fontFamily: "Inter, ui-sans-serif, sans-serif" }}>Settlements</h1>
+        <p style={{ fontSize: 14, color: "var(--color-ink-3)", marginTop: 6 }}>Track employer settlement obligations to MobPae.</p>
       </div>
 
       {/* Summary cards */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 24, marginTop: 24 }}>
         <StatCard label="Outstanding"  value={formatCurrency(totalOutstanding)} icon={<CircleDollarSign size={18} strokeWidth={1.75} />} iconBg="rgba(255,255,255,0.15)" iconColor="white"     highlight />
-        <StatCard label="Pending"      value={counts["PENDING"] ?? 0}           icon={<Clock3 size={18} strokeWidth={1.75} />}           iconBg="#FEF3C7"              iconColor="#D97706" />
-        <StatCard label="Overdue"      value={counts["OVERDUE"] ?? 0}           icon={<AlertTriangle size={18} strokeWidth={1.75} />}    iconBg="#FEE2E2"              iconColor="#EF4444" />
-        <StatCard label="Paid"         value={counts["PAID"] ?? 0}              icon={<CheckCircle2 size={18} strokeWidth={1.75} />}     iconBg="#EEF2FF"              iconColor="#315eff" />
+        <StatCard label="Generated"    value={counts["GENERATED"] ?? 0}          icon={<Clock3 size={18} strokeWidth={1.75} />}           iconBg="var(--color-warning-bg)"              iconColor="var(--color-warning)" />
+        <StatCard label="Overdue"      value={counts["OVERDUE"] ?? 0}            icon={<AlertTriangle size={18} strokeWidth={1.75} />}    iconBg="var(--color-danger-bg)"              iconColor="#EF4444" />
+        <StatCard label="Paid"         value={counts["PAID"] ?? 0}               icon={<CheckCircle2 size={18} strokeWidth={1.75} />}     iconBg="var(--color-brand-soft)"              iconColor="var(--color-brand)" />
       </div>
 
       {/* Search + filter */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 20 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, height: 40, padding: "0 14px", background: "white", border: "1px solid #E5E7EB", borderRadius: 12, minWidth: 240 }}>
-          <Search size={14} style={{ color: "#9CA3AF", flexShrink: 0 }} />
+          <Search size={14} style={{ color: "var(--color-ink-4)", flexShrink: 0 }} />
           <input
             type="text"
-            placeholder="Search by employer, month, ref…"
+            placeholder="Search by employer, cycle, settlement no…"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            style={{ flex: 1, fontSize: 13.5, color: "#111827", background: "transparent", outline: "none", border: "none", fontFamily: "inherit" }}
+            style={{ flex: 1, fontSize: 13.5, color: "var(--color-ink)", background: "transparent", outline: "none", border: "none", fontFamily: "inherit" }}
           />
         </div>
         <div style={{ display: "flex", gap: 6 }}>
@@ -308,7 +312,7 @@ export default function SettlementsPage() {
               <button
                 key={f.value}
                 onClick={() => setFilter(f.value)}
-                style={{ height: 36, padding: "0 14px", background: active ? "#111827" : "white", color: active ? "white" : "#6B7280", border: `1px solid ${active ? "#111827" : "#E5E7EB"}`, borderRadius: 10, fontSize: 13, fontWeight: active ? 600 : 400, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6 }}
+                style={{ height: 36, padding: "0 14px", background: active ? "var(--color-ink)" : "white", color: active ? "white" : "var(--color-ink-3)", border: `1px solid ${active ? "var(--color-ink)" : "var(--color-edge)"}`, borderRadius: 10, fontSize: 13, fontWeight: active ? 600 : 400, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6 }}
               >
                 {f.label}
                 {counts[f.value] !== undefined && (
@@ -324,39 +328,39 @@ export default function SettlementsPage() {
       <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", overflow: "hidden" }}>
         {isError ? (
           <div style={{ padding: "56px 24px", textAlign: "center" }}>
-            <p style={{ fontSize: 13, fontWeight: 500, color: "#DC2626", margin: 0 }}>Failed to load settlements</p>
-            <p style={{ fontSize: 12, color: "#6B7280", marginTop: 4 }}>Check your connection and try again.</p>
-            <button onClick={() => void refetch()} style={{ marginTop: 16, height: 34, padding: "0 16px", background: "white", border: "1px solid #E5E7EB", borderRadius: 10, fontSize: 12, fontWeight: 600, color: "#DC2626", cursor: "pointer", fontFamily: "inherit" }}>Retry</button>
+            <p style={{ fontSize: 13, fontWeight: 500, color: "var(--color-danger)", margin: 0 }}>Failed to load settlements</p>
+            <p style={{ fontSize: 12, color: "var(--color-ink-3)", marginTop: 4 }}>Check your connection and try again.</p>
+            <button onClick={() => void refetch()} style={{ marginTop: 16, height: 34, padding: "0 16px", background: "white", border: "1px solid #E5E7EB", borderRadius: 10, fontSize: 12, fontWeight: 600, color: "var(--color-danger)", cursor: "pointer", fontFamily: "inherit" }}>Retry</button>
           </div>
         ) : isLoading ? (
           <div>
             {[...Array(6)].map((_, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 20px", borderBottom: "1px solid #F9FAFB" }}>
-                <div style={{ width: 32, height: 32, borderRadius: 8, background: "#F3F4F6", flexShrink: 0 }} className="animate-pulse" />
+                <div style={{ width: 32, height: 32, borderRadius: 8, background: "var(--color-surface-muted)", flexShrink: 0 }} className="animate-pulse" />
                 <div style={{ flex: 1 }}>
-                  <div style={{ height: 12, background: "#F3F4F6", borderRadius: 4, width: 140, marginBottom: 6 }} className="animate-pulse" />
-                  <div style={{ height: 10, background: "#F3F4F6", borderRadius: 4, width: 100 }} className="animate-pulse" />
+                  <div style={{ height: 12, background: "var(--color-surface-muted)", borderRadius: 4, width: 140, marginBottom: 6 }} className="animate-pulse" />
+                  <div style={{ height: 10, background: "var(--color-surface-muted)", borderRadius: 4, width: 100 }} className="animate-pulse" />
                 </div>
-                <div style={{ height: 12, background: "#F3F4F6", borderRadius: 4, width: 80 }} className="animate-pulse" />
-                <div style={{ height: 22, background: "#F3F4F6", borderRadius: 999, width: 70 }} className="animate-pulse" />
+                <div style={{ height: 12, background: "var(--color-surface-muted)", borderRadius: 4, width: 80 }} className="animate-pulse" />
+                <div style={{ height: 22, background: "var(--color-surface-muted)", borderRadius: 999, width: 70 }} className="animate-pulse" />
               </div>
             ))}
           </div>
         ) : !rows.length ? (
           <div style={{ padding: "60px 24px", textAlign: "center" }}>
-            <div style={{ width: 40, height: 40, borderRadius: 12, background: "#F3F4F6", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>
-              <CreditCard size={18} color="#6B7280" />
+            <div style={{ width: 40, height: 40, borderRadius: 12, background: "var(--color-surface-muted)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>
+              <CreditCard size={18} color="var(--color-ink-3)" />
             </div>
-            <p style={{ fontSize: 13, fontWeight: 500, color: "#6B7280", margin: 0 }}>No settlements found</p>
-            <p style={{ fontSize: 12, color: "#9CA3AF", marginTop: 4 }}>Settlements appear once employer recoveries are due to MobPae</p>
+            <p style={{ fontSize: 13, fontWeight: 500, color: "var(--color-ink-3)", margin: 0 }}>No settlements found</p>
+            <p style={{ fontSize: 12, color: "var(--color-ink-4)", marginTop: 4 }}>Settlements appear once employer recoveries are due to MobPae</p>
           </div>
         ) : (
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
               <thead>
-                <tr style={{ borderBottom: "1px solid #F3F4F6", background: "#FAFAFA" }}>
-                  {["Employer", "Salary Cycle", "Total", "Outstanding", "Late Fee", "Due Date", "Status", "Actions"].map(h => (
-                    <th key={h} style={{ padding: "14px 20px", textAlign: "left", fontSize: 11.5, fontWeight: 600, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.07em", whiteSpace: "nowrap" }}>{h}</th>
+                <tr style={{ borderBottom: "1px solid #F3F4F6", background: "var(--color-surface-raised)" }}>
+                  {["Employer", "Settlement No.", "Salary Cycle", "Total", "Outstanding", "Late Fee", "Due Date", "Status", "Actions"].map(h => (
+                    <th key={h} style={{ padding: "14px 20px", textAlign: "left", fontSize: 11.5, fontWeight: 600, color: "var(--color-ink-4)", textTransform: "uppercase", letterSpacing: "0.07em", whiteSpace: "nowrap" }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -364,23 +368,24 @@ export default function SettlementsPage() {
                 {rows.map(s => (
                   <tr
                     key={s.id}
-                    style={{ borderBottom: "1px solid #F9FAFB", background: selected?.id === s.id ? "#EEF2FF" : "transparent" }}
+                    style={{ borderBottom: "1px solid #F9FAFB", background: selected?.id === s.id ? "var(--color-brand-soft)" : "transparent" }}
                   >
                     <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
                       <div>
-                        <p style={{ fontSize: 13.5, fontWeight: 600, color: "#111827", margin: 0 }}>{s.employer.companyName}</p>
-                        <p style={{ fontSize: 11.5, color: "#9CA3AF", margin: "2px 0 0", fontFamily: "ui-monospace, monospace" }}>{s.employer.companyCode}</p>
+                        <p style={{ fontSize: 13.5, fontWeight: 600, color: "var(--color-ink)", margin: 0 }}>{s.employer.companyName}</p>
+                        <p style={{ fontSize: 11.5, color: "var(--color-ink-4)", margin: "2px 0 0", fontFamily: "ui-monospace, monospace" }}>{s.employer.companyCode}</p>
                       </div>
                     </td>
-                    <td style={{ padding: "16px 20px", verticalAlign: "middle", fontWeight: 500, color: "#6B7280", whiteSpace: "nowrap" }}>{formatPayrollMonth(s.payrollMonth)}</td>
-                    <td style={{ padding: "16px 20px", verticalAlign: "middle", fontWeight: 600, color: "#111827", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>{formatCurrency(s.totalAmount)}</td>
-                    <td style={{ padding: "16px 20px", verticalAlign: "middle", fontWeight: 600, whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums", color: parseFloat(s.outstandingAmount) > 0 ? "#DC2626" : "#315eff" }}>
+                    <td style={{ padding: "16px 20px", verticalAlign: "middle", fontFamily: "ui-monospace, monospace", fontSize: 12, color: "var(--color-ink-2)" }}>{s.settlementNumber}</td>
+                    <td style={{ padding: "16px 20px", verticalAlign: "middle", fontWeight: 500, color: "var(--color-ink-3)", whiteSpace: "nowrap" }}>{formatCycleDate(s.cycleDate)}</td>
+                    <td style={{ padding: "16px 20px", verticalAlign: "middle", fontWeight: 600, color: "var(--color-ink)", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>{formatCurrency(s.totalAmount)}</td>
+                    <td style={{ padding: "16px 20px", verticalAlign: "middle", fontWeight: 600, whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums", color: parseFloat(s.outstandingAmount) > 0 ? "var(--color-danger)" : "var(--color-brand)" }}>
                       {parseFloat(s.outstandingAmount) > 0 ? formatCurrency(s.outstandingAmount) : "No dues"}
                     </td>
-                    <td style={{ padding: "16px 20px", verticalAlign: "middle", color: "#6B7280", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>
+                    <td style={{ padding: "16px 20px", verticalAlign: "middle", color: "var(--color-ink-3)", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>
                       {parseFloat(s.lateFeeAmount) > 0 ? formatCurrency(s.lateFeeAmount) : "—"}
                     </td>
-                    <td style={{ padding: "16px 20px", verticalAlign: "middle", fontWeight: 500, whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums", color: s.status === "OVERDUE" ? "#DC2626" : "#9CA3AF" }}>
+                    <td style={{ padding: "16px 20px", verticalAlign: "middle", fontWeight: 500, whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums", color: s.status === "OVERDUE" ? "var(--color-danger)" : "var(--color-ink-4)" }}>
                       {formatDate(s.dueDate)}
                     </td>
                     <td style={{ padding: "16px 20px", verticalAlign: "middle" }}><StatusPill status={s.status} /></td>
@@ -392,7 +397,7 @@ export default function SettlementsPage() {
                         <button
                           title="View Details"
                           onClick={() => void openSettlement(s)}
-                          style={{ height: 28, width: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid #E5E7EB", background: "white", color: "#6B7280", cursor: "pointer" }}
+                          style={{ height: 28, width: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid #E5E7EB", background: "white", color: "var(--color-ink-3)", cursor: "pointer" }}
                         >
                           <Eye size={13} />
                         </button>
@@ -402,10 +407,10 @@ export default function SettlementsPage() {
                           title="Send Report"
                           disabled={sending === s.id}
                           onClick={e => handleSendReport(s, e)}
-                          style={{ height: 28, width: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid #E5E7EB", background: "white", color: "#6B7280", cursor: "pointer", opacity: sending === s.id ? 0.5 : 1 }}
+                          style={{ height: 28, width: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid #E5E7EB", background: "white", color: "var(--color-ink-3)", cursor: "pointer", opacity: sending === s.id ? 0.5 : 1 }}
                         >
                           {sending === s.id
-                            ? <span style={{ width: 12, height: 12, border: "2px solid rgba(49,94,255,0.3)", borderTopColor: "#315eff", borderRadius: "50%" }} className="animate-spin" />
+                            ? <span style={{ width: 12, height: 12, border: "2px solid rgba(49,94,255,0.3)", borderTopColor: "var(--color-brand)", borderRadius: "50%" }} className="animate-spin" />
                             : <Send size={13} />
                           }
                         </button>
@@ -416,10 +421,10 @@ export default function SettlementsPage() {
                             title="Mark as Paid"
                             disabled={marking === s.id}
                             onClick={e => { e.stopPropagation(); void handleMarkPaid(s); }}
-                            style={{ height: 28, padding: "0 10px", display: "flex", alignItems: "center", gap: 4, borderRadius: 8, border: "1px solid #C8C9FF", background: "#EEF2FF", color: "#2048EE", cursor: "pointer", fontSize: 11, fontWeight: 600, fontFamily: "inherit", whiteSpace: "nowrap", opacity: marking === s.id ? 0.5 : 1 }}
+                            style={{ height: 28, padding: "0 10px", display: "flex", alignItems: "center", gap: 4, borderRadius: 8, border: "1px solid #C8C9FF", background: "var(--color-brand-soft)", color: "var(--color-info)", cursor: "pointer", fontSize: 11, fontWeight: 600, fontFamily: "inherit", whiteSpace: "nowrap", opacity: marking === s.id ? 0.5 : 1 }}
                           >
                             {marking === s.id
-                              ? <span style={{ width: 12, height: 12, border: "2px solid rgba(49,94,255,0.3)", borderTopColor: "#315eff", borderRadius: "50%" }} className="animate-spin" />
+                              ? <span style={{ width: 12, height: 12, border: "2px solid rgba(49,94,255,0.3)", borderTopColor: "var(--color-brand)", borderRadius: "50%" }} className="animate-spin" />
                               : <CheckCircle2 size={11} />
                             }
                             {marking === s.id ? "" : "Mark Paid"}
@@ -446,16 +451,16 @@ export default function SettlementsPage() {
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
                     <StatusPill status={selected.status} />
-                    {selected.referenceNumber && (
-                      <span style={{ fontSize: 11, fontWeight: 500, color: "#6B7280", background: "#F3F4F6", padding: "2px 8px", borderRadius: 6 }}>
-                        Ref: {selected.referenceNumber}
+                    {selected.settlementNumber && (
+                      <span style={{ fontSize: 11, fontWeight: 500, color: "var(--color-ink-3)", background: "var(--color-surface-muted)", padding: "2px 8px", borderRadius: 6, fontFamily: "ui-monospace, monospace" }}>
+                        {selected.settlementNumber}
                       </span>
                     )}
                   </div>
-                  <p style={{ fontSize: 16, fontWeight: 700, color: "#111827", margin: 0, lineHeight: 1.2 }}>{selected.employer.companyName}</p>
-                  <p style={{ fontSize: 12, color: "#6B7280", marginTop: 2 }}>{formatPayrollMonth(selected.payrollMonth)} · {selected.employer.companyCode}</p>
+                  <p style={{ fontSize: 16, fontWeight: 700, color: "var(--color-ink)", margin: 0, lineHeight: 1.2 }}>{selected.employer.companyName}</p>
+                  <p style={{ fontSize: 12, color: "var(--color-ink-3)", marginTop: 2 }}>{formatCycleDate(selected.cycleDate)} · {selected.employer.companyCode}</p>
                 </div>
-                <button onClick={() => setSelected(null)} style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid #E5E7EB", background: "white", color: "#6B7280", cursor: "pointer" }}>
+                <button onClick={() => setSelected(null)} style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid #E5E7EB", background: "white", color: "var(--color-ink-3)", cursor: "pointer" }}>
                   <X size={14} />
                 </button>
               </div>
@@ -465,10 +470,10 @@ export default function SettlementsPage() {
             <div style={{ flex: 1, overflowY: "auto", padding: "16px 20px", display: "flex", flexDirection: "column", gap: 20 }}>
               {/* Overdue warning */}
               {selected.status === "OVERDUE" && (
-                <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 14, padding: "12px 14px", display: "flex", alignItems: "flex-start", gap: 10 }}>
+                <div style={{ background: "var(--color-danger-soft)", border: "1px solid #FECACA", borderRadius: 14, padding: "12px 14px", display: "flex", alignItems: "flex-start", gap: 10 }}>
                   <AlertTriangle size={14} color="#EF4444" style={{ flexShrink: 0, marginTop: 1 }} />
                   <div>
-                    <p style={{ fontSize: 12, fontWeight: 600, color: "#B91C1C", margin: 0 }}>Payment overdue</p>
+                    <p style={{ fontSize: 12, fontWeight: 600, color: "var(--color-danger-dark)", margin: 0 }}>Payment overdue</p>
                     <p style={{ fontSize: 11, color: "#EF4444", marginTop: 3, lineHeight: 1.5 }}>
                       This settlement is past its due date. Employer has not remitted payment. Late fees may apply.
                     </p>
@@ -478,29 +483,35 @@ export default function SettlementsPage() {
 
               {/* Risk badge */}
               {selected.employer.riskStatus && selected.employer.riskStatus !== "LOW" && (
-                <div style={{ background: "#FFF7ED", border: "1px solid #FED7AA", borderRadius: 14, padding: "10px 14px", display: "flex", alignItems: "center", gap: 8 }}>
+                <div style={{ background: "var(--color-warning-soft)", border: "1px solid var(--color-warning-bg)", borderRadius: 14, padding: "10px 14px", display: "flex", alignItems: "center", gap: 8 }}>
                   <AlertTriangle size={13} color="#F97316" style={{ flexShrink: 0 }} />
-                  <p style={{ fontSize: 12, color: "#C2410C", fontWeight: 500, margin: 0 }}>Employer risk: <span style={{ fontWeight: 600 }}>{selected.employer.riskStatus}</span></p>
+                  <p style={{ fontSize: 12, color: "var(--color-warning-dark)", fontWeight: 500, margin: 0 }}>Employer risk: <span style={{ fontWeight: 600 }}>{selected.employer.riskStatus}</span></p>
                 </div>
               )}
 
               {/* Amount breakdown */}
               <div>
-                <p style={{ fontSize: 11, fontWeight: 600, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Amount Breakdown</p>
+                <p style={{ fontSize: 11, fontWeight: 600, color: "var(--color-ink-4)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Amount Breakdown</p>
                 <div style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 16, padding: "0 16px" }}>
                   <InfoRow label="Principal" value={formatCurrency(selected.principalAmount)} />
                   <InfoRow label="Interest"  value={formatCurrency(selected.interestAmount)} />
+                  {parseFloat(selected.processingFeeAmount ?? "0") > 0 && (
+                    <InfoRow label="Processing fee" value={formatCurrency(selected.processingFeeAmount)} />
+                  )}
+                  {parseFloat(selected.gstAmount ?? "0") > 0 && (
+                    <InfoRow label="GST" value={formatCurrency(selected.gstAmount)} />
+                  )}
                   {parseFloat(selected.lateFeeAmount) > 0 && (
                     <InfoRow label="Late fee" value={formatCurrency(selected.lateFeeAmount)} accent />
                   )}
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderTop: "1px solid #E5E7EB", marginTop: 4 }}>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: "#111827" }}>Total</span>
-                    <span style={{ fontSize: 14, fontWeight: 700, color: "#111827", fontVariantNumeric: "tabular-nums" }}>{formatCurrency(selected.totalAmount)}</span>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: "var(--color-ink)" }}>Total</span>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: "var(--color-ink)", fontVariantNumeric: "tabular-nums" }}>{formatCurrency(selected.totalAmount)}</span>
                   </div>
                   {parseFloat(selected.outstandingAmount) > 0 && (
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderTop: "1px solid #FEE2E2" }}>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: "#DC2626" }}>Outstanding</span>
-                      <span style={{ fontSize: 14, fontWeight: 700, color: "#DC2626", fontVariantNumeric: "tabular-nums" }}>{formatCurrency(selected.outstandingAmount)}</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: "var(--color-danger)" }}>Outstanding</span>
+                      <span style={{ fontSize: 14, fontWeight: 700, color: "var(--color-danger)", fontVariantNumeric: "tabular-nums" }}>{formatCurrency(selected.outstandingAmount)}</span>
                     </div>
                   )}
                 </div>
@@ -508,67 +519,64 @@ export default function SettlementsPage() {
 
               {/* Key dates */}
               <div>
-                <p style={{ fontSize: 11, fontWeight: 600, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Key Dates</p>
+                <p style={{ fontSize: 11, fontWeight: 600, color: "var(--color-ink-4)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Key Dates</p>
                 <div style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 16, padding: "0 16px" }}>
                   <InfoRow label="Due date"          value={formatDate(selected.dueDate)} accent={selected.status === "OVERDUE"} />
                   {selected.gracePeriodEnd && <InfoRow label="Grace period ends" value={formatDate(selected.gracePeriodEnd)} />}
                   {selected.paidDate && <InfoRow label="Paid on" value={formatDate(selected.paidDate)} />}
+                  {selected.generatedAt && <InfoRow label="Generated" value={formatDate(selected.generatedAt)} />}
                   <InfoRow label="Created" value={formatDate(selected.createdAt)} />
+                  {selected.employeeCount > 0 && <InfoRow label="Employees" value={`${selected.employeeCount}`} />}
                 </div>
               </div>
 
               {/* Timeline */}
               <div>
-                <p style={{ fontSize: 11, fontWeight: 600, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 10 }}>Status Timeline</p>
+                <p style={{ fontSize: 11, fontWeight: 600, color: "var(--color-ink-4)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 10 }}>Status Timeline</p>
                 <Timeline s={selected} />
               </div>
 
-              {/* Linked recoveries */}
+              {/* Linked salary deductions */}
               <div>
-                <p style={{ fontSize: 11, fontWeight: 600, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Linked Recoveries</p>
+                <p style={{ fontSize: 11, fontWeight: 600, color: "var(--color-ink-4)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Salary Deductions</p>
                 {loadingDetailId === selected.id ? (
-                  <div style={{ background: "#F8F9FC", border: "1px solid #E5E7EB", borderRadius: 16, padding: 16 }}>
-                    <p style={{ fontSize: 12, color: "#6B7280", margin: 0 }}>Loading recovery rows...</p>
+                  <div style={{ background: "var(--color-canvas)", border: "1px solid #E5E7EB", borderRadius: 16, padding: 16 }}>
+                    <p style={{ fontSize: 12, color: "var(--color-ink-3)", margin: 0 }}>Loading salary deduction rows…</p>
                   </div>
-                ) : selected.repayments?.length ? (
+                ) : selected.lineItems?.length ? (
                   <div style={{ border: "1px solid #E5E7EB", borderRadius: 16, overflow: "hidden", background: "white" }}>
-                    {selected.repayments.map((repayment) => {
-                      const employee = repayment.loanApplication?.employee;
-                      const requestLabel = repayment.loanApplication?.applicationNumber ?? repayment.loanApplicationId.slice(0, 8);
-                      return (
-                        <div key={repayment.id} style={{ padding: "12px 14px", borderBottom: "1px solid #F3F4F6" }}>
-                          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
-                            <div style={{ minWidth: 0 }}>
-                              <p style={{ fontSize: 12.5, fontWeight: 600, color: "#111827", margin: 0 }}>{employee?.name ?? "Employee"}</p>
-                              <p style={{ fontSize: 11, color: "#6B7280", marginTop: 2 }}>
-                                {employee?.employeeCode ?? "Code unavailable"} · Req {requestLabel}
-                              </p>
-                            </div>
-                            <StatusPill status={repayment.status} />
+                    {selected.lineItems.map((item) => (
+                      <div key={item.id} style={{ padding: "12px 14px", borderBottom: "1px solid #F3F4F6" }}>
+                        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
+                          <div style={{ minWidth: 0 }}>
+                            <p style={{ fontSize: 12.5, fontWeight: 600, color: "var(--color-ink)", margin: 0 }}>{item.employeeName}</p>
+                            <p style={{ fontSize: 11, color: "var(--color-ink-3)", marginTop: 2 }}>
+                              {item.employeeCode} · {item.loanApplicationNumber}
+                            </p>
                           </div>
-                          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginTop: 10 }}>
-                            <div>
-                              <p style={{ fontSize: 10.5, color: "#9CA3AF", margin: 0 }}>Principal</p>
-                              <p style={{ fontSize: 12, fontWeight: 600, color: "#111827", marginTop: 2 }}>{formatCurrency(repayment.principalAmount)}</p>
-                            </div>
-                            <div>
-                              <p style={{ fontSize: 10.5, color: "#9CA3AF", margin: 0 }}>Interest</p>
-                              <p style={{ fontSize: 12, fontWeight: 600, color: "#111827", marginTop: 2 }}>{formatCurrency(repayment.interestAmount)}</p>
-                            </div>
-                            <div>
-                              <p style={{ fontSize: 10.5, color: "#9CA3AF", margin: 0 }}>Total</p>
-                              <p style={{ fontSize: 12, fontWeight: 700, color: "#111827", marginTop: 2 }}>{formatCurrency(repayment.totalAmount)}</p>
-                            </div>
-                          </div>
-                          <p style={{ fontSize: 11, color: "#6B7280", marginTop: 8 }}>Due {formatDate(repayment.dueDate)}</p>
+                          <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 6, background: "var(--color-surface-muted)", color: "var(--color-ink-3)", flexShrink: 0 }}>{item.status}</span>
                         </div>
-                      );
-                    })}
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginTop: 10 }}>
+                          <div>
+                            <p style={{ fontSize: 10.5, color: "var(--color-ink-4)", margin: 0 }}>Principal</p>
+                            <p style={{ fontSize: 12, fontWeight: 600, color: "var(--color-ink)", marginTop: 2 }}>{formatCurrency(item.principalAmount)}</p>
+                          </div>
+                          <div>
+                            <p style={{ fontSize: 10.5, color: "var(--color-ink-4)", margin: 0 }}>Interest</p>
+                            <p style={{ fontSize: 12, fontWeight: 600, color: "var(--color-ink)", marginTop: 2 }}>{formatCurrency(item.interestAmount)}</p>
+                          </div>
+                          <div>
+                            <p style={{ fontSize: 10.5, color: "var(--color-ink-4)", margin: 0 }}>Total deduction</p>
+                            <p style={{ fontSize: 12, fontWeight: 700, color: "var(--color-ink)", marginTop: 2 }}>{formatCurrency(item.totalDeductionAmount)}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 ) : (
-                  <div style={{ background: "#F8F9FC", border: "1px solid #E5E7EB", borderRadius: 16, padding: "12px 14px" }}>
-                    <p style={{ fontSize: 12, color: "#6B7280", lineHeight: 1.5, margin: 0 }}>
-                      No linked recovery rows were returned for this settlement. This can happen for older records or no-dues cycles.
+                  <div style={{ background: "var(--color-canvas)", border: "1px solid #E5E7EB", borderRadius: 16, padding: "12px 14px" }}>
+                    <p style={{ fontSize: 12, color: "var(--color-ink-3)", lineHeight: 1.5, margin: 0 }}>
+                      No salary deduction rows linked to this settlement yet.
                     </p>
                   </div>
                 )}
@@ -577,9 +585,9 @@ export default function SettlementsPage() {
               {/* Notes */}
               {selected.notes && (
                 <div>
-                  <p style={{ fontSize: 11, fontWeight: 600, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Notes</p>
-                  <div style={{ background: "#F8F9FC", border: "1px solid #E5E7EB", borderRadius: 16, padding: "12px 16px" }}>
-                    <p style={{ fontSize: 12, color: "#6B7280", lineHeight: 1.6, margin: 0 }}>{selected.notes}</p>
+                  <p style={{ fontSize: 11, fontWeight: 600, color: "var(--color-ink-4)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Notes</p>
+                  <div style={{ background: "var(--color-canvas)", border: "1px solid #E5E7EB", borderRadius: 16, padding: "12px 16px" }}>
+                    <p style={{ fontSize: 12, color: "var(--color-ink-3)", lineHeight: 1.6, margin: 0 }}>{selected.notes}</p>
                   </div>
                 </div>
               )}
@@ -587,16 +595,16 @@ export default function SettlementsPage() {
 
             {/* Footer */}
             <div style={{ padding: "16px 20px", borderTop: "1px solid #E5E7EB", display: "flex", flexDirection: "column", gap: 8 }}>
-              {markError && <p style={{ fontSize: 11, color: "#DC2626", textAlign: "center", margin: 0 }}>{markError}</p>}
+              {markError && <p style={{ fontSize: 11, color: "var(--color-danger)", textAlign: "center", margin: 0 }}>{markError}</p>}
 
               {/* Send Report */}
               <button
                 onClick={() => handleSendReport(selected)}
                 disabled={sending === selected.id}
-                style={{ width: "100%", height: 40, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, borderRadius: 10, border: "1px solid #315eff", color: "#315eff", fontSize: 13, fontWeight: 600, background: "white", cursor: sending === selected.id ? "not-allowed" : "pointer", opacity: sending === selected.id ? 0.5 : 1, fontFamily: "inherit" }}
+                style={{ width: "100%", height: 40, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, borderRadius: 10, border: "1px solid #315eff", color: "var(--color-brand)", fontSize: 13, fontWeight: 600, background: "white", cursor: sending === selected.id ? "not-allowed" : "pointer", opacity: sending === selected.id ? 0.5 : 1, fontFamily: "inherit" }}
               >
                 {sending === selected.id
-                  ? <span style={{ width: 16, height: 16, border: "2px solid rgba(49,94,255,0.3)", borderTopColor: "#315eff", borderRadius: "50%" }} className="animate-spin" />
+                  ? <span style={{ width: 16, height: 16, border: "2px solid rgba(49,94,255,0.3)", borderTopColor: "var(--color-brand)", borderRadius: "50%" }} className="animate-spin" />
                   : <Send size={15} />
                 }
                 {sending === selected.id ? "Sending…" : "Send Report"}
@@ -608,13 +616,13 @@ export default function SettlementsPage() {
                   <button
                     onClick={() => handleMarkPaid(selected)}
                     disabled={marking === selected.id}
-                    style={{ width: "100%", height: 40, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, borderRadius: 10, background: "#315eff", color: "white", fontSize: 13, fontWeight: 600, border: "none", cursor: marking === selected.id ? "not-allowed" : "pointer", opacity: marking === selected.id ? 0.5 : 1, fontFamily: "inherit" }}
+                    style={{ width: "100%", height: 40, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, borderRadius: 10, background: "var(--color-brand)", color: "white", fontSize: 13, fontWeight: 600, border: "none", cursor: marking === selected.id ? "not-allowed" : "pointer", opacity: marking === selected.id ? 0.5 : 1, fontFamily: "inherit" }}
                   >
                     <CheckCircle2 size={15} />
                     {marking === selected.id ? "Processing…" : "Mark as Paid"}
                   </button>
-                  <p style={{ fontSize: 11, color: "#6B7280", textAlign: "center", margin: 0 }}>
-                    Confirm receipt of {formatCurrency(selected.outstandingAmount || selected.totalAmount)} from {selected.employer.companyName}. Linked recoveries will move to recovered.
+                  <p style={{ fontSize: 11, color: "var(--color-ink-3)", textAlign: "center", margin: 0 }}>
+                    Confirm receipt of {formatCurrency(selected.outstandingAmount || selected.totalAmount)} from {selected.employer.companyName}. Linked salary deductions will move to recovered.
                   </p>
                 </>
               )}

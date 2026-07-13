@@ -28,9 +28,9 @@ function RevenueCard({ label, value, icon, iconBg, sub, highlight }: {
     <div style={{ background: "white", borderRadius: 16, padding: "14px 16px", border: "1px solid #E5E7EB", boxShadow: "0 1px 4px rgba(17,24,39,0.04)", display: "flex", alignItems: "center", gap: 14 }}>
       <div style={{ width: 40, height: 40, borderRadius: 12, background: iconBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{icon}</div>
       <div>
-        <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1, color: "#111827" }}>{value}</div>
-        <div style={{ fontSize: 12, marginTop: 3, fontWeight: 500, color: "#6B7280" }}>{label}</div>
-        {sub && <div style={{ fontSize: 11, color: "#9CA3AF", marginTop: 2 }}>{sub}</div>}
+        <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1, color: "var(--color-ink)" }}>{value}</div>
+        <div style={{ fontSize: 12, marginTop: 3, fontWeight: 500, color: "var(--color-ink-3)" }}>{label}</div>
+        {sub && <div style={{ fontSize: 11, color: "var(--color-ink-4)", marginTop: 2 }}>{sub}</div>}
       </div>
     </div>
   );
@@ -46,8 +46,8 @@ export default function RevenuePage() {
     <div style={{ padding: "28px 32px", fontFamily: "Inter, ui-sans-serif, sans-serif" }}>
       {/* Header */}
       <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: 26, fontWeight: 700, color: "#111827", letterSpacing: "-0.025em", margin: 0 }}>Revenue</h1>
-        <p style={{ fontSize: 14, color: "#6B7280", marginTop: 6 }}>Platform revenue from memberships and interest.</p>
+        <h1 style={{ fontSize: 26, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.025em", margin: 0 }}>Revenue</h1>
+        <p style={{ fontSize: 14, color: "var(--color-ink-3)", marginTop: 6 }}>Platform revenue from memberships and interest.</p>
       </div>
 
       {isLoading && (
@@ -59,10 +59,10 @@ export default function RevenuePage() {
       )}
 
       {error && (
-        <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 16, padding: "20px 24px" }}>
-          <p style={{ fontSize: 13, fontWeight: 500, color: "#DC2626", margin: 0 }}>Failed to load revenue data</p>
+        <div style={{ background: "var(--color-danger-soft)", border: "1px solid #FECACA", borderRadius: 16, padding: "20px 24px" }}>
+          <p style={{ fontSize: 13, fontWeight: 500, color: "var(--color-danger)", margin: 0 }}>Failed to load revenue data</p>
           <p style={{ fontSize: 12, color: "#EF4444", marginTop: 4 }}>{error instanceof Error ? error.message : "Unknown error"}</p>
-          <button type="button" onClick={() => void refetch()} style={{ marginTop: 12, height: 34, padding: "0 14px", borderRadius: 10, background: "white", border: "1px solid #FECACA", fontSize: 12, fontWeight: 600, color: "#DC2626", cursor: "pointer", fontFamily: "inherit" }}>Try again</button>
+          <button type="button" onClick={() => void refetch()} style={{ marginTop: 12, height: 34, padding: "0 14px", borderRadius: 10, background: "white", border: "1px solid #FECACA", fontSize: 12, fontWeight: 600, color: "var(--color-danger)", cursor: "pointer", fontFamily: "inherit" }}>Try again</button>
         </div>
       )}
 
@@ -81,15 +81,15 @@ export default function RevenuePage() {
             <RevenueCard
               label="Membership Revenue"
               value={formatCurrency(revenue.membershipRevenue)}
-              icon={<CreditCard size={18} color="#315eff" strokeWidth={1.75} />}
-              iconBg="#EEF2FF"
+              icon={<CreditCard size={18} color="var(--color-brand)" strokeWidth={1.75} />}
+              iconBg="var(--color-brand-soft)"
               sub="From membership plan payments"
             />
             <RevenueCard
               label="Interest Revenue"
               value={formatCurrency(revenue.interestRevenue)}
-              icon={<CircleDollarSign size={18} color="#16A34A" strokeWidth={1.75} />}
-              iconBg="#DCFCE7"
+              icon={<CircleDollarSign size={18} color="var(--color-success)" strokeWidth={1.75} />}
+              iconBg="var(--color-success-bg)"
               sub="From salary advance interest"
             />
           </div>
@@ -97,25 +97,25 @@ export default function RevenuePage() {
           {/* Breakdown */}
           <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", overflow: "hidden" }}>
             <div style={{ padding: "14px 20px", borderBottom: "1px solid #E5E7EB" }}>
-              <p style={{ fontSize: 13, fontWeight: 600, color: "#111827", margin: 0 }}>Revenue Breakdown</p>
+              <p style={{ fontSize: 13, fontWeight: 600, color: "var(--color-ink)", margin: 0 }}>Revenue Breakdown</p>
             </div>
             <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: 20 }}>
               {[
-                { label: "Membership revenue", value: revenue.membershipRevenue, color: "#315eff" },
-                { label: "Interest revenue",   value: revenue.interestRevenue,   color: "#16A34A" },
+                { label: "Membership revenue", value: revenue.membershipRevenue, color: "var(--color-brand)" },
+                { label: "Interest revenue",   value: revenue.interestRevenue,   color: "var(--color-success)" },
               ].map(({ label, value, color }) => {
                 const total = Number(revenue.totalRevenue) || 1;
                 const pct = Math.round((Number(value) / total) * 100);
                 return (
                   <div key={label}>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-                      <span style={{ fontSize: 13, color: "#6B7280" }}>{label}</span>
-                      <span style={{ fontSize: 13, fontWeight: 600, color: "#111827" }}>
+                      <span style={{ fontSize: 13, color: "var(--color-ink-3)" }}>{label}</span>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: "var(--color-ink)" }}>
                         {formatCurrency(value)}
-                        <span style={{ fontSize: 11, fontWeight: 400, color: "#9CA3AF", marginLeft: 6 }}>({pct}%)</span>
+                        <span style={{ fontSize: 11, fontWeight: 400, color: "var(--color-ink-4)", marginLeft: 6 }}>({pct}%)</span>
                       </span>
                     </div>
-                    <div style={{ height: 6, borderRadius: 999, background: "#F3F4F6", overflow: "hidden" }}>
+                    <div style={{ height: 6, borderRadius: 999, background: "var(--color-surface-muted)", overflow: "hidden" }}>
                       <div style={{ height: "100%", borderRadius: 999, background: color, width: `${pct}%`, transition: "width 0.5s ease" }} />
                     </div>
                   </div>

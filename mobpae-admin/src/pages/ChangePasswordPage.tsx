@@ -4,8 +4,8 @@ import { ArrowLeft, Eye, EyeOff, Lock, Shield, ShieldCheck } from "lucide-react"
 import { changePassword, logout } from "../services/authService";
 import { getApiErrorMessage } from "../utils/api-errors";
 
-const P  = "#315eff";
-const PL = "#EEF2FF";
+const P  = "var(--color-brand)";
+const PL = "var(--color-brand-soft)";
 
 function getStrength(pwd: string): number {
   let s = 0;
@@ -66,7 +66,7 @@ export default function ChangePasswordPage() {
   return (
     <div style={{
       minHeight: "100vh",
-      background: "#F8F9FC",
+      background: "var(--color-canvas)",
       display: "flex", alignItems: "center", justifyContent: "center",
       padding: "24px 16px",
       fontFamily: "Inter, ui-sans-serif, sans-serif",
@@ -79,7 +79,7 @@ export default function ChangePasswordPage() {
           onClick={() => navigate("/login")}
           style={{
             display: "flex", alignItems: "center", gap: 8,
-            fontSize: 13, color: "#6B7280", fontWeight: 500,
+            fontSize: 13, color: "var(--color-ink-3)", fontWeight: 500,
             background: "none", border: "none", cursor: "pointer",
             marginBottom: 28, padding: 0, fontFamily: "inherit",
           }}
@@ -99,8 +99,8 @@ export default function ChangePasswordPage() {
               <Lock size={24} style={{ color: P }} />
             </div>
             <div>
-              <h1 style={{ fontSize: 22, fontWeight: 700, color: "#111827", letterSpacing: "-0.02em", margin: 0 }}>Change Password</h1>
-              <p style={{ fontSize: 13, color: "#6B7280", marginTop: 4, lineHeight: 1.5 }}>
+              <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.02em", margin: 0 }}>Change Password</h1>
+              <p style={{ fontSize: 13, color: "var(--color-ink-3)", marginTop: 4, lineHeight: 1.5 }}>
                 For your security, please choose a strong password that you don't use on other sites.
               </p>
             </div>
@@ -108,11 +108,11 @@ export default function ChangePasswordPage() {
 
           {success ? (
             <div style={{ textAlign: "center", padding: "24px 0" }}>
-              <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#DCFCE7", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
-                <ShieldCheck size={28} style={{ color: "#16A34A" }} />
+              <div style={{ width: 56, height: 56, borderRadius: "50%", background: "var(--color-success-bg)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+                <ShieldCheck size={28} style={{ color: "var(--color-success)" }} />
               </div>
-              <p style={{ fontSize: 16, fontWeight: 600, color: "#111827", marginBottom: 8 }}>Password changed successfully!</p>
-              <p style={{ fontSize: 13, color: "#6B7280" }}>Redirecting you to sign in…</p>
+              <p style={{ fontSize: 16, fontWeight: 600, color: "var(--color-ink)", marginBottom: 8 }}>Password changed successfully!</p>
+              <p style={{ fontSize: 13, color: "var(--color-ink-3)" }}>Redirecting you to sign in…</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
@@ -130,7 +130,7 @@ export default function ChangePasswordPage() {
                       {[1, 2, 3, 4].map((i) => (
                         <div key={i} style={{
                           flex: 1, height: 4, borderRadius: 999,
-                          background: i <= strength ? STRENGTH_COLORS[strength] : "#E5E7EB",
+                          background: i <= strength ? STRENGTH_COLORS[strength] : "var(--color-edge)",
                           transition: "background 0.2s",
                         }} />
                       ))}
@@ -141,7 +141,7 @@ export default function ChangePasswordPage() {
                     {/* Checks */}
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 16px" }}>
                       {checks.map((c) => (
-                        <div key={c.label} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: c.ok ? "#16A34A" : "#9CA3AF" }}>
+                        <div key={c.label} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: c.ok ? "var(--color-success)" : "var(--color-ink-4)" }}>
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                             {c.ok ? <polyline points="20 6 9 17 4 12" /> : <circle cx="12" cy="12" r="9" />}
                           </svg>
@@ -156,8 +156,8 @@ export default function ChangePasswordPage() {
               <Field label="Confirm New Password" value={confirm} onChange={setConfirm} show={showCon} onToggle={() => setShowCon(v => !v)} placeholder="Confirm your new password" autoComplete="new-password" />
 
               {error && (
-                <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 10, padding: "10px 14px" }}>
-                  <p style={{ fontSize: 13, color: "#DC2626", fontWeight: 500 }}>{error}</p>
+                <div style={{ background: "var(--color-danger-soft)", border: "1px solid #FECACA", borderRadius: 10, padding: "10px 14px" }}>
+                  <p style={{ fontSize: 13, color: "var(--color-danger)", fontWeight: 500 }}>{error}</p>
                 </div>
               )}
 
@@ -167,9 +167,9 @@ export default function ChangePasswordPage() {
                 style={{
                   width: "100%", height: 48,
                   background: (loading || !current || !next || !confirm)
-                    ? "#E5E7EB"
+                    ? "var(--color-edge)"
                     : `linear-gradient(135deg, #2048EE 0%, ${P} 100%)`,
-                  color: (loading || !current || !next || !confirm) ? "#9CA3AF" : "white",
+                  color: (loading || !current || !next || !confirm) ? "var(--color-ink-4)" : "white",
                   borderRadius: 12, border: "none",
                   fontSize: 14, fontWeight: 600,
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
@@ -190,10 +190,10 @@ export default function ChangePasswordPage() {
 
               {/* Security note */}
               <div style={{ display: "flex", alignItems: "center", gap: 10, paddingTop: 12, borderTop: "1px solid #F3F4F6" }}>
-                <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#EEF2FF", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <div style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--color-brand-soft)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                   <Shield size={14} style={{ color: P }} />
                 </div>
-                <p style={{ fontSize: 12, color: "#9CA3AF", lineHeight: 1.5 }}>
+                <p style={{ fontSize: 12, color: "var(--color-ink-4)", lineHeight: 1.5 }}>
                   For your security, you will be signed out of all other active sessions.
                 </p>
               </div>
@@ -216,10 +216,10 @@ function Field({
   placeholder: string;
   autoComplete: string;
 }) {
-  const P = "#315eff";
+  const P = "var(--color-brand)";
   return (
     <div>
-      <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#374151", marginBottom: 6 }}>{label}</label>
+      <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "var(--color-ink-2)", marginBottom: 6 }}>{label}</label>
       <div style={{
         display: "flex", alignItems: "center", gap: 10,
         background: "white", border: "1.5px solid #E5E7EB", borderRadius: 12, padding: "11px 14px",
@@ -227,7 +227,7 @@ function Field({
       }}
         onFocus={() => {}} // handled on input
       >
-        <Lock size={14} style={{ color: "#D1D5DB", flexShrink: 0 }} />
+        <Lock size={14} style={{ color: "var(--color-ink-disabled)", flexShrink: 0 }} />
         <input
           type={show ? "text" : "password"}
           value={value}
@@ -235,7 +235,7 @@ function Field({
           placeholder={placeholder}
           autoComplete={autoComplete}
           required
-          style={{ flex: 1, fontSize: 14, color: "#111827", background: "transparent", outline: "none", border: "none", minWidth: 0, fontFamily: "inherit" }}
+          style={{ flex: 1, fontSize: 14, color: "var(--color-ink)", background: "transparent", outline: "none", border: "none", minWidth: 0, fontFamily: "inherit" }}
           onFocus={e  => {
             const wrapper = e.target.closest("div") as HTMLElement;
             wrapper.style.borderColor = P;
@@ -243,14 +243,14 @@ function Field({
           }}
           onBlur={e   => {
             const wrapper = e.target.closest("div") as HTMLElement;
-            wrapper.style.borderColor = "#E5E7EB";
+            wrapper.style.borderColor = "var(--color-edge)";
             wrapper.style.boxShadow = "none";
           }}
         />
         <button
           type="button"
           onClick={onToggle}
-          style={{ color: "#D1D5DB", background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", flexShrink: 0 }}
+          style={{ color: "var(--color-ink-disabled)", background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", flexShrink: 0 }}
         >
           {show ? <EyeOff size={14} /> : <Eye size={14} />}
         </button>

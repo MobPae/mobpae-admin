@@ -14,7 +14,6 @@ export function Pagination({ page, totalPages, total, limit, onPage }: Props) {
   const from = (page - 1) * limit + 1;
   const to   = Math.min(page * limit, total);
 
-  // Build visible page numbers (max 5 shown)
   const pages: (number | "…")[] = [];
   if (totalPages <= 7) {
     for (let i = 1; i <= totalPages; i++) pages.push(i);
@@ -26,41 +25,36 @@ export function Pagination({ page, totalPages, total, limit, onPage }: Props) {
     pages.push(totalPages);
   }
 
+  const navBtn = "flex h-8 w-8 items-center justify-center rounded-lg border border-edge text-ink-3 transition-colors hover:bg-surface-raised disabled:cursor-not-allowed disabled:opacity-40";
+
   return (
-    <div className="flex items-center justify-between px-1 mt-4">
-      <p className="text-[12px] text-[#6B7280]">
-        Showing <span className="font-[600] text-[#6B7280]">{from}–{to}</span> of <span className="font-[600] text-[#6B7280]">{total}</span>
+    <div className="mt-4 flex items-center justify-between px-1">
+      <p className="text-xs text-ink-4">
+        Showing <span className="font-semibold text-ink">{from}–{to}</span> of{" "}
+        <span className="font-semibold text-ink">{total}</span>
       </p>
       <div className="flex items-center gap-1">
-        <button
-          onClick={() => onPage(page - 1)}
-          disabled={page <= 1}
-          className="w-8 h-8 flex items-center justify-center rounded-lg border border-[#E5E7EB] text-[#6B7280] hover:bg-[#F8F9FC] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-        >
+        <button onClick={() => onPage(page - 1)} disabled={page <= 1} className={navBtn}>
           <ChevronLeft size={14} />
         </button>
         {pages.map((p, i) =>
           p === "…" ? (
-            <span key={`ellipsis-${i}`} className="w-8 h-8 flex items-center justify-center text-[12px] text-[#6B7280]">…</span>
+            <span key={`ellipsis-${i}`} className="flex h-8 w-8 items-center justify-center text-xs text-ink-4">…</span>
           ) : (
             <button
               key={p}
               onClick={() => onPage(p as number)}
-              className={`w-8 h-8 flex items-center justify-center rounded-lg text-[12px] font-[600] transition-colors ${
+              className={`flex h-8 w-8 items-center justify-center rounded-lg text-xs font-semibold transition-colors ${
                 p === page
-                  ? "bg-[#111827] text-white"
-                  : "border border-[#E5E7EB] text-[#6B7280] hover:bg-[#F8F9FC]"
+                  ? "bg-brand text-white"
+                  : "border border-edge text-ink-3 hover:bg-surface-raised"
               }`}
             >
               {p}
             </button>
           )
         )}
-        <button
-          onClick={() => onPage(page + 1)}
-          disabled={page >= totalPages}
-          className="w-8 h-8 flex items-center justify-center rounded-lg border border-[#E5E7EB] text-[#6B7280] hover:bg-[#F8F9FC] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-        >
+        <button onClick={() => onPage(page + 1)} disabled={page >= totalPages} className={navBtn}>
           <ChevronRight size={14} />
         </button>
       </div>

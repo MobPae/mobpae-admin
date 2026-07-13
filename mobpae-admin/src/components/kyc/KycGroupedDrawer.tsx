@@ -32,8 +32,8 @@ function keyIsPdf(key: string)   { return /\.pdf$/i.test(key); }
 
 const STATUS_BADGE: Record<string, { dot: string; text: string; bg: string; label: string }> = {
   PENDING:  { dot: "bg-amber-400", text: "text-amber-700", bg: "bg-amber-50/80",   label: "Pending"  },
-  VERIFIED: { dot: "bg-[#22C55E]", text: "text-[#15803D]", bg: "bg-[#DCFCE7]/80", label: "Verified" },
-  REJECTED: { dot: "bg-red-400", text: "text-red-600", bg: "bg-red-50/80",     label: "Rejected" },
+  VERIFIED: { dot: "bg-[#22C55E]", text: "text-success-dark", bg: "bg-success-bg/80", label: "Verified" },
+  REJECTED: { dot: "bg-red-400", text: "text-danger", bg: "bg-danger-soft/80",     label: "Rejected" },
 };
 
 function DocCard({
@@ -48,6 +48,8 @@ function DocCard({
   groupQueryKey: unknown[];
 }) {
   const qc = useQueryClient();
+  const [rejectMode, setRejectMode] = useState(false);
+  const [rejectNote, setRejectNote] = useState("");
 
   const refresh = () => {
     void qc.invalidateQueries({ queryKey: docQueryKey });
@@ -68,11 +70,13 @@ function DocCard({
   });
 
   const rejectMutation = useMutation({
-    mutationFn: () => rejectKycDocument(doc.id),
+    mutationFn: () => rejectKycDocument(doc.id, rejectNote.trim() || undefined),
     onSuccess: () => {
       toast.success("Document rejected", {
         description: `${employeeName}'s ${DOC_LABEL[doc.documentType] ?? doc.documentType} rejected.`,
       });
+      setRejectMode(false);
+      setRejectNote("");
       refresh();
     },
     onError: (err: unknown) => {
@@ -89,12 +93,12 @@ function DocCard({
   const isPdf   = keyIsPdf(doc.filePath);
 
   return (
-    <div className={`border rounded-xl overflow-hidden ${canAct ? "border-[#E5E7EB]" : "border-[#E5E7EB]"}`}>
+    <div className={`border rounded-xl overflow-hidden ${canAct ? "border-edge" : "border-edge"}`}>
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 bg-[#F8F9FC]/60 border-b border-[#E5E7EB]">
+      <div className="flex items-center justify-between px-4 py-3 bg-canvas/60 border-b border-edge">
         <div className="flex items-center gap-2">
-          <FileText size={13} className="text-[#6B7280] flex-shrink-0" />
-          <span className="text-[12px] font-[600] text-[#111827]">{DOC_LABEL[doc.documentType] ?? doc.documentType}</span>
+          <FileText size={13} className="text-ink-3 flex-shrink-0" />
+          <span className="text-[12px] font-[600] text-ink">{DOC_LABEL[doc.documentType] ?? doc.documentType}</span>
         </div>
         <span className={`inline-flex items-center gap-1.5 h-[20px] px-2 rounded-full text-[11px] font-[500] ${sc.bg} ${sc.text}`}>
           <span className={`w-1.5 h-1.5 rounded-full ${sc.dot}`} />
@@ -103,27 +107,27 @@ function DocCard({
       </div>
 
       {/* Meta */}
-      <div className="px-4 divide-y divide-[#F3F4F6]">
+      <div className="px-4 divide-y divide-edge-2">
         <div className="flex items-center justify-between py-2">
-          <span className="text-[11px] text-[#6B7280]">Uploaded</span>
-          <span className="text-[11px] font-[500] text-[#6B7280]">
+          <span className="text-[11px] text-ink-3">Uploaded</span>
+          <span className="text-[11px] font-[500] text-ink-3">
             {new Date(doc.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
           </span>
         </div>
         {doc.verifiedAt && (
           <div className="flex items-center justify-between py-2">
-            <span className="text-[11px] text-[#6B7280]">
+            <span className="text-[11px] text-ink-3">
               {doc.status === "REJECTED" ? "Rejected on" : "Verified on"}
             </span>
-            <span className="text-[11px] font-[500] text-[#6B7280]">
+            <span className="text-[11px] font-[500] text-ink-3">
               {new Date(doc.verifiedAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
             </span>
           </div>
         )}
         {doc.verifiedBy && (
           <div className="flex items-center justify-between py-2">
-            <span className="text-[11px] text-[#6B7280]">Reviewed by</span>
-            <span className="text-[11px] font-[500] text-[#6B7280] truncate max-w-[55%] text-right">{doc.verifiedBy}</span>
+            <span className="text-[11px] text-ink-3">Reviewed by</span>
+            <span className="text-[11px] font-[500] text-ink-3 truncate max-w-[55%] text-right">{doc.verifiedBy}</span>
           </div>
         )}
       </div>
@@ -135,7 +139,7 @@ function DocCard({
             <img
               src={fileUrl ?? undefined}
               alt={DOC_LABEL[doc.documentType]}
-              className="w-full rounded-lg border border-[#E5E7EB] object-contain max-h-[120px]"
+              className="w-full rounded-lg border border-edge object-contain max-h-[120px]"
               onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
             />
           </a>
@@ -144,7 +148,7 @@ function DocCard({
             href={fileUrl ?? undefined}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-2 flex items-center gap-2 text-[11px] font-[500] text-[#315eff] hover:underline"
+            className="mt-2 flex items-center gap-2 text-[11px] font-[500] text-brand hover:underline"
           >
             <ExternalLink size={11} />
             {isPdf ? "Open PDF" : "View file"}
@@ -154,14 +158,45 @@ function DocCard({
 
       {/* Actions */}
       {canAct && (
-        <div className="flex gap-2 px-4 pb-3">
+        <div className="px-4 pb-3 space-y-2">
+          {rejectMode && (
+            <div className="space-y-1.5">
+              <label className="text-[11px] text-ink-3 font-[500]">Reason <span className="font-normal">(optional — shown to employee)</span></label>
+              <textarea
+                autoFocus
+                rows={2}
+                value={rejectNote}
+                onChange={e => setRejectNote(e.target.value)}
+                placeholder="e.g. Document is blurry, please re-upload a clearer copy."
+                className="w-full text-[11px] border border-edge rounded-md px-2.5 py-1.5 resize-none focus:outline-none focus:ring-1 focus:ring-red-300 bg-canvas"
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={() => { setRejectMode(false); setRejectNote(""); }}
+                  disabled={isBusy}
+                  className="h-7 px-2.5 rounded-md border border-edge text-[11px] font-[500] text-ink-3 hover:bg-surface-muted transition-colors disabled:opacity-40"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => rejectMutation.mutate()}
+                  disabled={isBusy}
+                  className="flex-1 h-7 rounded-md bg-red-600 hover:bg-red-700 text-white text-[11px] font-[500] flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
+                >
+                  {rejectMutation.isPending ? <Loader2 size={11} className="animate-spin" /> : <XCircle size={11} />}
+                  {rejectMutation.isPending ? "Rejecting…" : "Confirm Reject"}
+                </button>
+              </div>
+            </div>
+          )}
+          {!rejectMode && (
+          <div className="flex gap-2">
           <button
-            onClick={() => rejectMutation.mutate()}
+            onClick={() => setRejectMode(true)}
             disabled={isBusy}
-            className="flex-1 h-7 rounded-md border border-red-200 bg-red-50 hover:bg-red-100 text-[11px] font-[500] text-red-700 flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
+            className="flex-1 h-7 rounded-md border border-red-200 bg-danger-soft hover:bg-danger-bg text-[11px] font-[500] text-red-700 flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
           >
-            {rejectMutation.isPending ? <Loader2 size={11} className="animate-spin" /> : <XCircle size={11} />}
-            {rejectMutation.isPending ? "Rejecting…" : "Reject"}
+            <XCircle size={11} /> Reject
           </button>
           <button
             onClick={() => verifyMutation.mutate()}
@@ -171,6 +206,8 @@ function DocCard({
             {verifyMutation.isPending ? <Loader2 size={11} className="animate-spin" /> : <CheckCircle2 size={11} />}
             {verifyMutation.isPending ? "Approving…" : "Approve"}
           </button>
+          </div>
+          )}
         </div>
       )}
     </div>
@@ -215,12 +252,12 @@ function SelfieCard({
   const { url: selfieUrl } = useSignedUrl(employee.selfieUrl ?? null);
 
   return (
-    <div className="border rounded-xl overflow-hidden border-[#E5E7EB]">
+    <div className="border rounded-xl overflow-hidden border-edge">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 bg-[#F8F9FC]/60 border-b border-[#E5E7EB]">
+      <div className="flex items-center justify-between px-4 py-3 bg-canvas/60 border-b border-edge">
         <div className="flex items-center gap-2">
-          <Camera size={13} className="text-[#6B7280] flex-shrink-0" />
-          <span className="text-[12px] font-[600] text-[#111827]">Selfie</span>
+          <Camera size={13} className="text-ink-3 flex-shrink-0" />
+          <span className="text-[12px] font-[600] text-ink">Selfie</span>
         </div>
         <span className={`inline-flex items-center gap-1.5 h-[20px] px-2 rounded-full text-[11px] font-[500] ${sc.bg} ${sc.text}`}>
           <span className={`w-1.5 h-1.5 rounded-full ${sc.dot}`} />
@@ -230,12 +267,12 @@ function SelfieCard({
 
       {/* Meta */}
       {employee.selfieVerifiedAt && (
-        <div className="px-4 divide-y divide-[#F3F4F6]">
+        <div className="px-4 divide-y divide-edge-2">
           <div className="flex items-center justify-between py-2">
-            <span className="text-[11px] text-[#6B7280]">
+            <span className="text-[11px] text-ink-3">
               {selfieStatus === "REJECTED" ? "Rejected on" : "Verified on"}
             </span>
-            <span className="text-[11px] font-[500] text-[#6B7280]">
+            <span className="text-[11px] font-[500] text-ink-3">
               {new Date(employee.selfieVerifiedAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
             </span>
           </div>
@@ -249,14 +286,14 @@ function SelfieCard({
             <img
               src={selfieUrl}
               alt="Employee selfie"
-              className="w-full rounded-lg border border-[#E5E7EB] object-cover"
+              className="w-full rounded-lg border border-edge object-cover"
               style={{ maxHeight: 160 }}
               onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
             />
           </a>
         ) : (
-          <div className="bg-[#F8F9FC] rounded-lg h-[80px] flex items-center justify-center">
-            <p className="text-[11px] text-[#6B7280]">No selfie uploaded yet</p>
+          <div className="bg-canvas rounded-lg h-[80px] flex items-center justify-center">
+            <p className="text-[11px] text-ink-3">No selfie uploaded yet</p>
           </div>
         )}
       </div>
@@ -268,7 +305,7 @@ function SelfieCard({
             <button
               onClick={() => setShowReject(v => !v)}
               disabled={isBusy}
-              className="flex-1 h-7 rounded-md border border-red-200 bg-red-50 hover:bg-red-100 text-[11px] font-[500] text-red-700 flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
+              className="flex-1 h-7 rounded-md border border-red-200 bg-danger-soft hover:bg-danger-bg text-[11px] font-[500] text-red-700 flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
             >
               <XCircle size={11} /> Reject
             </button>
@@ -288,7 +325,7 @@ function SelfieCard({
                 value={remarks}
                 onChange={e => setRemarks(e.target.value)}
                 placeholder="Rejection reason…"
-                className="w-full text-[11px] border border-[#E5E7EB] rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-red-300"
+                className="w-full text-[11px] border border-edge rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-red-300"
               />
               <button
                 onClick={() => rejectMut.mutate()}
@@ -345,18 +382,18 @@ export default function KycGroupedDrawer({ open, group, groupQueryKey, onClose }
     <>
       <div className="fixed inset-0 bg-black/20 z-40" onClick={onClose} />
 
-      <div className="fixed top-0 right-0 h-full w-[460px] bg-white z-50 flex flex-col border-l border-[#E5E7EB] shadow-xl">
+      <div className="fixed top-0 right-0 h-full w-[460px] bg-white z-50 flex flex-col border-l border-edge shadow-overlay">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E5E7EB] flex-shrink-0">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-edge flex-shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#111827] to-[#2A2C45] text-white flex items-center justify-center text-[12px] font-[600]">
               {first}
             </div>
             <div>
-              <p className="text-[13px] font-[500] text-[#111827] leading-none">{group.employeeName}</p>
-              <p className="text-[11px] text-[#6B7280] mt-0.5 leading-none">
+              <p className="text-[13px] font-[500] text-ink leading-none">{group.employeeName}</p>
+              <p className="text-[11px] text-ink-3 mt-0.5 leading-none">
                 <span className="font-mono">{group.employeeCode}</span>
-                <span className="mx-1.5 text-[#D1D5DB]">·</span>
+                <span className="mx-1.5 text-ink-disabled">·</span>
                 {group.companyName}
               </p>
             </div>
@@ -364,14 +401,14 @@ export default function KycGroupedDrawer({ open, group, groupQueryKey, onClose }
           <div className="flex items-center gap-2">
             {!isLoading && (
               <div className="flex items-center gap-1.5 text-[11px] font-[500]">
-                {verifiedCount > 0 && <span className="text-[#315eff]">{verifiedCount} verified</span>}
-                {pendingCount  > 0 && <span className="text-amber-600">{pendingCount} pending</span>}
-                {rejectedCount > 0 && <span className="text-red-500">{rejectedCount} rejected</span>}
+                {verifiedCount > 0 && <span className="text-brand">{verifiedCount} verified</span>}
+                {pendingCount  > 0 && <span className="text-warning">{pendingCount} pending</span>}
+                {rejectedCount > 0 && <span className="text-danger">{rejectedCount} rejected</span>}
               </div>
             )}
             <button
               onClick={onClose}
-              className="w-6 h-6 rounded-md flex items-center justify-center text-[#6B7280] hover:text-[#6B7280] hover:bg-[#F3F4F6] transition-colors"
+              className="w-6 h-6 rounded-md flex items-center justify-center text-ink-3 hover:text-ink-3 hover:bg-surface-muted transition-colors"
             >
               <X size={14} />
             </button>
@@ -382,12 +419,12 @@ export default function KycGroupedDrawer({ open, group, groupQueryKey, onClose }
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
           {isLoading ? (
             <div className="py-10 text-center">
-              <p className="text-[13px] text-[#6B7280]">Loading documents…</p>
+              <p className="text-[13px] text-ink-3">Loading documents…</p>
             </div>
           ) : sortedDocs.length === 0 && missingTypes.length === 3 ? (
             <div className="py-8 text-center">
-              <p className="text-[13px] text-[#6B7280] font-[500]">No documents uploaded yet</p>
-              <p className="text-[12px] text-[#6B7280] mt-1">The employee hasn't submitted any KYC documents.</p>
+              <p className="text-[13px] text-ink-3 font-[500]">No documents uploaded yet</p>
+              <p className="text-[12px] text-ink-3 mt-1">The employee hasn't submitted any KYC documents.</p>
             </div>
           ) : (
             <>
@@ -412,13 +449,13 @@ export default function KycGroupedDrawer({ open, group, groupQueryKey, onClose }
 
               {/* Missing doc type slots */}
               {missingTypes.map(type => (
-                <div key={type} className="border border-dashed border-[#E5E7EB] rounded-xl px-4 py-4 flex items-center gap-3">
-                  <div className="w-7 h-7 rounded-lg bg-[#F3F4F6] flex items-center justify-center flex-shrink-0">
-                    <FileText size={13} className="text-[#6B7280]" />
+                <div key={type} className="border border-dashed border-edge rounded-xl px-4 py-4 flex items-center gap-3">
+                  <div className="w-7 h-7 rounded-lg bg-surface-muted flex items-center justify-center flex-shrink-0">
+                    <FileText size={13} className="text-ink-3" />
                   </div>
                   <div>
-                    <p className="text-[12px] font-[500] text-[#6B7280]">{DOC_LABEL[type]}</p>
-                    <p className="text-[11px] text-[#6B7280] mt-0.5">Not uploaded</p>
+                    <p className="text-[12px] font-[500] text-ink-3">{DOC_LABEL[type]}</p>
+                    <p className="text-[11px] text-ink-3 mt-0.5">Not uploaded</p>
                   </div>
                 </div>
               ))}

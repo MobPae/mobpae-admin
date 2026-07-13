@@ -47,53 +47,54 @@ export default function RecentSalaryRequests() {
   const getStatusClass = (status: string) => {
     switch (status) {
       case "SUBMITTED":
-        return "bg-amber-100 text-amber-700";
+        return "bg-warning-bg text-amber-700";
 
       case "EMPLOYER_APPROVED":
         return "bg-[#DBEAFE] text-[#1D4ED8]";
 
       case "AWAITING_MEMBERSHIP_PAYMENT":
-        return "bg-amber-100 text-amber-700";
+      case "AWAITING_PLATFORM_FEE_PAYMENT":
+        return "bg-warning-bg text-amber-700";
 
       case "READY_FOR_DISBURSAL":
-        return "bg-[#DCFCE7] text-[#15803D]";
+        return "bg-success-bg text-success-dark";
 
       case "APPROVED":
         return "bg-[#DBEAFE] text-[#1D4ED8]";
 
       case "DISBURSED":
-        return "bg-[#DCFCE7] text-[#15803D]";
+        return "bg-success-bg text-success-dark";
 
       case "REPAID":
-        return "bg-[#DCFCE7] text-[#166534]";
+        return "bg-success-bg text-[#166534]";
 
       default:
-        return "bg-[#F3F4F6] text-[#6B7280]";
+        return "bg-surface-muted text-ink-3";
     }
   };
 
   return (
-    <div className="col-span-6 bg-white border border-[#E5E7EB] rounded-3xl shadow-sm">
+    <div className="col-span-6 bg-white border border-edge rounded-3xl shadow-sm">
       {/* Header */}
-      <div className="px-6 py-5 border-b border-[#E5E7EB] flex items-center justify-between">
+      <div className="px-6 py-5 border-b border-edge flex items-center justify-between">
         <div>
-          <h3 className="text-base font-semibold text-[#111827]">
+          <h3 className="text-base font-semibold text-ink">
             Recent Loan Applications
           </h3>
 
-          <p className="text-xs text-[#6B7280] mt-1">
+          <p className="text-xs text-ink-3 mt-1">
             Latest employee advance applications
           </p>
         </div>
 
-        <button className="text-xs font-medium text-[#315eff] hover:text-[#2048EE] flex items-center gap-1">
+        <button className="text-xs font-medium text-brand hover:text-[#2048EE] flex items-center gap-1">
           View All
           <ArrowRight size={12} />
         </button>
       </div>
 
       {/* Rows */}
-      <div className="divide-y divide-[#E5E7EB]">
+      <div className="divide-y divide-edge">
         {requests.slice(0, 3).map((request, index) => (
           <div
             key={index}
@@ -103,13 +104,13 @@ export default function RecentSalaryRequests() {
                 flex
                 items-center
                 justify-between
-                hover:bg-[#F8F9FC]
+                hover:bg-canvas
                 transition-all
               "
           >
             {/* Employee */}
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-[#F3F4F6] flex items-center justify-center text-xs font-semibold text-[#6B7280]">
+              <div className="w-10 h-10 rounded-full bg-surface-muted flex items-center justify-center text-xs font-semibold text-ink-3">
                 {request.employee.name
                   .split(" ")
                   .map((word) => word[0])
@@ -117,18 +118,18 @@ export default function RecentSalaryRequests() {
               </div>
 
               <div>
-                <p className="text-sm font-medium text-[#111827]">
+                <p className="text-sm font-medium text-ink">
                   {request.employee.name}
                 </p>
 
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-[11px] text-[#6B7280]">
+                  <span className="text-[11px] text-ink-3">
                     {request.employee.code}
                   </span>
 
                   <span className="w-1 h-1 rounded-full bg-[#D1D5DB]" />
 
-                  <span className="text-[11px] text-[#6B7280]">
+                  <span className="text-[11px] text-ink-3">
                     {request.employee.employer}
                   </span>
                 </div>
@@ -139,14 +140,14 @@ export default function RecentSalaryRequests() {
             <div className="flex items-center gap-5">
               <div className="text-right">
                 <div className="flex items-center justify-end gap-1">
-                  <IndianRupee size={12} className="text-[#6B7280]" />
+                  <IndianRupee size={12} className="text-ink-3" />
 
-                  <span className="text-sm font-semibold text-[#111827]">
+                  <span className="text-sm font-semibold text-ink">
                     {request.amount.replace("₹", "")}
                   </span>
                 </div>
 
-                <span className="text-[11px] text-[#6B7280]">
+                <span className="text-[11px] text-ink-3">
                   {request.requestedAt}
                 </span>
               </div>

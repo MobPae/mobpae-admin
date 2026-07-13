@@ -65,6 +65,10 @@ export async function verifyKycDocument(documentId: string): Promise<void> {
   await api.post(`/kyc-documents/${documentId}/verify`);
 }
 
-export async function rejectKycDocument(documentId: string): Promise<void> {
-  await api.post(`/kyc-documents/${documentId}/reject`);
+export async function rejectKycDocument(documentId: string, note?: string): Promise<void> {
+  await api.post(`/kyc-documents/${documentId}/reject`, { note: note || undefined });
+}
+
+export async function updateKycDocumentNote(documentId: string, note: string): Promise<void> {
+  await api.patch(`/kyc-documents/${documentId}/note`, { note });
 }

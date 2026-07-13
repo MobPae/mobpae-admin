@@ -4,7 +4,8 @@ export interface PayrollSummary {
   employerId: string;
   companyName: string;
   companyCode: string;
-  payrollMonth: string;
+  /** ISO DateTime of first day of payroll recovery month */
+  cycleDate: string;
   totalDisbursed: string;
   totalRepaid: string;
   totalOutstanding: string;
@@ -15,7 +16,8 @@ export interface PayrollSummary {
 export interface PayrollRecovery {
   id: string;
   employerId: string;
-  payrollMonth: string;
+  /** ISO DateTime of first day of payroll recovery month */
+  cycleDate: string;
   totalSalaryDisbursed: string;
   totalAdvanceOutstanding: string;
   totalRecovered: string;

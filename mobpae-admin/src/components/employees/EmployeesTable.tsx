@@ -8,19 +8,19 @@ interface Props {
 }
 
 const AVATAR_COLORS: Record<string, string> = {
-  A: "#EF4444", B: "#EC4899", C: "#A855F7", D: "#315eff",
+  A: "#EF4444", B: "#EC4899", C: "#A855F7", D: "var(--color-brand)",
   E: "#6366F1", F: "#3B82F6", G: "#0EA5E9", H: "#06B6D4",
   I: "#10B981", J: "#22C55E", K: "#84CC16", L: "#EAB308",
-  M: "#F59E0B", N: "#F97316", O: "#EF4444", P: "#315eff",
+  M: "#F59E0B", N: "#F97316", O: "#EF4444", P: "var(--color-brand)",
   Q: "#8B5CF6", R: "#D946EF", S: "#EC4899", T: "#F43F5E",
-  U: "#315eff", V: "#6366F1", W: "#3B82F6", X: "#0EA5E9",
+  U: "var(--color-brand)", V: "#6366F1", W: "#3B82F6", X: "#0EA5E9",
   Y: "#14B8A6", Z: "#10B981",
 };
-const avatarColor = (n: string) => AVATAR_COLORS[n.charAt(0).toUpperCase()] ?? "#315eff";
+const avatarColor = (n: string) => AVATAR_COLORS[n.charAt(0).toUpperCase()] ?? "var(--color-brand)";
 
 const STATUS_CFG: Record<EmploymentStatus, { label: string; color: string; bg: string }> = {
-  ACTIVE:   { label: "Active",   color: "#16A34A", bg: "#DCFCE7" },
-  INACTIVE: { label: "Inactive", color: "#6B7280", bg: "#F3F4F6" },
+  ACTIVE:   { label: "Active",   color: "var(--color-success)", bg: "var(--color-success-bg)" },
+  INACTIVE: { label: "Inactive", color: "var(--color-ink-3)", bg: "var(--color-surface-muted)" },
 };
 
 function Pill({ label, color, bg }: { label: string; color: string; bg: string }) {
@@ -41,9 +41,9 @@ export default function EmployeesTable({ employees, selectedId, onSelect }: Prop
     <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", boxShadow: "0 2px 8px rgba(17,24,39,0.04)", overflow: "hidden" }}>
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
-          <tr style={{ borderBottom: "1px solid #F3F4F6", background: "#FAFAFA" }}>
+          <tr style={{ borderBottom: "1px solid #F3F4F6", background: "var(--color-surface-raised)" }}>
             {HEADERS.map((h, i) => (
-              <th key={i} style={{ padding: "14px 20px", textAlign: "left", fontSize: 11.5, fontWeight: 600, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.07em", whiteSpace: "nowrap" }}>
+              <th key={i} style={{ padding: "14px 20px", textAlign: "left", fontSize: 11.5, fontWeight: 600, color: "var(--color-ink-4)", textTransform: "uppercase", letterSpacing: "0.07em", whiteSpace: "nowrap" }}>
                 {h}
               </th>
             ))}
@@ -52,9 +52,9 @@ export default function EmployeesTable({ employees, selectedId, onSelect }: Prop
         <tbody>
           {employees.map((emp) => {
             const isSelected = selectedId === emp.id;
-            const s = STATUS_CFG[emp.employmentStatus] ?? { label: emp.employmentStatus, color: "#6B7280", bg: "#F3F4F6" };
+            const s = STATUS_CFG[emp.employmentStatus] ?? { label: emp.employmentStatus, color: "var(--color-ink-3)", bg: "var(--color-surface-muted)" };
             const ac = avatarColor(emp.name);
-            const rowBg = isSelected ? "#EEF2FF" : hovered === emp.id ? "#FAFAFC" : "transparent";
+            const rowBg = isSelected ? "var(--color-brand-soft)" : hovered === emp.id ? "var(--color-surface-raised)" : "transparent";
 
             return (
               <tr
@@ -71,24 +71,24 @@ export default function EmployeesTable({ employees, selectedId, onSelect }: Prop
                       {emp.name.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <p style={{ fontSize: 13.5, fontWeight: 600, color: "#111827", margin: 0 }}>{emp.name}</p>
-                      <p style={{ fontSize: 11.5, color: "#9CA3AF", margin: "2px 0 0", fontFamily: "ui-monospace, monospace" }}>{emp.employeeCode}</p>
+                      <p style={{ fontSize: 13.5, fontWeight: 600, color: "var(--color-ink)", margin: 0 }}>{emp.name}</p>
+                      <p style={{ fontSize: 11.5, color: "var(--color-ink-4)", margin: "2px 0 0", fontFamily: "ui-monospace, monospace" }}>{emp.employeeCode}</p>
                     </div>
                   </div>
                 </td>
 
                 {/* Employer */}
                 <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
-                  <p style={{ fontSize: 13.5, fontWeight: 500, color: "#374151", margin: 0 }}>{emp.employer.companyName}</p>
-                  <p style={{ fontSize: 11.5, color: "#9CA3AF", margin: "2px 0 0", fontFamily: "ui-monospace, monospace" }}>{emp.employer.companyCode}</p>
+                  <p style={{ fontSize: 13.5, fontWeight: 500, color: "var(--color-ink-2)", margin: 0 }}>{emp.employer.companyName}</p>
+                  <p style={{ fontSize: 11.5, color: "var(--color-ink-4)", margin: "2px 0 0", fontFamily: "ui-monospace, monospace" }}>{emp.employer.companyCode}</p>
                 </td>
 
                 {/* Salary */}
                 <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
-                  <p style={{ fontSize: 13.5, fontWeight: 600, color: "#111827", margin: 0, fontVariantNumeric: "tabular-nums" }}>
+                  <p style={{ fontSize: 13.5, fontWeight: 600, color: "var(--color-ink)", margin: 0, fontVariantNumeric: "tabular-nums" }}>
                     ₹{Number(emp.salaryInHand).toLocaleString("en-IN")}
                   </p>
-                  <p style={{ fontSize: 11.5, color: "#9CA3AF", margin: "2px 0 0" }}>per month</p>
+                  <p style={{ fontSize: 11.5, color: "var(--color-ink-4)", margin: "2px 0 0" }}>per month</p>
                 </td>
 
                 {/* Status */}
@@ -99,8 +99,8 @@ export default function EmployeesTable({ employees, selectedId, onSelect }: Prop
                 {/* App */}
                 <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
                   {emp.appActivated
-                    ? <Pill label="Active"   color="#16A34A" bg="#DCFCE7" />
-                    : <Pill label="Inactive" color="#6B7280" bg="#F3F4F6" />
+                    ? <Pill label="Active"   color="var(--color-success)" bg="var(--color-success-bg)" />
+                    : <Pill label="Inactive" color="var(--color-ink-3)" bg="var(--color-surface-muted)" />
                   }
                 </td>
 
@@ -108,7 +108,7 @@ export default function EmployeesTable({ employees, selectedId, onSelect }: Prop
                 <td style={{ padding: "16px 20px", verticalAlign: "middle", textAlign: "right" }}>
                   <button
                     onClick={(e) => { e.stopPropagation(); onSelect(emp); }}
-                    style={{ height: 30, padding: "0 14px", background: isSelected ? "#315eff" : "#EEF2FF", color: isSelected ? "white" : "#315eff", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
+                    style={{ height: 30, padding: "0 14px", background: isSelected ? "var(--color-brand)" : "var(--color-brand-soft)", color: isSelected ? "white" : "var(--color-brand)", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
                   >
                     {isSelected ? "Close" : "View"}
                   </button>
@@ -118,8 +118,8 @@ export default function EmployeesTable({ employees, selectedId, onSelect }: Prop
           })}
         </tbody>
       </table>
-      <div style={{ padding: "12px 20px", borderTop: "1px solid #F3F4F6", background: "#FAFAFA" }}>
-        <p style={{ fontSize: 12, color: "#9CA3AF", margin: 0 }}>
+      <div style={{ padding: "12px 20px", borderTop: "1px solid #F3F4F6", background: "var(--color-surface-raised)" }}>
+        <p style={{ fontSize: 12, color: "var(--color-ink-4)", margin: 0 }}>
           {employees.length} {employees.length === 1 ? "employee" : "employees"}
         </p>
       </div>

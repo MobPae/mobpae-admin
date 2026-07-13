@@ -24,7 +24,10 @@ export interface RefreshResponse {
 }
 
 export async function login(email: string, password: string): Promise<LoginResponse> {
-  const response = await api.post<LoginResponse>("/auth/login", { email, password });
+  const response = await api.post<LoginResponse>("/auth/login", {
+    email: email.trim().toLowerCase(),
+    password,
+  });
   const data = response.data;
   const role = data.user?.role ?? data.role ?? getTokenRole(data.accessToken);
 
@@ -51,7 +54,7 @@ export async function logout(): Promise<void> {
 }
 
 export async function forgotPassword(email: string): Promise<void> {
-  await api.post("/auth/forgot-password", { email });
+  await api.post("/auth/forgot-password", { email: email.trim().toLowerCase() });
 }
 
 export async function resetPassword(token: string, newPassword: string): Promise<void> {

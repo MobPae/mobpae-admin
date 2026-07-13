@@ -10,10 +10,11 @@ import type { Disbursal } from "../types/disbursal";
 type FilterStatus = "ALL" | DisbursalStatus;
 
 const STATUS_TABS: { key: FilterStatus; label: string }[] = [
-  { key: "ALL",       label: "All"       },
-  { key: "PENDING",   label: "Pending"   },
-  { key: "DISBURSED", label: "Disbursed" },
-  { key: "FAILED",    label: "Failed"    },
+  { key: "ALL",        label: "All"        },
+  { key: "PENDING",    label: "Pending"    },
+  { key: "PROCESSING", label: "Processing" },
+  { key: "SUCCESS",    label: "Succeeded"  },
+  { key: "FAILED",     label: "Failed"     },
 ];
 
 export default function DisbursalsPage() {
@@ -35,10 +36,11 @@ export default function DisbursalsPage() {
     queryFn: () => getDisbursals(serverFilters),
   });
 
-  const pending   = data.filter(d => d.status === "PENDING").length;
-  const disbursed = data.filter(d => d.status === "DISBURSED").length;
-  const failed    = data.filter(d => d.status === "FAILED").length;
-  const total     = data.length;
+  const pending    = data.filter(d => d.status === "PENDING").length;
+  const processing = data.filter(d => d.status === "PROCESSING").length;
+  const succeeded  = data.filter(d => d.status === "SUCCESS").length;
+  const failed     = data.filter(d => d.status === "FAILED").length;
+  const total      = data.length;
 
   const rows = data.filter(d => {
     const q = search.toLowerCase();
@@ -50,13 +52,13 @@ export default function DisbursalsPage() {
     );
   });
 
-  const counts: Record<FilterStatus, number> = { ALL: total, PENDING: pending, DISBURSED: disbursed, FAILED: failed };
+  const counts: Record<FilterStatus, number> = { ALL: total, PENDING: pending, PROCESSING: processing, SUCCESS: succeeded, FAILED: failed, CANCELLED: 0 };
 
   const kpis = [
-    { icon: <Clock size={18} color="#D97706" strokeWidth={1.75} />,       iconBg: "#FEF3C7", label: "Pending",   val: pending   },
-    { icon: <CheckCircle size={18} color="#16A34A" strokeWidth={1.75} />, iconBg: "#DCFCE7", label: "Disbursed", val: disbursed },
-    { icon: <XCircle size={18} color="#EF4444" strokeWidth={1.75} />,     iconBg: "#FEE2E2", label: "Failed",    val: failed    },
-    { icon: <CreditCard size={18} color="#315eff" strokeWidth={1.75} />,  iconBg: "#EEF2FF", label: "Total",     val: total     },
+    { icon: <Clock size={18} color="var(--color-warning)" strokeWidth={1.75} />,       iconBg: "var(--color-warning-bg)", label: "Pending",    val: pending    },
+    { icon: <CheckCircle size={18} color="var(--color-success)" strokeWidth={1.75} />, iconBg: "var(--color-success-bg)", label: "Succeeded",  val: succeeded  },
+    { icon: <XCircle size={18} color="#EF4444" strokeWidth={1.75} />,     iconBg: "var(--color-danger-bg)", label: "Failed",     val: failed     },
+    { icon: <CreditCard size={18} color="var(--color-brand)" strokeWidth={1.75} />,  iconBg: "var(--color-brand-soft)", label: "Total",      val: total      },
   ];
 
   return (
@@ -64,14 +66,14 @@ export default function DisbursalsPage() {
 
       {/* ── Header ──────────────────────────── */}
       <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: 26, fontWeight: 700, color: "#111827", letterSpacing: "-0.025em", margin: 0 }}>Disbursals</h1>
-        <p style={{ fontSize: 14, color: "#6B7280", marginTop: 6 }}>Track and manage salary disbursals.</p>
+        <h1 style={{ fontSize: 26, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.025em", margin: 0 }}>Disbursals</h1>
+        <p style={{ fontSize: 14, color: "var(--color-ink-3)", marginTop: 6 }}>Track and manage salary disbursals.</p>
       </div>
 
       {isError && (
-        <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 12, padding: "12px 16px", marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, color: "#DC2626" }}>
+        <div style={{ background: "var(--color-danger-soft)", border: "1px solid #FECACA", borderRadius: 12, padding: "12px 16px", marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, color: "var(--color-danger)" }}>
           <span>Failed to load disbursals.</span>
-          <button onClick={() => void refetch()} style={{ padding: "6px 12px", background: "white", border: "1px solid #FECACA", borderRadius: 8, fontSize: 12, fontWeight: 600, color: "#DC2626", cursor: "pointer", fontFamily: "inherit" }}>Retry</button>
+          <button onClick={() => void refetch()} style={{ padding: "6px 12px", background: "white", border: "1px solid #FECACA", borderRadius: 8, fontSize: 12, fontWeight: 600, color: "var(--color-danger)", cursor: "pointer", fontFamily: "inherit" }}>Retry</button>
         </div>
       )}
 
@@ -81,8 +83,8 @@ export default function DisbursalsPage() {
           <div key={label} style={{ background: "white", borderRadius: 16, padding: "14px 16px", border: "1px solid #E5E7EB", boxShadow: "0 1px 4px rgba(17,24,39,0.04)", display: "flex", alignItems: "center", gap: 14 }}>
             <div style={{ width: 40, height: 40, borderRadius: 12, background: iconBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{icon}</div>
             <div>
-              <div style={{ fontSize: 22, fontWeight: 700, color: "#111827", letterSpacing: "-0.02em", lineHeight: 1, opacity: isLoading ? 0.3 : 1 }}>{val}</div>
-              <div style={{ fontSize: 12, color: "#6B7280", marginTop: 3, fontWeight: 500 }}>{label}</div>
+              <div style={{ fontSize: 22, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.02em", lineHeight: 1, opacity: isLoading ? 0.3 : 1 }}>{val}</div>
+              <div style={{ fontSize: 12, color: "var(--color-ink-3)", marginTop: 3, fontWeight: 500 }}>{label}</div>
             </div>
           </div>
         ))}
@@ -91,13 +93,13 @@ export default function DisbursalsPage() {
       {/* ── Filter bar ──────────────────────── */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, height: 40, padding: "0 14px", background: "white", border: "1px solid #E5E7EB", borderRadius: 12, minWidth: 240 }}>
-          <Search size={14} style={{ color: "#9CA3AF", flexShrink: 0 }} />
+          <Search size={14} style={{ color: "var(--color-ink-4)", flexShrink: 0 }} />
           <input
             type="text"
             placeholder="Search name, code, employer..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            style={{ flex: 1, fontSize: 13.5, color: "#111827", background: "transparent", outline: "none", border: "none", fontFamily: "inherit" }}
+            style={{ flex: 1, fontSize: 13.5, color: "var(--color-ink)", background: "transparent", outline: "none", border: "none", fontFamily: "inherit" }}
           />
         </div>
         <div style={{ display: "flex", gap: 6 }}>
@@ -109,9 +111,9 @@ export default function DisbursalsPage() {
                 onClick={() => setFilter(tab.key)}
                 style={{
                   height: 36, padding: "0 14px",
-                  background: active ? "#111827" : "white",
-                  color: active ? "white" : "#6B7280",
-                  border: `1px solid ${active ? "#111827" : "#E5E7EB"}`,
+                  background: active ? "var(--color-ink)" : "white",
+                  color: active ? "white" : "var(--color-ink-3)",
+                  border: `1px solid ${active ? "var(--color-ink)" : "var(--color-edge)"}`,
                   borderRadius: 10, fontSize: 13, fontWeight: active ? 600 : 400,
                   cursor: "pointer", fontFamily: "inherit",
                   display: "flex", alignItems: "center", gap: 6,
@@ -124,21 +126,21 @@ export default function DisbursalsPage() {
           })}
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <Calendar size={13} style={{ color: "#9CA3AF" }} />
+          <Calendar size={13} className="text-ink-4" />
           <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)}
-            style={{ height: 36, padding: "0 10px", background: "white", border: "1px solid #E5E7EB", borderRadius: 10, fontSize: 12.5, color: "#6B7280", outline: "none", fontFamily: "inherit" }} />
-          <span style={{ fontSize: 12, color: "#9CA3AF" }}>–</span>
+            style={{ height: 36, padding: "0 10px", background: "white", border: "1px solid #E5E7EB", borderRadius: 10, fontSize: 12.5, color: "var(--color-ink-3)", outline: "none", fontFamily: "inherit" }} />
+          <span style={{ fontSize: 12, color: "var(--color-ink-4)" }}>–</span>
           <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)}
-            style={{ height: 36, padding: "0 10px", background: "white", border: "1px solid #E5E7EB", borderRadius: 10, fontSize: 12.5, color: "#6B7280", outline: "none", fontFamily: "inherit" }} />
+            style={{ height: 36, padding: "0 10px", background: "white", border: "1px solid #E5E7EB", borderRadius: 10, fontSize: 12.5, color: "var(--color-ink-3)", outline: "none", fontFamily: "inherit" }} />
           {(dateFrom || dateTo) && (
             <button onClick={() => { setDateFrom(""); setDateTo(""); }}
-              style={{ width: 24, height: 24, borderRadius: "50%", background: "#F3F4F6", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#6B7280" }}>
+              style={{ width: 24, height: 24, borderRadius: "50%", background: "var(--color-surface-muted)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--color-ink-3)" }}>
               <X size={10} />
             </button>
           )}
         </div>
         <div style={{ flex: 1 }} />
-        <span style={{ fontSize: 12, color: "#9CA3AF" }}>{rows.length} disbursals</span>
+        <span style={{ fontSize: 12, color: "var(--color-ink-4)" }}>{rows.length} disbursals</span>
       </div>
 
       {/* ── Table ───────────────────────────── */}
@@ -146,20 +148,20 @@ export default function DisbursalsPage() {
         <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", overflow: "hidden" }}>
           {[...Array(6)].map((_, i) => (
             <div key={i} style={{ display: "flex", alignItems: "center", gap: 16, padding: "18px 24px", borderBottom: "1px solid #F9FAFB" }}>
-              <div style={{ width: 38, height: 38, borderRadius: 10, background: "#F3F4F6", flexShrink: 0 }} className="animate-pulse" />
+              <div style={{ width: 38, height: 38, borderRadius: 10, background: "var(--color-surface-muted)", flexShrink: 0 }} className="animate-pulse" />
               <div style={{ flex: 1 }}>
-                <div style={{ height: 12, background: "#F3F4F6", borderRadius: 4, width: 140, marginBottom: 6 }} className="animate-pulse" />
-                <div style={{ height: 10, background: "#F3F4F6", borderRadius: 4, width: 100 }} className="animate-pulse" />
+                <div style={{ height: 12, background: "var(--color-surface-muted)", borderRadius: 4, width: 140, marginBottom: 6 }} className="animate-pulse" />
+                <div style={{ height: 10, background: "var(--color-surface-muted)", borderRadius: 4, width: 100 }} className="animate-pulse" />
               </div>
-              <div style={{ height: 22, background: "#F3F4F6", borderRadius: 999, width: 80 }} className="animate-pulse" />
+              <div style={{ height: 22, background: "var(--color-surface-muted)", borderRadius: 999, width: 80 }} className="animate-pulse" />
             </div>
           ))}
         </div>
       ) : rows.length === 0 ? (
         <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", padding: "60px 24px", textAlign: "center" }}>
-          <CreditCard size={36} style={{ color: "#E5E7EB", margin: "0 auto 12px" }} />
-          <p style={{ fontSize: 15, fontWeight: 600, color: "#111827", margin: 0 }}>No disbursals found</p>
-          <p style={{ fontSize: 13, color: "#9CA3AF", marginTop: 6 }}>
+          <CreditCard size={36} style={{ color: "var(--color-edge)", margin: "0 auto 12px" }} />
+          <p style={{ fontSize: 15, fontWeight: 600, color: "var(--color-ink)", margin: 0 }}>No disbursals found</p>
+          <p style={{ fontSize: 13, color: "var(--color-ink-4)", marginTop: 6 }}>
             {search || filter !== "ALL" || dateFrom || dateTo
               ? "Try adjusting your search or filters."
               : "Disbursals appear once salary requests are approved."}

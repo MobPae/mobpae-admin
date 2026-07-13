@@ -44,7 +44,8 @@ function srStatusLabel(s: SRStatus): string {
     EMPLOYER_REJECTED: "Rejected",
     REPAYMENT_SCHEDULED: "Recovery",
     REPAID: "Repaid",
-    AWAITING_MEMBERSHIP_PAYMENT: "Awaiting Mbr",
+    AWAITING_MEMBERSHIP_PAYMENT: "Platform Fee",
+    AWAITING_PLATFORM_FEE_PAYMENT: "Platform Fee",
     CANCELLED: "Cancelled",
     EXPIRED: "Expired",
   };
@@ -53,18 +54,19 @@ function srStatusLabel(s: SRStatus): string {
 
 function srStatusStyle(s: SRStatus): { bg: string; text: string } {
   const map: Partial<Record<SRStatus, { bg: string; text: string }>> = {
-    SUBMITTED: { bg: "#FEF3C7", text: "#D97706" },
-    EMPLOYER_APPROVED: { bg: "#DBEAFE", text: "#1D4ED8" },
-    READY_FOR_DISBURSAL: { bg: "#DCFCE7", text: "#16A34A" },
-    DISBURSED: { bg: "#DCFCE7", text: "#15803D" },
-    EMPLOYER_REJECTED: { bg: "#FEE2E2", text: "#DC2626" },
-    REPAYMENT_SCHEDULED: { bg: "#FEF3C7", text: "#B45309" },
-    REPAID: { bg: "#DCFCE7", text: "#166534" },
-    AWAITING_MEMBERSHIP_PAYMENT: { bg: "#FEF3C7", text: "#D97706" },
-    CANCELLED: { bg: "#F3F4F6", text: "#6B7280" },
-    EXPIRED: { bg: "#F3F4F6", text: "#6B7280" },
+    SUBMITTED: { bg: "var(--color-warning-bg)", text: "var(--color-warning)" },
+    EMPLOYER_APPROVED: { bg: "var(--color-info-bg)", text: "#1D4ED8" },
+    READY_FOR_DISBURSAL: { bg: "var(--color-success-bg)", text: "var(--color-success)" },
+    DISBURSED: { bg: "var(--color-success-bg)", text: "var(--color-success-dark)" },
+    EMPLOYER_REJECTED: { bg: "var(--color-danger-bg)", text: "var(--color-danger)" },
+    REPAYMENT_SCHEDULED: { bg: "var(--color-warning-bg)", text: "var(--color-warning-dark)" },
+    REPAID: { bg: "var(--color-success-bg)", text: "#166534" },
+    AWAITING_MEMBERSHIP_PAYMENT: { bg: "var(--color-warning-bg)", text: "var(--color-warning)" },
+    AWAITING_PLATFORM_FEE_PAYMENT: { bg: "var(--color-warning-bg)", text: "var(--color-warning)" },
+    CANCELLED: { bg: "var(--color-surface-muted)", text: "var(--color-ink-3)" },
+    EXPIRED: { bg: "var(--color-surface-muted)", text: "var(--color-ink-3)" },
   };
-  return map[s] ?? { bg: "#F3F4F6", text: "#6B7280" };
+  return map[s] ?? { bg: "var(--color-surface-muted)", text: "var(--color-ink-3)" };
 }
 
 function fmt(n: number) {
@@ -137,7 +139,7 @@ function KpiCard({
           style={{
             fontSize: 22,
             fontWeight: 700,
-            color: accent ? "#D97706" : "#111827",
+            color: accent ? "var(--color-warning)" : "var(--color-ink)",
             letterSpacing: "-0.02em",
             lineHeight: 1,
             opacity: loading ? 0.2 : 1,
@@ -148,7 +150,7 @@ function KpiCard({
         <div
           style={{
             fontSize: 12,
-            color: "#6B7280",
+            color: "var(--color-ink-3)",
             marginTop: 3,
             fontWeight: 500,
           }}
@@ -166,7 +168,7 @@ const SR_TABS: { key: SRTab; label: string; status?: SRStatus | SRStatus[] }[] =
     { key: "PENDING", label: "Pending", status: "SUBMITTED" },
     { key: "APPROVED", label: "Approved", status: "EMPLOYER_APPROVED" },
     { key: "DISBURSED", label: "Disbursed Today", status: "DISBURSED" },
-    { key: "ALL", label: "All Advances" },
+    { key: "ALL", label: "All Salary Advances" },
   ];
 
 export default function DashboardPage() {
@@ -235,14 +237,14 @@ export default function DashboardPage() {
     {
       label: "Disbursed Today",
       value: fmt(d.disbursedAmount),
-      iconBg: "#EEF2FF",
+      iconBg: "var(--color-brand-soft)",
       icon: (
         <svg
           width="18"
           height="18"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="#315eff"
+          stroke="var(--color-brand)"
           strokeWidth="2"
           strokeLinecap="round"
         >
@@ -252,16 +254,16 @@ export default function DashboardPage() {
       ),
     },
     {
-      label: "Advances Processed",
+      label: "Salary Advances Processed",
       value: d.activeRepayments || 0,
-      iconBg: "#DCFCE7",
+      iconBg: "var(--color-success-bg)",
       icon: (
         <svg
           width="18"
           height="18"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="#16A34A"
+          stroke="var(--color-success)"
           strokeWidth="2"
           strokeLinecap="round"
         >
@@ -281,14 +283,14 @@ export default function DashboardPage() {
           : dashLoading
           ? "—"
           : "N/A",
-      iconBg: "#DCFCE7",
+      iconBg: "var(--color-success-bg)",
       icon: (
         <svg
           width="18"
           height="18"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="#16A34A"
+          stroke="var(--color-success)"
           strokeWidth="2"
           strokeLinecap="round"
         >
@@ -300,7 +302,7 @@ export default function DashboardPage() {
     {
       label: "Items Need Attention",
       value: totalAttention || d.pendingLoanApplications,
-      iconBg: "#FEF3C7",
+      iconBg: "var(--color-warning-bg)",
       accent: totalAttention > 0,
       icon: (
         <svg
@@ -308,7 +310,7 @@ export default function DashboardPage() {
           height="18"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="#D97706"
+          stroke="var(--color-warning)"
           strokeWidth="2"
           strokeLinecap="round"
         >
@@ -326,7 +328,7 @@ export default function DashboardPage() {
       sub: "Pending verification",
       count: d.pendingKycDocuments,
       to: "/kyc",
-      color: "#315eff",
+      color: "var(--color-brand)",
     },
     {
       label: "Loan Applications",
@@ -347,7 +349,7 @@ export default function DashboardPage() {
       sub: "Awaiting activation",
       count: d.pendingEmployers,
       to: "/employers",
-      color: "#315eff",
+      color: "var(--color-brand)",
     },
   ];
 
@@ -381,14 +383,14 @@ export default function DashboardPage() {
             style={{
               fontSize: 26,
               fontWeight: 700,
-              color: "#111827",
+              color: "var(--color-ink)",
               letterSpacing: "-0.025em",
               margin: 0,
             }}
           >
             {getGreeting()}, {firstName} 👋
           </h1>
-          <p style={{ fontSize: 14, color: "#6B7280", marginTop: 6 }}>
+          <p style={{ fontSize: 14, color: "var(--color-ink-3)", marginTop: 6 }}>
             Here's what's happening with MobPae today.
           </p>
         </div>
@@ -403,15 +405,15 @@ export default function DashboardPage() {
             border: "1px solid #E5E7EB",
             borderRadius: 12,
             fontSize: 13,
-            color: "#374151",
+            color: "var(--color-ink-2)",
             fontWeight: 500,
             cursor: "pointer",
             fontFamily: "inherit",
           }}
         >
-          <CalendarDays size={14} style={{ color: "#9CA3AF" }} />
+          <CalendarDays size={14} className="text-ink-4" />
           {today}
-          <ChevronDown size={13} style={{ color: "#9CA3AF" }} />
+          <ChevronDown size={13} className="text-ink-4" />
         </button>
       </div>
 
@@ -457,15 +459,15 @@ export default function DashboardPage() {
                 justifyContent: "space-between",
               }}
             >
-              <span style={{ fontSize: 14, fontWeight: 600, color: "#111827" }}>
+              <span style={{ fontSize: 14, fontWeight: 600, color: "var(--color-ink)" }}>
                 Today's Queue
               </span>
               <span
                 style={{
                   fontSize: 11,
                   fontWeight: 700,
-                  color: "#D97706",
-                  background: "#FEF3C7",
+                  color: "var(--color-warning)",
+                  background: "var(--color-warning-bg)",
                   borderRadius: 999,
                   padding: "2px 8px",
                 }}
@@ -492,7 +494,7 @@ export default function DashboardPage() {
                     transition: "background 0.12s",
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "#FAFAFC";
+                    e.currentTarget.style.background = "var(--color-surface-raised)";
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.background = "none";
@@ -512,7 +514,7 @@ export default function DashboardPage() {
                       style={{
                         fontSize: 13,
                         fontWeight: 500,
-                        color: "#111827",
+                        color: "var(--color-ink)",
                         margin: 0,
                       }}
                     >
@@ -521,7 +523,7 @@ export default function DashboardPage() {
                     <p
                       style={{
                         fontSize: 11,
-                        color: "#9CA3AF",
+                        color: "var(--color-ink-4)",
                         margin: "2px 0 0",
                       }}
                     >
@@ -532,8 +534,8 @@ export default function DashboardPage() {
                     style={{
                       fontSize: 12,
                       fontWeight: 600,
-                      background: item.count > 0 ? "#FEF3C7" : "#F3F4F6",
-                      color: item.count > 0 ? "#D97706" : "#9CA3AF",
+                      background: item.count > 0 ? "var(--color-warning-bg)" : "var(--color-surface-muted)",
+                      color: item.count > 0 ? "var(--color-warning)" : "var(--color-ink-4)",
                       borderRadius: 999,
                       padding: "2px 8px",
                     }}
@@ -549,12 +551,12 @@ export default function DashboardPage() {
                 style={{
                   width: "100%",
                   height: 36,
-                  background: "#EEF2FF",
+                  background: "var(--color-brand-soft)",
                   border: "none",
                   borderRadius: 10,
                   fontSize: 13,
                   fontWeight: 600,
-                  color: "#315eff",
+                  color: "var(--color-brand)",
                   cursor: "pointer",
                   fontFamily: "inherit",
                 }}
@@ -583,7 +585,7 @@ export default function DashboardPage() {
                 marginBottom: 16,
               }}
             >
-              <span style={{ fontSize: 14, fontWeight: 600, color: "#111827" }}>
+              <span style={{ fontSize: 14, fontWeight: 600, color: "var(--color-ink)" }}>
                 Insights
               </span>
               <button
@@ -592,7 +594,7 @@ export default function DashboardPage() {
                   alignItems: "center",
                   gap: 4,
                   fontSize: 12,
-                  color: "#6B7280",
+                  color: "var(--color-ink-3)",
                   background: "none",
                   border: "1px solid #E5E7EB",
                   borderRadius: 8,
@@ -606,14 +608,14 @@ export default function DashboardPage() {
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
-                <p style={{ fontSize: 11, color: "#9CA3AF", marginBottom: 4 }}>
+                <p style={{ fontSize: 11, color: "var(--color-ink-4)", marginBottom: 4 }}>
                   Total Disbursed
                 </p>
                 <p
                   style={{
                     fontSize: 22,
                     fontWeight: 700,
-                    color: "#111827",
+                    color: "var(--color-ink)",
                     letterSpacing: "-0.02em",
                   }}
                 >
@@ -624,7 +626,7 @@ export default function DashboardPage() {
                   style={{
                     marginTop: 8,
                     height: 36,
-                    background: "#EEF2FF",
+                    background: "var(--color-brand-soft)",
                     borderRadius: 8,
                     position: "relative",
                     overflow: "hidden",
@@ -638,7 +640,7 @@ export default function DashboardPage() {
                     <polyline
                       points="0,28 40,22 80,30 120,14 160,18 200,8"
                       fill="none"
-                      stroke="#315eff"
+                      stroke="var(--color-brand)"
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -647,14 +649,14 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div>
-                <p style={{ fontSize: 11, color: "#9CA3AF", marginBottom: 4 }}>
+                <p style={{ fontSize: 11, color: "var(--color-ink-4)", marginBottom: 4 }}>
                   Active Employees
                 </p>
                 <p
                   style={{
                     fontSize: 22,
                     fontWeight: 700,
-                    color: "#111827",
+                    color: "var(--color-ink)",
                     letterSpacing: "-0.02em",
                   }}
                 >
@@ -664,7 +666,7 @@ export default function DashboardPage() {
                   style={{
                     marginTop: 8,
                     height: 36,
-                    background: "#DCFCE7",
+                    background: "var(--color-success-bg)",
                     borderRadius: 8,
                     overflow: "hidden",
                   }}
@@ -677,7 +679,7 @@ export default function DashboardPage() {
                     <polyline
                       points="0,30 40,26 80,20 120,22 160,12 200,8"
                       fill="none"
-                      stroke="#16A34A"
+                      stroke="var(--color-success)"
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -715,7 +717,7 @@ export default function DashboardPage() {
                 marginBottom: 12,
               }}
             >
-              <span style={{ fontSize: 14, fontWeight: 600, color: "#111827" }}>
+              <span style={{ fontSize: 14, fontWeight: 600, color: "var(--color-ink)" }}>
                 Salary Advances
               </span>
               <div style={{ display: "flex", gap: 8 }}>
@@ -726,11 +728,11 @@ export default function DashboardPage() {
                     gap: 5,
                     height: 32,
                     padding: "0 12px",
-                    background: "#F8F9FC",
+                    background: "var(--color-canvas)",
                     border: "1px solid #E5E7EB",
                     borderRadius: 8,
                     fontSize: 12,
-                    color: "#6B7280",
+                    color: "var(--color-ink-3)",
                     cursor: "pointer",
                     fontFamily: "inherit",
                   }}
@@ -742,7 +744,7 @@ export default function DashboardPage() {
                   style={{
                     width: 32,
                     height: 32,
-                    background: "#F8F9FC",
+                    background: "var(--color-canvas)",
                     border: "1px solid #E5E7EB",
                     borderRadius: 8,
                     display: "flex",
@@ -751,7 +753,7 @@ export default function DashboardPage() {
                     cursor: "pointer",
                   }}
                 >
-                  <MoreHorizontal size={14} style={{ color: "#9CA3AF" }} />
+                  <MoreHorizontal size={14} className="text-ink-4" />
                 </button>
               </div>
             </div>
@@ -765,7 +767,7 @@ export default function DashboardPage() {
                     padding: "8px 16px",
                     fontSize: 13,
                     fontWeight: srTab === tab.key ? 600 : 400,
-                    color: srTab === tab.key ? "#315eff" : "#9CA3AF",
+                    color: srTab === tab.key ? "var(--color-brand)" : "var(--color-ink-4)",
                     background: "none",
                     border: "none",
                     cursor: "pointer",
@@ -783,8 +785,8 @@ export default function DashboardPage() {
                       style={{
                         marginLeft: 6,
                         fontSize: 11,
-                        background: srTab === tab.key ? "#315eff" : "#F3F4F6",
-                        color: srTab === tab.key ? "white" : "#9CA3AF",
+                        background: srTab === tab.key ? "var(--color-brand)" : "var(--color-surface-muted)",
+                        color: srTab === tab.key ? "white" : "var(--color-ink-4)",
                         borderRadius: 999,
                         padding: "1px 6px",
                         fontWeight: 600,
@@ -819,7 +821,7 @@ export default function DashboardPage() {
                         textAlign: "left",
                         fontSize: 12,
                         fontWeight: 600,
-                        color: "#9CA3AF",
+                        color: "var(--color-ink-4)",
                         whiteSpace: "nowrap",
                       }}
                     >
@@ -837,7 +839,7 @@ export default function DashboardPage() {
                           <div
                             style={{
                               height: 10,
-                              background: "#F3F4F6",
+                              background: "var(--color-surface-muted)",
                               borderRadius: 4,
                               width: j === 0 ? 100 : 60,
                               animation: "pulse 1.5s infinite",
@@ -855,10 +857,10 @@ export default function DashboardPage() {
                         padding: "48px 16px",
                         textAlign: "center",
                         fontSize: 13,
-                        color: "#9CA3AF",
+                        color: "var(--color-ink-4)",
                       }}
                     >
-                      No advances in this category
+                      No salary advances in this category
                     </td>
                   </tr>
                 ) : (
@@ -873,7 +875,7 @@ export default function DashboardPage() {
                           transition: "background 0.1s",
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.background = "#FAFAFC";
+                          e.currentTarget.style.background = "var(--color-surface-raised)";
                         }}
                         onMouseLeave={(e) => {
                           e.currentTarget.style.background = "transparent";
@@ -910,7 +912,7 @@ export default function DashboardPage() {
                                 style={{
                                   fontSize: 13,
                                   fontWeight: 500,
-                                  color: "#111827",
+                                  color: "var(--color-ink)",
                                   margin: 0,
                                 }}
                               >
@@ -919,7 +921,7 @@ export default function DashboardPage() {
                               <p
                                 style={{
                                   fontSize: 11,
-                                  color: "#9CA3AF",
+                                  color: "var(--color-ink-4)",
                                   margin: "2px 0 0",
                                 }}
                               >
@@ -932,7 +934,7 @@ export default function DashboardPage() {
                           style={{
                             padding: "12px 16px",
                             fontSize: 13,
-                            color: "#6B7280",
+                            color: "var(--color-ink-3)",
                           }}
                         >
                           {req.employer?.companyName ?? "—"}
@@ -942,7 +944,7 @@ export default function DashboardPage() {
                             padding: "12px 16px",
                             fontSize: 13,
                             fontWeight: 600,
-                            color: "#111827",
+                            color: "var(--color-ink)",
                           }}
                         >
                           ₹{parseFloat(req.requestedAmount).toLocaleString("en-IN")}
@@ -951,16 +953,19 @@ export default function DashboardPage() {
                           style={{
                             padding: "12px 16px",
                             fontSize: 13,
-                            color: "#6B7280",
+                            color: "var(--color-ink-3)",
+                            fontVariantNumeric: "tabular-nums",
                           }}
                         >
-                          —
+                          {req.snapshotSalaryInHand
+                            ? `₹${parseFloat(req.snapshotSalaryInHand).toLocaleString("en-IN")}`
+                            : "—"}
                         </td>
                         <td
                           style={{
                             padding: "12px 16px",
                             fontSize: 13,
-                            color: "#6B7280",
+                            color: "var(--color-ink-3)",
                           }}
                         >
                           {new Date(req.submittedAt).toLocaleDateString(
@@ -991,12 +996,12 @@ export default function DashboardPage() {
                               padding: "0 14px",
                               background:
                                 req.status === "SUBMITTED"
-                                  ? "#315eff"
-                                  : "#F3F4F6",
+                                  ? "var(--color-brand)"
+                                  : "var(--color-surface-muted)",
                               color:
                                 req.status === "SUBMITTED"
                                   ? "white"
-                                  : "#6B7280",
+                                  : "var(--color-ink-3)",
                               border: "none",
                               borderRadius: 8,
                               fontSize: 12,
@@ -1021,7 +1026,7 @@ export default function DashboardPage() {
               onClick={() => void navigate("/loan-applications")}
               style={{
                 fontSize: 13,
-                color: "#315eff",
+                color: "var(--color-brand)",
                 fontWeight: 600,
                 background: "none",
                 border: "none",
@@ -1029,7 +1034,7 @@ export default function DashboardPage() {
                 fontFamily: "inherit",
               }}
             >
-              View all advances →
+              View all salary advances →
             </button>
           </div>
         </div>
@@ -1055,14 +1060,14 @@ export default function DashboardPage() {
                 justifyContent: "space-between",
               }}
             >
-              <span style={{ fontSize: 14, fontWeight: 600, color: "#111827" }}>
+              <span style={{ fontSize: 14, fontWeight: 600, color: "var(--color-ink)" }}>
                 Recent Activity
               </span>
               <button
                 onClick={() => void navigate("/audit-logs")}
                 style={{
                   fontSize: 12,
-                  color: "#315eff",
+                  color: "var(--color-brand)",
                   fontWeight: 600,
                   background: "none",
                   border: "none",
@@ -1080,7 +1085,7 @@ export default function DashboardPage() {
                     padding: "24px 20px",
                     textAlign: "center",
                     fontSize: 12,
-                    color: "#9CA3AF",
+                    color: "var(--color-ink-4)",
                   }}
                 >
                   No recent activity
@@ -1105,7 +1110,7 @@ export default function DashboardPage() {
                         width: 8,
                         height: 8,
                         borderRadius: "50%",
-                        background: "#315eff",
+                        background: "var(--color-brand)",
                         marginTop: 4,
                         flexShrink: 0,
                       }}
@@ -1115,20 +1120,20 @@ export default function DashboardPage() {
                         style={{
                           fontSize: 12,
                           fontWeight: 500,
-                          color: "#111827",
+                          color: "var(--color-ink)",
                           margin: 0,
                         }}
                       >
                         {log.action}
                         {log.entityType && (
-                          <span style={{ color: "#315eff" }}>
+                          <span className="text-brand">
                             {" "}
                             · {log.entityType}
                           </span>
                         )}
                       </p>
                       <p
-                        style={{ fontSize: 11, color: "#9CA3AF", marginTop: 2 }}
+                        style={{ fontSize: 11, color: "var(--color-ink-4)", marginTop: 2 }}
                       >
                         {log.user?.email ?? "System"} · {timeAgo(log.createdAt)}
                       </p>
@@ -1158,14 +1163,14 @@ export default function DashboardPage() {
                 justifyContent: "space-between",
               }}
             >
-              <span style={{ fontSize: 14, fontWeight: 600, color: "#111827" }}>
+              <span style={{ fontSize: 14, fontWeight: 600, color: "var(--color-ink)" }}>
                 Employer Health
               </span>
               <button
                 onClick={() => void navigate("/employers")}
                 style={{
                   fontSize: 12,
-                  color: "#315eff",
+                  color: "var(--color-brand)",
                   fontWeight: 600,
                   background: "none",
                   border: "none",
@@ -1194,7 +1199,7 @@ export default function DashboardPage() {
                         width: 28,
                         height: 28,
                         borderRadius: 8,
-                        background: "#F3F4F6",
+                        background: "var(--color-surface-muted)",
                         animation: "pulse 1.5s infinite",
                       }}
                     />
@@ -1202,7 +1207,7 @@ export default function DashboardPage() {
                       <div
                         style={{
                           height: 10,
-                          background: "#F3F4F6",
+                          background: "var(--color-surface-muted)",
                           borderRadius: 4,
                           width: 100,
                           marginBottom: 6,
@@ -1211,7 +1216,7 @@ export default function DashboardPage() {
                       <div
                         style={{
                           height: 8,
-                          background: "#F3F4F6",
+                          background: "var(--color-surface-muted)",
                           borderRadius: 4,
                           width: 60,
                         }}
@@ -1225,7 +1230,7 @@ export default function DashboardPage() {
                     padding: "24px 20px",
                     textAlign: "center",
                     fontSize: 13,
-                    color: "#9CA3AF",
+                    color: "var(--color-ink-4)",
                   }}
                 >
                   No employers yet
@@ -1255,7 +1260,7 @@ export default function DashboardPage() {
                         transition: "background 0.1s",
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.background = "#FAFAFC";
+                        e.currentTarget.style.background = "var(--color-surface-raised)";
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.background = "none";
@@ -1266,8 +1271,8 @@ export default function DashboardPage() {
                           width: 30,
                           height: 30,
                           borderRadius: 8,
-                          background: "#EEF2FF",
-                          color: "#315eff",
+                          background: "var(--color-brand-soft)",
+                          color: "var(--color-brand)",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
@@ -1283,7 +1288,7 @@ export default function DashboardPage() {
                           style={{
                             fontSize: 12,
                             fontWeight: 500,
-                            color: "#111827",
+                            color: "var(--color-ink)",
                             margin: 0,
                             whiteSpace: "nowrap",
                             overflow: "hidden",
@@ -1295,7 +1300,7 @@ export default function DashboardPage() {
                         <p
                           style={{
                             fontSize: 11,
-                            color: "#9CA3AF",
+                            color: "var(--color-ink-4)",
                             margin: "2px 0 0",
                           }}
                         >
@@ -1306,8 +1311,8 @@ export default function DashboardPage() {
                         style={{
                           fontSize: 11,
                           fontWeight: 600,
-                          background: isHealthy ? "#DCFCE7" : "#FEF3C7",
-                          color: isHealthy ? "#16A34A" : "#D97706",
+                          background: isHealthy ? "var(--color-success-bg)" : "var(--color-warning-bg)",
+                          color: isHealthy ? "var(--color-success)" : "var(--color-warning)",
                           borderRadius: 999,
                           padding: "2px 8px",
                           flexShrink: 0,

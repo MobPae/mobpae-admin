@@ -29,14 +29,13 @@ export interface CreateEmployerPayload {
   employerEnquiryId?: string; // links the new employer to its source lead
 }
 
-// Backend may optionally return login credentials in the create response
-export interface CreateEmployerResponse extends Employer {
+export interface CreateEmployerResponse {
+  employerId: string;
   loginEmail?: string;
-  temporaryPassword?: string;
+  status: EmployerStatus;
 }
 
 // PATCH /employers/:id/status response
 export interface ActivateEmployerResponse {
-  emailDelivered: boolean;
-  temporaryPassword?: string;
+  emailDelivered: boolean | null;
 }

@@ -3,9 +3,10 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { resetPassword } from "../services/authService";
 
-const B  = "#315eff";
-const BD = "#2048EE";
-const CREAM = "#f8fafc";
+const B  = "var(--color-brand)";
+const BD = "var(--color-info)";
+const CREAM = "var(--color-canvas)";
+
 
 export default function ResetPasswordPage() {
   const navigate = useNavigate();
@@ -50,7 +51,7 @@ export default function ResetPasswordPage() {
     return (
       <div style={{ display: "flex", height: "100vh", background: CREAM, alignItems: "center", justifyContent: "center" }}>
         <div style={{ maxWidth: 400, width: "100%", padding: "0 24px", textAlign: "center" }}>
-          <p style={{ fontSize: 15, color: "#e11d48", fontWeight: 600 }}>Invalid reset link.</p>
+          <p style={{ fontSize: 15, color: "var(--color-danger)", fontWeight: 600 }}>Invalid reset link.</p>
           <button onClick={() => navigate("/forgot-password")} style={{ marginTop: 16, fontSize: 13, color: B, fontWeight: 600, background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>
             Request a new link
           </button>
@@ -65,16 +66,16 @@ export default function ResetPasswordPage() {
         {/* Logo */}
         <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 40 }}>
           <img src="/logo-icon.svg" alt="MobPae" width="32" height="21" style={{ objectFit: "contain", flexShrink: 0 }} />
-          <span style={{ fontSize: 15, fontWeight: 700, color: "#111827", letterSpacing: "-0.01em" }}>MobPae</span>
+          <span style={{ fontSize: 15, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.01em" }}>MobPae</span>
         </div>
 
         {done ? (
           <div>
-            <div style={{ width: 48, height: 48, borderRadius: 12, background: "#EEF2FF", border: "1px solid #C8C9FF", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#315eff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <div style={{ width: 48, height: 48, borderRadius: 12, background: "var(--color-brand-soft)", border: "1px solid #C8C9FF", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
-            <h2 style={{ fontSize: 26, fontWeight: 800, color: "#111", letterSpacing: "-0.025em", margin: "0 0 10px" }}>Password reset</h2>
-            <p style={{ fontSize: 14, color: "#9CA3AF", lineHeight: 1.6, marginBottom: 28 }}>
+            <h2 style={{ fontSize: 26, fontWeight: 800, color: "var(--color-ink)", letterSpacing: "-0.025em", margin: "0 0 10px" }}>Password reset</h2>
+            <p style={{ fontSize: 14, color: "var(--color-ink-4)", lineHeight: 1.6, marginBottom: 28 }}>
               Your password has been updated. All active sessions have been invalidated — please sign in again.
             </p>
             <button
@@ -92,25 +93,25 @@ export default function ResetPasswordPage() {
           </div>
         ) : (
           <div>
-            <h2 style={{ fontSize: 28, fontWeight: 800, color: "#111", letterSpacing: "-0.025em", margin: "0 0 10px" }}>Set new password</h2>
-            <p style={{ fontSize: 14, color: "#9CA3AF", lineHeight: 1.6, marginBottom: 28 }}>
+            <h2 style={{ fontSize: 28, fontWeight: 800, color: "var(--color-ink)", letterSpacing: "-0.025em", margin: "0 0 10px" }}>Set new password</h2>
+            <p style={{ fontSize: 14, color: "var(--color-ink-4)", lineHeight: 1.6, marginBottom: 28 }}>
               Choose a strong password. All active sessions will be signed out.
             </p>
 
             <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               {/* New password */}
               <div>
-                <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#333", marginBottom: 8 }}>New Password</label>
+                <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--color-ink)", marginBottom: 8 }}>New Password</label>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, background: "white", border: "1.5px solid #e8e0d8", borderRadius: 10, padding: "11px 14px", transition: "border-color 0.15s" }}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--color-ink-4)" strokeWidth="2" strokeLinecap="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                   <input
                     type={showNew ? "text" : "password"} value={newPassword} onChange={e => setNewPassword(e.target.value)}
                     placeholder="Min. 8 characters" required
-                    style={{ flex: 1, fontSize: 14, color: "#111", background: "transparent", outline: "none", minWidth: 0 }}
+                    style={{ flex: 1, fontSize: 14, color: "var(--color-ink)", background: "transparent", outline: "none", minWidth: 0 }}
                     onFocus={e => { (e.target.closest("div") as HTMLElement).style.borderColor = B; }}
-                    onBlur={e  => { (e.target.closest("div") as HTMLElement).style.borderColor = "#e8e0d8"; }}
+                    onBlur={e  => { (e.target.closest("div") as HTMLElement).style.borderColor = "var(--color-edge)"; }}
                   />
-                  <button type="button" onClick={() => setShowNew(v => !v)} style={{ color: "#D1D5DB", background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex" }}>
+                  <button type="button" onClick={() => setShowNew(v => !v)} style={{ color: "var(--color-ink-disabled)", background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex" }}>
                     {showNew ? <EyeOff size={15} /> : <Eye size={15} />}
                   </button>
                 </div>
@@ -118,24 +119,24 @@ export default function ResetPasswordPage() {
 
               {/* Confirm password */}
               <div>
-                <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#333", marginBottom: 8 }}>Confirm Password</label>
+                <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--color-ink)", marginBottom: 8 }}>Confirm Password</label>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, background: "white", border: "1.5px solid #e8e0d8", borderRadius: 10, padding: "11px 14px", transition: "border-color 0.15s" }}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--color-ink-4)" strokeWidth="2" strokeLinecap="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                   <input
                     type={showConfirm ? "text" : "password"} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)}
                     placeholder="Repeat new password" required
-                    style={{ flex: 1, fontSize: 14, color: "#111", background: "transparent", outline: "none", minWidth: 0 }}
+                    style={{ flex: 1, fontSize: 14, color: "var(--color-ink)", background: "transparent", outline: "none", minWidth: 0 }}
                     onFocus={e => { (e.target.closest("div") as HTMLElement).style.borderColor = B; }}
-                    onBlur={e  => { (e.target.closest("div") as HTMLElement).style.borderColor = "#e8e0d8"; }}
+                    onBlur={e  => { (e.target.closest("div") as HTMLElement).style.borderColor = "var(--color-edge)"; }}
                   />
-                  <button type="button" onClick={() => setShowConfirm(v => !v)} style={{ color: "#D1D5DB", background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex" }}>
+                  <button type="button" onClick={() => setShowConfirm(v => !v)} style={{ color: "var(--color-ink-disabled)", background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex" }}>
                     {showConfirm ? <EyeOff size={15} /> : <Eye size={15} />}
                   </button>
                 </div>
               </div>
 
               {error && (
-                <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#fff1f2", border: "1px solid #fecdd3", borderRadius: 8, padding: "10px 14px", fontSize: 13, color: "#e11d48", fontWeight: 500 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, background: "var(--color-danger-soft)", border: "1px solid var(--color-danger-bg)", borderRadius: 8, padding: "10px 14px", fontSize: 13, color: "var(--color-danger)", fontWeight: 500 }}>
                   {error}
                 </div>
               )}
@@ -144,7 +145,7 @@ export default function ResetPasswordPage() {
                 type="submit" disabled={loading}
                 style={{
                   width: "100%", height: 48, marginTop: 4,
-                  background: loading ? "#c4825e" : `linear-gradient(135deg, ${BD} 0%, ${B} 100%)`,
+                  background: loading ? "var(--color-brand-muted)" : `linear-gradient(135deg, ${BD} 0%, ${B} 100%)`,
                   color: "white", borderRadius: 10, border: "none",
                   fontSize: 14, fontWeight: 700,
                   display: "flex", alignItems: "center", justifyContent: "center",

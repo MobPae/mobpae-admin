@@ -10,10 +10,10 @@ import {
 
 // ── constants ─────────────────────────────────────────────────────────────────
 
-const P   = "#315eff";
-const T1  = "#111827";
-const T2  = "#6B7280";
-const T3  = "#9CA3AF";
+const P   = "var(--color-brand)";
+const T1  = "var(--color-ink)";
+const T2  = "var(--color-ink-3)";
+const T3  = "var(--color-ink-4)";
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -31,7 +31,7 @@ function fmtDate(s: string) {
 function RuleCard({ title, rows }: { title: string; rows: { label: string; value: string | number | boolean }[] }) {
   return (
     <div style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 16, overflow: "hidden" }}>
-      <div style={{ padding: "10px 16px", borderBottom: "1px solid #F3F4F6", background: "#FAFAFA" }}>
+      <div style={{ padding: "10px 16px", borderBottom: "1px solid #F3F4F6", background: "var(--color-surface-raised)" }}>
         <p style={{ fontSize: 11.5, fontWeight: 600, color: T2, textTransform: "uppercase", letterSpacing: "0.07em", margin: 0 }}>{title}</p>
       </div>
       <div>
@@ -40,7 +40,7 @@ function RuleCard({ title, rows }: { title: string; rows: { label: string; value
             <span style={{ fontSize: 12.5, color: T2 }}>{label}</span>
             <span style={{ fontSize: 12.5, fontWeight: 600, color: T1 }}>
               {typeof value === "boolean"
-                ? <span style={{ color: value ? "#16A34A" : "#DC2626" }}>{value ? "Yes" : "No"}</span>
+                ? <span style={{ color: value ? "var(--color-success)" : "var(--color-danger)" }}>{value ? "Yes" : "No"}</span>
                 : value}
             </span>
           </div>
@@ -150,7 +150,7 @@ function renderField(field: Field, value: number | boolean | string, onChange: (
       <button
         type="button"
         onClick={() => onChange(!on)}
-        style={{ position: "relative", display: "inline-flex", alignItems: "center", height: 20, width: 36, borderRadius: 999, background: on ? P : "#E5E7EB", border: "none", cursor: "pointer", flexShrink: 0, transition: "background 0.2s" }}
+        style={{ position: "relative", display: "inline-flex", alignItems: "center", height: 20, width: 36, borderRadius: 999, background: on ? P : "var(--color-edge)", border: "none", cursor: "pointer", flexShrink: 0, transition: "background 0.2s" }}
       >
         <span style={{ display: "inline-block", width: 14, height: 14, borderRadius: "50%", background: "white", boxShadow: "0 1px 3px rgba(0,0,0,0.2)", transform: on ? "translateX(18px)" : "translateX(3px)", transition: "transform 0.2s" }} />
       </button>
@@ -248,7 +248,7 @@ function PublishDrawer({ activeConfig, onClose, onPublished }: DrawerProps) {
               {activeConfig ? `Supersedes v${activeConfig.versionNumber} · ${activeConfig.versionName ?? ""}` : "First version"}
             </p>
           </div>
-          <button onClick={onClose} style={{ width: 28, height: 28, borderRadius: 8, border: "none", background: "#F3F4F6", color: T2, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+          <button onClick={onClose} style={{ width: 28, height: 28, borderRadius: 8, border: "none", background: "var(--color-surface-muted)", color: T2, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
             <X size={14} />
           </button>
         </div>
@@ -306,7 +306,7 @@ function PublishDrawer({ activeConfig, onClose, onPublished }: DrawerProps) {
             </button>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              <div style={{ background: "#FEF3C7", border: "1px solid #FCD34D", borderRadius: 8, padding: "8px 12px" }}>
+              <div style={{ background: "var(--color-warning-bg)", border: "1px solid #FCD34D", borderRadius: 8, padding: "8px 12px" }}>
                 <p style={{ fontSize: 12, color: "#92400E", margin: 0 }}>
                   ⚠ This will immediately deactivate the current config. All future loan applications will use the new rules.
                 </p>
@@ -321,7 +321,7 @@ function PublishDrawer({ activeConfig, onClose, onPublished }: DrawerProps) {
                 <button
                   onClick={() => mutation.mutate(form)}
                   disabled={mutation.isPending}
-                  style={{ flex: 2, height: 38, borderRadius: 10, background: "#DC2626", color: "white", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", opacity: mutation.isPending ? 0.6 : 1 }}
+                  style={{ flex: 2, height: 38, borderRadius: 10, background: "var(--color-danger)", color: "white", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", opacity: mutation.isPending ? 0.6 : 1 }}
                 >
                   {mutation.isPending ? "Publishing…" : "Confirm & Publish"}
                 </button>
@@ -361,14 +361,14 @@ function HistoryRow({ cfg, onDeleted }: { cfg: LoanProductConfig; onDeleted: () 
         >
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {cfg.isActive
-              ? <CheckCircle2 size={14} color="#16A34A" />
+              ? <CheckCircle2 size={14} color="var(--color-success)" />
               : <Clock size={14} color={T3} />
             }
             <span style={{ fontSize: 13, fontWeight: 600, color: T1 }}>
               v{cfg.versionNumber}{cfg.versionName ? ` · ${cfg.versionName}` : ""}
             </span>
             {cfg.isActive && (
-              <span style={{ fontSize: 10, fontWeight: 700, background: "#DCFCE7", color: "#16A34A", borderRadius: 99, padding: "1px 7px" }}>ACTIVE</span>
+              <span style={{ fontSize: 10, fontWeight: 700, background: "var(--color-success-bg)", color: "var(--color-success)", borderRadius: 99, padding: "1px 7px" }}>ACTIVE</span>
             )}
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -382,17 +382,17 @@ function HistoryRow({ cfg, onDeleted }: { cfg: LoanProductConfig; onDeleted: () 
               <button
                 onClick={e => { e.stopPropagation(); setConfirmDelete(true); }}
                 title="Delete this version"
-                style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6, border: "1px solid #FEE2E2", background: "#FFF5F5", cursor: "pointer" }}
+                style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6, border: "1px solid var(--color-danger-bg)", background: "var(--color-danger-soft)", cursor: "pointer" }}
               >
-                <Trash2 size={13} color="#DC2626" />
+                <Trash2 size={13} color="var(--color-danger)" />
               </button>
             ) : (
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <span style={{ fontSize: 11, color: "#DC2626", fontWeight: 500 }}>Delete?</span>
+                <span style={{ fontSize: 11, color: "var(--color-danger)", fontWeight: 500 }}>Delete?</span>
                 <button
                   onClick={() => deleteMutation.mutate()}
                   disabled={deleteMutation.isPending}
-                  style={{ fontSize: 11, fontWeight: 600, color: "white", background: "#DC2626", border: "none", borderRadius: 6, padding: "3px 8px", cursor: "pointer", opacity: deleteMutation.isPending ? 0.6 : 1 }}
+                  style={{ fontSize: 11, fontWeight: 600, color: "white", background: "var(--color-danger)", border: "none", borderRadius: 6, padding: "3px 8px", cursor: "pointer", opacity: deleteMutation.isPending ? 0.6 : 1 }}
                 >
                   Yes
                 </button>
@@ -522,7 +522,7 @@ export function LoanProductPage() {
             />
           </div>
         ) : (
-          <div style={{ background: "#FEF3C7", border: "1px solid #FCD34D", borderRadius: 12, padding: "16px 20px", marginBottom: 32 }}>
+          <div style={{ background: "var(--color-warning-bg)", border: "1px solid #FCD34D", borderRadius: 12, padding: "16px 20px", marginBottom: 32 }}>
             <p style={{ fontSize: 13, color: "#92400E", margin: 0 }}>No active config found. Publish the first version to enable salary advances.</p>
           </div>
         )}

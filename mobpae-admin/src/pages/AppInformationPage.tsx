@@ -11,10 +11,10 @@ import {
 
 // ── constants ─────────────────────────────────────────────────────────────────
 
-const P  = "#315eff";
-const T1 = "#111827";
-const T2 = "#6B7280";
-const T3 = "#9CA3AF";
+const P  = "var(--color-brand)";
+const T1 = "var(--color-ink)";
+const T2 = "var(--color-ink-3)";
+const T3 = "var(--color-ink-4)";
 
 const TYPE_META: Record<AppInfoType, { label: string; description: string }> = {
   ABOUT:            { label: "About",             description: "App description shown in Profile > About" },
@@ -159,7 +159,7 @@ function EditorDrawer({ entry, type, onClose, onSaved }: EditorProps) {
               onClick={() => setIsActive(v => !v)}
               style={{
                 width: 40, height: 22, borderRadius: 999,
-                background: isActive ? P : "#E5E7EB",
+                background: isActive ? P : "var(--color-edge)",
                 border: "none", cursor: "pointer", position: "relative",
                 transition: "background 0.2s", flexShrink: 0,
               }}
@@ -184,7 +184,7 @@ function EditorDrawer({ entry, type, onClose, onSaved }: EditorProps) {
             disabled={isBusy || !title.trim() || !content.trim()}
             style={{
               height: 38, padding: "0 20px", borderRadius: 9, border: "none",
-              background: saved ? "#16A34A" : P,
+              background: saved ? "var(--color-success)" : P,
               color: "white", fontSize: 13, fontWeight: 700,
               cursor: isBusy || !title.trim() || !content.trim() ? "not-allowed" : "pointer",
               opacity: !title.trim() || !content.trim() ? 0.5 : 1,
@@ -201,7 +201,7 @@ function EditorDrawer({ entry, type, onClose, onSaved }: EditorProps) {
             Cancel
           </button>
           {save.isError && (
-            <p style={{ fontSize: 12, color: "#DC2626", margin: 0 }}>Failed to save. Try again.</p>
+            <p style={{ fontSize: 12, color: "var(--color-danger)", margin: 0 }}>Failed to save. Try again.</p>
           )}
         </div>
       </div>
@@ -231,7 +231,7 @@ function InfoCard({
 
   return (
     <div style={{
-      background: "white", borderRadius: 14, border: `1.5px solid ${exists ? "#E5E7EB" : "#F3F4F6"}`,
+      background: "white", borderRadius: 14, border: `1.5px solid ${exists ? "var(--color-edge)" : "var(--color-surface-muted)"}`,
       overflow: "hidden", transition: "box-shadow 0.15s",
     }}>
       {/* Card header */}
@@ -239,19 +239,19 @@ function InfoCard({
         {/* Status dot */}
         <div style={{
           width: 10, height: 10, borderRadius: "50%", flexShrink: 0,
-          background: !exists ? T3 : active ? "#16A34A" : "#F59E0B",
+          background: !exists ? T3 : active ? "var(--color-success)" : "#F59E0B",
         }} />
 
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <p style={{ fontSize: 14, fontWeight: 700, color: T1, margin: 0 }}>{meta.label}</p>
             {entry?.version && (
-              <span style={{ fontSize: 11, fontWeight: 600, color: P, background: "#EEF2FF", padding: "1px 7px", borderRadius: 999 }}>
+              <span style={{ fontSize: 11, fontWeight: 600, color: P, background: "var(--color-brand-soft)", padding: "1px 7px", borderRadius: 999 }}>
                 v{entry.version}
               </span>
             )}
             {!exists && (
-              <span style={{ fontSize: 11, fontWeight: 600, color: T3, background: "#F3F4F6", padding: "1px 7px", borderRadius: 999 }}>
+              <span style={{ fontSize: 11, fontWeight: 600, color: T3, background: "var(--color-surface-muted)", padding: "1px 7px", borderRadius: 999 }}>
                 Not created
               </span>
             )}
@@ -273,7 +273,7 @@ function InfoCard({
               style={{
                 width: 30, height: 30, borderRadius: 8, border: "1px solid #E5E7EB",
                 background: "white", display: "flex", alignItems: "center", justifyContent: "center",
-                cursor: toggling ? "not-allowed" : "pointer", color: active ? "#16A34A" : T3,
+                cursor: toggling ? "not-allowed" : "pointer", color: active ? "var(--color-success)" : T3,
                 opacity: toggling ? 0.5 : 1,
               }}
             >
@@ -285,7 +285,7 @@ function InfoCard({
             onClick={onEdit}
             style={{
               height: 30, padding: "0 12px", borderRadius: 8,
-              border: "none", background: exists ? "#EEF2FF" : P,
+              border: "none", background: exists ? "var(--color-brand-soft)" : P,
               color: exists ? P : "white",
               fontSize: 12, fontWeight: 600, cursor: "pointer",
               fontFamily: "inherit", display: "flex", alignItems: "center", gap: 5,
@@ -307,7 +307,7 @@ function InfoCard({
 
       {/* Expanded preview */}
       {expanded && entry && (
-        <div style={{ borderTop: "1px solid #F3F4F6", padding: "16px 20px", background: "#FAFAFA" }}>
+        <div style={{ borderTop: "1px solid #F3F4F6", padding: "16px 20px", background: "var(--color-surface-raised)" }}>
           <p style={{ fontSize: 12, fontWeight: 600, color: T3, margin: "0 0 8px", textTransform: "uppercase", letterSpacing: "0.06em" }}>
             Content preview
           </p>
@@ -350,7 +350,7 @@ export function AppInformationPage() {
   const missingTypes = ALL_TYPES.filter(t => !entryByType(t));
 
   return (
-    <div style={{ padding: "28px 32px", minHeight: "100vh", background: "#F8F8FC" }}>
+    <div style={{ padding: "28px 32px", minHeight: "100vh", background: "var(--color-canvas)" }}>
       {/* Header */}
       <div style={{ marginBottom: 24, display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
         <div>
@@ -371,7 +371,7 @@ export function AppInformationPage() {
       <div style={{ display: "flex", gap: 12, marginBottom: 24, flexWrap: "wrap" }}>
         {[
           { label: "Total sections",   value: ALL_TYPES.length,                color: T1       },
-          { label: "Active",           value: activeCount,                      color: "#16A34A" },
+          { label: "Active",           value: activeCount,                      color: "var(--color-success)" },
           { label: "Inactive",         value: entries.filter(e => !e.isActive).length, color: "#F59E0B" },
           { label: "Not created yet",  value: missingTypes.length,              color: T3       },
         ].map(s => (
@@ -385,7 +385,7 @@ export function AppInformationPage() {
       {/* States */}
       {isError && (
         <div style={{ background: "white", borderRadius: 14, padding: "40px 24px", textAlign: "center", border: "1px solid #F3F4F6" }}>
-          <p style={{ fontSize: 13, color: "#DC2626", margin: 0 }}>Failed to load app information</p>
+          <p style={{ fontSize: 13, color: "var(--color-danger)", margin: 0 }}>Failed to load app information</p>
           <button onClick={() => void refetch()} style={{ marginTop: 12, height: 32, padding: "0 16px", borderRadius: 8, border: "none", background: P, color: "white", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>Retry</button>
         </div>
       )}

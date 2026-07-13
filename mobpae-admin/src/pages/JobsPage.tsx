@@ -23,8 +23,8 @@ const JOBS: JobDef[] = [
     schedule: "0 2 * * *",
     scheduleHuman: "Daily at 2:00 AM",
     icon: <Shield size={15} />,
-    color: "text-[#315eff]",
-    bg: "bg-[#EEF2FF]",
+    color: "text-brand",
+    bg: "bg-brand-soft",
   },
   {
     id: "token-rotation",
@@ -33,8 +33,8 @@ const JOBS: JobDef[] = [
     schedule: "Per-request",
     scheduleHuman: "On every auth refresh",
     icon: <RefreshCcw size={15} />,
-    color: "text-[#315eff]",
-    bg: "bg-[#EEF2FF]",
+    color: "text-brand",
+    bg: "bg-brand-soft",
   },
   {
     id: "password-reset-expiry",
@@ -43,7 +43,7 @@ const JOBS: JobDef[] = [
     schedule: "15 min TTL",
     scheduleHuman: "15-minute time-to-live",
     icon: <Clock size={15} />,
-    color: "text-amber-600",
+    color: "text-warning",
     bg: "bg-amber-50",
   },
 ];
@@ -72,18 +72,18 @@ export default function JobsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[22px] font-[600] text-[#111827] tracking-[-0.01em]">Scheduled Jobs</h1>
-          <p className="text-[13px] text-[#6B7280] mt-0.5">Backend maintenance tasks that run automatically</p>
+          <h1 className="text-[22px] font-[600] text-ink tracking-[-0.01em]">Scheduled Jobs</h1>
+          <p className="text-[13px] text-ink-3 mt-0.5">Backend maintenance tasks that run automatically</p>
         </div>
         <div className={`flex items-center gap-1.5 h-6 px-2.5 rounded-md border ${
-          healthLoading ? "bg-[#F8F9FC] border-[#E5E7EB]" :
-          systemOk      ? "bg-[#EEF2FF] border-[#EEF2FF]" : "bg-red-50 border-red-100"
+          healthLoading ? "bg-canvas border-edge" :
+          systemOk      ? "bg-brand-soft border-[#EEF2FF]" : "bg-danger-soft border-red-100"
         }`}>
           <span className={`w-1.5 h-1.5 rounded-full ${
-            healthLoading ? "bg-[#D1D5DB]" : systemOk ? "bg-[#315eff]" : "bg-red-500"
+            healthLoading ? "bg-[#D1D5DB]" : systemOk ? "bg-brand" : "bg-danger-soft0"
           }`} />
           <span className={`text-[11px] font-[500] ${
-            healthLoading ? "text-[#6B7280]" : systemOk ? "text-[#2048EE]" : "text-red-700"
+            healthLoading ? "text-ink-3" : systemOk ? "text-[#2048EE]" : "text-red-700"
           }`}>
             {healthLoading ? "Checking…" : systemOk ? "System healthy" : "System degraded"}
           </span>
@@ -91,8 +91,8 @@ export default function JobsPage() {
       </div>
 
       {/* Info banner */}
-      <div className="bg-[#EEF2FF] border border-[#E5E7EB] rounded-xl px-4 py-3 flex items-start gap-3">
-        <Zap size={14} className="text-[#315eff] mt-0.5 flex-shrink-0" />
+      <div className="bg-brand-soft border border-edge rounded-xl px-4 py-3 flex items-start gap-3">
+        <Zap size={14} className="text-brand mt-0.5 flex-shrink-0" />
         <p className="text-[12px] text-[#2048EE] leading-relaxed">
           These jobs are managed by the backend runtime. They run automatically on the configured schedule — no manual triggering is needed or supported via this interface. This page reflects the configured schedule only; individual run history is stored in server logs.
         </p>
@@ -101,26 +101,26 @@ export default function JobsPage() {
       {/* Job cards */}
       <div className="space-y-3">
         {JOBS.map(job => (
-          <div key={job.id} className="bg-white border border-[#E5E7EB] rounded-xl p-5 flex items-start gap-4">
+          <div key={job.id} className="bg-white border border-edge rounded-xl p-5 flex items-start gap-4">
             <div className={`w-9 h-9 rounded-xl ${job.bg} ${job.color} flex items-center justify-center flex-shrink-0 mt-0.5`}>
               {job.icon}
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 mb-1">
-                <p className="text-[13px] font-[600] text-[#111827]">{job.name}</p>
-                <span className="inline-flex items-center gap-1 h-[18px] px-2 rounded-full bg-[#DCFCE7] text-[#15803D] text-[11px] font-[500]">
+                <p className="text-[13px] font-[600] text-ink">{job.name}</p>
+                <span className="inline-flex items-center gap-1 h-[18px] px-2 rounded-full bg-success-bg text-success-dark text-[11px] font-[500]">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E]" />
                   Active
                 </span>
               </div>
-              <p className="text-[12px] text-[#6B7280] leading-relaxed mb-3">{job.description}</p>
+              <p className="text-[12px] text-ink-3 leading-relaxed mb-3">{job.description}</p>
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1.5">
-                  <Clock size={11} className="text-[#6B7280]" />
-                  <span className="text-[11px] text-[#6B7280]">{job.scheduleHuman}</span>
+                  <Clock size={11} className="text-ink-3" />
+                  <span className="text-[11px] text-ink-3">{job.scheduleHuman}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[11px] font-mono text-[#6B7280] bg-[#F8F9FC] border border-[#E5E7EB] px-1.5 py-0.5 rounded">{job.schedule}</span>
+                  <span className="text-[11px] font-mono text-ink-3 bg-canvas border border-edge px-1.5 py-0.5 rounded">{job.schedule}</span>
                 </div>
               </div>
             </div>
@@ -129,8 +129,8 @@ export default function JobsPage() {
       </div>
 
       {/* Footer note */}
-      <div className="bg-[#F8F9FC] border border-[#E5E7EB] rounded-xl px-4 py-3">
-        <p className="text-[11px] text-[#6B7280]">
+      <div className="bg-canvas border border-edge rounded-xl px-4 py-3">
+        <p className="text-[11px] text-ink-3">
           Page rendered at {timeNow()}. Job schedules reflect backend configuration at the time of the last deployment.
         </p>
       </div>
