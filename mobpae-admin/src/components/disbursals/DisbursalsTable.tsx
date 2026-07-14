@@ -1,22 +1,12 @@
 import { useState } from "react";
 import type { Disbursal } from "../../types/disbursal";
+import { avatarColor } from "../../utils/avatarColor";
 
 interface Props {
   disbursals: Disbursal[];
   selectedId: string | null;
   onSelect: (d: Disbursal) => void;
 }
-
-const AVATAR_COLORS: Record<string, string> = {
-  A: "#EF4444", B: "#EC4899", C: "#A855F7", D: "var(--color-brand)",
-  E: "#6366F1", F: "#3B82F6", G: "#0EA5E9", H: "#06B6D4",
-  I: "#10B981", J: "#22C55E", K: "#84CC16", L: "#EAB308",
-  M: "#F59E0B", N: "#F97316", O: "#EF4444", P: "var(--color-brand)",
-  Q: "#8B5CF6", R: "#D946EF", S: "#EC4899", T: "#F43F5E",
-  U: "var(--color-brand)", V: "#6366F1", W: "#3B82F6", X: "#0EA5E9",
-  Y: "#14B8A6", Z: "#10B981",
-};
-const avatarColor = (n: string) => AVATAR_COLORS[n.charAt(0).toUpperCase()] ?? "var(--color-brand)";
 
 const STATUS_CFG: Record<string, { label: string; color: string; bg: string }> = {
   PENDING:    { label: "Pending",    color: "var(--color-warning)", bg: "var(--color-warning-bg)" },

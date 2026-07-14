@@ -1,4 +1,4 @@
-import { Eye, EyeOff, Shield } from "lucide-react";
+import { Eye, EyeOff, Shield, ShieldCheck } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../services/authService";
@@ -7,88 +7,23 @@ import { getToken, setToken, setRefreshToken } from "../utils/auth";
 const P  = "var(--color-brand)";
 const PD = "var(--color-info)";
 
-
-// Mini dashboard preview for right panel
-function DashboardPreview() {
-  return (
-    <div style={{
-      background: "white",
-      borderRadius: 16,
-      padding: "16px 16px 12px",
-      boxShadow: "0 20px 60px rgba(0,0,0,0.25)",
-      width: "100%",
-      maxWidth: 440,
-    }}>
-      {/* Mini topbar */}
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-        <div style={{ display: "flex", gap: 4 }}>
-          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#FCA5A5" }} />
-          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#FDE68A" }} />
-          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#6EE7B7" }} />
-        </div>
-        <div style={{ flex: 1, height: 6, background: "var(--color-surface-muted)", borderRadius: 4 }} />
-      </div>
-
-      {/* Stats row */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 12 }}>
-        {[
-          { label: "Total Employers", value: "542", color: "var(--color-brand-soft)" },
-          { label: "Total Employees", value: "32,489", color: "var(--color-success-bg)" },
-          { label: "Advances This Month", value: "₹2,48,75,000", color: "var(--color-warning-bg)" },
-        ].map((s) => (
-          <div key={s.label} style={{ background: s.color, borderRadius: 10, padding: "10px 12px" }}>
-            <p style={{ fontSize: 9, color: "var(--color-ink-3)", marginBottom: 4 }}>{s.label}</p>
-            <p style={{ fontSize: 13, fontWeight: 700, color: "var(--color-ink)" }}>{s.value}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Recent activity */}
-      <div style={{ background: "var(--color-canvas)", borderRadius: 10, padding: "10px 12px" }}>
-        <p style={{ fontSize: 10, fontWeight: 600, color: "var(--color-ink)", marginBottom: 8 }}>Recent Activity</p>
-        {[
-          { name: "Rahul Sharma",  action: "Advance request submitted", time: "12 May 2025", status: "Completed", color: "var(--color-success-bg)", text: "var(--color-success)" },
-          { name: "Priya Nair",    action: "KYC verification approved",  time: "12 May 2025", status: "Approved",  color: "var(--color-success-bg)", text: "var(--color-success)" },
-          { name: "Arjun Verma",   action: "Advance disbursed",          time: "11 May 2025", status: "Completed", color: "var(--color-success-bg)", text: "var(--color-success)" },
-          { name: "Sneha Iyer",    action: "Repayment received",         time: "11 May 2025", status: "Completed", color: "var(--color-success-bg)", text: "var(--color-success)" },
-        ].map((r) => (
-          <div key={r.name} style={{ display: "flex", alignItems: "center", gap: 8, paddingBottom: 7, marginBottom: 7, borderBottom: "1px solid #E5E7EB" }}>
-            <div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg, #8B7CFF, #315eff)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, color: "white", fontWeight: 700, flexShrink: 0 }}>
-              {r.name[0]}
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontSize: 9, fontWeight: 600, color: "var(--color-ink)", lineHeight: 1.2 }}>{r.name}</p>
-              <p style={{ fontSize: 8, color: "var(--color-ink-3)", lineHeight: 1.2 }}>{r.action}</p>
-            </div>
-            <div>
-              <p style={{ fontSize: 8, color: "var(--color-ink-4)", marginBottom: 2, textAlign: "right" }}>{r.time}</p>
-              <span style={{ fontSize: 8, fontWeight: 600, background: r.color, color: r.text, padding: "1px 6px", borderRadius: 999 }}>{r.status}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export default function LoginPage() {
   const [showPass, setShowPass]  = useState(false);
   const [email,    setEmail]     = useState("");
   const [password, setPassword]  = useState("");
   const [remember, setRemember]  = useState(false);
   const [loading,  setLoading]   = useState(false);
-  const [error,    setError]     = useState("");
+  const [error,    setError]     = useState(() => {
+    if (sessionStorage.getItem("mobpae_session_expired")) {
+      sessionStorage.removeItem("mobpae_session_expired");
+      return "Your session has expired. Please sign in again.";
+    }
+    return "";
+  });
   const loginAttempted = useRef(false);
   const navigate = useNavigate();
 
   useEffect(() => { if (getToken()) navigate("/"); }, [navigate]);
-
-  useEffect(() => {
-    if (sessionStorage.getItem("mobpae_session_expired")) {
-      sessionStorage.removeItem("mobpae_session_expired");
-      setError("Your session has expired. Please sign in again.");
-    }
-  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -146,7 +81,7 @@ export default function LoginPage() {
                 </label>
                 <div style={{
                   display: "flex", alignItems: "center", gap: 10,
-                  background: "white", border: "1.5px solid #E5E7EB", borderRadius: 12, padding: "11px 14px",
+                  background: "white", border: "1.5px solid var(--color-edge)", borderRadius: 12, padding: "11px 14px",
                   transition: "border-color 0.15s",
                 }}>
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--color-ink-disabled)" strokeWidth="2" strokeLinecap="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
@@ -167,7 +102,7 @@ export default function LoginPage() {
                 </label>
                 <div style={{
                   display: "flex", alignItems: "center", gap: 10,
-                  background: "white", border: "1.5px solid #E5E7EB", borderRadius: 12, padding: "11px 14px",
+                  background: "white", border: "1.5px solid var(--color-edge)", borderRadius: 12, padding: "11px 14px",
                   transition: "border-color 0.15s",
                 }}>
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--color-ink-disabled)" strokeWidth="2" strokeLinecap="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -236,36 +171,6 @@ export default function LoginPage() {
                   <>Sign in <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></>
                 )}
               </button>
-
-              {/* Divider */}
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ flex: 1, height: 1, background: "var(--color-edge)" }} />
-                <span style={{ fontSize: 12, color: "var(--color-ink-4)" }}>or continue with</span>
-                <div style={{ flex: 1, height: 1, background: "var(--color-edge)" }} />
-              </div>
-
-              {/* Google button */}
-              <button
-                type="button"
-                style={{
-                  width: "100%", height: 46,
-                  background: "white", border: "1.5px solid #E5E7EB", borderRadius: 12,
-                  fontSize: 14, fontWeight: 500, color: "var(--color-ink)",
-                  display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-                  cursor: "pointer", transition: "border-color 0.15s", fontFamily: "inherit",
-                }}
-                onMouseEnter={e => { (e.currentTarget).style.borderColor = "var(--color-ink-disabled)"; }}
-                onMouseLeave={e => { (e.currentTarget).style.borderColor = "var(--color-edge)"; }}
-              >
-                {/* Google G */}
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                  <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                  <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                </svg>
-                Continue with Google
-              </button>
             </form>
 
             {/* Trust note */}
@@ -313,8 +218,17 @@ export default function LoginPage() {
             All your employee advances, managed in one place.
           </p>
 
-          {/* Dashboard preview card */}
-          <DashboardPreview />
+          {/* Trust badge */}
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: 10,
+            background: "rgba(255,255,255,0.10)", border: "1px solid rgba(255,255,255,0.18)",
+            borderRadius: 999, padding: "10px 20px",
+          }}>
+            <ShieldCheck size={16} color="white" />
+            <span style={{ fontSize: 13, fontWeight: 500, color: "white" }}>
+              Bank-grade encryption, role-gated access
+            </span>
+          </div>
         </div>
       </div>
     </div>

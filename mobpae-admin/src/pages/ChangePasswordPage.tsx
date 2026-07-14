@@ -88,7 +88,7 @@ export default function ChangePasswordPage() {
           Back to login
         </button>
 
-        <div style={{ background: "white", borderRadius: 24, padding: "40px 40px 36px", boxShadow: "0 2px 8px rgba(17,24,39,0.06), 0 0 0 1px #E5E7EB" }}>
+        <div style={{ background: "white", borderRadius: 24, padding: "40px 40px 36px", boxShadow: "0 2px 8px rgba(17,24,39,0.06), 0 0 0 1px var(--color-edge)" }}>
 
           {/* Icon + heading */}
           <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 28 }}>
@@ -168,7 +168,7 @@ export default function ChangePasswordPage() {
                   width: "100%", height: 48,
                   background: (loading || !current || !next || !confirm)
                     ? "var(--color-edge)"
-                    : `linear-gradient(135deg, #2048EE 0%, ${P} 100%)`,
+                    : `linear-gradient(135deg, var(--color-info) 0%, ${P} 100%)`,
                   color: (loading || !current || !next || !confirm) ? "var(--color-ink-4)" : "white",
                   borderRadius: 12, border: "none",
                   fontSize: 14, fontWeight: 600,
@@ -189,7 +189,7 @@ export default function ChangePasswordPage() {
               </button>
 
               {/* Security note */}
-              <div style={{ display: "flex", alignItems: "center", gap: 10, paddingTop: 12, borderTop: "1px solid #F3F4F6" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, paddingTop: 12, borderTop: "1px solid var(--color-edge-2)" }}>
                 <div style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--color-brand-soft)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                   <Shield size={14} style={{ color: P }} />
                 </div>
@@ -222,11 +222,9 @@ function Field({
       <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "var(--color-ink-2)", marginBottom: 6 }}>{label}</label>
       <div style={{
         display: "flex", alignItems: "center", gap: 10,
-        background: "white", border: "1.5px solid #E5E7EB", borderRadius: 12, padding: "11px 14px",
+        background: "white", border: "1.5px solid var(--color-edge)", borderRadius: 12, padding: "11px 14px",
         transition: "border-color 0.15s, box-shadow 0.15s",
-      }}
-        onFocus={() => {}} // handled on input
-      >
+      }}>
         <Lock size={14} style={{ color: "var(--color-ink-disabled)", flexShrink: 0 }} />
         <input
           type={show ? "text" : "password"}

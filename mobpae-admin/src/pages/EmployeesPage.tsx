@@ -6,6 +6,7 @@ import type { Employee, EmploymentStatus } from "../types/employee";
 import EmployeesTable from "../components/employees/EmployeesTable";
 import EmployeeDrawer from "../components/employees/EmployeeDrawer";
 import { exportToCsv } from "../utils/exportCsv";
+import { useDebouncedValue } from "../hooks/useDebouncedValue";
 
 const P = "var(--color-brand)";
 
@@ -16,6 +17,7 @@ export default function EmployeesPage() {
   });
 
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebouncedValue(search, 200);
   const [statusFilter, setStatusFilter] = useState<"ALL" | EmploymentStatus>("ALL");
   const [employerFilter, setEmployerFilter] = useState("ALL");
   const [selected, setSelected] = useState<Employee | null>(null);
@@ -23,7 +25,7 @@ export default function EmployeesPage() {
   const employers = [...new Map(employees.map((e) => [e.employer.id, e.employer])).values()];
 
   const filtered = employees.filter((e) => {
-    const q = search.toLowerCase();
+    const q = debouncedSearch.toLowerCase();
     const matchSearch = !q || e.name.toLowerCase().includes(q) || e.email.toLowerCase().includes(q) || e.employeeCode.toLowerCase().includes(q);
     const matchStatus = statusFilter === "ALL" || e.employmentStatus === statusFilter;
     const matchEmployer = employerFilter === "ALL" || e.employer.id === employerFilter;

@@ -1,5 +1,5 @@
 import { useEscKey } from "../../lib/useEscKey";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Building2, Loader2, X } from "lucide-react";
@@ -44,7 +44,9 @@ export default function CreateEmployerDrawer({ open, onClose, prefill }: Props) 
   const [payrollCutoffErr, setPayrollCutoffErr]     = useState<string | null>(null);
 
   // Re-populate form whenever the drawer opens (with or without prefill)
-  useEffect(() => {
+  const [wasOpen, setWasOpen] = useState(open);
+  if (open !== wasOpen) {
+    setWasOpen(open);
     if (open) {
       setForm({
         companyName:      prefill?.companyName   ?? "",
@@ -58,7 +60,7 @@ export default function CreateEmployerDrawer({ open, onClose, prefill }: Props) 
       setPayrollDateErr(null);
       setPayrollCutoffErr(null);
     }
-  }, [open, prefill]);
+  }
 
   const mutation = useMutation({
     mutationFn: createEmployer,

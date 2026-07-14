@@ -7,6 +7,7 @@ import type { LoanApplication, LoanApplicationStatus } from "../types/loan-appli
 import LoanApplicationsTable from "../components/loan-applications/LoanApplicationsTable";
 import LoanApplicationDrawer from "../components/loan-applications/LoanApplicationDrawer";
 import { Pagination } from "../components/ui/Pagination";
+import { useDebouncedValue } from "../hooks/useDebouncedValue";
 
 const PAGE_SIZE = 15;
 
@@ -42,6 +43,7 @@ export default function LoanApplicationsPage() {
   });
 
   const [search, setSearch]               = useState("");
+  const debouncedSearch = useDebouncedValue(search, 200);
   const [statusFilter, setStatusFilter]   = useState<"ALL" | "NEEDS_ACTION" | LoanApplicationStatus>("ALL");
   const [selected, setSelected]           = useState<LoanApplication | null>(null);
   const [page, setPage]                   = useState(1);
@@ -55,7 +57,7 @@ export default function LoanApplicationsPage() {
   const needsActionCount = NEEDS_ACTION_STATUSES.reduce((sum, s) => sum + (counts[s] ?? 0), 0);
 
   const filtered = applications.filter((a) => {
-    const q = search.toLowerCase();
+    const q = debouncedSearch.toLowerCase();
     const matchSearch = !q ||
       a.employee.name.toLowerCase().includes(q) ||
       a.employee.employeeCode.toLowerCase().includes(q) ||

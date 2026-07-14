@@ -70,8 +70,8 @@ function SectionCard({ icon, color, title, children }: {
   icon: React.ReactNode; color: string; title: string; children: React.ReactNode;
 }) {
   return (
-    <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", overflow: "hidden" }}>
-      <div style={{ padding: "12px 20px", borderBottom: "1px solid #E5E7EB", display: "flex", alignItems: "center", gap: 8 }}>
+    <div style={{ background: "white", borderRadius: 20, border: "1px solid var(--color-edge)", overflow: "hidden" }}>
+      <div style={{ padding: "12px 20px", borderBottom: "1px solid var(--color-edge)", display: "flex", alignItems: "center", gap: 8 }}>
         <div style={{ width: 26, height: 26, borderRadius: 8, background: color, display: "flex", alignItems: "center", justifyContent: "center" }}>
           {icon}
         </div>
@@ -87,7 +87,7 @@ function SectionCard({ icon, color, title, children }: {
 interface ToggleRowProps { k: string; label: string; settings: SettingsRecord; onToggle: (k: string) => void; toggling: string | null; isPending: boolean; }
 function ToggleRow({ k, label, settings, onToggle, toggling, isPending }: ToggleRowProps) {
   return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", minHeight: 44, borderBottom: "1px solid #F3F4F6" }}>
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", minHeight: 44, borderBottom: "1px solid var(--color-edge-2)" }}>
       <span style={{ fontSize: 13, color: "var(--color-ink-3)" }}>{label}</span>
       <Toggle
         on={isOn(settings, k)}
@@ -112,7 +112,7 @@ function TextRow({ k, label, suffix, placeholder, wide, settings, editing, setEd
   const isSaving = isPending && pendingKey === k;
 
   return (
-    <div style={{ display: "flex", alignItems: wide ? "flex-start" : "center", justifyContent: "space-between", padding: "12px 20px", minHeight: 44, borderBottom: "1px solid #F3F4F6", gap: 12 }}>
+    <div style={{ display: "flex", alignItems: wide ? "flex-start" : "center", justifyContent: "space-between", padding: "12px 20px", minHeight: 44, borderBottom: "1px solid var(--color-edge-2)", gap: 12 }}>
       <span style={{ fontSize: 13, color: "var(--color-ink-3)", flexShrink: 0, paddingTop: wide ? 2 : 0 }}>{label}</span>
       <div style={{ display: "flex", alignItems: "flex-start", gap: 6, flex: 1, justifyContent: "flex-end" }}>
         {isEditingThis ? (
@@ -124,7 +124,7 @@ function TextRow({ k, label, suffix, placeholder, wide, settings, editing, setEd
                   value={editing!.value}
                   onChange={e => setEditing({ key: k, value: e.target.value })}
                   rows={3}
-                  style={{ width: "100%", padding: "6px 10px", fontSize: 12, fontWeight: 500, color: "var(--color-ink)", border: "1px solid #315eff", borderRadius: 8, outline: "none", resize: "vertical", fontFamily: "inherit" }}
+                  style={{ width: "100%", padding: "6px 10px", fontSize: 12, fontWeight: 500, color: "var(--color-ink)", border: "1px solid var(--color-brand)", borderRadius: 8, outline: "none", resize: "vertical", fontFamily: "inherit" }}
                 />
               ) : (
                 <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
@@ -138,7 +138,7 @@ function TextRow({ k, label, suffix, placeholder, wide, settings, editing, setEd
                       if (e.key === "Enter") onSave(editing!);
                       if (e.key === "Escape") setEditing(null);
                     }}
-                    style={{ width: 180, height: 28, padding: "0 8px", fontSize: 12, fontWeight: 500, color: "var(--color-ink)", border: "1px solid #315eff", borderRadius: 8, outline: "none", fontFamily: "inherit" }}
+                    style={{ width: 180, height: 28, padding: "0 8px", fontSize: 12, fontWeight: 500, color: "var(--color-ink)", border: "1px solid var(--color-brand)", borderRadius: 8, outline: "none", fontFamily: "inherit" }}
                   />
                   {suffix && <span style={{ fontSize: 12, color: "var(--color-ink-3)", flexShrink: 0 }}>{suffix}</span>}
                 </div>
@@ -153,7 +153,7 @@ function TextRow({ k, label, suffix, placeholder, wide, settings, editing, setEd
                 </button>
                 <button
                   onClick={() => setEditing(null)}
-                  style={{ width: 24, height: 24, borderRadius: 6, background: "white", border: "1px solid #E5E7EB", color: "var(--color-ink-3)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+                  style={{ width: 24, height: 24, borderRadius: 6, background: "white", border: "1px solid var(--color-edge)", color: "var(--color-ink-3)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
                 >
                   <X size={10} />
                 </button>
@@ -185,7 +185,7 @@ export default function SettingsPage() {
   const [editing,  setEditing]  = useState<EditState | null>(null);
   const [toggling, setToggling] = useState<string | null>(null);
 
-  const { data: settings = {}, isLoading } = useQuery<SettingsRecord>({
+  const { data: settings = {}, isLoading, isError, refetch } = useQuery<SettingsRecord>({
     queryKey: ["settings"],
     queryFn: getSettings,
   });
@@ -217,10 +217,43 @@ export default function SettingsPage() {
     pendingKey: saveMutation.variables?.key,
   };
 
+  if (isError) {
+    return (
+      <div style={{ padding: "28px 32px" }}>
+        <div style={{ background: "var(--color-danger-soft)", border: "1px solid #FECACA", borderRadius: 12, padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, color: "var(--color-danger)" }}>
+          <span>Failed to load settings.</span>
+          <button onClick={() => void refetch()} style={{ padding: "6px 12px", background: "white", border: "1px solid #FECACA", borderRadius: 8, fontSize: 12, fontWeight: 600, color: "var(--color-danger)", cursor: "pointer", fontFamily: "inherit" }}>Retry</button>
+        </div>
+      </div>
+    );
+  }
+
   if (isLoading) {
     return (
       <div style={{ padding: "28px 32px" }}>
-        <p style={{ fontSize: 13, color: "var(--color-ink-3)" }}>Loading settings…</p>
+        <div style={{ marginBottom: 28 }}>
+          <div style={{ height: 24, width: 200, background: "var(--color-surface-muted)", borderRadius: 4, marginBottom: 8 }} className="animate-pulse" />
+          <div style={{ height: 14, width: 340, background: "var(--color-surface-muted)", borderRadius: 4 }} className="animate-pulse" />
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+          {[0, 1].map(col => (
+            <div key={col} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+              {[0, 1].map(card => (
+                <div key={card} style={{ background: "white", borderRadius: 20, border: "1px solid var(--color-edge)", overflow: "hidden" }}>
+                  <div style={{ padding: "12px 20px", borderBottom: "1px solid var(--color-edge)" }}>
+                    <div style={{ height: 14, width: 100, background: "var(--color-surface-muted)", borderRadius: 4 }} className="animate-pulse" />
+                  </div>
+                  {[0, 1].map(row => (
+                    <div key={row} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", minHeight: 44, borderBottom: "1px solid var(--color-edge-2)" }}>
+                      <div style={{ height: 12, width: 140, background: "var(--color-surface-muted)", borderRadius: 4 }} className="animate-pulse" />
+                      <div style={{ height: 12, width: 60, background: "var(--color-surface-muted)", borderRadius: 4 }} className="animate-pulse" />
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

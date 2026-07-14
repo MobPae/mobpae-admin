@@ -30,17 +30,23 @@ export async function getLoanApplications(filters?: LoanApplicationFilters): Pro
   if (filters?.startDate)  params.startDate  = filters.startDate;
   if (filters?.endDate)    params.endDate    = filters.endDate;
 
-  const r1 = await api.get("/loan-applications", { params });
-  const page1 = unwrapList<LoanApplication>(r1.data);
+  const all: LoanApplication[] = [];
+  let page = 1;
 
-  if (page1.length < PAGE_LIMIT) return page1;
+  while (true) {
+    const response = await api.get("/loan-applications", { params: { ...params, page: String(page) } });
+    const batch = unwrapList<LoanApplication>(response.data);
+    all.push(...batch);
 
-  const raw = r1.data as Record<string, unknown>;
-  const total = typeof raw?.total === "number" ? raw.total : null;
-  if (total !== null && total <= PAGE_LIMIT) return page1;
+    const raw = response.data as Record<string, unknown>;
+    const total = typeof raw?.total === "number" ? raw.total : null;
 
-  const r2 = await api.get("/loan-applications", { params: { ...params, page: "2" } });
-  return [...page1, ...unwrapList<LoanApplication>(r2.data)];
+    if (batch.length < PAGE_LIMIT) break;
+    if (total !== null && all.length >= total) break;
+    page += 1;
+  }
+
+  return all;
 }
 
 export async function getLoanApplication(id: string): Promise<LoanApplication> {

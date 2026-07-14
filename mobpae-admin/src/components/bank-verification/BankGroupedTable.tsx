@@ -1,20 +1,11 @@
 import type { BankEmployerGroup } from "../../types/bankAccount";
+import { avatarColor } from "../../utils/avatarColor";
 
 interface Props {
   groups: BankEmployerGroup[];
   selectedId: string | null;
   onSelect: (g: BankEmployerGroup) => void;
 }
-
-const AVATAR_COLORS: Record<string, string> = {
-  A:"bg-rose-500", B:"bg-pink-500", C:"bg-fuchsia-500", D:"bg-brand",
-  E:"bg-indigo-500", F:"bg-violet-500", G:"bg-purple-500", H:"bg-sky-500",
-  I:"bg-cyan-500", J:"bg-brand", K:"bg-brand", L:"bg-brand",
-  M:"bg-lime-500", N:"bg-yellow-500", O:"bg-amber-500", P:"bg-orange-500",
-  Q:"bg-danger-soft0", R:"bg-rose-600", S:"bg-pink-600", T:"bg-fuchsia-600",
-  U:"bg-brand", V:"bg-indigo-600", W:"bg-violet-600", X:"bg-brand",
-  Y:"bg-sky-600", Z:"bg-cyan-600",
-};
 
 export default function BankGroupedTable({ groups, selectedId, onSelect }: Props) {
   return (
@@ -40,7 +31,7 @@ export default function BankGroupedTable({ groups, selectedId, onSelect }: Props
         <tbody className="divide-y divide-edge-2">
           {groups.map(g => {
             const first = g.companyName.charAt(0).toUpperCase();
-            const av    = AVATAR_COLORS[first] ?? "bg-brand";
+            const av    = avatarColor(g.companyName);
             const sel   = selectedId === g.employerId;
             const pct   = g.totalAccounts > 0 ? Math.round((g.verifiedCount / g.totalAccounts) * 100) : 0;
 
@@ -53,7 +44,7 @@ export default function BankGroupedTable({ groups, selectedId, onSelect }: Props
                 {/* Employer */}
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <div className={`w-7 h-7 rounded-lg ${av} text-white flex-shrink-0 flex items-center justify-center text-[11px] font-[600]`}>
+                    <div className="w-7 h-7 rounded-lg text-white flex-shrink-0 flex items-center justify-center text-[11px] font-[600]" style={{ background: av }}>
                       {first}
                     </div>
                     <div className="min-w-0">

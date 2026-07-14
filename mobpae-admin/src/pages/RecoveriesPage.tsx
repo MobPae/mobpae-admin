@@ -6,12 +6,16 @@ import {
   ChevronRight,
   CircleDollarSign,
   Clock3,
+  Download,
   RefreshCcw,
   Search,
   X,
 } from "lucide-react";
 import { getRepayments } from "../services/repaymentService";
 import type { Repayment } from "../types/repayment";
+import { exportToCsv } from "../utils/exportCsv";
+import { Pagination } from "../components/ui/Pagination";
+import { useDebouncedValue } from "../hooks/useDebouncedValue";
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -29,13 +33,13 @@ const fmtDate = (s: string | null | undefined) => {
 
 // Map repayment status → display config
 const STATUS_CFG: Record<string, { label: string; bg: string; text: string; dot: string }> = {
-  SCHEDULED: { label: "Awaiting Payroll", dot: "bg-[#D97706]", text: "text-warning-dark", bg: "bg-warning-bg" },
+  SCHEDULED: { label: "Awaiting Payroll", dot: "bg-warning", text: "text-warning-dark", bg: "bg-warning-bg" },
   OVERDUE:   { label: "Overdue",          dot: "bg-red-400",   text: "text-danger",   bg: "bg-danger-soft"     },
   PAID:      { label: "Recovered",        dot: "bg-[#22C55E]", text: "text-success-dark", bg: "bg-success-bg"  },
 };
 
 function StatusPill({ status }: { status: string }) {
-  const cfg = STATUS_CFG[status] ?? { label: status, bg: "bg-surface-muted", text: "text-ink-3", dot: "bg-[#D1D5DB]" };
+  const cfg = STATUS_CFG[status] ?? { label: status, bg: "bg-surface-muted", text: "text-ink-3", dot: "bg-edge-strong" };
   return (
     <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-[500] ${cfg.bg} ${cfg.text}`}>
       <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
@@ -95,19 +99,23 @@ function toRecoveryRow(r: Repayment): RecoveryRow {
 
 function InfoRow({ label, value, accent }: { label: string; value: React.ReactNode; accent?: boolean }) {
   return (
-    <div className="flex items-center justify-between py-2.5 border-b border-[#F3F4F6] last:border-0">
+    <div className="flex items-center justify-between py-2.5 border-b border-edge-2 last:border-0">
       <span className="text-[12px] text-ink-3">{label}</span>
       <span className={`text-[12px] font-[500] ${accent ? "text-danger" : "text-ink"}`}>{value}</span>
     </div>
   );
 }
 
+const PAGE_SIZE = 15;
+
 // ── page ──────────────────────────────────────────────────────────────────────
 
 export default function RecoveriesPage() {
   const [search,   setSearch]   = useState("");
+  const debouncedSearch = useDebouncedValue(search, 200);
   const [filter,   setFilter]   = useState<FilterValue>("ALL");
   const [selected, setSelected] = useState<RecoveryRow | null>(null);
+  const [page,     setPage]     = useState(1);
 
   const { data: repayments = [], isLoading, isError, refetch } = useQuery({
     queryKey: ["repayments"],
@@ -141,7 +149,7 @@ export default function RecoveriesPage() {
 
   const rows = useMemo(() =>
     allRows.filter(r => {
-      const q = search.toLowerCase();
+      const q = debouncedSearch.toLowerCase();
       const matchSearch = !q ||
         r.employeeName.toLowerCase().includes(q) ||
         r.employeeCode.toLowerCase().includes(q) ||
@@ -150,15 +158,37 @@ export default function RecoveriesPage() {
       if (filter === "ALL") return matchSearch;
       return matchSearch && r.status === filter;
     }),
-    [allRows, search, filter]
+    [allRows, debouncedSearch, filter]
   );
+
+  const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  const safePage    = Math.min(page, totalPages);
+  const paginated   = rows.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   return (
     <div className="px-8 py-6 space-y-5">
       {/* Header */}
-      <div>
-        <h1 className="text-[22px] font-[600] text-ink tracking-[-0.01em]">Recoveries</h1>
-        <p className="text-[13px] text-ink-3 mt-0.5">Salary advance recoveries derived from disbursed requests</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-[22px] font-[600] text-ink tracking-[-0.01em]">Recoveries</h1>
+          <p className="text-[13px] text-ink-3 mt-0.5">Salary advance recoveries derived from disbursed requests</p>
+        </div>
+        <button
+          onClick={() => exportToCsv(rows.map(r => ({
+            Employee: r.employeeName,
+            Code: r.employeeCode,
+            Employer: r.companyName,
+            Principal: r.principalAmount,
+            Interest: r.interestAmount,
+            "Total Recovery": r.totalRecoveryAmount,
+            "Recovery Date": r.recoveryDate ?? "",
+            Status: r.status,
+          })), "recoveries")}
+          className="h-9 px-4 flex items-center gap-2 bg-white border border-edge rounded-xl text-[13px] font-[500] text-ink-2 hover:bg-surface-raised transition-colors"
+        >
+          <Download size={14} />
+          Export
+        </button>
       </div>
 
       {/* Stat cards */}
@@ -197,18 +227,18 @@ export default function RecoveriesPage() {
             type="text"
             placeholder="Search employee, code, employer…"
             value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="h-8 pl-8 pr-4 text-[12px] bg-white border border-edge rounded-lg outline-none focus:border-brand w-64 text-ink-3 placeholder-[#D1D5DB]"
+            onChange={e => { setSearch(e.target.value); setPage(1); }}
+            className="h-8 pl-8 pr-4 text-[12px] bg-white border border-edge rounded-lg outline-none focus:border-brand w-64 text-ink-3 placeholder-edge-strong"
           />
         </div>
         <div className="flex items-center gap-1.5 flex-wrap">
           {FILTERS.map(f => (
             <button
               key={f.value}
-              onClick={() => setFilter(f.value)}
+              onClick={() => { setFilter(f.value); setPage(1); }}
               className={`h-7 px-3 rounded-full text-[12px] font-[500] transition-colors flex items-center gap-1.5 ${
                 filter === f.value
-                  ? "bg-[#111827] text-white"
+                  ? "bg-ink text-white"
                   : "bg-white border border-edge text-ink-3 hover:border-edge"
               }`}
             >
@@ -222,7 +252,7 @@ export default function RecoveriesPage() {
       </div>
 
       {/* Table */}
-      <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", overflow: "hidden" }}>
+      <div style={{ background: "white", borderRadius: 20, border: "1px solid var(--color-edge)", overflow: "hidden" }}>
         {isError ? (
           <div className="px-6 py-14 text-center">
             <p className="text-[13px] font-[500] text-danger">Failed to load recoveries</p>
@@ -234,7 +264,7 @@ export default function RecoveriesPage() {
         ) : isLoading ? (
           <div>
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="flex items-center gap-4 px-5 py-3.5 border-b border-[#F3F4F6] last:border-0">
+              <div key={i} className="flex items-center gap-4 px-5 py-3.5 border-b border-edge-2 last:border-0">
                 <div className="w-7 h-7 rounded-lg bg-surface-muted animate-pulse flex-shrink-0" />
                 <div className="flex-1 space-y-1.5">
                   <div className="h-2.5 w-28 bg-surface-muted rounded animate-pulse" />
@@ -266,7 +296,7 @@ export default function RecoveriesPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-edge-2">
-                {rows.map(r => (
+                {paginated.map(r => (
                   <tr
                     key={r.loanApplicationId}
                     onClick={() => setSelected(r)}
@@ -300,6 +330,10 @@ export default function RecoveriesPage() {
           </div>
         )}
       </div>
+
+      {!isError && !isLoading && rows.length > 0 && (
+        <Pagination page={safePage} totalPages={totalPages} total={rows.length} limit={PAGE_SIZE} onPage={setPage} />
+      )}
 
       {/* Drawer */}
       {selected && (

@@ -1,5 +1,5 @@
 import { useEscKey } from "../../lib/useEscKey";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { X, Ban, CheckCircle2, Loader2, RotateCcw, RefreshCw, Save } from "lucide-react";
@@ -49,9 +49,12 @@ export default function EmployerManagementDrawer({ open, onClose, onMutated, emp
   const [recoveryConfirm,   setRecoveryConfirm]   = useState(false);
   const [overrideInput,     setOverrideInput]     = useState<string>("");
 
-  useEffect(() => {
+  const resetSignature = open ? (employer?.id ?? null) : null;
+  const [prevResetSignature, setPrevResetSignature] = useState(resetSignature);
+  if (resetSignature !== prevResetSignature) {
+    setPrevResetSignature(resetSignature);
     if (open) { setSuspendConfirm(false); setRecoveryConfirm(false); }
-  }, [open, employer?.id]);
+  }
 
   const { data: recentRequests = [], isLoading: reqLoading } = useQuery<LoanApplication[]>({
     queryKey: ["loan-applications-employer", employer?.id],

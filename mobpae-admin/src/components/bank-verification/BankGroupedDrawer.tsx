@@ -1,7 +1,8 @@
+import { useState } from "react";
 import { useEscKey } from "../../lib/useEscKey";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { X, Loader2, CreditCard, XCircle } from "lucide-react";
+import { X, Loader2, CreditCard, XCircle, Eye, EyeOff } from "lucide-react";
 import { getApiErrorMessage } from "../../utils/api-errors";
 import {
   verifyBankAccount,
@@ -9,6 +10,7 @@ import {
   getBankAccountsByEmployer,
 } from "../../services/bankVerificationService";
 import type { BankAccount, BankEmployerGroup } from "../../types/bankAccount";
+import { avatarColor } from "../../utils/avatarColor";
 
 interface Props {
   open: boolean;
@@ -17,15 +19,10 @@ interface Props {
   onClose: () => void;
 }
 
-const AVATAR_COLORS: Record<string, string> = {
-  A:"bg-rose-500", B:"bg-pink-500", C:"bg-fuchsia-500", D:"bg-brand",
-  E:"bg-indigo-500", F:"bg-violet-500", G:"bg-purple-500", H:"bg-sky-500",
-  I:"bg-cyan-500", J:"bg-brand", K:"bg-brand", L:"bg-brand",
-  M:"bg-lime-500", N:"bg-yellow-500", O:"bg-amber-500", P:"bg-orange-500",
-  Q:"bg-danger-soft0", R:"bg-rose-600", S:"bg-pink-600", T:"bg-fuchsia-600",
-  U:"bg-brand", V:"bg-indigo-600", W:"bg-violet-600", X:"bg-brand",
-  Y:"bg-sky-600", Z:"bg-cyan-600",
-};
+function maskAccountNumber(num: string): string {
+  if (num.length <= 4) return num;
+  return "•".repeat(num.length - 4) + num.slice(-4);
+}
 
 function AccountRow({
   account,
@@ -72,15 +69,16 @@ function AccountRow({
     },
   });
 
+  const [revealAccount, setRevealAccount] = useState(false);
   const first = account.employee.name.charAt(0).toUpperCase();
-  const av    = AVATAR_COLORS[first] ?? "bg-brand";
+  const av    = avatarColor(account.employee.name);
 
   return (
     <div className={`border rounded-xl overflow-hidden ${account.verified ? "border-edge" : "border-edge"}`}>
       {/* Employee header */}
       <div className="flex items-center justify-between px-4 py-3 bg-canvas/60 border-b border-edge">
         <div className="flex items-center gap-2">
-          <div className={`w-6 h-6 rounded-lg ${av} text-white flex-shrink-0 flex items-center justify-center text-[11px] font-[600]`}>
+          <div className="w-6 h-6 rounded-lg text-white flex-shrink-0 flex items-center justify-center text-[11px] font-[600]" style={{ background: av }}>
             {first}
           </div>
           <div>
@@ -106,7 +104,24 @@ function AccountRow({
         {[
           { k: "Holder",  v: account.accountHolderName },
           { k: "Bank",    v: account.bankName ?? "—" },
-          { k: "Account", v: <span className="font-mono">{account.accountNumber}</span> },
+          {
+            k: "Account",
+            v: (
+              <span className="inline-flex items-center gap-1.5">
+                <span className="font-mono">
+                  {revealAccount ? account.accountNumber : maskAccountNumber(account.accountNumber)}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setRevealAccount(v => !v)}
+                  className="text-ink-4 hover:text-ink-2 transition-colors"
+                  title={revealAccount ? "Hide account number" : "Reveal account number"}
+                >
+                  {revealAccount ? <EyeOff size={11} /> : <Eye size={11} />}
+                </button>
+              </span>
+            ),
+          },
           { k: "IFSC",    v: <span className="font-mono">{account.ifscCode}</span> },
           ...(account.upiId ? [{ k: "UPI ID", v: account.upiId }] : []),
           { k: "Added",   v: new Date(account.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) },
@@ -157,7 +172,7 @@ export default function BankGroupedDrawer({ open, group, queryKey, onClose }: Pr
   if (!open || !group) return null;
 
   const first = group.companyName.charAt(0).toUpperCase();
-  const av    = AVATAR_COLORS[first] ?? "bg-brand";
+  const av    = avatarColor(group.companyName);
 
   // Prefer fresh drill-down data; fall back to pre-loaded group.accounts
   const rawAccounts: BankAccount[] =
@@ -177,7 +192,7 @@ export default function BankGroupedDrawer({ open, group, queryKey, onClose }: Pr
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-edge flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className={`w-8 h-8 rounded-lg ${av} text-white flex items-center justify-center text-[12px] font-[600]`}>
+            <div className="w-8 h-8 rounded-lg text-white flex items-center justify-center text-[12px] font-[600]" style={{ background: av }}>
               {first}
             </div>
             <div>
@@ -210,10 +225,10 @@ export default function BankGroupedDrawer({ open, group, queryKey, onClose }: Pr
               <div key={i} className="border border-edge rounded-xl overflow-hidden">
                 <div className="flex items-center justify-between px-4 py-3 bg-canvas border-b border-edge">
                   <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-lg bg-[#E5E7EB] animate-pulse" />
-                    <div className="h-2.5 w-28 bg-[#E5E7EB] rounded animate-pulse" />
+                    <div className="w-6 h-6 rounded-lg bg-edge animate-pulse" />
+                    <div className="h-2.5 w-28 bg-edge rounded animate-pulse" />
                   </div>
-                  <div className="h-4 w-14 bg-[#E5E7EB] rounded-full animate-pulse" />
+                  <div className="h-4 w-14 bg-edge rounded-full animate-pulse" />
                 </div>
                 <div className="px-4 py-3 space-y-2.5">
                   {[...Array(4)].map((_, j) => (

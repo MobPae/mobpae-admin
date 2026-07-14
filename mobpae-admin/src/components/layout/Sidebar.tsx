@@ -22,7 +22,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useState } from "react";
-import { getTokenName, removeToken } from "../../utils/auth";
+import { getRoleLabel, getTokenName, removeToken } from "../../utils/auth";
 import { ConfirmModal } from "../ui/ConfirmModal";
 
 interface NavItem { label: string; icon: LucideIcon; to: string; }
@@ -137,7 +137,7 @@ export default function Sidebar() {
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-[13px] font-semibold leading-none text-ink">{adminName}</p>
-            <p className="mt-0.5 text-2xs text-ink-4">Super Admin</p>
+            <p className="mt-0.5 text-2xs text-ink-4">{getRoleLabel()}</p>
           </div>
           <div className="flex items-center gap-0.5">
             <button

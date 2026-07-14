@@ -1,11 +1,16 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Search, CreditCard, Clock, CheckCircle, XCircle, Calendar, X } from "lucide-react";
+import { Search, CreditCard, Clock, CheckCircle, XCircle, Calendar, X, Download } from "lucide-react";
 import { getDisbursals } from "../services/disbursalService";
 import DisbursalsTable from "../components/disbursals/DisbursalsTable";
 import DisbursalDrawer from "../components/disbursals/DisbursalDrawer";
 import type { DisbursalStatus } from "../types/disbursal";
 import type { Disbursal } from "../types/disbursal";
+import { exportToCsv } from "../utils/exportCsv";
+import { Pagination } from "../components/ui/Pagination";
+import { useDebouncedValue } from "../hooks/useDebouncedValue";
+
+const PAGE_SIZE = 15;
 
 type FilterStatus = "ALL" | DisbursalStatus;
 
@@ -20,10 +25,12 @@ const STATUS_TABS: { key: FilterStatus; label: string }[] = [
 export default function DisbursalsPage() {
   const qc = useQueryClient();
   const [search,   setSearch]   = useState("");
+  const debouncedSearch = useDebouncedValue(search, 200);
   const [filter,   setFilter]   = useState<FilterStatus>("ALL");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo,   setDateTo]   = useState("");
   const [selected, setSelected] = useState<Disbursal | null>(null);
+  const [page,     setPage]     = useState(1);
 
   const serverFilters = {
     ...(filter !== "ALL" ? { status: filter as DisbursalStatus } : {}),
@@ -43,7 +50,7 @@ export default function DisbursalsPage() {
   const total      = data.length;
 
   const rows = data.filter(d => {
-    const q = search.toLowerCase();
+    const q = debouncedSearch.toLowerCase();
     return (
       !q ||
       d.loanApplication.employee.name.toLowerCase().includes(q) ||
@@ -53,6 +60,10 @@ export default function DisbursalsPage() {
   });
 
   const counts: Record<FilterStatus, number> = { ALL: total, PENDING: pending, PROCESSING: processing, SUCCESS: succeeded, FAILED: failed, CANCELLED: 0 };
+
+  const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  const safePage    = Math.min(page, totalPages);
+  const paginated   = rows.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   const kpis = [
     { icon: <Clock size={18} color="var(--color-warning)" strokeWidth={1.75} />,       iconBg: "var(--color-warning-bg)", label: "Pending",    val: pending    },
@@ -65,22 +76,38 @@ export default function DisbursalsPage() {
     <div style={{ padding: "28px 32px", fontFamily: "Inter, ui-sans-serif, sans-serif" }}>
 
       {/* ── Header ──────────────────────────── */}
-      <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: 26, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.025em", margin: 0 }}>Disbursals</h1>
-        <p style={{ fontSize: 14, color: "var(--color-ink-3)", marginTop: 6 }}>Track and manage salary disbursals.</p>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28 }}>
+        <div>
+          <h1 style={{ fontSize: 26, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.025em", margin: 0 }}>Disbursals</h1>
+          <p style={{ fontSize: 14, color: "var(--color-ink-3)", marginTop: 6 }}>Track and manage salary disbursals.</p>
+        </div>
+        <button
+          onClick={() => exportToCsv(rows.map(d => ({
+            Employee: d.loanApplication.employee.name,
+            Code: d.loanApplication.employee.employeeCode,
+            Employer: d.loanApplication.employee.employer.companyName,
+            Amount: d.disbursedAmount,
+            Status: d.status,
+            Date: d.createdAt ? new Date(d.createdAt).toLocaleDateString() : "",
+          })), "disbursals")}
+          style={{ height: 40, padding: "0 16px", display: "flex", alignItems: "center", gap: 8, background: "white", border: "1px solid var(--color-edge)", borderRadius: 12, fontSize: 13, fontWeight: 500, color: "var(--color-ink-2)", cursor: "pointer", fontFamily: "inherit" }}
+        >
+          <Download size={14} />
+          Export
+        </button>
       </div>
 
       {isError && (
-        <div style={{ background: "var(--color-danger-soft)", border: "1px solid #FECACA", borderRadius: 12, padding: "12px 16px", marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, color: "var(--color-danger)" }}>
+        <div style={{ background: "var(--color-danger-soft)", border: "1px solid var(--color-danger-bg)", borderRadius: 12, padding: "12px 16px", marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, color: "var(--color-danger)" }}>
           <span>Failed to load disbursals.</span>
-          <button onClick={() => void refetch()} style={{ padding: "6px 12px", background: "white", border: "1px solid #FECACA", borderRadius: 8, fontSize: 12, fontWeight: 600, color: "var(--color-danger)", cursor: "pointer", fontFamily: "inherit" }}>Retry</button>
+          <button onClick={() => void refetch()} style={{ padding: "6px 12px", background: "white", border: "1px solid var(--color-danger-bg)", borderRadius: 8, fontSize: 12, fontWeight: 600, color: "var(--color-danger)", cursor: "pointer", fontFamily: "inherit" }}>Retry</button>
         </div>
       )}
 
       {/* ── KPI cards ───────────────────────── */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 24 }}>
         {kpis.map(({ icon, iconBg, label, val }) => (
-          <div key={label} style={{ background: "white", borderRadius: 16, padding: "14px 16px", border: "1px solid #E5E7EB", boxShadow: "0 1px 4px rgba(17,24,39,0.04)", display: "flex", alignItems: "center", gap: 14 }}>
+          <div key={label} style={{ background: "white", borderRadius: 16, padding: "14px 16px", border: "1px solid var(--color-edge)", boxShadow: "0 1px 4px rgba(17,24,39,0.04)", display: "flex", alignItems: "center", gap: 14 }}>
             <div style={{ width: 40, height: 40, borderRadius: 12, background: iconBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{icon}</div>
             <div>
               <div style={{ fontSize: 22, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.02em", lineHeight: 1, opacity: isLoading ? 0.3 : 1 }}>{val}</div>
@@ -92,13 +119,13 @@ export default function DisbursalsPage() {
 
       {/* ── Filter bar ──────────────────────── */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, height: 40, padding: "0 14px", background: "white", border: "1px solid #E5E7EB", borderRadius: 12, minWidth: 240 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, height: 40, padding: "0 14px", background: "white", border: "1px solid var(--color-edge)", borderRadius: 12, minWidth: 240 }}>
           <Search size={14} style={{ color: "var(--color-ink-4)", flexShrink: 0 }} />
           <input
             type="text"
             placeholder="Search name, code, employer..."
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={e => { setSearch(e.target.value); setPage(1); }}
             style={{ flex: 1, fontSize: 13.5, color: "var(--color-ink)", background: "transparent", outline: "none", border: "none", fontFamily: "inherit" }}
           />
         </div>
@@ -108,7 +135,7 @@ export default function DisbursalsPage() {
             return (
               <button
                 key={tab.key}
-                onClick={() => setFilter(tab.key)}
+                onClick={() => { setFilter(tab.key); setPage(1); }}
                 style={{
                   height: 36, padding: "0 14px",
                   background: active ? "var(--color-ink)" : "white",
@@ -127,13 +154,13 @@ export default function DisbursalsPage() {
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <Calendar size={13} className="text-ink-4" />
-          <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)}
-            style={{ height: 36, padding: "0 10px", background: "white", border: "1px solid #E5E7EB", borderRadius: 10, fontSize: 12.5, color: "var(--color-ink-3)", outline: "none", fontFamily: "inherit" }} />
+          <input type="date" value={dateFrom} onChange={e => { setDateFrom(e.target.value); setPage(1); }}
+            style={{ height: 36, padding: "0 10px", background: "white", border: "1px solid var(--color-edge)", borderRadius: 10, fontSize: 12.5, color: "var(--color-ink-3)", outline: "none", fontFamily: "inherit" }} />
           <span style={{ fontSize: 12, color: "var(--color-ink-4)" }}>–</span>
-          <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)}
-            style={{ height: 36, padding: "0 10px", background: "white", border: "1px solid #E5E7EB", borderRadius: 10, fontSize: 12.5, color: "var(--color-ink-3)", outline: "none", fontFamily: "inherit" }} />
+          <input type="date" value={dateTo} onChange={e => { setDateTo(e.target.value); setPage(1); }}
+            style={{ height: 36, padding: "0 10px", background: "white", border: "1px solid var(--color-edge)", borderRadius: 10, fontSize: 12.5, color: "var(--color-ink-3)", outline: "none", fontFamily: "inherit" }} />
           {(dateFrom || dateTo) && (
-            <button onClick={() => { setDateFrom(""); setDateTo(""); }}
+            <button onClick={() => { setDateFrom(""); setDateTo(""); setPage(1); }}
               style={{ width: 24, height: 24, borderRadius: "50%", background: "var(--color-surface-muted)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--color-ink-3)" }}>
               <X size={10} />
             </button>
@@ -145,9 +172,9 @@ export default function DisbursalsPage() {
 
       {/* ── Table ───────────────────────────── */}
       {isLoading ? (
-        <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", overflow: "hidden" }}>
+        <div style={{ background: "white", borderRadius: 20, border: "1px solid var(--color-edge)", overflow: "hidden" }}>
           {[...Array(6)].map((_, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 16, padding: "18px 24px", borderBottom: "1px solid #F9FAFB" }}>
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 16, padding: "18px 24px", borderBottom: "1px solid var(--color-canvas)" }}>
               <div style={{ width: 38, height: 38, borderRadius: 10, background: "var(--color-surface-muted)", flexShrink: 0 }} className="animate-pulse" />
               <div style={{ flex: 1 }}>
                 <div style={{ height: 12, background: "var(--color-surface-muted)", borderRadius: 4, width: 140, marginBottom: 6 }} className="animate-pulse" />
@@ -158,7 +185,7 @@ export default function DisbursalsPage() {
           ))}
         </div>
       ) : rows.length === 0 ? (
-        <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", padding: "60px 24px", textAlign: "center" }}>
+        <div style={{ background: "white", borderRadius: 20, border: "1px solid var(--color-edge)", padding: "60px 24px", textAlign: "center" }}>
           <CreditCard size={36} style={{ color: "var(--color-edge)", margin: "0 auto 12px" }} />
           <p style={{ fontSize: 15, fontWeight: 600, color: "var(--color-ink)", margin: 0 }}>No disbursals found</p>
           <p style={{ fontSize: 13, color: "var(--color-ink-4)", marginTop: 6 }}>
@@ -168,11 +195,14 @@ export default function DisbursalsPage() {
           </p>
         </div>
       ) : (
-        <DisbursalsTable
-          disbursals={rows}
-          selectedId={selected?.id ?? null}
-          onSelect={d => setSelected(d)}
-        />
+        <>
+          <DisbursalsTable
+            disbursals={paginated}
+            selectedId={selected?.id ?? null}
+            onSelect={d => setSelected(d)}
+          />
+          <Pagination page={safePage} totalPages={totalPages} total={rows.length} limit={PAGE_SIZE} onPage={setPage} />
+        </>
       )}
 
       <DisbursalDrawer

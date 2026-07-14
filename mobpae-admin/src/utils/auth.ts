@@ -57,6 +57,11 @@ export function getTokenName(token = getToken()): string | null {
   }
 }
 
+export function getRoleLabel(role = getTokenRole()): string {
+  if (!role) return "Admin";
+  return role === "ADMIN" ? "Administrator" : role.charAt(0) + role.slice(1).toLowerCase();
+}
+
 export function isAuthenticated() {
   const token = getToken();
   if (!token) return false;

@@ -1,11 +1,13 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Search, Clock, CheckCircle, CreditCard } from "lucide-react";
+import { Search, Clock, CheckCircle, CreditCard, Download } from "lucide-react";
 import { getBankGroupedByEmployer } from "../services/bankVerificationService";
 import type { BankVerificationFilter } from "../services/bankVerificationService";
 import BankGroupedTable from "../components/bank-verification/BankGroupedTable";
 import BankGroupedDrawer from "../components/bank-verification/BankGroupedDrawer";
 import type { BankEmployerGroup } from "../types/bankAccount";
+import { exportToCsv } from "../utils/exportCsv";
+import { useDebouncedValue } from "../hooks/useDebouncedValue";
 
 const CHIPS: { key: BankVerificationFilter; label: string }[] = [
   { key: "ALL",      label: "All"      },
@@ -15,6 +17,7 @@ const CHIPS: { key: BankVerificationFilter; label: string }[] = [
 
 export default function BankVerificationPage() {
   const [search,     setSearch]     = useState("");
+  const debouncedSearch = useDebouncedValue(search, 200);
   const [filter,     setFilter]     = useState<BankVerificationFilter>("ALL");
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -32,7 +35,7 @@ export default function BankVerificationPage() {
 
   // Client-side search
   const rows = data.filter(g => {
-    const q = search.toLowerCase();
+    const q = debouncedSearch.toLowerCase();
     return (
       g.companyName.toLowerCase().includes(q) ||
       g.companyCode.toLowerCase().includes(q)
@@ -47,9 +50,24 @@ export default function BankVerificationPage() {
 
   return (
     <div style={{ padding: "28px 32px", fontFamily: "Inter, ui-sans-serif, sans-serif" }}>
-      <div>
-        <h1 style={{ fontSize: 26, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.025em", margin: 0 }}>Bank Verification</h1>
-        <p style={{ fontSize: 14, color: "var(--color-ink-3)", marginTop: 6 }}>Review and verify employee bank accounts by employer.</p>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+        <div>
+          <h1 style={{ fontSize: 26, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.025em", margin: 0 }}>Bank Verification</h1>
+          <p style={{ fontSize: 14, color: "var(--color-ink-3)", marginTop: 6 }}>Review and verify employee bank accounts by employer.</p>
+        </div>
+        <button
+          onClick={() => exportToCsv(rows.map(g => ({
+            Employer: g.companyName,
+            Code: g.companyCode,
+            "Total Accounts": g.totalAccounts,
+            Pending: g.pendingCount,
+            Verified: g.verifiedCount,
+          })), "bank-verification")}
+          style={{ height: 40, padding: "0 16px", display: "flex", alignItems: "center", gap: 8, background: "white", border: "1px solid var(--color-edge)", borderRadius: 12, fontSize: 13, fontWeight: 500, color: "var(--color-ink-2)", cursor: "pointer", fontFamily: "inherit" }}
+        >
+          <Download size={14} />
+          Export
+        </button>
       </div>
 
       {/* KPI cards */}
@@ -59,7 +77,7 @@ export default function BankVerificationPage() {
           { icon: <CheckCircle size={18} color="var(--color-success)" strokeWidth={1.75} />, iconBg: "var(--color-success-bg)", label: "Verified", val: verified },
           { icon: <CreditCard size={18} color="var(--color-brand)" strokeWidth={1.75} />,  iconBg: "var(--color-brand-soft)", label: "Total",    val: total    },
         ].map(({ icon, iconBg, label, val }) => (
-          <div key={label} style={{ background: "white", borderRadius: 16, padding: "14px 16px", border: "1px solid #E5E7EB", boxShadow: "0 1px 4px rgba(17,24,39,0.04)", display: "flex", alignItems: "center", gap: 14 }}>
+          <div key={label} style={{ background: "white", borderRadius: 16, padding: "14px 16px", border: "1px solid var(--color-edge)", boxShadow: "0 1px 4px rgba(17,24,39,0.04)", display: "flex", alignItems: "center", gap: 14 }}>
             <div style={{ width: 40, height: 40, borderRadius: 12, background: iconBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{icon}</div>
             <div>
               <div style={{ fontSize: 22, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.02em", lineHeight: 1 }}>{val}</div>
@@ -71,7 +89,7 @@ export default function BankVerificationPage() {
 
       {/* Search + filters */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 20 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, height: 40, padding: "0 14px", background: "white", border: "1px solid #E5E7EB", borderRadius: 12, minWidth: 240 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, height: 40, padding: "0 14px", background: "white", border: "1px solid var(--color-edge)", borderRadius: 12, minWidth: 240 }}>
           <Search size={14} style={{ color: "var(--color-ink-4)", flexShrink: 0 }} />
           <input
             type="text"
@@ -98,7 +116,7 @@ export default function BankVerificationPage() {
         {(search || filter !== "ALL") && (
           <button
             onClick={() => { setSearch(""); setFilter("ALL"); }}
-            style={{ height: 36, padding: "0 14px", background: "white", border: "1px dashed #E5E7EB", borderRadius: 10, fontSize: 13, color: "var(--color-ink-3)", cursor: "pointer", fontFamily: "inherit" }}
+            style={{ height: 36, padding: "0 14px", background: "white", border: "1px dashed var(--color-edge)", borderRadius: 10, fontSize: 13, color: "var(--color-ink-3)", cursor: "pointer", fontFamily: "inherit" }}
           >
             Clear
           </button>
@@ -107,17 +125,17 @@ export default function BankVerificationPage() {
 
       {/* Table */}
       {isError ? (
-        <div style={{ background: "white", border: "1px solid #FEE2E2", borderRadius: 20, padding: "56px 24px", textAlign: "center" }}>
+        <div style={{ background: "white", border: "1px solid var(--color-danger-bg)", borderRadius: 20, padding: "56px 24px", textAlign: "center" }}>
           <p style={{ fontSize: 13, fontWeight: 500, color: "var(--color-danger)", margin: 0 }}>Failed to load bank accounts</p>
           <p style={{ fontSize: 12, color: "var(--color-ink-3)", marginTop: 4 }}>Check your connection and try again.</p>
-          <button onClick={() => void refetch()} style={{ marginTop: 16, height: 34, padding: "0 16px", background: "white", border: "1px solid #E5E7EB", borderRadius: 10, fontSize: 12, fontWeight: 600, color: "var(--color-danger)", cursor: "pointer", fontFamily: "inherit" }}>
+          <button onClick={() => void refetch()} style={{ marginTop: 16, height: 34, padding: "0 16px", background: "white", border: "1px solid var(--color-edge)", borderRadius: 10, fontSize: 12, fontWeight: 600, color: "var(--color-danger)", cursor: "pointer", fontFamily: "inherit" }}>
             Retry
           </button>
         </div>
       ) : isLoading ? (
-        <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", overflow: "hidden" }}>
+        <div style={{ background: "white", borderRadius: 20, border: "1px solid var(--color-edge)", overflow: "hidden" }}>
           {[...Array(5)].map((_, i) => (
-            <div key={i} style={{ padding: "18px 24px", borderBottom: "1px solid #F9FAFB" }}>
+            <div key={i} style={{ padding: "18px 24px", borderBottom: "1px solid var(--color-canvas)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
                 <div style={{ width: 36, height: 36, borderRadius: 10, background: "var(--color-surface-muted)", flexShrink: 0 }} className="animate-pulse" />
                 <div>
@@ -134,7 +152,7 @@ export default function BankVerificationPage() {
           ))}
         </div>
       ) : rows.length === 0 ? (
-        <div style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 20, padding: "60px 24px", textAlign: "center" }}>
+        <div style={{ background: "white", border: "1px solid var(--color-edge)", borderRadius: 20, padding: "60px 24px", textAlign: "center" }}>
           <div style={{ width: 40, height: 40, borderRadius: 12, background: "var(--color-surface-muted)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", fontSize: 18 }}>🏦</div>
           <p style={{ fontSize: 13, fontWeight: 500, color: "var(--color-ink-3)", margin: 0 }}>No employers found</p>
           <p style={{ fontSize: 12, color: "var(--color-ink-4)", marginTop: 4 }}>

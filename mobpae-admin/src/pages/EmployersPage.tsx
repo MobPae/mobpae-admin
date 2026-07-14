@@ -7,6 +7,7 @@ import CreateEmployerDrawer from "../components/employers/CreateEmployerDrawer";
 import type { Employer, EmployerStatus } from "../types/employer";
 import { getEmployers } from "../services/employerService";
 import { exportToCsv } from "../utils/exportCsv";
+import { useDebouncedValue } from "../hooks/useDebouncedValue";
 
 const P = "var(--color-brand)";
 
@@ -28,6 +29,7 @@ export default function EmployersPage() {
   });
 
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebouncedValue(search, 200);
   const [statusFilter, setStatusFilter] = useState<"ALL" | EmployerStatus>("ALL");
   const [selected, setSelected] = useState<Employer | null>(null);
   const [showCreate, setShowCreate] = useState(false);
@@ -42,7 +44,7 @@ export default function EmployersPage() {
   };
 
   const filtered = employers.filter((e) => {
-    const q = search.toLowerCase();
+    const q = debouncedSearch.toLowerCase();
     const matchSearch =
       !q ||
       e.companyName.toLowerCase().includes(q) ||

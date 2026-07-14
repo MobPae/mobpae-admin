@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Search, Building2, Phone, CheckCircle, XCircle, Plus } from "lucide-react";
+import { Search, Building2, Phone, CheckCircle, XCircle, Plus, Download } from "lucide-react";
 import EmployerEnquiriesTable from "../components/employer-enquiries/EmployerEnquiriesTable";
 import EmployerDetailsDrawer from "../components/employer-enquiries/EmployerDetailsDrawer";
 import CreateEmployerDrawer from "../components/employers/CreateEmployerDrawer";
 import type { CreateEmployerPrefill } from "../components/employers/CreateEmployerDrawer";
 import type { EmployerEnquiry, EmployerEnquiryStatus } from "../types/employer-enquiry";
 import { getEmployerEnquiries } from "../services/employerEnquiryService";
+import { exportToCsv } from "../utils/exportCsv";
+import { useDebouncedValue } from "../hooks/useDebouncedValue";
 
 const P = "var(--color-brand)";
 
@@ -25,6 +27,7 @@ export default function EmployerEnquiriesPage() {
   });
 
   const [search,        setSearch]        = useState("");
+  const debouncedSearch = useDebouncedValue(search, 200);
   const [statusFilter,  setStatusFilter]  = useState<"ALL" | EmployerEnquiryStatus>("ALL");
   const [selected,      setSelected]      = useState<EmployerEnquiry | null>(null);
   const [createPrefill, setCreatePrefill] = useState<CreateEmployerPrefill | undefined>(undefined);
@@ -38,7 +41,7 @@ export default function EmployerEnquiriesPage() {
   };
 
   const filtered = enquiries.filter((e) => {
-    const q = search.toLowerCase();
+    const q = debouncedSearch.toLowerCase();
     const matchSearch =
       !q ||
       e.companyName.toLowerCase().includes(q) ||
@@ -82,26 +85,42 @@ export default function EmployerEnquiriesPage() {
             Inbound leads from the website
           </p>
         </div>
-        <button
-          onClick={() => setCreatePrefill({})}
-          style={{
-            height: 40, padding: "0 18px",
-            display: "flex", alignItems: "center", gap: 8,
-            background: P, border: "none", borderRadius: 12,
-            fontSize: 13.5, fontWeight: 600, color: "white",
-            cursor: "pointer", fontFamily: "inherit",
-          }}
-        >
-          <Plus size={15} />
-          Add Employer
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <button
+            onClick={() => exportToCsv(filtered.map(e => ({
+              Company: e.companyName,
+              Contact: e.contactPerson,
+              Email: e.email,
+              Phone: e.phone,
+              Status: e.status,
+              Created: e.createdAt ? new Date(e.createdAt).toLocaleDateString() : "",
+            })), "employer-enquiries")}
+            style={{ height: 40, padding: "0 16px", display: "flex", alignItems: "center", gap: 8, background: "white", border: "1px solid var(--color-edge)", borderRadius: 12, fontSize: 13, fontWeight: 500, color: "var(--color-ink-2)", cursor: "pointer", fontFamily: "inherit" }}
+          >
+            <Download size={14} />
+            Export
+          </button>
+          <button
+            onClick={() => setCreatePrefill({})}
+            style={{
+              height: 40, padding: "0 18px",
+              display: "flex", alignItems: "center", gap: 8,
+              background: P, border: "none", borderRadius: 12,
+              fontSize: 13.5, fontWeight: 600, color: "white",
+              cursor: "pointer", fontFamily: "inherit",
+            }}
+          >
+            <Plus size={15} />
+            Add Employer
+          </button>
+        </div>
       </div>
 
       {/* ── Error banner ───────────────────────────── */}
       {isError && (
-        <div style={{ background: "var(--color-danger-soft)", border: "1px solid #FECACA", borderRadius: 12, padding: "12px 16px", marginBottom: 24, display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, color: "var(--color-danger)" }}>
+        <div style={{ background: "var(--color-danger-soft)", border: "1px solid var(--color-danger-bg)", borderRadius: 12, padding: "12px 16px", marginBottom: 24, display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, color: "var(--color-danger)" }}>
           <span>Failed to load enquiries.</span>
-          <button onClick={() => void refetch()} style={{ padding: "6px 12px", background: "white", border: "1px solid #FECACA", borderRadius: 8, fontSize: 12, fontWeight: 600, color: "var(--color-danger)", cursor: "pointer", fontFamily: "inherit" }}>
+          <button onClick={() => void refetch()} style={{ padding: "6px 12px", background: "white", border: "1px solid var(--color-danger-bg)", borderRadius: 8, fontSize: 12, fontWeight: 600, color: "var(--color-danger)", cursor: "pointer", fontFamily: "inherit" }}>
             Retry
           </button>
         </div>
@@ -110,7 +129,7 @@ export default function EmployerEnquiriesPage() {
       {/* ── KPI cards ──────────────────────────────── */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 24 }}>
         {kpis.map(({ icon, iconBg, label, val }) => (
-          <div key={label} style={{ background: "white", borderRadius: 16, padding: "14px 16px", border: "1px solid #E5E7EB", boxShadow: "0 1px 4px rgba(17,24,39,0.04)", display: "flex", alignItems: "center", gap: 14 }}>
+          <div key={label} style={{ background: "white", borderRadius: 16, padding: "14px 16px", border: "1px solid var(--color-edge)", boxShadow: "0 1px 4px rgba(17,24,39,0.04)", display: "flex", alignItems: "center", gap: 14 }}>
             <div style={{ width: 40, height: 40, borderRadius: 12, background: iconBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
               {icon}
             </div>
@@ -127,7 +146,7 @@ export default function EmployerEnquiriesPage() {
       {/* ── Filter bar ─────────────────────────────── */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
         {/* Search */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8, height: 40, padding: "0 14px", background: "white", border: "1px solid #E5E7EB", borderRadius: 12, minWidth: 260 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, height: 40, padding: "0 14px", background: "white", border: "1px solid var(--color-edge)", borderRadius: 12, minWidth: 260 }}>
           <Search size={14} style={{ color: "var(--color-ink-4)", flexShrink: 0 }} />
           <input
             type="text"
@@ -170,9 +189,9 @@ export default function EmployerEnquiriesPage() {
 
       {/* ── Table ──────────────────────────────────── */}
       {isLoading ? (
-        <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", overflow: "hidden" }}>
+        <div style={{ background: "white", borderRadius: 20, border: "1px solid var(--color-edge)", overflow: "hidden" }}>
           {[...Array(6)].map((_, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 16, padding: "18px 24px", borderBottom: "1px solid #F9FAFB" }}>
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 16, padding: "18px 24px", borderBottom: "1px solid var(--color-canvas)" }}>
               <div style={{ width: 38, height: 38, borderRadius: 10, background: "var(--color-surface-muted)", flexShrink: 0 }} className="animate-pulse" />
               <div style={{ flex: 1 }}>
                 <div style={{ height: 12, background: "var(--color-surface-muted)", borderRadius: 4, width: 160, marginBottom: 8 }} className="animate-pulse" />
@@ -184,7 +203,7 @@ export default function EmployerEnquiriesPage() {
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", padding: "64px 24px", textAlign: "center" }}>
+        <div style={{ background: "white", borderRadius: 20, border: "1px solid var(--color-edge)", padding: "64px 24px", textAlign: "center" }}>
           <Building2 size={36} style={{ color: "var(--color-edge)", margin: "0 auto 12px" }} />
           <p style={{ fontSize: 15, fontWeight: 600, color: "var(--color-ink)", margin: 0 }}>No enquiries found</p>
           <p style={{ fontSize: 13, color: "var(--color-ink-4)", marginTop: 6 }}>

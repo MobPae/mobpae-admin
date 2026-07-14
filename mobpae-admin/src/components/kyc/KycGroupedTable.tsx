@@ -1,20 +1,11 @@
 import type { KycEmployeeGroup } from "../../types/kyc";
+import { avatarColor } from "../../utils/avatarColor";
 
 interface Props {
   groups: KycEmployeeGroup[];
   selectedId: string | null;
   onSelect: (g: KycEmployeeGroup) => void;
 }
-
-const AVATAR_COLORS: Record<string, string> = {
-  A:"bg-rose-500", B:"bg-pink-500", C:"bg-fuchsia-500", D:"bg-brand",
-  E:"bg-indigo-500", F:"bg-violet-500", G:"bg-purple-500", H:"bg-sky-500",
-  I:"bg-cyan-500", J:"bg-brand", K:"bg-brand", L:"bg-brand",
-  M:"bg-lime-500", N:"bg-yellow-500", O:"bg-amber-500", P:"bg-orange-500",
-  Q:"bg-danger-soft0", R:"bg-rose-600", S:"bg-pink-600", T:"bg-fuchsia-600",
-  U:"bg-brand", V:"bg-indigo-600", W:"bg-violet-600", X:"bg-brand",
-  Y:"bg-sky-600", Z:"bg-cyan-600",
-};
 
 const OVERALL_STATUS: Record<string, { dot: string; text: string; bg: string; label: string }> = {
   PENDING:       { label: "Pending", dot: "bg-amber-400", text: "text-amber-700", bg: "bg-amber-50" },
@@ -50,7 +41,7 @@ export default function KycGroupedTable({ groups, selectedId, onSelect }: Props)
         <tbody className="divide-y divide-edge-2">
           {groups.map(g => {
             const first = g.employeeName.charAt(0).toUpperCase();
-            const av    = AVATAR_COLORS[first] ?? "bg-brand";
+            const av    = avatarColor(g.employeeName);
             const sc    = OVERALL_STATUS[g.overallStatus] ?? OVERALL_STATUS.NOT_SUBMITTED;
             const sel   = selectedId === g.employeeId;
             return (
@@ -62,7 +53,7 @@ export default function KycGroupedTable({ groups, selectedId, onSelect }: Props)
                 {/* Employee */}
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <div className={`w-7 h-7 rounded-lg ${av} text-white flex-shrink-0 flex items-center justify-center text-[11px] font-[600]`}>
+                    <div className="w-7 h-7 rounded-lg text-white flex-shrink-0 flex items-center justify-center text-[11px] font-[600]" style={{ background: av }}>
                       {first}
                     </div>
                     <div className="min-w-0">

@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Search, Shield, ChevronLeft, ChevronRight, Monitor, Smartphone, Globe } from "lucide-react";
 import { getAuditLogs } from "../services/auditService";
 import type { AuditLog } from "../services/auditService";
+import { useDebouncedValue } from "../hooks/useDebouncedValue";
 
 // ── Action colour mapping ─────────────────────────────────────────────────────
 
@@ -121,6 +122,7 @@ const ACTIONS = Object.keys(ACTION_CONFIG);
 
 export default function AuditLogsPage() {
   const [search, setSearch]           = useState("");
+  const debouncedSearch = useDebouncedValue(search, 200);
   const [actionFilter, setActionFilter] = useState("");
   const [entityFilter, setEntityFilter] = useState("");
   const [page, setPage]               = useState(1);
@@ -142,7 +144,7 @@ export default function AuditLogsPage() {
 
   const rows = logs.filter(log => {
     if (!search) return true;
-    const q = search.toLowerCase();
+    const q = debouncedSearch.toLowerCase();
     const ua = (log.newValue?.deviceInfo as string | undefined) ?? "";
     return (
       log.action.toLowerCase().includes(q) ||
@@ -160,7 +162,7 @@ export default function AuditLogsPage() {
     };
   }
 
-  const selectStyle: React.CSSProperties = { height: 40, padding: "0 12px", fontSize: 13, background: "white", border: "1px solid #E5E7EB", borderRadius: 10, outline: "none", color: "var(--color-ink-3)", fontFamily: "inherit", cursor: "pointer" };
+  const selectStyle: React.CSSProperties = { height: 40, padding: "0 12px", fontSize: 13, background: "white", border: "1px solid var(--color-edge)", borderRadius: 10, outline: "none", color: "var(--color-ink-3)", fontFamily: "inherit", cursor: "pointer" };
   const thStyle: React.CSSProperties = { padding: "12px 16px", textAlign: "left", fontSize: 11.5, fontWeight: 600, color: "var(--color-ink-4)", textTransform: "uppercase", letterSpacing: "0.07em", whiteSpace: "nowrap" };
   const tdStyle: React.CSSProperties = { padding: "12px 16px", verticalAlign: "top" };
 
@@ -172,7 +174,7 @@ export default function AuditLogsPage() {
           <h1 style={{ fontSize: 26, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.025em", margin: 0 }}>Audit Logs</h1>
           <p style={{ fontSize: 14, color: "var(--color-ink-3)", marginTop: 6 }}>Full audit trail — auth, employer, employee, salary, disbursal events</p>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, height: 32, padding: "0 12px", borderRadius: 8, background: "var(--color-canvas)", border: "1px solid #E5E7EB" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, height: 32, padding: "0 12px", borderRadius: 8, background: "var(--color-canvas)", border: "1px solid var(--color-edge)" }}>
           <Shield size={12} color="var(--color-ink-3)" />
           <span style={{ fontSize: 12, color: "var(--color-ink-3)", fontWeight: 500 }}>{total.toLocaleString()} events</span>
         </div>
@@ -187,7 +189,7 @@ export default function AuditLogsPage() {
             placeholder="Search action, email, entity…"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            style={{ width: "100%", height: 40, paddingLeft: 36, paddingRight: 16, fontSize: 13, background: "white", border: "1px solid #E5E7EB", borderRadius: 10, outline: "none", color: "var(--color-ink)", fontFamily: "inherit", boxSizing: "border-box" }}
+            style={{ width: "100%", height: 40, paddingLeft: 36, paddingRight: 16, fontSize: 13, background: "white", border: "1px solid var(--color-edge)", borderRadius: 10, outline: "none", color: "var(--color-ink)", fontFamily: "inherit", boxSizing: "border-box" }}
           />
         </div>
         <select value={actionFilter} onChange={handleFilterChange(setActionFilter)} style={selectStyle}>
@@ -201,7 +203,7 @@ export default function AuditLogsPage() {
         {(actionFilter || entityFilter || search) && (
           <button
             onClick={() => { setSearch(""); setActionFilter(""); setEntityFilter(""); setPage(1); }}
-            style={{ height: 40, padding: "0 14px", fontSize: 13, color: "var(--color-ink-3)", border: "1px solid #E5E7EB", borderRadius: 10, background: "white", cursor: "pointer", fontFamily: "inherit" }}
+            style={{ height: 40, padding: "0 14px", fontSize: 13, color: "var(--color-ink-3)", border: "1px solid var(--color-edge)", borderRadius: 10, background: "white", cursor: "pointer", fontFamily: "inherit" }}
           >
             Clear filters
           </button>
@@ -210,23 +212,32 @@ export default function AuditLogsPage() {
 
       {/* States */}
       {isLoading ? (
-        <div style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 20, padding: "40px 24px", textAlign: "center" }}>
-          <p style={{ fontSize: 13, color: "var(--color-ink-3)" }}>Loading audit logs…</p>
+        <div style={{ background: "white", borderRadius: 20, border: "1px solid var(--color-edge)", overflow: "hidden" }}>
+          {[...Array(8)].map((_, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 16, padding: "12px 16px", borderBottom: "1px solid var(--color-canvas)" }}>
+              <div style={{ height: 22, width: "18%", background: "var(--color-surface-muted)", borderRadius: 999 }} className="animate-pulse" />
+              <div style={{ height: 12, width: "22%", background: "var(--color-surface-muted)", borderRadius: 4 }} className="animate-pulse" />
+              <div style={{ height: 11, width: "12%", background: "var(--color-surface-muted)", borderRadius: 4 }} className="animate-pulse" />
+              <div style={{ height: 11, width: "14%", background: "var(--color-surface-muted)", borderRadius: 4 }} className="animate-pulse" />
+              <div style={{ height: 11, width: "14%", background: "var(--color-surface-muted)", borderRadius: 4 }} className="animate-pulse" />
+              <div style={{ height: 11, width: "10%", background: "var(--color-surface-muted)", borderRadius: 4 }} className="animate-pulse" />
+            </div>
+          ))}
         </div>
       ) : isError ? (
-        <div style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 20, padding: "40px 24px", textAlign: "center" }}>
+        <div style={{ background: "white", border: "1px solid var(--color-edge)", borderRadius: 20, padding: "40px 24px", textAlign: "center" }}>
           <p style={{ fontSize: 13, fontWeight: 500, color: "var(--color-ink-2)", margin: 0 }}>Could not load audit logs</p>
           <p style={{ fontSize: 12, color: "var(--color-ink-3)", marginTop: 4 }}>Ensure the backend exposes <code style={{ fontFamily: "ui-monospace, monospace", fontSize: 11, background: "var(--color-surface-muted)", padding: "2px 4px", borderRadius: 4 }}>GET /audit-logs</code> with admin auth.</p>
-          <button type="button" onClick={() => void refetch()} style={{ marginTop: 12, height: 36, padding: "0 14px", borderRadius: 10, border: "1px solid #E5E7EB", fontSize: 12, fontWeight: 600, color: "var(--color-ink-3)", background: "white", cursor: "pointer", fontFamily: "inherit" }}>Try again</button>
+          <button type="button" onClick={() => void refetch()} style={{ marginTop: 12, height: 36, padding: "0 14px", borderRadius: 10, border: "1px solid var(--color-edge)", fontSize: 12, fontWeight: 600, color: "var(--color-ink-3)", background: "white", cursor: "pointer", fontFamily: "inherit" }}>Try again</button>
         </div>
       ) : rows.length === 0 ? (
-        <div style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 20, padding: "40px 24px", textAlign: "center" }}>
+        <div style={{ background: "white", border: "1px solid var(--color-edge)", borderRadius: 20, padding: "40px 24px", textAlign: "center" }}>
           <p style={{ fontSize: 13, fontWeight: 500, color: "var(--color-ink-2)", margin: 0 }}>No audit events found</p>
           <p style={{ fontSize: 12, color: "var(--color-ink-3)", marginTop: 4 }}>Events are recorded as admin and user actions occur.</p>
         </div>
       ) : (
         <>
-          <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", overflow: "hidden" }}>
+          <div style={{ background: "white", borderRadius: 20, border: "1px solid var(--color-edge)", overflow: "hidden" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", fontSize: 13 }}>
               <colgroup>
                 <col style={{ width: "20%" }} />
@@ -237,7 +248,7 @@ export default function AuditLogsPage() {
                 <col style={{ width: "12%" }} />
               </colgroup>
               <thead>
-                <tr style={{ borderBottom: "1px solid #F3F4F6", background: "var(--color-surface-raised)" }}>
+                <tr style={{ borderBottom: "1px solid var(--color-edge-2)", background: "var(--color-surface-raised)" }}>
                   {["Action", "Performed by", "Entity type", "Entity ID", "Timestamp", "When"].map((h, i) => (
                     <th key={i} style={thStyle}>{h}</th>
                   ))}
@@ -249,7 +260,7 @@ export default function AuditLogsPage() {
                   const deviceInfo = log.newValue?.deviceInfo as string | undefined;
                   const ipAddress  = log.newValue?.ipAddress as string | undefined;
                   return (
-                    <tr key={log.id} style={{ borderBottom: "1px solid #F9FAFB" }}>
+                    <tr key={log.id} style={{ borderBottom: "1px solid var(--color-canvas)" }}>
                       {/* Action */}
                       <td style={tdStyle}>
                         <span style={{ display: "inline-flex", alignItems: "center", gap: 5, height: 22, padding: "0 8px", borderRadius: 999, fontSize: 11, fontWeight: 500, background: cfg.bg, color: cfg.color }}>
@@ -307,7 +318,7 @@ export default function AuditLogsPage() {
                 <button
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid #E5E7EB", background: "white", color: "var(--color-ink-3)", cursor: page === 1 ? "not-allowed" : "pointer", opacity: page === 1 ? 0.3 : 1 }}
+                  style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid var(--color-edge)", background: "white", color: "var(--color-ink-3)", cursor: page === 1 ? "not-allowed" : "pointer", opacity: page === 1 ? 0.3 : 1 }}
                 >
                   <ChevronLeft size={13} />
                 </button>
@@ -319,7 +330,7 @@ export default function AuditLogsPage() {
                     <button
                       key={p}
                       onClick={() => setPage(p)}
-                      style={{ width: 28, height: 28, fontSize: 12, borderRadius: 8, border: active ? "1px solid #315eff" : "1px solid #E5E7EB", background: active ? "var(--color-brand-soft)" : "white", color: active ? "var(--color-brand)" : "var(--color-ink-3)", fontWeight: active ? 600 : 400, cursor: "pointer", fontFamily: "inherit" }}
+                      style={{ width: 28, height: 28, fontSize: 12, borderRadius: 8, border: active ? "1px solid var(--color-brand)" : "1px solid var(--color-edge)", background: active ? "var(--color-brand-soft)" : "white", color: active ? "var(--color-brand)" : "var(--color-ink-3)", fontWeight: active ? 600 : 400, cursor: "pointer", fontFamily: "inherit" }}
                     >
                       {p}
                     </button>
@@ -328,7 +339,7 @@ export default function AuditLogsPage() {
                 <button
                   onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid #E5E7EB", background: "white", color: "var(--color-ink-3)", cursor: page === totalPages ? "not-allowed" : "pointer", opacity: page === totalPages ? 0.3 : 1 }}
+                  style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid var(--color-edge)", background: "white", color: "var(--color-ink-3)", cursor: page === totalPages ? "not-allowed" : "pointer", opacity: page === totalPages ? 0.3 : 1 }}
                 >
                   <ChevronRight size={13} />
                 </button>

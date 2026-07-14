@@ -1,12 +1,14 @@
 import { useState, useMemo } from "react";
 import { useSignedUrl } from "../hooks/useSignedUrl";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import {
   Building2,
   CheckCircle2,
   ChevronRight,
   CircleDollarSign,
   CreditCard,
+  Download,
   Plus,
   Search,
   Tag,
@@ -26,6 +28,10 @@ import {
 } from "../services/membershipService";
 import type { Membership, MembershipCoupon, MembershipStatus, EmployerMembershipSummary } from "../types/membership";
 import { getApiErrorMessage } from "../utils/api-errors";
+import { exportToCsv } from "../utils/exportCsv";
+import { Pagination } from "../components/ui/Pagination";
+import { ConfirmModal } from "../components/ui/ConfirmModal";
+import { useDebouncedValue } from "../hooks/useDebouncedValue";
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -76,7 +82,7 @@ const FILTERS: { label: string; value: "ALL" | MembershipStatus }[] = [
 
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #F3F4F6" }}>
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid var(--color-edge-2)" }}>
       <span style={{ fontSize: 12, color: "var(--color-ink-3)" }}>{label}</span>
       <span style={{ fontSize: 12, fontWeight: 500, color: "var(--color-ink)" }}>{value}</span>
     </div>
@@ -98,7 +104,7 @@ function EmployerSummaryTable({ employers }: { employers: EmployerMembershipSumm
     <div style={{ overflowX: "auto" }}>
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
         <thead>
-          <tr style={{ borderBottom: "1px solid #F3F4F6", background: "var(--color-surface-raised)" }}>
+          <tr style={{ borderBottom: "1px solid var(--color-edge-2)", background: "var(--color-surface-raised)" }}>
             {["Company", "Total Members", "Active Members", "Revenue"].map(h => (
               <th key={h} style={{ padding: "14px 20px", textAlign: "left", fontSize: 11.5, fontWeight: 600, color: "var(--color-ink-4)", textTransform: "uppercase", letterSpacing: "0.07em", whiteSpace: "nowrap" }}>{h}</th>
             ))}
@@ -106,7 +112,7 @@ function EmployerSummaryTable({ employers }: { employers: EmployerMembershipSumm
         </thead>
         <tbody>
           {employers.map(e => (
-            <tr key={e.employerId} style={{ borderBottom: "1px solid #F9FAFB" }}>
+            <tr key={e.employerId} style={{ borderBottom: "1px solid var(--color-canvas)" }}>
               <td style={{ padding: "14px 20px", verticalAlign: "middle" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <div style={{ width: 26, height: 26, borderRadius: 8, background: "var(--color-brand-soft)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -131,16 +137,21 @@ function EmployerSummaryTable({ employers }: { employers: EmployerMembershipSumm
   );
 }
 
+const PAGE_SIZE = 15;
+
 // ── page ──────────────────────────────────────────────────────────────────────
 
 export default function MembershipsPage() {
   const qc = useQueryClient();
   const [search,      setSearch]      = useState("");
+  const debouncedSearch = useDebouncedValue(search, 200);
   const [filter,      setFilter]      = useState<"ALL" | MembershipStatus>("ALL");
   const [selected,    setSelected]    = useState<Membership | null>(null);
   const [acting,      setActing]      = useState<"approve" | "reject" | null>(null);
   const [remarks,     setRemarks]     = useState("");
   const [actionError, setActionError] = useState("");
+  const [confirmAction, setConfirmAction] = useState<"approve" | "reject" | null>(null);
+  const [page,        setPage]        = useState(1);
 
   // Signed URL for the selected membership's payment screenshot
   const { url: screenshotUrl } = useSignedUrl(selected?.paymentScreenshot ?? null);
@@ -211,7 +222,7 @@ export default function MembershipsPage() {
 
   const rows = useMemo(() =>
     memberships.filter(ms => {
-      const q = search.toLowerCase();
+      const q = debouncedSearch.toLowerCase();
       const matchSearch = !q ||
         ms.employee.name.toLowerCase().includes(q) ||
         ms.employee.employeeCode.toLowerCase().includes(q) ||
@@ -221,8 +232,12 @@ export default function MembershipsPage() {
       const matchFilter = filter === "ALL" || ms.status === filter;
       return matchSearch && matchFilter;
     }),
-    [memberships, search, filter]
+    [memberships, debouncedSearch, filter]
   );
+
+  const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  const safePage    = Math.min(page, totalPages);
+  const paginated   = rows.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["memberships"] });
@@ -237,35 +252,60 @@ export default function MembershipsPage() {
     try {
       if (action === "approve") await approveMembership(selected.id, remarks || undefined);
       else await rejectMembership(selected.id, remarks || undefined);
+      toast.success(action === "approve" ? "Membership approved" : "Membership rejected", {
+        description: `${selected.employee.name}'s ${selected.planName} membership has been ${action === "approve" ? "approved" : "rejected"}.`,
+      });
       invalidate();
       setSelected(null);
       setRemarks("");
     } catch (err) {
-      setActionError(getApiErrorMessage(err, "Action failed. Please try again."));
+      const msg = getApiErrorMessage(err, "Action failed. Please try again.");
+      setActionError(msg);
+      toast.error("Action failed", { description: msg });
     } finally {
       setActing(null);
+      setConfirmAction(null);
     }
   };
 
   return (
     <div style={{ padding: "28px 32px" }}>
       {/* Header */}
-      <div>
-        <h1 style={{ fontSize: 26, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.025em", margin: 0 }}>Memberships</h1>
-        <p style={{ fontSize: 14, color: "var(--color-ink-3)", marginTop: 6 }}>Employee membership plans and verification</p>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+        <div>
+          <h1 style={{ fontSize: 26, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.025em", margin: 0 }}>Memberships</h1>
+          <p style={{ fontSize: 14, color: "var(--color-ink-3)", marginTop: 6 }}>Employee membership plans and verification</p>
+        </div>
+        <button
+          onClick={() => exportToCsv(rows.map(ms => ({
+            Employee: ms.employee.name,
+            Code: ms.employee.employeeCode,
+            Employer: ms.employee.employer.companyName,
+            Plan: ms.planName,
+            Amount: ms.amount,
+            Status: ms.status,
+            "Start Date": ms.startDate ?? "",
+            "End Date": ms.endDate ?? "",
+            Created: ms.createdAt,
+          })), "memberships")}
+          style={{ height: 40, padding: "0 16px", display: "flex", alignItems: "center", gap: 8, background: "white", border: "1px solid var(--color-edge)", borderRadius: 12, fontSize: 13, fontWeight: 500, color: "var(--color-ink-2)", cursor: "pointer", fontFamily: "inherit" }}
+        >
+          <Download size={14} />
+          Export
+        </button>
       </div>
 
       {/* Summary cards — GET /membership/summary */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginTop: 24, marginBottom: 24 }}>
         {[
-          { icon: <Users size={18} color="white" strokeWidth={1.75} />,            iconBg: "linear-gradient(135deg,#2048EE,#315eff)", label: "Total Members",  val: summary?.totalMembers ?? "—" },
+          { icon: <Users size={18} color="white" strokeWidth={1.75} />,            iconBg: "linear-gradient(135deg,var(--color-info),#315eff)", label: "Total Members",  val: summary?.totalMembers ?? "—" },
           { icon: <CreditCard size={18} color="var(--color-success)" strokeWidth={1.75} />,      iconBg: "var(--color-success-bg)",                                  label: "Active",         val: summary?.active ?? "—"       },
           { icon: <CreditCard size={18} color="var(--color-warning)" strokeWidth={1.75} />,      iconBg: "var(--color-warning-bg)",                                  label: "Pending Review", val: summary?.pending ?? "—"      },
           { icon: <XCircle size={18} color="#EF4444" strokeWidth={1.75} />,         iconBg: "var(--color-danger-bg)",                                  label: "Rejected",       val: summary?.rejected ?? "—"     },
           { icon: <TimerOff size={18} color="var(--color-ink-3)" strokeWidth={1.75} />,        iconBg: "var(--color-surface-muted)",                                  label: "Expired",        val: summary?.expired ?? "—"      },
           { icon: <CircleDollarSign size={18} color="var(--color-brand)" strokeWidth={1.75} />, iconBg: "var(--color-brand-soft)",                                 label: "Revenue",        val: formatCurrency(summary?.membershipRevenue ?? 0) },
         ].map(({ icon, iconBg, label, val }) => (
-          <div key={label} style={{ background: "white", borderRadius: 16, padding: "14px 16px", border: "1px solid #E5E7EB", boxShadow: "0 1px 4px rgba(17,24,39,0.04)", display: "flex", alignItems: "center", gap: 14 }}>
+          <div key={label} style={{ background: "white", borderRadius: 16, padding: "14px 16px", border: "1px solid var(--color-edge)", boxShadow: "0 1px 4px rgba(17,24,39,0.04)", display: "flex", alignItems: "center", gap: 14 }}>
             <div style={{ width: 40, height: 40, borderRadius: 12, background: iconBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{icon}</div>
             <div>
               <div style={{ fontSize: 22, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.02em", lineHeight: 1 }}>{val}</div>
@@ -277,8 +317,8 @@ export default function MembershipsPage() {
 
       {/* Employer breakdown — GET /membership/employer-summary */}
       {employerSummary.length > 0 && (
-        <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", overflow: "hidden", marginBottom: 20 }}>
-          <div style={{ padding: "14px 20px", borderBottom: "1px solid #E5E7EB" }}>
+        <div style={{ background: "white", borderRadius: 20, border: "1px solid var(--color-edge)", overflow: "hidden", marginBottom: 20 }}>
+          <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--color-edge)" }}>
             <p style={{ fontSize: 13, fontWeight: 600, color: "var(--color-ink)", margin: 0 }}>By Employer</p>
             <p style={{ fontSize: 11, color: "var(--color-ink-3)", marginTop: 2 }}>Membership breakdown per company</p>
           </div>
@@ -288,13 +328,13 @@ export default function MembershipsPage() {
 
       {/* Search + filter */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 20 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, height: 40, padding: "0 14px", background: "white", border: "1px solid #E5E7EB", borderRadius: 12, minWidth: 260 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, height: 40, padding: "0 14px", background: "white", border: "1px solid var(--color-edge)", borderRadius: 12, minWidth: 260 }}>
           <Search size={14} style={{ color: "var(--color-ink-4)", flexShrink: 0 }} />
           <input
             type="text"
             placeholder="Search employee, employer, plan…"
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={e => { setSearch(e.target.value); setPage(1); }}
             style={{ flex: 1, fontSize: 13.5, color: "var(--color-ink)", background: "transparent", outline: "none", border: "none", fontFamily: "inherit" }}
           />
         </div>
@@ -304,7 +344,7 @@ export default function MembershipsPage() {
             return (
               <button
                 key={f.value}
-                onClick={() => setFilter(f.value)}
+                onClick={() => { setFilter(f.value); setPage(1); }}
                 style={{ height: 36, padding: "0 14px", background: active ? "var(--color-ink)" : "white", color: active ? "white" : "var(--color-ink-3)", border: `1px solid ${active ? "var(--color-ink)" : "var(--color-edge)"}`, borderRadius: 10, fontSize: 13, fontWeight: active ? 600 : 400, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6 }}
               >
                 {f.label}
@@ -318,11 +358,11 @@ export default function MembershipsPage() {
       </div>
 
       {/* Membership list — GET /membership */}
-      <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", overflow: "hidden" }}>
+      <div style={{ background: "white", borderRadius: 20, border: "1px solid var(--color-edge)", overflow: "hidden" }}>
         {isLoading ? (
           <div>
             {[...Array(5)].map((_, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 16, padding: "18px 24px", borderBottom: "1px solid #F9FAFB" }}>
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 16, padding: "18px 24px", borderBottom: "1px solid var(--color-canvas)" }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ height: 12, background: "var(--color-surface-muted)", borderRadius: 4, width: 140, marginBottom: 6 }} className="animate-pulse" />
                   <div style={{ height: 10, background: "var(--color-surface-muted)", borderRadius: 4, width: 100 }} className="animate-pulse" />
@@ -342,18 +382,18 @@ export default function MembershipsPage() {
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
               <thead>
-                <tr style={{ borderBottom: "1px solid #F3F4F6", background: "var(--color-surface-raised)" }}>
+                <tr style={{ borderBottom: "1px solid var(--color-edge-2)", background: "var(--color-surface-raised)" }}>
                   {["Employee", "Employer", "Plan Name", "Amount", "Status", "Start Date", "End Date", "Created", ""].map(h => (
                     <th key={h} style={{ padding: "14px 20px", textAlign: "left", fontSize: 11.5, fontWeight: 600, color: "var(--color-ink-4)", textTransform: "uppercase", letterSpacing: "0.07em", whiteSpace: "nowrap" }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {rows.map(ms => (
+                {paginated.map(ms => (
                   <tr
                     key={ms.id}
                     onClick={() => { setSelected(ms); setRemarks(""); setActionError(""); }}
-                    style={{ borderBottom: "1px solid #F9FAFB", cursor: "pointer", background: selected?.id === ms.id ? "var(--color-brand-soft)" : "transparent" }}
+                    style={{ borderBottom: "1px solid var(--color-canvas)", cursor: "pointer", background: selected?.id === ms.id ? "var(--color-brand-soft)" : "transparent" }}
                   >
                     <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
                       <p style={{ fontSize: 13.5, fontWeight: 600, color: "var(--color-ink)", margin: 0 }}>{ms.employee.name}</p>
@@ -375,20 +415,24 @@ export default function MembershipsPage() {
                 ))}
               </tbody>
             </table>
-            <div style={{ padding: "12px 20px", borderTop: "1px solid #F3F4F6", background: "var(--color-surface-raised)" }}>
+            <div style={{ padding: "12px 20px", borderTop: "1px solid var(--color-edge-2)", background: "var(--color-surface-raised)" }}>
               <p style={{ fontSize: 12, color: "var(--color-ink-4)", margin: 0 }}>{rows.length} membership{rows.length !== 1 ? "s" : ""}</p>
             </div>
           </div>
         )}
       </div>
 
+      {!isLoading && rows.length > 0 && (
+        <Pagination page={safePage} totalPages={totalPages} total={rows.length} limit={PAGE_SIZE} onPage={setPage} />
+      )}
+
       {/* Detail drawer */}
       {selected && (
         <>
           <div style={{ position: "fixed", inset: 0, zIndex: 30, background: "rgba(0,0,0,0.2)", backdropFilter: "blur(1px)" }} onClick={() => setSelected(null)} />
-          <div style={{ position: "fixed", top: 0, bottom: 0, right: 0, zIndex: 40, width: 460, background: "white", borderLeft: "1px solid #E5E7EB", boxShadow: "0 20px 60px rgba(0,0,0,0.15)", display: "flex", flexDirection: "column" }}>
+          <div style={{ position: "fixed", top: 0, bottom: 0, right: 0, zIndex: 40, width: 460, background: "white", borderLeft: "1px solid var(--color-edge)", boxShadow: "0 20px 60px rgba(0,0,0,0.15)", display: "flex", flexDirection: "column" }}>
             {/* Drawer header */}
-            <div style={{ padding: "20px 20px 16px", borderBottom: "1px solid #E5E7EB" }}>
+            <div style={{ padding: "20px 20px 16px", borderBottom: "1px solid var(--color-edge)" }}>
               <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
@@ -402,7 +446,7 @@ export default function MembershipsPage() {
                   <p style={{ fontSize: 16, fontWeight: 700, color: "var(--color-ink)", margin: 0 }}>{selected.employee.name}</p>
                   <p style={{ fontSize: 12, color: "var(--color-ink-3)", marginTop: 2 }}>{selected.employee.employeeCode} · {selected.employee.employer.companyName}</p>
                 </div>
-                <button onClick={() => setSelected(null)} style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid #E5E7EB", background: "white", color: "var(--color-ink-3)", cursor: "pointer" }}>
+                <button onClick={() => setSelected(null)} style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid var(--color-edge)", background: "white", color: "var(--color-ink-3)", cursor: "pointer" }}>
                   <X size={14} />
                 </button>
               </div>
@@ -412,7 +456,7 @@ export default function MembershipsPage() {
             <div style={{ flex: 1, overflowY: "auto", padding: "16px 20px", display: "flex", flexDirection: "column", gap: 20 }}>
               <div>
                 <p style={{ fontSize: 11, fontWeight: 600, color: "var(--color-ink-4)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Plan Details</p>
-                <div style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 16, padding: "0 16px" }}>
+                <div style={{ background: "white", border: "1px solid var(--color-edge)", borderRadius: 16, padding: "0 16px" }}>
                   <InfoRow label="Plan name"        value={selected.planName} />
                   <InfoRow label="Amount"           value={formatCurrency(selected.amount)} />
                   {selected.discountAmount && parseFloat(selected.discountAmount) > 0 && (
@@ -426,16 +470,16 @@ export default function MembershipsPage() {
 
               <div>
                 <p style={{ fontSize: 11, fontWeight: 600, color: "var(--color-ink-4)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Payment</p>
-                <div style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 16, padding: "0 16px" }}>
+                <div style={{ background: "white", border: "1px solid var(--color-edge)", borderRadius: 16, padding: "0 16px" }}>
                   <InfoRow label="Reference" value={selected.paymentReference ?? "—"} />
                   {selected.paymentScreenshot && screenshotUrl && (
-                    <div style={{ padding: "10px 0", borderBottom: "1px solid #F3F4F6" }}>
+                    <div style={{ padding: "10px 0", borderBottom: "1px solid var(--color-edge-2)" }}>
                       <span style={{ fontSize: 12, color: "var(--color-ink-3)", display: "block", marginBottom: 6 }}>Screenshot</span>
                       <a href={screenshotUrl} target="_blank" rel="noopener noreferrer">
                         <img
                           src={screenshotUrl}
                           alt="Payment screenshot"
-                          style={{ borderRadius: 10, border: "1px solid #E5E7EB", maxHeight: 176, objectFit: "contain" }}
+                          style={{ borderRadius: 10, border: "1px solid var(--color-edge)", maxHeight: 176, objectFit: "contain" }}
                           onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
                         />
                       </a>
@@ -447,7 +491,7 @@ export default function MembershipsPage() {
               {(selected.verifiedBy || selected.verifiedAt) && (
                 <div>
                   <p style={{ fontSize: 11, fontWeight: 600, color: "var(--color-ink-4)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Verification</p>
-                  <div style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 16, padding: "0 16px" }}>
+                  <div style={{ background: "white", border: "1px solid var(--color-edge)", borderRadius: 16, padding: "0 16px" }}>
                     <InfoRow label="Verified by" value={selected.verifiedBy ?? "—"} />
                     <InfoRow label="Verified at" value={formatDate(selected.verifiedAt)} />
                   </div>
@@ -457,7 +501,7 @@ export default function MembershipsPage() {
               {selected.remarks && (
                 <div>
                   <p style={{ fontSize: 11, fontWeight: 600, color: "var(--color-ink-4)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Remarks</p>
-                  <div style={{ background: "var(--color-canvas)", border: "1px solid #E5E7EB", borderRadius: 16, padding: "12px 16px" }}>
+                  <div style={{ background: "var(--color-canvas)", border: "1px solid var(--color-edge)", borderRadius: 16, padding: "12px 16px" }}>
                     <p style={{ fontSize: 12, color: "var(--color-ink-3)", lineHeight: 1.6, margin: 0 }}>{selected.remarks}</p>
                   </div>
                 </div>
@@ -471,26 +515,26 @@ export default function MembershipsPage() {
                     onChange={e => setRemarks(e.target.value)}
                     placeholder="Add a note before approving or rejecting…"
                     rows={3}
-                    style={{ width: "100%", fontSize: 12, background: "white", border: "1px solid #E5E7EB", borderRadius: 12, padding: "10px 12px", color: "var(--color-ink-3)", outline: "none", resize: "none", fontFamily: "inherit", boxSizing: "border-box" }}
+                    style={{ width: "100%", fontSize: 12, background: "white", border: "1px solid var(--color-edge)", borderRadius: 12, padding: "10px 12px", color: "var(--color-ink-3)", outline: "none", resize: "none", fontFamily: "inherit", boxSizing: "border-box" }}
                   />
                 </div>
               )}
             </div>
 
             {selected.status === "PENDING" && (
-              <div style={{ padding: "16px 20px", borderTop: "1px solid #E5E7EB", display: "flex", flexDirection: "column", gap: 8 }}>
+              <div style={{ padding: "16px 20px", borderTop: "1px solid var(--color-edge)", display: "flex", flexDirection: "column", gap: 8 }}>
                 {actionError && <p style={{ fontSize: 11, color: "var(--color-danger)", textAlign: "center", margin: 0 }}>{actionError}</p>}
                 <div style={{ display: "flex", gap: 8 }}>
                   <button
-                    onClick={() => handleAction("reject")}
+                    onClick={() => setConfirmAction("reject")}
                     disabled={acting !== null}
-                    style={{ flex: 1, height: 38, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, borderRadius: 10, border: "1px solid #E5E7EB", color: "var(--color-ink-3)", fontSize: 12, fontWeight: 500, background: "white", cursor: acting !== null ? "not-allowed" : "pointer", opacity: acting !== null ? 0.5 : 1, fontFamily: "inherit" }}
+                    style={{ flex: 1, height: 38, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, borderRadius: 10, border: "1px solid var(--color-edge)", color: "var(--color-ink-3)", fontSize: 12, fontWeight: 500, background: "white", cursor: acting !== null ? "not-allowed" : "pointer", opacity: acting !== null ? 0.5 : 1, fontFamily: "inherit" }}
                   >
                     <XCircle size={13} />
                     {acting === "reject" ? "Rejecting…" : "Reject"}
                   </button>
                   <button
-                    onClick={() => handleAction("approve")}
+                    onClick={() => setConfirmAction("approve")}
                     disabled={acting !== null}
                     style={{ flex: 1, height: 38, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, borderRadius: 10, background: "var(--color-brand)", color: "white", fontSize: 12, fontWeight: 600, border: "none", cursor: acting !== null ? "not-allowed" : "pointer", opacity: acting !== null ? 0.5 : 1, fontFamily: "inherit" }}
                   >
@@ -507,8 +551,8 @@ export default function MembershipsPage() {
       {/* ── Coupon Management ─────────────────────────────────────────────── */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
         {/* Create coupon */}
-        <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", overflow: "hidden" }}>
-          <div style={{ padding: "14px 20px", borderBottom: "1px solid #E5E7EB", display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ background: "white", borderRadius: 20, border: "1px solid var(--color-edge)", overflow: "hidden" }}>
+          <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--color-edge)", display: "flex", alignItems: "center", gap: 10 }}>
             <Tag size={14} color="var(--color-ink-3)" />
             <div>
               <p style={{ fontSize: 13, fontWeight: 600, color: "var(--color-ink)", margin: 0 }}>Create Coupon</p>
@@ -524,7 +568,7 @@ export default function MembershipsPage() {
                   value={couponCode}
                   onChange={e => setCouponCode(e.target.value.toUpperCase())}
                   placeholder="e.g. MOBPAE50"
-                  style={{ width: "100%", height: 36, padding: "0 12px", fontSize: 12, background: "white", border: "1px solid #E5E7EB", borderRadius: 10, color: "var(--color-ink)", fontFamily: "ui-monospace, monospace", outline: "none", boxSizing: "border-box" }}
+                  style={{ width: "100%", height: 36, padding: "0 12px", fontSize: 12, background: "white", border: "1px solid var(--color-edge)", borderRadius: 10, color: "var(--color-ink)", fontFamily: "ui-monospace, monospace", outline: "none", boxSizing: "border-box" }}
                 />
               </div>
               <div>
@@ -535,7 +579,7 @@ export default function MembershipsPage() {
                   value={couponDiscount}
                   onChange={e => setCouponDiscount(e.target.value)}
                   placeholder="100"
-                  style={{ width: "100%", height: 36, padding: "0 12px", fontSize: 12, background: "white", border: "1px solid #E5E7EB", borderRadius: 10, color: "var(--color-ink)", outline: "none", boxSizing: "border-box", fontFamily: "inherit" }}
+                  style={{ width: "100%", height: 36, padding: "0 12px", fontSize: 12, background: "white", border: "1px solid var(--color-edge)", borderRadius: 10, color: "var(--color-ink)", outline: "none", boxSizing: "border-box", fontFamily: "inherit" }}
                 />
               </div>
             </div>
@@ -545,7 +589,7 @@ export default function MembershipsPage() {
                 type="date"
                 value={couponExpiry}
                 onChange={e => setCouponExpiry(e.target.value)}
-                style={{ width: "100%", height: 36, padding: "0 12px", fontSize: 12, background: "white", border: "1px solid #E5E7EB", borderRadius: 10, color: "var(--color-ink-3)", outline: "none", boxSizing: "border-box", fontFamily: "inherit" }}
+                style={{ width: "100%", height: 36, padding: "0 12px", fontSize: 12, background: "white", border: "1px solid var(--color-edge)", borderRadius: 10, color: "var(--color-ink-3)", outline: "none", boxSizing: "border-box", fontFamily: "inherit" }}
               />
             </div>
             {couponError && <p style={{ fontSize: 11, color: "var(--color-danger)", margin: 0 }}>{couponError}</p>}
@@ -561,8 +605,8 @@ export default function MembershipsPage() {
         </div>
 
         {/* Coupon list */}
-        <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", overflow: "hidden" }}>
-          <div style={{ padding: "14px 20px", borderBottom: "1px solid #E5E7EB" }}>
+        <div style={{ background: "white", borderRadius: 20, border: "1px solid var(--color-edge)", overflow: "hidden" }}>
+          <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--color-edge)" }}>
             <p style={{ fontSize: 13, fontWeight: 600, color: "var(--color-ink)", margin: 0 }}>Active Coupons</p>
             <p style={{ fontSize: 11, color: "var(--color-ink-3)", marginTop: 2 }}>{coupons.length} coupon{coupons.length !== 1 ? "s" : ""} total</p>
           </div>
@@ -573,9 +617,9 @@ export default function MembershipsPage() {
           ) : (
             <div style={{ maxHeight: 280, overflowY: "auto" }}>
               {coupons.map(c => (
-                <div key={c.id} style={{ padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #F3F4F6" }}>
+                <div key={c.id} style={{ padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid var(--color-edge-2)" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
-                    <div style={{ width: 30, height: 30, borderRadius: 8, background: "var(--color-canvas)", border: "1px solid #E5E7EB", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <div style={{ width: 30, height: 30, borderRadius: 8, background: "var(--color-canvas)", border: "1px solid var(--color-edge)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                       <Tag size={12} color="var(--color-ink-3)" />
                     </div>
                     <div style={{ minWidth: 0 }}>
@@ -597,6 +641,17 @@ export default function MembershipsPage() {
           )}
         </div>
       </div>
+
+      <ConfirmModal
+        open={confirmAction !== null}
+        title={confirmAction === "approve" ? "Approve this membership?" : "Reject this membership?"}
+        description={selected ? `${selected.employee.name}'s ${selected.planName} membership will be ${confirmAction === "approve" ? "activated" : "rejected"}.` : ""}
+        confirmLabel={confirmAction === "approve" ? "Approve" : "Reject"}
+        confirmVariant={confirmAction === "approve" ? "primary" : "danger"}
+        loading={acting !== null}
+        onConfirm={() => confirmAction && void handleAction(confirmAction)}
+        onCancel={() => setConfirmAction(null)}
+      />
     </div>
   );
 }

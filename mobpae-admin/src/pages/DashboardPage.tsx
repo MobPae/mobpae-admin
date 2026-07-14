@@ -1,3 +1,4 @@
+import { useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import {
@@ -102,7 +103,7 @@ function KpiCard({
 }: {
   label: string;
   value: string | number;
-  icon: React.ReactNode;
+  icon: ReactNode;
   iconBg: string;
   loading?: boolean;
   accent?: boolean;
@@ -176,7 +177,7 @@ export default function DashboardPage() {
   const adminName = getTokenName() ?? "Admin";
   const firstName = adminName.split(" ")[0];
 
-  const [srTab, setSrTab] = React.useState<SRTab>("ALL");
+  const [srTab, setSrTab] = useState<SRTab>("ALL");
 
   const { data: dashboard, isLoading: dashLoading } = useQuery({
     queryKey: ["dashboard", "admin"],
@@ -1331,6 +1332,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-// Need React import for useState
-import React from "react";

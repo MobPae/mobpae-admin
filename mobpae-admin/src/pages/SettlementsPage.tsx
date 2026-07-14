@@ -1,11 +1,13 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import {
   AlertTriangle,
   CheckCircle2,
   CircleDollarSign,
   Clock3,
   CreditCard,
+  Download,
   Eye,
   Search,
   Send,
@@ -19,6 +21,10 @@ import {
 } from "../services/settlementService";
 import type { EmployerSettlement, EmployerSettlementStatus } from "../types/settlement";
 import { getApiErrorMessage } from "../utils/api-errors";
+import { exportToCsv } from "../utils/exportCsv";
+import { Pagination } from "../components/ui/Pagination";
+import { ConfirmModal } from "../components/ui/ConfirmModal";
+import { useDebouncedValue } from "../hooks/useDebouncedValue";
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -72,36 +78,6 @@ const FILTERS: { label: string; value: "ALL" | EmployerSettlementStatus }[] = [
   { label: "Paid",           value: "PAID"          },
 ];
 
-// ── toast ─────────────────────────────────────────────────────────────────────
-
-type ToastKind = "success" | "error";
-interface Toast { id: number; kind: ToastKind; message: string }
-
-let _toastId = 0;
-
-function ToastContainer({ toasts, onDismiss }: { toasts: Toast[]; onDismiss: (id: number) => void }) {
-  if (!toasts.length) return null;
-  return (
-    <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 50, display: "flex", flexDirection: "column", gap: 8, pointerEvents: "none" }}>
-      {toasts.map(t => (
-        <div
-          key={t.id}
-          style={{ pointerEvents: "auto", display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", borderRadius: 14, boxShadow: "0 4px 20px rgba(0,0,0,0.12)", fontSize: 13, fontWeight: 500, border: "1px solid", minWidth: 260, background: t.kind === "success" ? "var(--color-brand-soft)" : "var(--color-danger-soft)", borderColor: t.kind === "success" ? "var(--color-brand-muted)" : "var(--color-danger-bg)", color: t.kind === "success" ? "var(--color-ink)" : "#991B1B" }}
-        >
-          {t.kind === "success"
-            ? <CheckCircle2 size={15} color="var(--color-brand)" style={{ flexShrink: 0 }} />
-            : <AlertTriangle size={15} color="#EF4444" style={{ flexShrink: 0 }} />
-          }
-          <span style={{ flex: 1 }}>{t.message}</span>
-          <button onClick={() => onDismiss(t.id)} style={{ background: "none", border: "none", cursor: "pointer", opacity: 0.4, color: "inherit", padding: 0 }}>
-            <X size={13} />
-          </button>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 // ── stat card ─────────────────────────────────────────────────────────────────
 
 function StatCard({ label, value, icon, iconBg, iconColor, highlight }: {
@@ -110,7 +86,7 @@ function StatCard({ label, value, icon, iconBg, iconColor, highlight }: {
 }) {
   if (highlight) {
     return (
-      <div style={{ background: "linear-gradient(135deg, #2048EE 0%, #315eff 100%)", borderRadius: 16, padding: "14px 16px", border: "1px solid #2048EE", boxShadow: "0 4px 20px rgba(49,94,255,0.25)", display: "flex", alignItems: "center", gap: 14 }}>
+      <div style={{ background: "linear-gradient(135deg, var(--color-info) 0%, #315eff 100%)", borderRadius: 16, padding: "14px 16px", border: "1px solid var(--color-info)", boxShadow: "0 4px 20px rgba(49,94,255,0.25)", display: "flex", alignItems: "center", gap: 14 }}>
         <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "white" }}>{icon}</div>
         <div>
           <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1, color: "white" }}>{value}</div>
@@ -120,7 +96,7 @@ function StatCard({ label, value, icon, iconBg, iconColor, highlight }: {
     );
   }
   return (
-    <div style={{ background: "white", borderRadius: 16, padding: "14px 16px", border: "1px solid #E5E7EB", boxShadow: "0 1px 4px rgba(17,24,39,0.04)", display: "flex", alignItems: "center", gap: 14 }}>
+    <div style={{ background: "white", borderRadius: 16, padding: "14px 16px", border: "1px solid var(--color-edge)", boxShadow: "0 1px 4px rgba(17,24,39,0.04)", display: "flex", alignItems: "center", gap: 14 }}>
       <div style={{ width: 40, height: 40, borderRadius: 12, background: iconBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: iconColor }}>{icon}</div>
       <div>
         <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1, color: "var(--color-ink)" }}>{value}</div>
@@ -134,7 +110,7 @@ function StatCard({ label, value, icon, iconBg, iconColor, highlight }: {
 
 function InfoRow({ label, value, accent }: { label: string; value: React.ReactNode; accent?: boolean }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #F3F4F6" }}>
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid var(--color-edge-2)" }}>
       <span style={{ fontSize: 12, color: "var(--color-ink-3)" }}>{label}</span>
       <span style={{ fontSize: 12, fontWeight: 500, color: accent ? "var(--color-danger)" : "var(--color-ink)" }}>{value}</span>
     </div>
@@ -171,29 +147,22 @@ function Timeline({ s }: { s: EmployerSettlement }) {
   );
 }
 
+const PAGE_SIZE = 15;
+
 // ── page ──────────────────────────────────────────────────────────────────────
 
 export default function SettlementsPage() {
   const qc = useQueryClient();
   const [search,    setSearch]    = useState("");
+  const debouncedSearch = useDebouncedValue(search, 200);
   const [filter,    setFilter]    = useState<"ALL" | EmployerSettlementStatus>("ALL");
   const [selected,  setSelected]  = useState<EmployerSettlement | null>(null);
   const [loadingDetailId, setLoadingDetailId] = useState<string | null>(null);
   const [marking,   setMarking]   = useState<string | null>(null);
   const [sending,   setSending]   = useState<string | null>(null);
   const [markError, setMarkError] = useState("");
-  const [toasts,    setToasts]    = useState<Toast[]>([]);
-
-  // ── toast helpers ──────────────────────────────────────────────────────────
-  const addToast = useCallback((kind: ToastKind, message: string) => {
-    const id = ++_toastId;
-    setToasts(prev => [...prev, { id, kind, message }]);
-    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 4000);
-  }, []);
-
-  const dismissToast = useCallback((id: number) => {
-    setToasts(prev => prev.filter(t => t.id !== id));
-  }, []);
+  const [confirmPay, setConfirmPay] = useState<EmployerSettlement | null>(null);
+  const [page,      setPage]      = useState(1);
 
   // ── query ──────────────────────────────────────────────────────────────────
   const { data: settlements = [], isLoading, isError, refetch } = useQuery({
@@ -214,7 +183,7 @@ export default function SettlementsPage() {
 
   const rows = useMemo(() =>
     settlements.filter(s => {
-      const q = search.toLowerCase();
+      const q = debouncedSearch.toLowerCase();
       const matchSearch = !q ||
         s.employer.companyName.toLowerCase().includes(q) ||
         s.employer.companyCode.toLowerCase().includes(q) ||
@@ -223,8 +192,12 @@ export default function SettlementsPage() {
       const matchFilter = filter === "ALL" || s.status === filter;
       return matchSearch && matchFilter;
     }),
-    [settlements, search, filter]
+    [settlements, debouncedSearch, filter]
   );
+
+  const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  const safePage    = Math.min(page, totalPages);
+  const paginated   = rows.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   // ── actions ────────────────────────────────────────────────────────────────
   const handleMarkPaid = async (s: EmployerSettlement) => {
@@ -233,13 +206,15 @@ export default function SettlementsPage() {
     try {
       await markSettlementPaid(s.id);
       qc.invalidateQueries({ queryKey: ["settlements"] });
-      addToast("success", `${s.employer.companyName} settlement marked as paid`);
+      toast.success("Settlement marked as paid", { description: `${s.employer.companyName} — payment recorded.` });
       setSelected(null);
     } catch (err) {
       const msg = getApiErrorMessage(err, "Failed to mark as paid");
       setMarkError(msg);
+      toast.error("Failed to mark as paid", { description: msg });
     } finally {
       setMarking(null);
+      setConfirmPay(null);
     }
   };
 
@@ -251,7 +226,7 @@ export default function SettlementsPage() {
       const detail = await getSettlement(s.id);
       setSelected(detail);
     } catch (err) {
-      addToast("error", getApiErrorMessage(err, "Failed to load settlement details"));
+      toast.error("Failed to load settlement details", { description: getApiErrorMessage(err) });
     } finally {
       setLoadingDetailId(null);
     }
@@ -262,10 +237,9 @@ export default function SettlementsPage() {
     setSending(s.id);
     try {
       await sendSettlementReport(s.id);
-      addToast("success", `Report sent to ${s.employer.companyName}`);
+      toast.success("Report sent", { description: `Settlement report sent to ${s.employer.companyName}.` });
     } catch (err) {
-      const msg = getApiErrorMessage(err, "Failed to send report");
-      addToast("error", msg);
+      toast.error("Failed to send report", { description: getApiErrorMessage(err) });
     } finally {
       setSending(null);
     }
@@ -276,13 +250,28 @@ export default function SettlementsPage() {
 
   return (
     <div style={{ padding: "28px 32px" }}>
-      {/* Toast container */}
-      <ToastContainer toasts={toasts} onDismiss={dismissToast} />
-
       {/* Header */}
-      <div style={{ marginBottom: 0 }}>
-        <h1 style={{ fontSize: 26, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.025em", margin: 0, fontFamily: "Inter, ui-sans-serif, sans-serif" }}>Settlements</h1>
-        <p style={{ fontSize: 14, color: "var(--color-ink-3)", marginTop: 6 }}>Track employer settlement obligations to MobPae.</p>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+        <div>
+          <h1 style={{ fontSize: 26, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.025em", margin: 0, fontFamily: "Inter, ui-sans-serif, sans-serif" }}>Settlements</h1>
+          <p style={{ fontSize: 14, color: "var(--color-ink-3)", marginTop: 6 }}>Track employer settlement obligations to MobPae.</p>
+        </div>
+        <button
+          onClick={() => exportToCsv(rows.map(s => ({
+            Employer: s.employer.companyName,
+            "Settlement No.": s.settlementNumber ?? "",
+            "Salary Cycle": formatCycleDate(s.cycleDate),
+            Total: s.totalAmount,
+            Outstanding: s.outstandingAmount,
+            "Late Fee": s.lateFeeAmount,
+            "Due Date": s.dueDate ?? "",
+            Status: s.status,
+          })), "settlements")}
+          style={{ height: 40, padding: "0 16px", display: "flex", alignItems: "center", gap: 8, background: "white", border: "1px solid var(--color-edge)", borderRadius: 12, fontSize: 13, fontWeight: 500, color: "var(--color-ink-2)", cursor: "pointer", fontFamily: "inherit" }}
+        >
+          <Download size={14} />
+          Export
+        </button>
       </div>
 
       {/* Summary cards */}
@@ -295,13 +284,13 @@ export default function SettlementsPage() {
 
       {/* Search + filter */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 20 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, height: 40, padding: "0 14px", background: "white", border: "1px solid #E5E7EB", borderRadius: 12, minWidth: 240 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, height: 40, padding: "0 14px", background: "white", border: "1px solid var(--color-edge)", borderRadius: 12, minWidth: 240 }}>
           <Search size={14} style={{ color: "var(--color-ink-4)", flexShrink: 0 }} />
           <input
             type="text"
             placeholder="Search by employer, cycle, settlement no…"
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={e => { setSearch(e.target.value); setPage(1); }}
             style={{ flex: 1, fontSize: 13.5, color: "var(--color-ink)", background: "transparent", outline: "none", border: "none", fontFamily: "inherit" }}
           />
         </div>
@@ -311,7 +300,7 @@ export default function SettlementsPage() {
             return (
               <button
                 key={f.value}
-                onClick={() => setFilter(f.value)}
+                onClick={() => { setFilter(f.value); setPage(1); }}
                 style={{ height: 36, padding: "0 14px", background: active ? "var(--color-ink)" : "white", color: active ? "white" : "var(--color-ink-3)", border: `1px solid ${active ? "var(--color-ink)" : "var(--color-edge)"}`, borderRadius: 10, fontSize: 13, fontWeight: active ? 600 : 400, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6 }}
               >
                 {f.label}
@@ -325,17 +314,17 @@ export default function SettlementsPage() {
       </div>
 
       {/* Table */}
-      <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", overflow: "hidden" }}>
+      <div style={{ background: "white", borderRadius: 20, border: "1px solid var(--color-edge)", overflow: "hidden" }}>
         {isError ? (
           <div style={{ padding: "56px 24px", textAlign: "center" }}>
             <p style={{ fontSize: 13, fontWeight: 500, color: "var(--color-danger)", margin: 0 }}>Failed to load settlements</p>
             <p style={{ fontSize: 12, color: "var(--color-ink-3)", marginTop: 4 }}>Check your connection and try again.</p>
-            <button onClick={() => void refetch()} style={{ marginTop: 16, height: 34, padding: "0 16px", background: "white", border: "1px solid #E5E7EB", borderRadius: 10, fontSize: 12, fontWeight: 600, color: "var(--color-danger)", cursor: "pointer", fontFamily: "inherit" }}>Retry</button>
+            <button onClick={() => void refetch()} style={{ marginTop: 16, height: 34, padding: "0 16px", background: "white", border: "1px solid var(--color-edge)", borderRadius: 10, fontSize: 12, fontWeight: 600, color: "var(--color-danger)", cursor: "pointer", fontFamily: "inherit" }}>Retry</button>
           </div>
         ) : isLoading ? (
           <div>
             {[...Array(6)].map((_, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 20px", borderBottom: "1px solid #F9FAFB" }}>
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 20px", borderBottom: "1px solid var(--color-canvas)" }}>
                 <div style={{ width: 32, height: 32, borderRadius: 8, background: "var(--color-surface-muted)", flexShrink: 0 }} className="animate-pulse" />
                 <div style={{ flex: 1 }}>
                   <div style={{ height: 12, background: "var(--color-surface-muted)", borderRadius: 4, width: 140, marginBottom: 6 }} className="animate-pulse" />
@@ -358,17 +347,17 @@ export default function SettlementsPage() {
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
               <thead>
-                <tr style={{ borderBottom: "1px solid #F3F4F6", background: "var(--color-surface-raised)" }}>
+                <tr style={{ borderBottom: "1px solid var(--color-edge-2)", background: "var(--color-surface-raised)" }}>
                   {["Employer", "Settlement No.", "Salary Cycle", "Total", "Outstanding", "Late Fee", "Due Date", "Status", "Actions"].map(h => (
                     <th key={h} style={{ padding: "14px 20px", textAlign: "left", fontSize: 11.5, fontWeight: 600, color: "var(--color-ink-4)", textTransform: "uppercase", letterSpacing: "0.07em", whiteSpace: "nowrap" }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {rows.map(s => (
+                {paginated.map(s => (
                   <tr
                     key={s.id}
-                    style={{ borderBottom: "1px solid #F9FAFB", background: selected?.id === s.id ? "var(--color-brand-soft)" : "transparent" }}
+                    style={{ borderBottom: "1px solid var(--color-canvas)", background: selected?.id === s.id ? "var(--color-brand-soft)" : "transparent" }}
                   >
                     <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
                       <div>
@@ -397,7 +386,7 @@ export default function SettlementsPage() {
                         <button
                           title="View Details"
                           onClick={() => void openSettlement(s)}
-                          style={{ height: 28, width: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid #E5E7EB", background: "white", color: "var(--color-ink-3)", cursor: "pointer" }}
+                          style={{ height: 28, width: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid var(--color-edge)", background: "white", color: "var(--color-ink-3)", cursor: "pointer" }}
                         >
                           <Eye size={13} />
                         </button>
@@ -407,7 +396,7 @@ export default function SettlementsPage() {
                           title="Send Report"
                           disabled={sending === s.id}
                           onClick={e => handleSendReport(s, e)}
-                          style={{ height: 28, width: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid #E5E7EB", background: "white", color: "var(--color-ink-3)", cursor: "pointer", opacity: sending === s.id ? 0.5 : 1 }}
+                          style={{ height: 28, width: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid var(--color-edge)", background: "white", color: "var(--color-ink-3)", cursor: "pointer", opacity: sending === s.id ? 0.5 : 1 }}
                         >
                           {sending === s.id
                             ? <span style={{ width: 12, height: 12, border: "2px solid rgba(49,94,255,0.3)", borderTopColor: "var(--color-brand)", borderRadius: "50%" }} className="animate-spin" />
@@ -420,7 +409,7 @@ export default function SettlementsPage() {
                           <button
                             title="Mark as Paid"
                             disabled={marking === s.id}
-                            onClick={e => { e.stopPropagation(); void handleMarkPaid(s); }}
+                            onClick={e => { e.stopPropagation(); setConfirmPay(s); }}
                             style={{ height: 28, padding: "0 10px", display: "flex", alignItems: "center", gap: 4, borderRadius: 8, border: "1px solid #C8C9FF", background: "var(--color-brand-soft)", color: "var(--color-info)", cursor: "pointer", fontSize: 11, fontWeight: 600, fontFamily: "inherit", whiteSpace: "nowrap", opacity: marking === s.id ? 0.5 : 1 }}
                           >
                             {marking === s.id
@@ -440,13 +429,17 @@ export default function SettlementsPage() {
         )}
       </div>
 
+      {!isError && !isLoading && rows.length > 0 && (
+        <Pagination page={safePage} totalPages={totalPages} total={rows.length} limit={PAGE_SIZE} onPage={setPage} />
+      )}
+
       {/* Drawer — settlement detail */}
       {selected && (
         <>
           <div style={{ position: "fixed", inset: 0, zIndex: 30, background: "rgba(0,0,0,0.2)", backdropFilter: "blur(1px)" }} onClick={() => setSelected(null)} />
-          <div style={{ position: "fixed", top: 0, bottom: 0, right: 0, zIndex: 40, width: 460, background: "white", borderLeft: "1px solid #E5E7EB", boxShadow: "0 20px 60px rgba(0,0,0,0.15)", display: "flex", flexDirection: "column" }}>
+          <div style={{ position: "fixed", top: 0, bottom: 0, right: 0, zIndex: 40, width: 460, background: "white", borderLeft: "1px solid var(--color-edge)", boxShadow: "0 20px 60px rgba(0,0,0,0.15)", display: "flex", flexDirection: "column" }}>
             {/* Header */}
-            <div style={{ padding: "20px 20px 16px", borderBottom: "1px solid #E5E7EB" }}>
+            <div style={{ padding: "20px 20px 16px", borderBottom: "1px solid var(--color-edge)" }}>
               <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
@@ -460,7 +453,7 @@ export default function SettlementsPage() {
                   <p style={{ fontSize: 16, fontWeight: 700, color: "var(--color-ink)", margin: 0, lineHeight: 1.2 }}>{selected.employer.companyName}</p>
                   <p style={{ fontSize: 12, color: "var(--color-ink-3)", marginTop: 2 }}>{formatCycleDate(selected.cycleDate)} · {selected.employer.companyCode}</p>
                 </div>
-                <button onClick={() => setSelected(null)} style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid #E5E7EB", background: "white", color: "var(--color-ink-3)", cursor: "pointer" }}>
+                <button onClick={() => setSelected(null)} style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid var(--color-edge)", background: "white", color: "var(--color-ink-3)", cursor: "pointer" }}>
                   <X size={14} />
                 </button>
               </div>
@@ -492,7 +485,7 @@ export default function SettlementsPage() {
               {/* Amount breakdown */}
               <div>
                 <p style={{ fontSize: 11, fontWeight: 600, color: "var(--color-ink-4)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Amount Breakdown</p>
-                <div style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 16, padding: "0 16px" }}>
+                <div style={{ background: "white", border: "1px solid var(--color-edge)", borderRadius: 16, padding: "0 16px" }}>
                   <InfoRow label="Principal" value={formatCurrency(selected.principalAmount)} />
                   <InfoRow label="Interest"  value={formatCurrency(selected.interestAmount)} />
                   {parseFloat(selected.processingFeeAmount ?? "0") > 0 && (
@@ -504,12 +497,12 @@ export default function SettlementsPage() {
                   {parseFloat(selected.lateFeeAmount) > 0 && (
                     <InfoRow label="Late fee" value={formatCurrency(selected.lateFeeAmount)} accent />
                   )}
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderTop: "1px solid #E5E7EB", marginTop: 4 }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderTop: "1px solid var(--color-edge)", marginTop: 4 }}>
                     <span style={{ fontSize: 12, fontWeight: 600, color: "var(--color-ink)" }}>Total</span>
                     <span style={{ fontSize: 14, fontWeight: 700, color: "var(--color-ink)", fontVariantNumeric: "tabular-nums" }}>{formatCurrency(selected.totalAmount)}</span>
                   </div>
                   {parseFloat(selected.outstandingAmount) > 0 && (
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderTop: "1px solid #FEE2E2" }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderTop: "1px solid var(--color-danger-bg)" }}>
                       <span style={{ fontSize: 12, fontWeight: 600, color: "var(--color-danger)" }}>Outstanding</span>
                       <span style={{ fontSize: 14, fontWeight: 700, color: "var(--color-danger)", fontVariantNumeric: "tabular-nums" }}>{formatCurrency(selected.outstandingAmount)}</span>
                     </div>
@@ -520,7 +513,7 @@ export default function SettlementsPage() {
               {/* Key dates */}
               <div>
                 <p style={{ fontSize: 11, fontWeight: 600, color: "var(--color-ink-4)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Key Dates</p>
-                <div style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 16, padding: "0 16px" }}>
+                <div style={{ background: "white", border: "1px solid var(--color-edge)", borderRadius: 16, padding: "0 16px" }}>
                   <InfoRow label="Due date"          value={formatDate(selected.dueDate)} accent={selected.status === "OVERDUE"} />
                   {selected.gracePeriodEnd && <InfoRow label="Grace period ends" value={formatDate(selected.gracePeriodEnd)} />}
                   {selected.paidDate && <InfoRow label="Paid on" value={formatDate(selected.paidDate)} />}
@@ -540,13 +533,13 @@ export default function SettlementsPage() {
               <div>
                 <p style={{ fontSize: 11, fontWeight: 600, color: "var(--color-ink-4)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Salary Deductions</p>
                 {loadingDetailId === selected.id ? (
-                  <div style={{ background: "var(--color-canvas)", border: "1px solid #E5E7EB", borderRadius: 16, padding: 16 }}>
+                  <div style={{ background: "var(--color-canvas)", border: "1px solid var(--color-edge)", borderRadius: 16, padding: 16 }}>
                     <p style={{ fontSize: 12, color: "var(--color-ink-3)", margin: 0 }}>Loading salary deduction rows…</p>
                   </div>
                 ) : selected.lineItems?.length ? (
-                  <div style={{ border: "1px solid #E5E7EB", borderRadius: 16, overflow: "hidden", background: "white" }}>
+                  <div style={{ border: "1px solid var(--color-edge)", borderRadius: 16, overflow: "hidden", background: "white" }}>
                     {selected.lineItems.map((item) => (
-                      <div key={item.id} style={{ padding: "12px 14px", borderBottom: "1px solid #F3F4F6" }}>
+                      <div key={item.id} style={{ padding: "12px 14px", borderBottom: "1px solid var(--color-edge-2)" }}>
                         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
                           <div style={{ minWidth: 0 }}>
                             <p style={{ fontSize: 12.5, fontWeight: 600, color: "var(--color-ink)", margin: 0 }}>{item.employeeName}</p>
@@ -574,7 +567,7 @@ export default function SettlementsPage() {
                     ))}
                   </div>
                 ) : (
-                  <div style={{ background: "var(--color-canvas)", border: "1px solid #E5E7EB", borderRadius: 16, padding: "12px 14px" }}>
+                  <div style={{ background: "var(--color-canvas)", border: "1px solid var(--color-edge)", borderRadius: 16, padding: "12px 14px" }}>
                     <p style={{ fontSize: 12, color: "var(--color-ink-3)", lineHeight: 1.5, margin: 0 }}>
                       No salary deduction rows linked to this settlement yet.
                     </p>
@@ -586,7 +579,7 @@ export default function SettlementsPage() {
               {selected.notes && (
                 <div>
                   <p style={{ fontSize: 11, fontWeight: 600, color: "var(--color-ink-4)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Notes</p>
-                  <div style={{ background: "var(--color-canvas)", border: "1px solid #E5E7EB", borderRadius: 16, padding: "12px 16px" }}>
+                  <div style={{ background: "var(--color-canvas)", border: "1px solid var(--color-edge)", borderRadius: 16, padding: "12px 16px" }}>
                     <p style={{ fontSize: 12, color: "var(--color-ink-3)", lineHeight: 1.6, margin: 0 }}>{selected.notes}</p>
                   </div>
                 </div>
@@ -594,14 +587,14 @@ export default function SettlementsPage() {
             </div>
 
             {/* Footer */}
-            <div style={{ padding: "16px 20px", borderTop: "1px solid #E5E7EB", display: "flex", flexDirection: "column", gap: 8 }}>
+            <div style={{ padding: "16px 20px", borderTop: "1px solid var(--color-edge)", display: "flex", flexDirection: "column", gap: 8 }}>
               {markError && <p style={{ fontSize: 11, color: "var(--color-danger)", textAlign: "center", margin: 0 }}>{markError}</p>}
 
               {/* Send Report */}
               <button
                 onClick={() => handleSendReport(selected)}
                 disabled={sending === selected.id}
-                style={{ width: "100%", height: 40, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, borderRadius: 10, border: "1px solid #315eff", color: "var(--color-brand)", fontSize: 13, fontWeight: 600, background: "white", cursor: sending === selected.id ? "not-allowed" : "pointer", opacity: sending === selected.id ? 0.5 : 1, fontFamily: "inherit" }}
+                style={{ width: "100%", height: 40, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, borderRadius: 10, border: "1px solid var(--color-brand)", color: "var(--color-brand)", fontSize: 13, fontWeight: 600, background: "white", cursor: sending === selected.id ? "not-allowed" : "pointer", opacity: sending === selected.id ? 0.5 : 1, fontFamily: "inherit" }}
               >
                 {sending === selected.id
                   ? <span style={{ width: 16, height: 16, border: "2px solid rgba(49,94,255,0.3)", borderTopColor: "var(--color-brand)", borderRadius: "50%" }} className="animate-spin" />
@@ -614,7 +607,7 @@ export default function SettlementsPage() {
               {canPay(selected) && (
                 <>
                   <button
-                    onClick={() => handleMarkPaid(selected)}
+                    onClick={() => setConfirmPay(selected)}
                     disabled={marking === selected.id}
                     style={{ width: "100%", height: 40, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, borderRadius: 10, background: "var(--color-brand)", color: "white", fontSize: 13, fontWeight: 600, border: "none", cursor: marking === selected.id ? "not-allowed" : "pointer", opacity: marking === selected.id ? 0.5 : 1, fontFamily: "inherit" }}
                   >
@@ -630,6 +623,17 @@ export default function SettlementsPage() {
           </div>
         </>
       )}
+
+      <ConfirmModal
+        open={confirmPay !== null}
+        title="Mark settlement as paid?"
+        description={confirmPay ? `Confirm receipt of ${formatCurrency(confirmPay.outstandingAmount || confirmPay.totalAmount)} from ${confirmPay.employer.companyName}. Linked salary deductions will move to recovered.` : ""}
+        confirmLabel="Mark as Paid"
+        confirmVariant="primary"
+        loading={confirmPay !== null && marking === confirmPay.id}
+        onConfirm={() => confirmPay && void handleMarkPaid(confirmPay)}
+        onCancel={() => setConfirmPay(null)}
+      />
     </div>
   );
 }
