@@ -167,7 +167,7 @@ export default function AuditLogsPage() {
   const tdStyle: React.CSSProperties = { padding: "12px 16px", verticalAlign: "top" };
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: "Inter, ui-sans-serif, sans-serif", display: "flex", flexDirection: "column", gap: 20 }}>
+    <div style={{ padding: "28px 32px", display: "flex", flexDirection: "column", gap: 20 }}>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
@@ -186,7 +186,7 @@ export default function AuditLogsPage() {
           <Search size={13} color="var(--color-ink-4)" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }} />
           <input
             type="text"
-            placeholder="Search action, email, entity…"
+            placeholder="Filter this page (action, email, entity)…"
             value={search}
             onChange={e => setSearch(e.target.value)}
             style={{ width: "100%", height: 40, paddingLeft: 36, paddingRight: 16, fontSize: 13, background: "white", border: "1px solid var(--color-edge)", borderRadius: 10, outline: "none", color: "var(--color-ink)", fontFamily: "inherit", boxSizing: "border-box" }}
@@ -209,6 +209,12 @@ export default function AuditLogsPage() {
           </button>
         )}
       </div>
+
+      {search && (
+        <p style={{ fontSize: 11.5, color: "var(--color-ink-4)", marginTop: -12 }}>
+          Only scanning the {logs.length} event{logs.length !== 1 ? "s" : ""} currently loaded on this page — use the Action/Entity type filters to narrow the full {total.toLocaleString()}-event log, or page through for older results.
+        </p>
+      )}
 
       {/* States */}
       {isLoading ? (
@@ -233,7 +239,11 @@ export default function AuditLogsPage() {
       ) : rows.length === 0 ? (
         <div style={{ background: "white", border: "1px solid var(--color-edge)", borderRadius: 20, padding: "40px 24px", textAlign: "center" }}>
           <p style={{ fontSize: 13, fontWeight: 500, color: "var(--color-ink-2)", margin: 0 }}>No audit events found</p>
-          <p style={{ fontSize: 12, color: "var(--color-ink-3)", marginTop: 4 }}>Events are recorded as admin and user actions occur.</p>
+          <p style={{ fontSize: 12, color: "var(--color-ink-3)", marginTop: 4 }}>
+            {search
+              ? "No match on this page. Try clearing the search and paging through, or narrow by Action/Entity type instead."
+              : "Events are recorded as admin and user actions occur."}
+          </p>
         </div>
       ) : (
         <>

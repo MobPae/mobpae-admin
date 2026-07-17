@@ -7,6 +7,9 @@ import KycGroupedDrawer from "../components/kyc/KycGroupedDrawer";
 import type { KycEmployeeGroup } from "../types/kyc";
 import { exportToCsv } from "../utils/exportCsv";
 import { useDebouncedValue } from "../hooks/useDebouncedValue";
+import { Pagination } from "../components/ui/Pagination";
+
+const PAGE_SIZE = 15;
 
 type StatusFilter = "ALL" | "PENDING" | "VERIFIED" | "REJECTED";
 
@@ -22,6 +25,7 @@ export default function KycVerificationPage() {
   const debouncedSearch = useDebouncedValue(search, 200);
   const [status,     setStatus]     = useState<StatusFilter>("ALL");
   const [employerId, setEmployerId] = useState<string>("");
+  const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const queryKey = ["kyc-grouped", employerId, status];
@@ -59,6 +63,10 @@ export default function KycVerificationPage() {
       g.companyName.toLowerCase().includes(q)
     );
   });
+
+  const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const paginated = rows.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   // Keep drawer data live — re-derives whenever query refreshes
   const selectedGroup = useMemo(
@@ -118,7 +126,7 @@ export default function KycVerificationPage() {
             type="text"
             placeholder="Search by name, code, employer…"
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={e => { setSearch(e.target.value); setPage(1); }}
             style={{ flex: 1, fontSize: 13.5, color: "var(--color-ink)", background: "transparent", outline: "none", border: "none", fontFamily: "inherit" }}
           />
         </div>
@@ -128,7 +136,7 @@ export default function KycVerificationPage() {
           <div style={{ position: "relative" }}>
             <select
               value={employerId}
-              onChange={e => setEmployerId(e.target.value)}
+              onChange={e => { setEmployerId(e.target.value); setPage(1); }}
               style={{ height: 40, padding: "0 28px 0 12px", background: "white", border: "1px solid var(--color-edge)", borderRadius: 12, fontSize: 13.5, color: "var(--color-ink-3)", outline: "none", cursor: "pointer", fontFamily: "inherit", appearance: "none" }}
             >
               <option value="">All employers</option>
@@ -147,7 +155,7 @@ export default function KycVerificationPage() {
             return (
               <button
                 key={c.key}
-                onClick={() => setStatus(c.key)}
+                onClick={() => { setStatus(c.key); setPage(1); }}
                 style={{ height: 36, padding: "0 14px", background: active ? "var(--color-ink)" : "white", color: active ? "white" : "var(--color-ink-3)", border: `1px solid ${active ? "var(--color-ink)" : "var(--color-edge)"}`, borderRadius: 10, fontSize: 13, fontWeight: active ? 600 : 400, cursor: "pointer", fontFamily: "inherit" }}
               >
                 {c.label}
@@ -159,7 +167,7 @@ export default function KycVerificationPage() {
         {/* Clear */}
         {(search || employerId || status !== "ALL") && (
           <button
-            onClick={() => { setSearch(""); setEmployerId(""); setStatus("ALL"); }}
+            onClick={() => { setSearch(""); setEmployerId(""); setStatus("ALL"); setPage(1); }}
             style={{ height: 36, padding: "0 14px", background: "white", border: "1px dashed var(--color-edge)", borderRadius: 10, fontSize: 13, color: "var(--color-ink-3)", cursor: "pointer", fontFamily: "inherit" }}
           >
             Clear filters
@@ -204,10 +212,11 @@ export default function KycVerificationPage() {
             <span style={{ fontSize: 12, color: "var(--color-ink-4)" }}><span style={{ fontWeight: 500, color: "var(--color-ink-3)" }}>{rows.length}</span> employee{rows.length !== 1 ? "s" : ""}</span>
           </div>
           <KycGroupedTable
-            groups={rows}
+            groups={paginated}
             selectedId={selectedId}
             onSelect={g => setSelectedId(g.employeeId)}
           />
+          <Pagination page={safePage} totalPages={totalPages} total={rows.length} limit={PAGE_SIZE} onPage={setPage} />
         </>
       )}
 

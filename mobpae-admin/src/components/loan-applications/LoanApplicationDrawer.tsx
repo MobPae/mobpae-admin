@@ -81,7 +81,7 @@ const PLATFORM_FEE_BADGE: Record<string, string> = {
   EXPIRED: "bg-surface-muted text-ink-3",
 };
 
-type ConfirmAction = "admin-approve" | "approve-and-disburse" | "disburse-only" | "waive-platform-fee";
+type ConfirmAction = "admin-approve" | "approve-and-disburse" | "disburse-only" | "waive-platform-fee" | "admin-reject";
 
 export default function LoanApplicationDrawer({ open, application, onClose, onMutated }: Props) {
   useEscKey(open, onClose);
@@ -211,6 +211,7 @@ export default function LoanApplicationDrawer({ open, application, onClose, onMu
     else if (confirm === "approve-and-disburse") approveAndDisburseMutation.mutate();
     else if (confirm === "disburse-only")  disburseMutation.mutate();
     else if (confirm === "waive-platform-fee") waivePlatformFeeMutation.mutate();
+    else if (confirm === "admin-reject")   rejectMutation.mutate();
     setConfirm(null);
   };
 
@@ -219,25 +220,31 @@ export default function LoanApplicationDrawer({ open, application, onClose, onMu
       title: "Approve application",
       description: `This will approve ${application.employee.name}'s application (${displayAmount}) and mark it ready for disbursal.`,
       label: "Approve",
-      cls: "bg-brand hover:bg-[#2048EE] text-white",
+      cls: "bg-brand hover:bg-brand-hover text-white",
     },
     "approve-and-disburse": {
       title: "Approve & Disburse",
       description: `This will approve and immediately disburse ${displayAmount} to ${application.employee.name}'s bank account. This cannot be undone.`,
       label: "Approve & Disburse",
-      cls: "bg-brand hover:bg-[#2048EE] text-white",
+      cls: "bg-brand hover:bg-brand-hover text-white",
     },
     "disburse-only": {
       title: "Disburse funds",
       description: `This will send ${fmt(application.disbursal?.disbursedAmount)} to ${application.employee.name}'s bank account. This cannot be undone.`,
       label: "Disburse",
-      cls: "bg-brand hover:bg-[#2048EE] text-white",
+      cls: "bg-brand hover:bg-brand-hover text-white",
     },
     "waive-platform-fee": {
       title: "Waive platform fee",
       description: `This will waive the platform fee for ${application.employee.name}'s request and move it back to admin review. Use this only for support exceptions.`,
       label: "Waive fee",
       cls: "bg-warning hover:bg-warning-dark text-white",
+    },
+    "admin-reject": {
+      title: "Reject application",
+      description: `This will reject ${application.employee.name}'s application for ${displayAmount}. This cannot be undone and the employee will need to submit a new request.`,
+      label: "Reject",
+      cls: "bg-danger hover:bg-danger-dark text-white",
     },
   };
 
@@ -249,7 +256,7 @@ export default function LoanApplicationDrawer({ open, application, onClose, onMu
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-edge flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#111827] to-[#2A2C45] text-white flex items-center justify-center text-[12px] font-[600]">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-ink to-[#2A2C45] text-white flex items-center justify-center text-[12px] font-[600]">
               {application.employee.name.charAt(0).toUpperCase()}
             </div>
             <div>
@@ -504,7 +511,7 @@ export default function LoanApplicationDrawer({ open, application, onClose, onMu
               <button
                 onClick={() => setConfirm("approve-and-disburse")}
                 disabled={isBusy}
-                className="w-full h-8 rounded-md bg-brand hover:bg-[#2048EE] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
+                className="w-full h-8 rounded-md bg-brand hover:bg-brand-hover text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
               >
                 {approveAndDisburseMutation.isPending
                   ? <Loader2 size={12} className="animate-spin" />
@@ -532,7 +539,7 @@ export default function LoanApplicationDrawer({ open, application, onClose, onMu
               <button
                 onClick={() => setConfirm("disburse-only")}
                 disabled={isBusy}
-                className="w-full h-8 rounded-md bg-brand hover:bg-[#2048EE] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
+                className="w-full h-8 rounded-md bg-brand hover:bg-brand-hover text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
               >
                 {disburseMutation.isPending
                   ? <Loader2 size={12} className="animate-spin" />
@@ -544,7 +551,7 @@ export default function LoanApplicationDrawer({ open, application, onClose, onMu
             {/* Reject (shown alongside approve) */}
             {canAdminApprove && (
               <button
-                onClick={() => rejectMutation.mutate()}
+                onClick={() => setConfirm("admin-reject")}
                 disabled={isBusy}
                 className="w-full h-7 rounded-md border border-[#FECACA] text-[11px] font-[500] text-danger hover:bg-danger-soft flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
               >

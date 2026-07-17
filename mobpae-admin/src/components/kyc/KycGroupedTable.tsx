@@ -11,12 +11,12 @@ const OVERALL_STATUS: Record<string, { dot: string; text: string; bg: string; la
   PENDING:       { label: "Pending", dot: "bg-amber-400", text: "text-amber-700", bg: "bg-amber-50" },
   VERIFIED:      { label: "Verified", dot: "bg-[#22C55E]", text: "text-success-dark", bg: "bg-success-bg" },
   REJECTED:      { label: "Rejected", dot: "bg-red-400", text: "text-danger", bg: "bg-danger-soft" },
-  NOT_SUBMITTED: { label: "Not submitted", dot: "bg-[#9CA3AF]", text: "text-ink-3", bg: "bg-surface-muted" },
+  NOT_SUBMITTED: { label: "Not submitted", dot: "bg-ink-4", text: "text-ink-3", bg: "bg-surface-muted" },
 };
 
 export default function KycGroupedTable({ groups, selectedId, onSelect }: Props) {
   return (
-    <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", overflow: "hidden" }}>
+    <div style={{ background: "white", borderRadius: 20, border: "1px solid var(--color-edge)", overflow: "hidden" }}>
       <table className="w-full table-fixed">
         <colgroup>
           <col style={{ width: "18%" }} />

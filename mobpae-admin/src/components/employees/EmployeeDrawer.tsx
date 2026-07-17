@@ -1,9 +1,8 @@
 import { useEscKey } from "../../lib/useEscKey";
 import { useState } from "react";
-import { X, CheckCircle, XCircle, Camera } from "lucide-react";
+import { X, Mail } from "lucide-react";
 import type { Employee } from "../../types/employee";
-import { verifySelfie, rejectSelfie } from "../../services/employeeService";
-import { useSignedUrl } from "../../hooks/useSignedUrl";
+import { resendActivationEmail } from "../../services/employeeService";
 
 interface Props {
   open: boolean;
@@ -17,54 +16,12 @@ const STATUS_BADGE: Record<string, string> = {
   INACTIVE: "bg-surface-muted text-ink-3",
 };
 
-const SELFIE_BADGE: Record<string, string> = {
-  PENDING:  "bg-amber-50 text-amber-700",
-  VERIFIED: "bg-success-bg text-success-dark",
-  REJECTED: "bg-danger-soft text-danger",
-};
-
 export default function EmployeeDrawer({ open, employee, onClose, onRefresh }: Props) {
   useEscKey(open, onClose);
-  const [rejectRemarks, setRejectRemarks]     = useState("");
-  const [showRejectBox, setShowRejectBox]     = useState(false);
-  const [selfieLoading, setSelfieLoading]     = useState(false);
-  const [selfieError,   setSelfieError]       = useState("");
-
-  // Hook must be called before any early return to keep hook order stable
-  const { url: selfieImgUrl } = useSignedUrl(employee?.selfieUrl ?? null);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendMsg,     setResendMsg]     = useState<{ ok: boolean; text: string } | null>(null);
 
   if (!open || !employee) return null;
-
-  const selfieStatus = employee.selfieStatus ?? "PENDING";
-
-  async function handleVerify() {
-    setSelfieLoading(true);
-    setSelfieError("");
-    try {
-      await verifySelfie(employee!.id);
-      onRefresh?.();
-      onClose();
-    } catch {
-      setSelfieError("Verification failed. Please try again.");
-    } finally {
-      setSelfieLoading(false);
-    }
-  }
-
-  async function handleReject() {
-    if (!rejectRemarks.trim()) { setSelfieError("Remarks are required for rejection."); return; }
-    setSelfieLoading(true);
-    setSelfieError("");
-    try {
-      await rejectSelfie(employee!.id, rejectRemarks.trim());
-      onRefresh?.();
-      onClose();
-    } catch {
-      setSelfieError("Rejection failed. Please try again.");
-    } finally {
-      setSelfieLoading(false);
-    }
-  }
 
   return (
     <>
@@ -74,7 +31,7 @@ export default function EmployeeDrawer({ open, employee, onClose, onRefresh }: P
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-edge flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#111827] to-[#2A2C45] text-white flex items-center justify-center text-[12px] font-[600]">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-ink to-[#2A2C45] text-white flex items-center justify-center text-[12px] font-[600]">
               {employee.name.charAt(0).toUpperCase()}
             </div>
             <div>
@@ -104,9 +61,9 @@ export default function EmployeeDrawer({ open, employee, onClose, onRefresh }: P
             </p>
             <div className="border border-edge rounded-lg divide-y divide-edge">
               {[
-                { k: "Full name",  v: employee.name             },
-                { k: "Email",      v: employee.email            },
-                { k: "Phone",      v: employee.phone            },
+                { k: "Full name", v: employee.name  },
+                { k: "Email",     v: employee.email },
+                { k: "Phone",     v: employee.phone },
               ].map(({ k, v }) => (
                 <div key={k} className="flex items-center justify-between px-3 py-2.5">
                   <span className="text-[11px] text-ink-3">{k}</span>
@@ -127,6 +84,7 @@ export default function EmployeeDrawer({ open, employee, onClose, onRefresh }: P
                 { k: "Salary in hand", v: `₹${Number(employee.salaryInHand).toLocaleString("en-IN")}` },
                 { k: "Joining date",   v: employee.joiningDate ? new Date(employee.joiningDate).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "Not set" },
                 { k: "App access",     v: <span className={`inline-flex h-[16px] px-1.5 rounded-[3px] items-center text-[11px] font-[500] ${employee.appActivated ? "bg-[#DBEAFE] text-[#1D4ED8]" : "bg-surface-muted text-ink-3"}`}>{employee.appActivated ? "Enabled" : "Disabled"}</span> },
+                { k: "Password set",   v: <span className={`inline-flex h-[16px] px-1.5 rounded-[3px] items-center text-[11px] font-[500] ${employee.passwordChanged ? "bg-success-bg text-success-dark" : "bg-amber-50 text-amber-700"}`}>{employee.passwordChanged ? "Yes" : "Pending"}</span> },
                 { k: "Member since",   v: new Date(employee.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) },
               ].map(({ k, v }) => (
                 <div key={k} className="flex items-center justify-between px-3 py-2.5">
@@ -135,6 +93,35 @@ export default function EmployeeDrawer({ open, employee, onClose, onRefresh }: P
                 </div>
               ))}
             </div>
+            {!employee.passwordChanged && (
+              <div className="mt-2">
+                {resendMsg && (
+                  <p className={`mb-1.5 text-[11px] ${resendMsg.ok ? "text-success-dark" : "text-danger"}`}>
+                    {resendMsg.text}
+                  </p>
+                )}
+                <button
+                  disabled={resendLoading}
+                  onClick={async () => {
+                    setResendLoading(true);
+                    setResendMsg(null);
+                    try {
+                      await resendActivationEmail(employee.id);
+                      setResendMsg({ ok: true, text: "Activation email sent successfully." });
+                      onRefresh?.();
+                    } catch {
+                      setResendMsg({ ok: false, text: "Failed to send. Please try again." });
+                    } finally {
+                      setResendLoading(false);
+                    }
+                  }}
+                  className="flex h-8 w-full items-center justify-center gap-1.5 rounded-lg border border-edge bg-surface text-[12px] font-[500] text-ink-3 transition-colors hover:border-amber-300 hover:bg-amber-50 hover:text-amber-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <Mail size={12} />
+                  {resendLoading ? "Sending…" : "Resend activation email"}
+                </button>
+              </div>
+            )}
           </section>
 
           {/* Employer */}
@@ -152,88 +139,6 @@ export default function EmployeeDrawer({ open, employee, onClose, onRefresh }: P
                   <span className="text-[11px] font-[500] text-ink">{v}</span>
                 </div>
               ))}
-            </div>
-          </section>
-
-          {/* Selfie */}
-          <section>
-            <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-ink-3 mb-2">
-              Selfie verification
-            </p>
-            <div className="border border-edge rounded-lg p-3 space-y-3">
-              {/* Status row */}
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] text-ink-3 flex items-center gap-1.5">
-                  <Camera size={12} /> Status
-                </span>
-                <span className={`inline-flex h-[18px] px-1.5 rounded-[3px] items-center text-[11px] font-[500] ${SELFIE_BADGE[selfieStatus]}`}>
-                  {selfieStatus}
-                </span>
-              </div>
-
-              {/* Selfie image */}
-              {selfieImgUrl ? (
-                <img
-                  src={selfieImgUrl}
-                  alt="Employee selfie"
-                  className="w-full rounded-lg object-cover"
-                  style={{ maxHeight: 200 }}
-                />
-              ) : (
-                <div className="bg-canvas rounded-lg h-[100px] flex items-center justify-center">
-                  <p className="text-[11px] text-ink-3">No selfie uploaded</p>
-                </div>
-              )}
-
-              {/* Selfie verified at */}
-              {employee.selfieVerifiedAt && (
-                <p className="text-[11px] text-ink-3">
-                  Verified {new Date(employee.selfieVerifiedAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
-                </p>
-              )}
-
-              {/* Actions — only when PENDING */}
-              {selfieStatus === "PENDING" && selfieImgUrl && (
-                <div className="space-y-2">
-                  {selfieError && (
-                    <p className="text-[11px] text-danger bg-danger-soft rounded px-2 py-1">{selfieError}</p>
-                  )}
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => void handleVerify()}
-                      disabled={selfieLoading}
-                      className="flex-1 h-8 rounded-lg bg-brand hover:bg-[#2048EE] text-white text-[11px] font-[500] flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
-                    >
-                      <CheckCircle size={12} /> Verify
-                    </button>
-                    <button
-                      onClick={() => setShowRejectBox(v => !v)}
-                      disabled={selfieLoading}
-                      className="flex-1 h-8 rounded-lg bg-danger-soft hover:bg-danger-bg text-red-700 text-[11px] font-[500] flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
-                    >
-                      <XCircle size={12} /> Reject
-                    </button>
-                  </div>
-                  {showRejectBox && (
-                    <div className="space-y-2">
-                      <textarea
-                        value={rejectRemarks}
-                        onChange={e => setRejectRemarks(e.target.value)}
-                        placeholder="Reason for rejection…"
-                        rows={2}
-                        className="w-full border border-edge rounded-lg px-2 py-1.5 text-[11px] text-ink-3 resize-none focus:outline-none focus:border-red-400"
-                      />
-                      <button
-                        onClick={() => void handleReject()}
-                        disabled={selfieLoading || !rejectRemarks.trim()}
-                        className="w-full h-8 rounded-lg bg-red-600 hover:bg-red-700 text-white text-[11px] font-[500] transition-colors disabled:opacity-50"
-                      >
-                        {selfieLoading ? "Submitting…" : "Confirm Rejection"}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
           </section>
         </div>

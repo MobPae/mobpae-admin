@@ -54,7 +54,7 @@ export default function RepaymentDrawer({ open, repayment, onClose, onMutated }:
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-edge flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#111827] to-[#2A2C45] text-white flex items-center justify-center text-[12px] font-[600]">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-ink to-[#2A2C45] text-white flex items-center justify-center text-[12px] font-[600]">
               {emp.name.charAt(0).toUpperCase()}
             </div>
             <div>
@@ -137,7 +137,7 @@ export default function RepaymentDrawer({ open, repayment, onClose, onMutated }:
             <button
               onClick={() => setConfirmOpen(true)}
               disabled={markPaidMutation.isPending}
-              className="w-full h-8 rounded-md bg-brand hover:bg-[#2048EE] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
+              className="w-full h-8 rounded-md bg-brand hover:bg-brand-hover text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
             >
               {markPaidMutation.isPending
                 ? <Loader2 size={12} className="animate-spin" />
@@ -153,7 +153,7 @@ export default function RepaymentDrawer({ open, repayment, onClose, onMutated }:
         title="Mark repayment as paid"
         description={`This will record ${fmt(repayment.totalAmount)} from ${repayment.loanApplication.employee.name} as received. This cannot be undone.`}
         confirmLabel="Mark Paid"
-        confirmClass="bg-brand hover:bg-[#2048EE] text-white"
+        confirmClass="bg-brand hover:bg-brand-hover text-white"
         loading={markPaidMutation.isPending}
         onConfirm={() => { setConfirmOpen(false); markPaidMutation.mutate(); }}
         onCancel={() => setConfirmOpen(false)}

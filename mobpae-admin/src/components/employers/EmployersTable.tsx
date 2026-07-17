@@ -38,10 +38,10 @@ export default function EmployersTable({ employers, selectedId, onSelect }: Prop
   const [hovered, setHovered] = useState<string | null>(null);
 
   return (
-    <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", boxShadow: "0 2px 8px rgba(17,24,39,0.04)", overflow: "hidden" }}>
+    <div style={{ background: "white", borderRadius: 20, border: "1px solid var(--color-edge)", boxShadow: "0 2px 8px rgba(17,24,39,0.04)", overflow: "hidden" }}>
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
-          <tr style={{ borderBottom: "1px solid #F3F4F6", background: "var(--color-surface-raised)" }}>
+          <tr style={{ borderBottom: "1px solid var(--color-edge-2)", background: "var(--color-surface-raised)" }}>
             {HEADERS.map((h, i) => (
               <th key={i} style={{ padding: "14px 20px", textAlign: "left", fontSize: 11.5, fontWeight: 600, color: "var(--color-ink-4)", textTransform: "uppercase", letterSpacing: "0.07em", whiteSpace: "nowrap" }}>
                 {h}
@@ -63,7 +63,7 @@ export default function EmployersTable({ employers, selectedId, onSelect }: Prop
                 onClick={() => onSelect(emp)}
                 onMouseEnter={() => setHovered(emp.id)}
                 onMouseLeave={() => setHovered(null)}
-                style={{ borderBottom: "1px solid #F9FAFB", cursor: "pointer", background: rowBg, transition: "background 0.1s" }}
+                style={{ borderBottom: "1px solid var(--color-canvas)", cursor: "pointer", background: rowBg, transition: "background 0.1s" }}
               >
                 {/* Company */}
                 <td style={{ padding: "16px 20px", verticalAlign: "middle" }}>
@@ -114,7 +114,7 @@ export default function EmployersTable({ employers, selectedId, onSelect }: Prop
           })}
         </tbody>
       </table>
-      <div style={{ padding: "12px 20px", borderTop: "1px solid #F3F4F6", background: "var(--color-surface-raised)" }}>
+      <div style={{ padding: "12px 20px", borderTop: "1px solid var(--color-edge-2)", background: "var(--color-surface-raised)" }}>
         <p style={{ fontSize: 12, color: "var(--color-ink-4)", margin: 0 }}>
           {employers.length} {employers.length === 1 ? "employer" : "employers"}
         </p>

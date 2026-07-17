@@ -1,5 +1,5 @@
 import api from "../lib/axios";
-import type { ActivateEmployerResponse, CreateEmployerPayload, CreateEmployerResponse, Employer } from "../types/employer";
+import type { ActivateEmployerResponse, CreateEmployerPayload, CreateEmployerResponse, Employer, EmployerMember, EmployerInvite } from "../types/employer";
 
 export interface EmployerProductConfig {
   id: string;
@@ -14,11 +14,6 @@ export async function getEmployers(): Promise<Employer[]> {
   const response = await api.get("/employers");
   const raw = response.data;
   return Array.isArray(raw) ? raw : ((raw?.data ?? []) as Employer[]);
-}
-
-export async function getEmployer(employerId: string): Promise<Employer> {
-  const response = await api.get<Employer>(`/employers/${employerId}`);
-  return response.data;
 }
 
 export async function createEmployer(payload: CreateEmployerPayload): Promise<CreateEmployerResponse> {
@@ -36,6 +31,16 @@ export async function updateEmployerStatus(
 
 export async function getEmployerProductConfigs(employerId: string): Promise<EmployerProductConfig[]> {
   const response = await api.get<EmployerProductConfig[]>(`/employers/${employerId}/product-configs`);
+  return Array.isArray(response.data) ? response.data : [];
+}
+
+export async function getEmployerMembers(employerId: string): Promise<EmployerMember[]> {
+  const response = await api.get<EmployerMember[]>(`/employers/${employerId}/members`);
+  return Array.isArray(response.data) ? response.data : [];
+}
+
+export async function getEmployerInvites(employerId: string): Promise<EmployerInvite[]> {
+  const response = await api.get<EmployerInvite[]>(`/employers/${employerId}/invites`);
   return Array.isArray(response.data) ? response.data : [];
 }
 

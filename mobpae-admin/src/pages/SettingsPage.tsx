@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
@@ -259,7 +260,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: "Inter, ui-sans-serif, sans-serif" }}>
+    <div style={{ padding: "28px 32px" }}>
 
       {/* Header */}
       <div style={{ marginBottom: 28 }}>
@@ -268,7 +269,7 @@ export default function SettingsPage() {
         </h1>
         <p style={{ fontSize: 14, color: "var(--color-ink-3)", marginTop: 6 }}>
           Platform-wide configuration — changes take effect immediately. Lending rules live in{" "}
-          <a href="/loan-product" style={{ color: "var(--color-brand)", textDecoration: "underline" }}>Loan Product Config</a>.
+          <Link to="/loan-product" style={{ color: "var(--color-brand)", textDecoration: "underline" }}>Loan Product Config</Link>.
         </p>
       </div>
 

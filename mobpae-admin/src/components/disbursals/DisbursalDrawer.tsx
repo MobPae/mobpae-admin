@@ -62,7 +62,7 @@ export default function DisbursalDrawer({ open, disbursal, onClose, onMutated }:
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-edge flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#111827] to-[#2A2C45] text-white flex items-center justify-center text-[12px] font-[600]">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-ink to-[#2A2C45] text-white flex items-center justify-center text-[12px] font-[600]">
               {emp.name.charAt(0).toUpperCase()}
             </div>
             <div>
@@ -161,7 +161,7 @@ export default function DisbursalDrawer({ open, disbursal, onClose, onMutated }:
             <button
               onClick={() => setConfirmOpen(true)}
               disabled={!canDisburse || disburseMutation.isPending}
-              className="w-full h-8 rounded-md bg-brand hover:bg-[#2048EE] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-full h-8 rounded-md bg-brand hover:bg-brand-hover text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {disburseMutation.isPending
                 ? <Loader2 size={12} className="animate-spin" />
@@ -177,7 +177,7 @@ export default function DisbursalDrawer({ open, disbursal, onClose, onMutated }:
         title="Disburse funds"
         description={`This will send ${fmt(disbursal.disbursedAmount)} to ${disbursal.loanApplication.employee.name}'s bank account. This cannot be undone.`}
         confirmLabel="Disburse"
-        confirmClass="bg-brand hover:bg-[#2048EE] text-white"
+        confirmClass="bg-brand hover:bg-brand-hover text-white"
         loading={disburseMutation.isPending}
         onConfirm={() => { setConfirmOpen(false); disburseMutation.mutate(); }}
         onCancel={() => setConfirmOpen(false)}

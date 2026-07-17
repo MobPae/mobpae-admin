@@ -96,14 +96,14 @@ function EditorDrawer({ entry, type, onClose, onSaved }: EditorProps) {
         boxShadow: "-4px 0 24px rgba(0,0,0,0.10)",
       }}>
         {/* Header */}
-        <div style={{ padding: "20px 24px", borderBottom: "1px solid #F3F4F6", display: "flex", alignItems: "center", gap: 12 }}>
+        <div style={{ padding: "20px 24px", borderBottom: "1px solid var(--color-edge-2)", display: "flex", alignItems: "center", gap: 12 }}>
           <div style={{ flex: 1, minWidth: 0 }}>
             <p style={{ fontSize: 11, fontWeight: 600, color: T3, textTransform: "uppercase", letterSpacing: "0.06em", margin: 0 }}>
               {entry ? "Edit" : "Create"} · {type.replace(/_/g, " ")}
             </p>
             <h2 style={{ fontSize: 17, fontWeight: 700, color: T1, margin: "3px 0 0" }}>{meta.label}</h2>
           </div>
-          <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid #E5E7EB", background: "white", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: T2 }}>
+          <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid var(--color-edge)", background: "white", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: T2 }}>
             <X size={15} />
           </button>
         </div>
@@ -118,7 +118,7 @@ function EditorDrawer({ entry, type, onClose, onSaved }: EditorProps) {
             <input
               value={title}
               onChange={e => setTitle(e.target.value)}
-              style={{ width: "100%", height: 38, padding: "0 12px", border: "1.5px solid #E5E7EB", borderRadius: 8, fontSize: 13.5, color: T1, outline: "none", boxSizing: "border-box", fontFamily: "inherit" }}
+              style={{ width: "100%", height: 38, padding: "0 12px", border: "1.5px solid var(--color-edge)", borderRadius: 8, fontSize: 13.5, color: T1, outline: "none", boxSizing: "border-box", fontFamily: "inherit" }}
             />
           </div>
 
@@ -131,7 +131,7 @@ function EditorDrawer({ entry, type, onClose, onSaved }: EditorProps) {
               value={version}
               onChange={e => setVersion(e.target.value)}
               placeholder="e.g. 1.2.0"
-              style={{ width: "100%", height: 38, padding: "0 12px", border: "1.5px solid #E5E7EB", borderRadius: 8, fontSize: 13.5, color: T1, outline: "none", boxSizing: "border-box", fontFamily: "inherit" }}
+              style={{ width: "100%", height: 38, padding: "0 12px", border: "1.5px solid var(--color-edge)", borderRadius: 8, fontSize: 13.5, color: T1, outline: "none", boxSizing: "border-box", fontFamily: "inherit" }}
             />
           </div>
 
@@ -144,7 +144,7 @@ function EditorDrawer({ entry, type, onClose, onSaved }: EditorProps) {
               onChange={e => setContent(e.target.value)}
               placeholder="Enter content here…"
               style={{
-                width: "100%", minHeight: 280, padding: "12px", border: "1.5px solid #E5E7EB",
+                width: "100%", minHeight: 280, padding: "12px", border: "1.5px solid var(--color-edge)",
                 borderRadius: 8, fontSize: 13, color: T1, outline: "none",
                 boxSizing: "border-box", fontFamily: "inherit", resize: "vertical",
                 lineHeight: 1.6,
@@ -178,7 +178,7 @@ function EditorDrawer({ entry, type, onClose, onSaved }: EditorProps) {
         </div>
 
         {/* Footer */}
-        <div style={{ padding: "16px 24px", borderTop: "1px solid #F3F4F6", display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ padding: "16px 24px", borderTop: "1px solid var(--color-edge-2)", display: "flex", alignItems: "center", gap: 10 }}>
           <button
             onClick={() => save.mutate()}
             disabled={isBusy || !title.trim() || !content.trim()}
@@ -196,7 +196,7 @@ function EditorDrawer({ entry, type, onClose, onSaved }: EditorProps) {
           </button>
           <button
             onClick={onClose}
-            style={{ height: 38, padding: "0 16px", borderRadius: 9, border: "1.5px solid #E5E7EB", background: "white", color: T2, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
+            style={{ height: 38, padding: "0 16px", borderRadius: 9, border: "1.5px solid var(--color-edge)", background: "white", color: T2, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
           >
             Cancel
           </button>
@@ -271,7 +271,7 @@ function InfoCard({
               disabled={toggling}
               title={active ? "Deactivate" : "Activate"}
               style={{
-                width: 30, height: 30, borderRadius: 8, border: "1px solid #E5E7EB",
+                width: 30, height: 30, borderRadius: 8, border: "1px solid var(--color-edge)",
                 background: "white", display: "flex", alignItems: "center", justifyContent: "center",
                 cursor: toggling ? "not-allowed" : "pointer", color: active ? "var(--color-success)" : T3,
                 opacity: toggling ? 0.5 : 1,
@@ -297,7 +297,7 @@ function InfoCard({
           {exists && (
             <button
               onClick={() => setExpanded(v => !v)}
-              style={{ width: 30, height: 30, borderRadius: 8, border: "1px solid #E5E7EB", background: "white", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: T2 }}
+              style={{ width: 30, height: 30, borderRadius: 8, border: "1px solid var(--color-edge)", background: "white", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: T2 }}
             >
               {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
             </button>
@@ -307,7 +307,7 @@ function InfoCard({
 
       {/* Expanded preview */}
       {expanded && entry && (
-        <div style={{ borderTop: "1px solid #F3F4F6", padding: "16px 20px", background: "var(--color-surface-raised)" }}>
+        <div style={{ borderTop: "1px solid var(--color-edge-2)", padding: "16px 20px", background: "var(--color-surface-raised)" }}>
           <p style={{ fontSize: 12, fontWeight: 600, color: T3, margin: "0 0 8px", textTransform: "uppercase", letterSpacing: "0.06em" }}>
             Content preview
           </p>
@@ -361,7 +361,7 @@ export function AppInformationPage() {
         </div>
         <button
           onClick={() => void refetch()}
-          style={{ width: 34, height: 34, borderRadius: 8, border: "1.5px solid #E5E7EB", background: "white", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: T3 }}
+          style={{ width: 34, height: 34, borderRadius: 8, border: "1.5px solid var(--color-edge)", background: "white", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: T3 }}
         >
           <RefreshCw size={14} />
         </button>
@@ -375,7 +375,7 @@ export function AppInformationPage() {
           { label: "Inactive",         value: entries.filter(e => !e.isActive).length, color: "#F59E0B" },
           { label: "Not created yet",  value: missingTypes.length,              color: T3       },
         ].map(s => (
-          <div key={s.label} style={{ background: "white", borderRadius: 12, padding: "14px 20px", border: "1px solid #F3F4F6", minWidth: 130 }}>
+          <div key={s.label} style={{ background: "white", borderRadius: 12, padding: "14px 20px", border: "1px solid var(--color-edge-2)", minWidth: 130 }}>
             <p style={{ fontSize: 22, fontWeight: 700, color: s.color, margin: 0 }}>{s.value}</p>
             <p style={{ fontSize: 11.5, color: T3, margin: "2px 0 0", fontWeight: 500 }}>{s.label}</p>
           </div>
@@ -384,14 +384,14 @@ export function AppInformationPage() {
 
       {/* States */}
       {isError && (
-        <div style={{ background: "white", borderRadius: 14, padding: "40px 24px", textAlign: "center", border: "1px solid #F3F4F6" }}>
+        <div style={{ background: "white", borderRadius: 14, padding: "40px 24px", textAlign: "center", border: "1px solid var(--color-edge-2)" }}>
           <p style={{ fontSize: 13, color: "var(--color-danger)", margin: 0 }}>Failed to load app information</p>
           <button onClick={() => void refetch()} style={{ marginTop: 12, height: 32, padding: "0 16px", borderRadius: 8, border: "none", background: P, color: "white", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>Retry</button>
         </div>
       )}
 
       {isLoading && (
-        <div style={{ background: "white", borderRadius: 14, padding: "40px 24px", textAlign: "center", border: "1px solid #F3F4F6" }}>
+        <div style={{ background: "white", borderRadius: 14, padding: "40px 24px", textAlign: "center", border: "1px solid var(--color-edge-2)" }}>
           <p style={{ fontSize: 13, color: T3, margin: 0 }}>Loading…</p>
         </div>
       )}

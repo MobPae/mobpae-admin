@@ -12,10 +12,7 @@ export async function getEmployee(employeeId: string): Promise<Employee> {
   return response.data;
 }
 
-export async function verifySelfie(employeeId: string): Promise<void> {
-  await api.post(`/employees/${employeeId}/selfie/verify`);
-}
-
-export async function rejectSelfie(employeeId: string, remarks: string): Promise<void> {
-  await api.post(`/employees/${employeeId}/selfie/reject`, { remarks });
+export async function resendActivationEmail(employeeId: string): Promise<{ message: string }> {
+  const response = await api.post(`/employees/${employeeId}/resend-activation`);
+  return response.data;
 }

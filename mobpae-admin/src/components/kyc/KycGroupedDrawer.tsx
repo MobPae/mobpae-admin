@@ -2,12 +2,10 @@ import { useState } from "react";
 import { useEscKey } from "../../lib/useEscKey";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { X, CheckCircle2, XCircle, Loader2, ExternalLink, FileText, Camera } from "lucide-react";
+import { X, CheckCircle2, XCircle, Loader2, ExternalLink, FileText } from "lucide-react";
 import { getApiErrorMessage } from "../../utils/api-errors";
 import { getKycDocuments, verifyKycDocument, rejectKycDocument } from "../../services/kycService";
-import { getEmployee, verifySelfie, rejectSelfie } from "../../services/employeeService";
 import type { KycDocument, KycEmployeeGroup } from "../../types/kyc";
-import type { Employee } from "../../types/employee";
 import { useSignedUrl } from "../../hooks/useSignedUrl";
 
 interface Props {
@@ -201,7 +199,7 @@ function DocCard({
           <button
             onClick={() => verifyMutation.mutate()}
             disabled={isBusy}
-            className="flex-1 h-7 rounded-md bg-[#111827] hover:bg-[#2A2C45] text-[11px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
+            className="flex-1 h-7 rounded-md bg-ink hover:bg-[#2A2C45] text-[11px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
           >
             {verifyMutation.isPending ? <Loader2 size={11} className="animate-spin" /> : <CheckCircle2 size={11} />}
             {verifyMutation.isPending ? "Approving…" : "Approve"}
@@ -214,150 +212,14 @@ function DocCard({
   );
 }
 
-function SelfieCard({
-  employee,
-  employeeQueryKey,
-  groupQueryKey,
-}: {
-  employee: Employee;
-  employeeQueryKey: unknown[];
-  groupQueryKey: unknown[];
-}) {
-  const qc = useQueryClient();
-  const [showReject, setShowReject] = useState(false);
-  const [remarks, setRemarks] = useState("");
-
-  const refresh = () => {
-    void qc.invalidateQueries({ queryKey: employeeQueryKey });
-    void qc.invalidateQueries({ queryKey: groupQueryKey });
-  };
-
-  const verifyMut = useMutation({
-    mutationFn: () => verifySelfie(employee.id),
-    onSuccess: () => { toast.success("Selfie verified"); setShowReject(false); refresh(); },
-    onError: (err: unknown) => toast.error("Failed", { description: getApiErrorMessage(err) }),
-  });
-
-  const rejectMut = useMutation({
-    mutationFn: () => rejectSelfie(employee.id, remarks),
-    onSuccess: () => { toast.success("Selfie rejected"); setShowReject(false); setRemarks(""); refresh(); },
-    onError: (err: unknown) => toast.error("Failed", { description: getApiErrorMessage(err) }),
-  });
-
-  const selfieStatus = employee.selfieStatus ?? "PENDING";
-  const sc     = STATUS_BADGE[selfieStatus] ?? STATUS_BADGE.PENDING;
-  const isBusy = verifyMut.isPending || rejectMut.isPending;
-  const canAct = selfieStatus === "PENDING";
-
-  const { url: selfieUrl } = useSignedUrl(employee.selfieUrl ?? null);
-
-  return (
-    <div className="border rounded-xl overflow-hidden border-edge">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 bg-canvas/60 border-b border-edge">
-        <div className="flex items-center gap-2">
-          <Camera size={13} className="text-ink-3 flex-shrink-0" />
-          <span className="text-[12px] font-[600] text-ink">Selfie</span>
-        </div>
-        <span className={`inline-flex items-center gap-1.5 h-[20px] px-2 rounded-full text-[11px] font-[500] ${sc.bg} ${sc.text}`}>
-          <span className={`w-1.5 h-1.5 rounded-full ${sc.dot}`} />
-          {sc.label}
-        </span>
-      </div>
-
-      {/* Meta */}
-      {employee.selfieVerifiedAt && (
-        <div className="px-4 divide-y divide-edge-2">
-          <div className="flex items-center justify-between py-2">
-            <span className="text-[11px] text-ink-3">
-              {selfieStatus === "REJECTED" ? "Rejected on" : "Verified on"}
-            </span>
-            <span className="text-[11px] font-[500] text-ink-3">
-              {new Date(employee.selfieVerifiedAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
-            </span>
-          </div>
-        </div>
-      )}
-
-      {/* Selfie image */}
-      <div className="px-4 pb-3 pt-2">
-        {selfieUrl ? (
-          <a href={selfieUrl} target="_blank" rel="noopener noreferrer" className="block">
-            <img
-              src={selfieUrl}
-              alt="Employee selfie"
-              className="w-full rounded-lg border border-edge object-cover"
-              style={{ maxHeight: 160 }}
-              onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-            />
-          </a>
-        ) : (
-          <div className="bg-canvas rounded-lg h-[80px] flex items-center justify-center">
-            <p className="text-[11px] text-ink-3">No selfie uploaded yet</p>
-          </div>
-        )}
-      </div>
-
-      {/* Actions */}
-      {canAct && selfieUrl && (
-        <div className="px-4 pb-3 space-y-2">
-          <div className="flex gap-2">
-            <button
-              onClick={() => setShowReject(v => !v)}
-              disabled={isBusy}
-              className="flex-1 h-7 rounded-md border border-red-200 bg-danger-soft hover:bg-danger-bg text-[11px] font-[500] text-red-700 flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
-            >
-              <XCircle size={11} /> Reject
-            </button>
-            <button
-              onClick={() => verifyMut.mutate()}
-              disabled={isBusy}
-              className="flex-1 h-7 rounded-md bg-[#111827] hover:bg-[#2A2C45] text-[11px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
-            >
-              {verifyMut.isPending ? <Loader2 size={11} className="animate-spin" /> : <CheckCircle2 size={11} />}
-              {verifyMut.isPending ? "Approving…" : "Approve"}
-            </button>
-          </div>
-          {showReject && (
-            <div className="space-y-1.5">
-              <textarea
-                rows={2}
-                value={remarks}
-                onChange={e => setRemarks(e.target.value)}
-                placeholder="Rejection reason…"
-                className="w-full text-[11px] border border-edge rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-red-300"
-              />
-              <button
-                onClick={() => rejectMut.mutate()}
-                disabled={rejectMut.isPending || !remarks.trim()}
-                className="w-full h-7 rounded-md bg-red-600 hover:bg-red-700 text-white text-[11px] font-[500] transition-colors disabled:opacity-50"
-              >
-                {rejectMut.isPending ? "Submitting…" : "Confirm Rejection"}
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
 export default function KycGroupedDrawer({ open, group, groupQueryKey, onClose }: Props) {
   useEscKey(open, onClose);
-  const docQueryKey      = ["kyc-docs-employee", group?.employeeId];
-  const employeeQueryKey = ["employee", group?.employeeId];
+  const docQueryKey = ["kyc-docs-employee", group?.employeeId];
 
   // Fetch the actual documents for this employee when the drawer opens
   const { data: docs = [], isLoading } = useQuery<KycDocument[]>({
     queryKey: docQueryKey,
     queryFn: () => getKycDocuments(undefined, group!.employeeId),
-    enabled: open && !!group?.employeeId,
-  });
-
-  // Fetch employee for selfie data
-  const { data: employee } = useQuery<Employee>({
-    queryKey: employeeQueryKey,
-    queryFn: () => getEmployee(group!.employeeId),
     enabled: open && !!group?.employeeId,
   });
 
@@ -386,7 +248,7 @@ export default function KycGroupedDrawer({ open, group, groupQueryKey, onClose }
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-edge flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#111827] to-[#2A2C45] text-white flex items-center justify-center text-[12px] font-[600]">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-ink to-[#2A2C45] text-white flex items-center justify-center text-[12px] font-[600]">
               {first}
             </div>
             <div>
@@ -428,15 +290,6 @@ export default function KycGroupedDrawer({ open, group, groupQueryKey, onClose }
             </div>
           ) : (
             <>
-              {/* Selfie card — always shown if employee loaded */}
-              {employee && (
-                <SelfieCard
-                  employee={employee}
-                  employeeQueryKey={employeeQueryKey}
-                  groupQueryKey={groupQueryKey}
-                />
-              )}
-
               {sortedDocs.map(doc => (
                 <DocCard
                   key={doc.id}

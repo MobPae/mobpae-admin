@@ -2,13 +2,14 @@ import { useEscKey } from "../../lib/useEscKey";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { X, Ban, CheckCircle2, Loader2, RotateCcw, RefreshCw, Save } from "lucide-react";
+import { X, Ban, CheckCircle2, Loader2, RotateCcw, RefreshCw, Save, Users } from "lucide-react";
 import { getApiErrorMessage } from "../../utils/api-errors";
-import { updateEmployerStatus, getEmployerProductConfigs, upsertEmployerProductConfig, type EmployerProductConfig } from "../../services/employerService";
+import { updateEmployerStatus, getEmployerProductConfigs, upsertEmployerProductConfig, getEmployerMembers, getEmployerInvites, type EmployerProductConfig } from "../../services/employerService";
 import { processRecovery } from "../../services/payrollService";
 import { getLoanApplicationsByEmployer } from "../../services/loanApplicationService";
-import type { Employer } from "../../types/employer";
+import type { Employer, EmployerMember, EmployerInvite } from "../../types/employer";
 import type { LoanApplication } from "../../types/loan-application";
+import { ConfirmModal } from "../ui/ConfirmModal";
 
 interface Props {
   open: boolean;
@@ -42,6 +43,14 @@ const SR_STATUS: Record<string, { label: string; cls: string }> = {
   REPAID:               { cls: "bg-success-bg text-[#166534]", label: "Repaid" },
 };
 
+const ROLE_BADGE: Record<string, string> = {
+  OWNER:   "bg-[#EDE9FE] text-[#6D28D9]",
+  ADMIN:   "bg-[#DBEAFE] text-[#1D4ED8]",
+  HR:      "bg-[#D1FAE5] text-[#065F46]",
+  FINANCE: "bg-amber-50 text-amber-700",
+  VIEWER:  "bg-surface-muted text-ink-3",
+};
+
 export default function EmployerManagementDrawer({ open, onClose, onMutated, employer }: Props) {
   useEscKey(open, onClose);
   const qc = useQueryClient();
@@ -63,18 +72,40 @@ export default function EmployerManagementDrawer({ open, onClose, onMutated, emp
     staleTime: 60_000,
   });
 
+  const { data: members = [], isLoading: membersLoading } = useQuery<EmployerMember[]>({
+    queryKey: ["employer-members", employer?.id],
+    queryFn: () => getEmployerMembers(employer!.id),
+    enabled: open && !!employer?.id,
+    staleTime: 60_000,
+  });
+
+  const { data: invites = [], isLoading: invitesLoading } = useQuery<EmployerInvite[]>({
+    queryKey: ["employer-invites", employer?.id],
+    queryFn: () => getEmployerInvites(employer!.id),
+    enabled: open && !!employer?.id,
+    staleTime: 60_000,
+  });
+
   const { data: productConfigs = [] } = useQuery<EmployerProductConfig[]>({
     queryKey: ["employer-product-configs", employer?.id],
     queryFn: () => getEmployerProductConfigs(employer!.id),
     enabled: open && !!employer?.id,
     staleTime: 60_000,
-    select: (data) => {
-      const sa = data.find(c => c.product.productType === "SA");
-      if (sa) setOverrideInput(sa.maximumAdvanceAmountOverride != null ? String(sa.maximumAdvanceAmountOverride) : "");
-      return data;
-    },
   });
   const saConfig = productConfigs.find(c => c.product.productType === "SA");
+
+  // Sync the override input when saConfig loads or the drawer switches employer,
+  // using the same render-time-adjustment technique as resetSignature above.
+  const overrideSignature = `${employer?.id ?? ""}:${saConfig?.maximumAdvanceAmountOverride ?? ""}`;
+  const [prevOverrideSignature, setPrevOverrideSignature] = useState(overrideSignature);
+  if (overrideSignature !== prevOverrideSignature) {
+    setPrevOverrideSignature(overrideSignature);
+    setOverrideInput(
+      saConfig?.maximumAdvanceAmountOverride != null
+        ? String(saConfig.maximumAdvanceAmountOverride)
+        : ""
+    );
+  }
 
   const overrideMutation = useMutation({
     mutationFn: (amount: number | null) =>
@@ -148,7 +179,7 @@ export default function EmployerManagementDrawer({ open, onClose, onMutated, emp
         {/* Header — same as EmployerDetailsDrawer */}
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-edge flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#111827] to-[#2A2C45] text-white flex items-center justify-center text-[12px] font-[600]">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-ink to-[#2A2C45] text-white flex items-center justify-center text-[12px] font-[600]">
               {employer.companyName.charAt(0).toUpperCase()}
             </div>
             <div>
@@ -271,7 +302,7 @@ export default function EmployerManagementDrawer({ open, onClose, onMutated, emp
                   {overrideMutation.isPending ? "Saving…" : "Save"}
                 </button>
               </div>
-              <div className="px-3 py-1.5 bg-canvas border-t border-[#F3F4F6]">
+              <div className="px-3 py-1.5 bg-canvas border-t border-edge-2">
                 <p className="text-[10.5px] text-ink-4">
                   Blank = platform default: min(salary×10%, ₹5,000). Hard ceiling of salary×50% always applies.
                 </p>
@@ -322,107 +353,141 @@ export default function EmployerManagementDrawer({ open, onClose, onMutated, emp
               </div>
             )}
           </section>
+
+          {/* Team — members */}
+          <section>
+            <div className="flex items-center gap-1.5 mb-2">
+              <Users size={11} className="text-ink-3" />
+              <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-ink-3">
+                Team members
+              </p>
+              {!membersLoading && (
+                <span className="ml-auto inline-flex h-[15px] px-1.5 rounded-full bg-surface-muted text-[10px] font-[500] text-ink-3 items-center">
+                  {members.length}
+                </span>
+              )}
+            </div>
+            {membersLoading ? (
+              <div className="border border-edge rounded-lg divide-y divide-edge-2">
+                {[...Array(2)].map((_, i) => (
+                  <div key={i} className="flex items-center gap-3 px-3 py-2.5">
+                    <div className="h-2 w-32 bg-surface-muted rounded animate-pulse" />
+                    <div className="h-4 w-12 bg-surface-muted rounded-full animate-pulse ml-auto" />
+                    <div className="h-4 w-14 bg-surface-muted rounded-full animate-pulse" />
+                  </div>
+                ))}
+              </div>
+            ) : members.length === 0 ? (
+              <div className="border border-edge rounded-lg px-3 py-4 text-center">
+                <p className="text-[11px] text-ink-3">No team members</p>
+              </div>
+            ) : (
+              <div className="border border-edge rounded-lg divide-y divide-edge-2">
+                {members.map(m => {
+                  const statusCls = m.status === "SUSPENDED"
+                    ? "bg-warning-bg text-warning-dark"
+                    : "bg-success-bg text-success-dark";
+                  return (
+                    <div key={m.id} className="flex items-center gap-2 px-3 py-2.5">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[11px] font-[500] text-ink truncate">{m.user.email}</p>
+                        <p className="text-[10.5px] text-ink-4">
+                          Joined {new Date(m.joinedAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+                        </p>
+                      </div>
+                      <span className={`inline-flex h-[16px] px-1.5 rounded-[3px] items-center text-[10.5px] font-[500] flex-shrink-0 ${ROLE_BADGE[m.role] ?? "bg-surface-muted text-ink-3"}`}>
+                        {m.role}
+                      </span>
+                      <span className={`inline-flex h-[16px] px-1.5 rounded-[3px] items-center text-[10.5px] font-[500] flex-shrink-0 ${statusCls}`}>
+                        {m.status === "SUSPENDED" ? "Suspended" : "Active"}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </section>
+
+          {/* Team — pending invites */}
+          {(invitesLoading || invites.length > 0) && (
+            <section>
+              <p className="text-[11px] font-[500] uppercase tracking-[0.07em] text-ink-3 mb-2">
+                Pending invites
+              </p>
+              {invitesLoading ? (
+                <div className="border border-edge rounded-lg divide-y divide-edge-2">
+                  {[...Array(1)].map((_, i) => (
+                    <div key={i} className="flex items-center gap-3 px-3 py-2.5">
+                      <div className="h-2 w-32 bg-surface-muted rounded animate-pulse" />
+                      <div className="h-4 w-12 bg-surface-muted rounded-full animate-pulse ml-auto" />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="border border-edge rounded-lg divide-y divide-edge-2">
+                  {invites.map(inv => {
+                    const expired = new Date(inv.expiresAt) < new Date();
+                    return (
+                      <div key={inv.id} className="flex items-center gap-2 px-3 py-2.5">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[11px] font-[500] text-ink truncate">{inv.email}</p>
+                          <p className={`text-[10.5px] ${expired ? "text-danger" : "text-ink-4"}`}>
+                            {expired ? "Expired" : `Expires ${new Date(inv.expiresAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short" })}`}
+                          </p>
+                        </div>
+                        <span className={`inline-flex h-[16px] px-1.5 rounded-[3px] items-center text-[10.5px] font-[500] flex-shrink-0 ${ROLE_BADGE[inv.role] ?? "bg-surface-muted text-ink-3"}`}>
+                          {inv.role}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </section>
+          )}
         </div>
 
         {/* Footer — actions */}
         {(canActivate || canReactivate || canSuspend) && (
           <div className="border-t border-edge px-5 py-3.5 flex-shrink-0 space-y-2.5">
-
-            {/* Suspend confirm flow */}
-            {canSuspend && suspendConfirm && (
-              <div className="space-y-2.5">
-                <p className="text-[12px] text-ink-3">
-                  Suspend <span className="font-[500] text-ink">{employer.companyName}</span>? Employees will lose advance access.
-                </p>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setSuspendConfirm(false)}
-                    disabled={isBusy}
-                    className="flex-1 h-8 rounded-md border border-edge text-[12px] font-[500] text-ink-3 hover:bg-canvas transition-colors disabled:opacity-50"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={() => mutation.mutate("SUSPENDED")}
-                    disabled={isBusy}
-                    className="flex-1 h-8 rounded-md bg-red-600 hover:bg-red-700 text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-60"
-                  >
-                    {isBusy ? <Loader2 size={12} className="animate-spin" /> : <Ban size={12} />}
-                    Confirm suspend
-                  </button>
-                </div>
-              </div>
-            )}
-
-          {/* Generate settlement confirm */}
-          {recoveryConfirm && (
-            <div className="mb-3 rounded-lg bg-amber-50 border border-amber-200 p-3">
-                <p className="text-[12px] font-[600] text-amber-800 mb-1">Generate settlement?</p>
-                <p className="text-[11px] text-amber-700 mb-3">
-                  This will create a settlement for all due recoveries for <strong>{employer.companyName}</strong>.
-                  The employer can then pay MobPae and admin can mark the settlement paid.
-                </p>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setRecoveryConfirm(false)}
-                    disabled={isRecovering}
-                    className="flex-1 h-7 rounded-md border border-amber-200 text-[11px] font-[500] text-amber-700 hover:bg-warning-bg transition-colors disabled:opacity-50"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={() => recoveryMutation.mutate()}
-                    disabled={isRecovering}
-                    className="flex-1 h-7 rounded-md bg-amber-600 hover:bg-amber-700 text-[11px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-60"
-                  >
-                    {isRecovering ? <Loader2 size={11} className="animate-spin" /> : <RefreshCw size={11} />}
-                    Generate
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Normal action buttons */}
-            {!suspendConfirm && (
-              <div className="flex gap-2">
-                {/* PENDING / INACTIVE → Activate */}
-                {canActivate && (
-                  <button
-                    onClick={() => mutation.mutate("ACTIVE")}
-                    disabled={isBusy}
-                    className="flex-1 h-8 rounded-md bg-[#111827] hover:bg-[#111827] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
-                  >
-                    {isBusy ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle2 size={12} />}
-                    {isBusy ? "Activating…" : "Activate"}
-                  </button>
-                )}
-                {/* SUSPENDED → Reactivate */}
-                {canReactivate && (
-                  <button
-                    onClick={() => mutation.mutate("ACTIVE")}
-                    disabled={isBusy}
-                    className="flex-1 h-8 rounded-md bg-[#111827] hover:bg-[#111827] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
-                  >
-                    {isBusy ? <Loader2 size={12} className="animate-spin" /> : <RotateCcw size={12} />}
-                    {isBusy ? "Reactivating…" : "Reactivate"}
-                  </button>
-                )}
-                {/* ACTIVE → Suspend */}
-                {canSuspend && (
-                  <button
-                    onClick={() => setSuspendConfirm(true)}
-                    disabled={isBusy}
-                    className="h-8 px-3.5 rounded-md border border-edge text-[12px] font-[500] text-ink-3 hover:border-red-200 hover:text-danger transition-colors disabled:opacity-50 flex items-center gap-1.5"
-                  >
-                    <Ban size={12} />
-                    Suspend
-                  </button>
-                )}
-              </div>
-            )}
+            <div className="flex gap-2">
+              {/* PENDING / INACTIVE → Activate */}
+              {canActivate && (
+                <button
+                  onClick={() => mutation.mutate("ACTIVE")}
+                  disabled={isBusy}
+                  className="flex-1 h-8 rounded-md bg-ink hover:bg-ink text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
+                >
+                  {isBusy ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle2 size={12} />}
+                  {isBusy ? "Activating…" : "Activate"}
+                </button>
+              )}
+              {/* SUSPENDED → Reactivate */}
+              {canReactivate && (
+                <button
+                  onClick={() => mutation.mutate("ACTIVE")}
+                  disabled={isBusy}
+                  className="flex-1 h-8 rounded-md bg-ink hover:bg-ink text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
+                >
+                  {isBusy ? <Loader2 size={12} className="animate-spin" /> : <RotateCcw size={12} />}
+                  {isBusy ? "Reactivating…" : "Reactivate"}
+                </button>
+              )}
+              {/* ACTIVE → Suspend */}
+              {canSuspend && (
+                <button
+                  onClick={() => setSuspendConfirm(true)}
+                  disabled={isBusy}
+                  className="h-8 px-3.5 rounded-md border border-edge text-[12px] font-[500] text-ink-3 hover:border-red-200 hover:text-danger transition-colors disabled:opacity-50 flex items-center gap-1.5"
+                >
+                  <Ban size={12} />
+                  Suspend
+                </button>
+              )}
+            </div>
 
             {/* Generate settlement — available for any active employer */}
-            {!suspendConfirm && !recoveryConfirm && canSuspend && (
+            {canSuspend && (
               <div className="mt-2">
                 <button
                   onClick={() => setRecoveryConfirm(true)}
@@ -437,6 +502,27 @@ export default function EmployerManagementDrawer({ open, onClose, onMutated, emp
           </div>
         )}
       </div>
+
+      <ConfirmModal
+        open={suspendConfirm}
+        title="Suspend this employer?"
+        description={`${employer.companyName}'s employees will lose advance access immediately.`}
+        confirmLabel="Suspend"
+        loading={isBusy}
+        onConfirm={() => mutation.mutate("SUSPENDED")}
+        onCancel={() => setSuspendConfirm(false)}
+      />
+
+      <ConfirmModal
+        open={recoveryConfirm}
+        title="Generate settlement?"
+        description={`This will create a settlement for all due recoveries for ${employer.companyName}. The employer can then pay MobPae and admin can mark the settlement paid.`}
+        confirmLabel="Generate"
+        confirmVariant="primary"
+        loading={isRecovering}
+        onConfirm={() => recoveryMutation.mutate()}
+        onCancel={() => setRecoveryConfirm(false)}
+      />
     </>
   );
 }

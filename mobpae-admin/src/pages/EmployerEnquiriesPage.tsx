@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Search, Building2, Phone, CheckCircle, XCircle, Plus, Download } from "lucide-react";
 import EmployerEnquiriesTable from "../components/employer-enquiries/EmployerEnquiriesTable";
@@ -9,8 +9,10 @@ import type { EmployerEnquiry, EmployerEnquiryStatus } from "../types/employer-e
 import { getEmployerEnquiries } from "../services/employerEnquiryService";
 import { exportToCsv } from "../utils/exportCsv";
 import { useDebouncedValue } from "../hooks/useDebouncedValue";
+import { Pagination } from "../components/ui/Pagination";
 
 const P = "var(--color-brand)";
+const PAGE_SIZE = 15;
 
 const STATUS_TABS: { label: string; value: "ALL" | EmployerEnquiryStatus }[] = [
   { label: "All",       value: "ALL"       },
@@ -29,7 +31,12 @@ export default function EmployerEnquiriesPage() {
   const [search,        setSearch]        = useState("");
   const debouncedSearch = useDebouncedValue(search, 200);
   const [statusFilter,  setStatusFilter]  = useState<"ALL" | EmployerEnquiryStatus>("ALL");
-  const [selected,      setSelected]      = useState<EmployerEnquiry | null>(null);
+  const [page,          setPage]          = useState(1);
+  const [selectedId,    setSelectedId]    = useState<string | null>(null);
+  const selected = useMemo(
+    () => (selectedId ? enquiries.find((e) => e.id === selectedId) ?? null : null),
+    [enquiries, selectedId]
+  );
   const [createPrefill, setCreatePrefill] = useState<CreateEmployerPrefill | undefined>(undefined);
 
   const counts: Record<EmployerEnquiryStatus, number> = {
@@ -54,8 +61,12 @@ export default function EmployerEnquiriesPage() {
     return matchSearch && matchStatus;
   });
 
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const paginated = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+
   function handleCreateFromLead(enquiry: EmployerEnquiry) {
-    setSelected(null);
+    setSelectedId(null);
     setCreatePrefill({
       companyName:   enquiry.companyName,
       contactPerson: enquiry.contactPerson,
@@ -73,7 +84,7 @@ export default function EmployerEnquiriesPage() {
   ];
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: "Inter, ui-sans-serif, sans-serif", minHeight: "100%" }}>
+    <div style={{ padding: "28px 32px", minHeight: "100%" }}>
 
       {/* ── Header ─────────────────────────────────── */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28 }}>
@@ -152,7 +163,7 @@ export default function EmployerEnquiriesPage() {
             type="text"
             placeholder="Search company, contact, email…"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
             style={{ flex: 1, fontSize: 13.5, color: "var(--color-ink)", background: "transparent", outline: "none", border: "none", fontFamily: "inherit" }}
           />
         </div>
@@ -165,7 +176,7 @@ export default function EmployerEnquiriesPage() {
             return (
               <button
                 key={tab.value}
-                onClick={() => setStatusFilter(tab.value)}
+                onClick={() => { setStatusFilter(tab.value); setPage(1); }}
                 style={{
                   height: 36, padding: "0 14px",
                   background: active ? "var(--color-ink)" : "white",
@@ -213,18 +224,21 @@ export default function EmployerEnquiriesPage() {
           </p>
         </div>
       ) : (
-        <EmployerEnquiriesTable
-          enquiries={filtered}
-          selectedId={selected?.id ?? null}
-          onSelect={(enquiry) => setSelected(selected?.id === enquiry.id ? null : enquiry)}
-        />
+        <>
+          <EmployerEnquiriesTable
+            enquiries={paginated}
+            selectedId={selectedId}
+            onSelect={(enquiry) => setSelectedId(selectedId === enquiry.id ? null : enquiry.id)}
+          />
+          <Pagination page={safePage} totalPages={totalPages} total={filtered.length} limit={PAGE_SIZE} onPage={setPage} />
+        </>
       )}
 
       {/* ── Drawers ────────────────────────────────── */}
       <EmployerDetailsDrawer
         open={selected !== null}
         employer={selected}
-        onClose={() => setSelected(null)}
+        onClose={() => setSelectedId(null)}
         onCreateEmployer={handleCreateFromLead}
       />
 

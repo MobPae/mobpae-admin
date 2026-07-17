@@ -1,12 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import {
-  CalendarDays,
-  ChevronDown,
-  Filter,
-  MoreHorizontal,
-} from "lucide-react";
+import { CalendarDays } from "lucide-react";
 import { getAdminDashboard } from "../services/dashboardService";
 import { getLoanApplications } from "../services/loanApplicationService";
 import { getEmployers } from "../services/employerService";
@@ -29,8 +24,6 @@ const EMPTY_DASHBOARD: AdminDashboard = {
   recoveredAmount: 0,
   outstandingAmount: 0,
   pendingSettlements: 0,
-  membershipRevenue: 0,
-  activeMemberships: 0,
   activeRepayments: 0,
 };
 
@@ -114,7 +107,7 @@ function KpiCard({
         background: "white",
         borderRadius: 16,
         padding: "14px 16px",
-        border: "1px solid #E5E7EB",
+        border: "1px solid var(--color-edge)",
         boxShadow: "0 1px 4px rgba(17,24,39,0.04)",
         display: "flex",
         alignItems: "center",
@@ -302,7 +295,7 @@ export default function DashboardPage() {
     },
     {
       label: "Items Need Attention",
-      value: totalAttention || d.pendingLoanApplications,
+      value: totalAttention,
       iconBg: "var(--color-warning-bg)",
       accent: totalAttention > 0,
       icon: (
@@ -367,7 +360,6 @@ export default function DashboardPage() {
       style={{
         padding: "28px 32px",
         minHeight: "100%",
-        fontFamily: "Inter, ui-sans-serif, sans-serif",
       }}
     >
       {/* ── Page header ───────────────────────────────── */}
@@ -395,7 +387,7 @@ export default function DashboardPage() {
             Here's what's happening with MobPae today.
           </p>
         </div>
-        <button
+        <div
           style={{
             display: "flex",
             alignItems: "center",
@@ -403,19 +395,16 @@ export default function DashboardPage() {
             height: 38,
             padding: "0 14px",
             background: "white",
-            border: "1px solid #E5E7EB",
+            border: "1px solid var(--color-edge)",
             borderRadius: 12,
             fontSize: 13,
             color: "var(--color-ink-2)",
             fontWeight: 500,
-            cursor: "pointer",
-            fontFamily: "inherit",
           }}
         >
           <CalendarDays size={14} className="text-ink-4" />
           {today}
-          <ChevronDown size={13} className="text-ink-4" />
-        </button>
+        </div>
       </div>
 
       {/* ── KPI cards ─────────────────────────────────── */}
@@ -446,7 +435,7 @@ export default function DashboardPage() {
             style={{
               background: "white",
               borderRadius: 20,
-              border: "1px solid #E5E7EB",
+              border: "1px solid var(--color-edge)",
               boxShadow: "0 2px 8px rgba(17,24,39,0.04)",
               overflow: "hidden",
             }}
@@ -454,7 +443,7 @@ export default function DashboardPage() {
             <div
               style={{
                 padding: "16px 20px 12px",
-                borderBottom: "1px solid #F3F4F6",
+                borderBottom: "1px solid var(--color-edge-2)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
@@ -489,7 +478,7 @@ export default function DashboardPage() {
                     padding: "14px 20px",
                     background: "none",
                     border: "none",
-                    borderBottom: "1px solid #F3F4F6",
+                    borderBottom: "1px solid var(--color-edge-2)",
                     cursor: "pointer",
                     textAlign: "left",
                     transition: "background 0.12s",
@@ -572,7 +561,7 @@ export default function DashboardPage() {
             style={{
               background: "white",
               borderRadius: 20,
-              border: "1px solid #E5E7EB",
+              border: "1px solid var(--color-edge)",
               boxShadow: "0 2px 8px rgba(17,24,39,0.04)",
               marginTop: 20,
               padding: "16px 20px",
@@ -589,23 +578,7 @@ export default function DashboardPage() {
               <span style={{ fontSize: 14, fontWeight: 600, color: "var(--color-ink)" }}>
                 Insights
               </span>
-              <button
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 4,
-                  fontSize: 12,
-                  color: "var(--color-ink-3)",
-                  background: "none",
-                  border: "1px solid #E5E7EB",
-                  borderRadius: 8,
-                  padding: "4px 10px",
-                  cursor: "pointer",
-                  fontFamily: "inherit",
-                }}
-              >
-                This Month <ChevronDown size={11} />
-              </button>
+              <span style={{ fontSize: 11, color: "var(--color-ink-4)" }}>All-time</span>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
@@ -622,32 +595,6 @@ export default function DashboardPage() {
                 >
                   {fmt(d.disbursedAmount)}
                 </p>
-                {/* Sparkline placeholder */}
-                <div
-                  style={{
-                    marginTop: 8,
-                    height: 36,
-                    background: "var(--color-brand-soft)",
-                    borderRadius: 8,
-                    position: "relative",
-                    overflow: "hidden",
-                  }}
-                >
-                  <svg
-                    viewBox="0 0 200 36"
-                    style={{ width: "100%", height: "100%" }}
-                    preserveAspectRatio="none"
-                  >
-                    <polyline
-                      points="0,28 40,22 80,30 120,14 160,18 200,8"
-                      fill="none"
-                      stroke="var(--color-brand)"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
               </div>
               <div>
                 <p style={{ fontSize: 11, color: "var(--color-ink-4)", marginBottom: 4 }}>
@@ -663,30 +610,6 @@ export default function DashboardPage() {
                 >
                   {d.activeEmployees.toLocaleString("en-IN")}
                 </p>
-                <div
-                  style={{
-                    marginTop: 8,
-                    height: 36,
-                    background: "var(--color-success-bg)",
-                    borderRadius: 8,
-                    overflow: "hidden",
-                  }}
-                >
-                  <svg
-                    viewBox="0 0 200 36"
-                    style={{ width: "100%", height: "100%" }}
-                    preserveAspectRatio="none"
-                  >
-                    <polyline
-                      points="0,30 40,26 80,20 120,22 160,12 200,8"
-                      fill="none"
-                      stroke="var(--color-success)"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
               </div>
             </div>
           </div>
@@ -697,7 +620,7 @@ export default function DashboardPage() {
           style={{
             background: "white",
             borderRadius: 20,
-            border: "1px solid #E5E7EB",
+            border: "1px solid var(--color-edge)",
             boxShadow: "0 2px 8px rgba(17,24,39,0.04)",
             overflow: "hidden",
             display: "flex",
@@ -707,7 +630,7 @@ export default function DashboardPage() {
           <div
             style={{
               padding: "16px 20px 0",
-              borderBottom: "1px solid #F3F4F6",
+              borderBottom: "1px solid var(--color-edge-2)",
             }}
           >
             <div
@@ -721,42 +644,6 @@ export default function DashboardPage() {
               <span style={{ fontSize: 14, fontWeight: 600, color: "var(--color-ink)" }}>
                 Salary Advances
               </span>
-              <div style={{ display: "flex", gap: 8 }}>
-                <button
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 5,
-                    height: 32,
-                    padding: "0 12px",
-                    background: "var(--color-canvas)",
-                    border: "1px solid #E5E7EB",
-                    borderRadius: 8,
-                    fontSize: 12,
-                    color: "var(--color-ink-3)",
-                    cursor: "pointer",
-                    fontFamily: "inherit",
-                  }}
-                >
-                  <Filter size={12} />
-                  Filter
-                </button>
-                <button
-                  style={{
-                    width: 32,
-                    height: 32,
-                    background: "var(--color-canvas)",
-                    border: "1px solid #E5E7EB",
-                    borderRadius: 8,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: "pointer",
-                  }}
-                >
-                  <MoreHorizontal size={14} className="text-ink-4" />
-                </button>
-              </div>
             </div>
             {/* Tabs */}
             <div style={{ display: "flex", gap: 0 }}>
@@ -774,7 +661,7 @@ export default function DashboardPage() {
                     cursor: "pointer",
                     borderBottom:
                       srTab === tab.key
-                        ? "2px solid #315eff"
+                        ? "2px solid var(--color-brand)"
                         : "2px solid transparent",
                     fontFamily: "inherit",
                     transition: "all 0.15s",
@@ -805,7 +692,7 @@ export default function DashboardPage() {
           <div style={{ flex: 1, overflow: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
-                <tr style={{ borderBottom: "1px solid #F3F4F6" }}>
+                <tr style={{ borderBottom: "1px solid var(--color-edge-2)" }}>
                   {[
                     "Employee",
                     "Employer",
@@ -834,7 +721,7 @@ export default function DashboardPage() {
               <tbody>
                 {srLoading ? (
                   [...Array(5)].map((_, i) => (
-                    <tr key={i} style={{ borderBottom: "1px solid #F9FAFB" }}>
+                    <tr key={i} style={{ borderBottom: "1px solid var(--color-canvas)" }}>
                       {[...Array(7)].map((_, j) => (
                         <td key={j} style={{ padding: "14px 16px" }}>
                           <div
@@ -871,7 +758,7 @@ export default function DashboardPage() {
                       <tr
                         key={req.id}
                         style={{
-                          borderBottom: "1px solid #F9FAFB",
+                          borderBottom: "1px solid var(--color-canvas)",
                           cursor: "pointer",
                           transition: "background 0.1s",
                         }}
@@ -896,7 +783,7 @@ export default function DashboardPage() {
                                 height: 32,
                                 borderRadius: "50%",
                                 background:
-                                  "linear-gradient(135deg, #8B7CFF, #315eff)",
+                                  "linear-gradient(135deg, #8B7CFF, var(--color-brand))",
                                 color: "white",
                                 display: "flex",
                                 alignItems: "center",
@@ -1022,7 +909,7 @@ export default function DashboardPage() {
             </table>
           </div>
 
-          <div style={{ padding: "12px 20px", borderTop: "1px solid #F3F4F6" }}>
+          <div style={{ padding: "12px 20px", borderTop: "1px solid var(--color-edge-2)" }}>
             <button
               onClick={() => void navigate("/loan-applications")}
               style={{
@@ -1047,7 +934,7 @@ export default function DashboardPage() {
             style={{
               background: "white",
               borderRadius: 20,
-              border: "1px solid #E5E7EB",
+              border: "1px solid var(--color-edge)",
               boxShadow: "0 2px 8px rgba(17,24,39,0.04)",
               overflow: "hidden",
             }}
@@ -1055,7 +942,7 @@ export default function DashboardPage() {
             <div
               style={{
                 padding: "16px 20px 12px",
-                borderBottom: "1px solid #F3F4F6",
+                borderBottom: "1px solid var(--color-edge-2)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
@@ -1102,7 +989,7 @@ export default function DashboardPage() {
                       padding: "12px 20px",
                       borderBottom:
                         i < recentAuditLogs.length - 1
-                          ? "1px solid #F9FAFB"
+                          ? "1px solid var(--color-canvas)"
                           : "none",
                     }}
                   >
@@ -1150,7 +1037,7 @@ export default function DashboardPage() {
             style={{
               background: "white",
               borderRadius: 20,
-              border: "1px solid #E5E7EB",
+              border: "1px solid var(--color-edge)",
               boxShadow: "0 2px 8px rgba(17,24,39,0.04)",
               overflow: "hidden",
             }}
@@ -1158,7 +1045,7 @@ export default function DashboardPage() {
             <div
               style={{
                 padding: "16px 20px 12px",
-                borderBottom: "1px solid #F3F4F6",
+                borderBottom: "1px solid var(--color-edge-2)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
@@ -1192,7 +1079,7 @@ export default function DashboardPage() {
                       display: "flex",
                       alignItems: "center",
                       gap: 10,
-                      borderBottom: "1px solid #F9FAFB",
+                      borderBottom: "1px solid var(--color-canvas)",
                     }}
                   >
                     <div
@@ -1254,7 +1141,7 @@ export default function DashboardPage() {
                         border: "none",
                         borderBottom:
                           i < topEmployers.length - 1
-                            ? "1px solid #F9FAFB"
+                            ? "1px solid var(--color-canvas)"
                             : "none",
                         cursor: "pointer",
                         textAlign: "left",

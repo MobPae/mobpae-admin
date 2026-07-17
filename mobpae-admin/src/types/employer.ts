@@ -39,3 +39,28 @@ export interface CreateEmployerResponse {
 export interface ActivateEmployerResponse {
   emailDelivered: boolean | null;
 }
+
+// ── Team / Members ─────────────────────────────────────────────────────────
+
+export type EmployerRole = "OWNER" | "ADMIN" | "HR" | "FINANCE" | "VIEWER";
+export type EmployerMemberStatus = "ACTIVE" | "SUSPENDED";
+
+export interface EmployerMember {
+  id: string;
+  role: EmployerRole;
+  status: EmployerMemberStatus;
+  officeCode: string | null;
+  joinedAt: string;
+  user: { id: string; email: string; lastLogin: string | null };
+}
+
+export interface EmployerInvite {
+  id: string;
+  email: string;
+  role: EmployerRole;
+  expiresAt: string;
+  resendCount: number;
+  lastSentAt: string;
+  createdAt: string;
+  invitedByUser: { email: string } | null;
+}

@@ -77,13 +77,13 @@ export default function JobsPage() {
         </div>
         <div className={`flex items-center gap-1.5 h-6 px-2.5 rounded-md border ${
           healthLoading ? "bg-canvas border-edge" :
-          systemOk      ? "bg-brand-soft border-[#EEF2FF]" : "bg-danger-soft border-red-100"
+          systemOk      ? "bg-brand-soft border-brand-soft" : "bg-danger-soft border-red-100"
         }`}>
           <span className={`w-1.5 h-1.5 rounded-full ${
-            healthLoading ? "bg-[#D1D5DB]" : systemOk ? "bg-brand" : "bg-danger-soft0"
+            healthLoading ? "bg-edge-strong" : systemOk ? "bg-brand" : "bg-danger"
           }`} />
           <span className={`text-[11px] font-[500] ${
-            healthLoading ? "text-ink-3" : systemOk ? "text-[#2048EE]" : "text-red-700"
+            healthLoading ? "text-ink-3" : systemOk ? "text-info" : "text-red-700"
           }`}>
             {healthLoading ? "Checking…" : systemOk ? "System healthy" : "System degraded"}
           </span>
@@ -93,7 +93,7 @@ export default function JobsPage() {
       {/* Info banner */}
       <div className="bg-brand-soft border border-edge rounded-xl px-4 py-3 flex items-start gap-3">
         <Zap size={14} className="text-brand mt-0.5 flex-shrink-0" />
-        <p className="text-[12px] text-[#2048EE] leading-relaxed">
+        <p className="text-[12px] text-info leading-relaxed">
           These jobs are managed by the backend runtime. They run automatically on the configured schedule — no manual triggering is needed or supported via this interface. This page reflects the configured schedule only; individual run history is stored in server logs.
         </p>
       </div>

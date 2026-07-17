@@ -69,7 +69,7 @@ export default function RepaymentsPage() {
   ];
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: "Inter, ui-sans-serif, sans-serif" }}>
+    <div style={{ padding: "28px 32px" }}>
 
       {/* ── Header ──────────────────────────── */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28 }}>

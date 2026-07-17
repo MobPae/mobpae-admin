@@ -11,6 +11,7 @@ import {
 } from "../../services/bankVerificationService";
 import type { BankAccount, BankEmployerGroup } from "../../types/bankAccount";
 import { avatarColor } from "../../utils/avatarColor";
+import { ConfirmModal } from "../ui/ConfirmModal";
 
 interface Props {
   open: boolean;
@@ -63,6 +64,7 @@ function AccountRow({
         description: `${account.employee.name}'s bank account has been rejected.`,
       });
       invalidateAll();
+      setConfirmReject(false);
     },
     onError: (err: unknown) => {
       toast.error("Rejection failed", { description: getApiErrorMessage(err) });
@@ -70,6 +72,7 @@ function AccountRow({
   });
 
   const [revealAccount, setRevealAccount] = useState(false);
+  const [confirmReject, setConfirmReject] = useState(false);
   const first = account.employee.name.charAt(0).toUpperCase();
   const av    = avatarColor(account.employee.name);
 
@@ -139,13 +142,13 @@ function AccountRow({
           <button
             onClick={() => verifyMutation.mutate()}
             disabled={verifyMutation.isPending || rejectMutation.isPending}
-            className="h-7 rounded-md bg-[#111827] hover:bg-[#2A2C45] text-[11px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
+            className="h-7 rounded-md bg-ink hover:bg-[#2A2C45] text-[11px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
           >
             {verifyMutation.isPending ? <Loader2 size={11} className="animate-spin" /> : <CreditCard size={11} />}
             {verifyMutation.isPending ? "Verifying…" : "Verify"}
           </button>
           <button
-            onClick={() => rejectMutation.mutate()}
+            onClick={() => setConfirmReject(true)}
             disabled={verifyMutation.isPending || rejectMutation.isPending}
             className="h-7 rounded-md bg-red-600 hover:bg-red-700 text-[11px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
           >
@@ -154,6 +157,16 @@ function AccountRow({
           </button>
         </div>
       )}
+
+      <ConfirmModal
+        open={confirmReject}
+        title="Reject this bank account?"
+        description={`${account.employee.name}'s bank account will be marked as rejected. They will need to submit a new one.`}
+        confirmLabel="Reject"
+        loading={rejectMutation.isPending}
+        onConfirm={() => rejectMutation.mutate()}
+        onCancel={() => setConfirmReject(false)}
+      />
     </div>
   );
 }

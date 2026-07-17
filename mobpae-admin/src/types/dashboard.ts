@@ -1,10 +1,3 @@
-// Matches GET /membership/revenue-summary
-export interface RevenueSummary {
-  membershipRevenue: string | number;
-  interestRevenue: string | number;
-  totalRevenue: string | number;
-}
-
 // Matches GET /reports/dashboard
 export interface AdminDashboard {
   // Employer totals
@@ -25,9 +18,6 @@ export interface AdminDashboard {
   outstandingAmount: number;
   // Settlements
   pendingSettlements: number;
-  // Membership
-  membershipRevenue: number;
-  activeMemberships: number;
   // Legacy (kept for backward compat with older backend)
   activeRepayments: number;
 }

@@ -1,5 +1,5 @@
 import { Eye, EyeOff, Shield, ShieldCheck } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../services/authService";
 import { getToken, setToken, setRefreshToken } from "../utils/auth";
@@ -20,14 +20,12 @@ export default function LoginPage() {
     }
     return "";
   });
-  const loginAttempted = useRef(false);
   const navigate = useNavigate();
 
   useEffect(() => { if (getToken()) navigate("/"); }, [navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    loginAttempted.current = true;
     try {
       setLoading(true); setError("");
       const res = await login(email.trim().toLowerCase(), password);
@@ -35,7 +33,6 @@ export default function LoginPage() {
       if (res.refreshToken) setRefreshToken(res.refreshToken);
       navigate(res.passwordChanged === false ? "/change-password" : "/");
     } catch (err) {
-      loginAttempted.current = false;
       setError(err instanceof Error ? err.message : "Invalid email or password.");
     } finally {
       setLoading(false);
@@ -43,7 +40,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{ display: "flex", height: "100vh", overflow: "hidden", fontFamily: "Inter, ui-sans-serif, sans-serif" }}>
+    <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
 
       {/* ── LEFT — Form panel ───────────────────────────────────── */}
       <div style={{
@@ -191,7 +188,7 @@ export default function LoginPage() {
       {/* ── RIGHT — Brand panel ──────────────────────────────────── */}
       <div style={{
         flex: 1,
-        background: "linear-gradient(135deg, #8B7CFF 0%, #315eff 50%, #2048EE 100%)",
+        background: "linear-gradient(135deg, #8B7CFF 0%, var(--color-brand) 50%, var(--color-info) 100%)",
         display: "flex", flexDirection: "column",
         justifyContent: "center", alignItems: "center",
         padding: "48px 48px",

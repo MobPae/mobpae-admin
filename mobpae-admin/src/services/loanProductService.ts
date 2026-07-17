@@ -13,7 +13,6 @@ export interface EligibilityRules {
   requiresKyc: boolean;
   requiresMembership: boolean;
   requiresBankAccount: boolean;
-  requiresActiveSelfie: boolean;
   maxRequestsPerCycle: number;
   cooldownDays: number;
 }

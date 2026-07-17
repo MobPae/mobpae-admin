@@ -161,7 +161,7 @@ export default function CreateEmployerDrawer({ open, onClose, prefill }: Props) 
             <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
 
               {hasPrefill && (
-                <div className="bg-brand-soft border border-[#EEF2FF] rounded-lg px-4 py-3 text-[12px] text-[#2048EE] leading-relaxed">
+                <div className="bg-brand-soft border border-brand-soft rounded-lg px-4 py-3 text-[12px] text-info leading-relaxed">
                   Fields pre-filled from the lead. Add a Company Code to complete.
                 </div>
               )}
@@ -293,11 +293,11 @@ function FormField({
         onChange={onChange}
         placeholder={placeholder}
         required={required}
-        className="w-full h-9 px-3 text-[13px] bg-white border border-edge rounded-lg text-ink placeholder-[#D1D5DB] outline-none transition-colors"
+        className="w-full h-9 px-3 text-[13px] bg-white border border-edge rounded-lg text-ink placeholder-edge-strong outline-none transition-colors"
         style={{ boxShadow: "none" }}
         onFocus={(e) => {
           e.target.style.borderColor = "var(--color-brand)";
-          e.target.style.boxShadow = "0 0 0 3px #EEF2FF";
+          e.target.style.boxShadow = "0 0 0 3px var(--color-brand-soft)";
         }}
         onBlur={(e) => {
           e.target.style.borderColor = "";

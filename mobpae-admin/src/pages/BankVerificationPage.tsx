@@ -8,6 +8,9 @@ import BankGroupedDrawer from "../components/bank-verification/BankGroupedDrawer
 import type { BankEmployerGroup } from "../types/bankAccount";
 import { exportToCsv } from "../utils/exportCsv";
 import { useDebouncedValue } from "../hooks/useDebouncedValue";
+import { Pagination } from "../components/ui/Pagination";
+
+const PAGE_SIZE = 15;
 
 const CHIPS: { key: BankVerificationFilter; label: string }[] = [
   { key: "ALL",      label: "All"      },
@@ -19,6 +22,7 @@ export default function BankVerificationPage() {
   const [search,     setSearch]     = useState("");
   const debouncedSearch = useDebouncedValue(search, 200);
   const [filter,     setFilter]     = useState<BankVerificationFilter>("ALL");
+  const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const queryKey = ["bank-grouped", filter];
@@ -42,6 +46,10 @@ export default function BankVerificationPage() {
     );
   });
 
+  const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const paginated = rows.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+
   // Live drawer data
   const selectedGroup = useMemo(
     () => (selectedId ? data.find(g => g.employerId === selectedId) ?? null : null),
@@ -49,7 +57,7 @@ export default function BankVerificationPage() {
   );
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: "Inter, ui-sans-serif, sans-serif" }}>
+    <div style={{ padding: "28px 32px" }}>
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
         <div>
           <h1 style={{ fontSize: 26, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.025em", margin: 0 }}>Bank Verification</h1>
@@ -95,7 +103,7 @@ export default function BankVerificationPage() {
             type="text"
             placeholder="Search by employer name or code…"
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={e => { setSearch(e.target.value); setPage(1); }}
             style={{ flex: 1, fontSize: 13.5, color: "var(--color-ink)", background: "transparent", outline: "none", border: "none", fontFamily: "inherit" }}
           />
         </div>
@@ -105,7 +113,7 @@ export default function BankVerificationPage() {
             return (
               <button
                 key={c.key}
-                onClick={() => setFilter(c.key)}
+                onClick={() => { setFilter(c.key); setPage(1); }}
                 style={{ height: 36, padding: "0 14px", background: active ? "var(--color-ink)" : "white", color: active ? "white" : "var(--color-ink-3)", border: `1px solid ${active ? "var(--color-ink)" : "var(--color-edge)"}`, borderRadius: 10, fontSize: 13, fontWeight: active ? 600 : 400, cursor: "pointer", fontFamily: "inherit" }}
               >
                 {c.label}
@@ -115,7 +123,7 @@ export default function BankVerificationPage() {
         </div>
         {(search || filter !== "ALL") && (
           <button
-            onClick={() => { setSearch(""); setFilter("ALL"); }}
+            onClick={() => { setSearch(""); setFilter("ALL"); setPage(1); }}
             style={{ height: 36, padding: "0 14px", background: "white", border: "1px dashed var(--color-edge)", borderRadius: 10, fontSize: 13, color: "var(--color-ink-3)", cursor: "pointer", fontFamily: "inherit" }}
           >
             Clear
@@ -165,10 +173,11 @@ export default function BankVerificationPage() {
             <span style={{ fontSize: 12, color: "var(--color-ink-4)" }}><span style={{ fontWeight: 500, color: "var(--color-ink-3)" }}>{rows.length}</span> employer{rows.length !== 1 ? "s" : ""}</span>
           </div>
           <BankGroupedTable
-            groups={rows}
+            groups={paginated}
             selectedId={selectedId}
             onSelect={g => setSelectedId(g.employerId)}
           />
+          <Pagination page={safePage} totalPages={totalPages} total={rows.length} limit={PAGE_SIZE} onPage={setPage} />
         </>
       )}
 

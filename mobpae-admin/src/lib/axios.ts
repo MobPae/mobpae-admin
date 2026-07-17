@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { type InternalAxiosRequestConfig } from "axios";
 import {
   getToken,
   setToken,
@@ -28,10 +28,24 @@ api.interceptors.request.use((config) => {
 // Handle auth errors globally.
 // On 401: attempt one silent refresh before falling back to full logout.
 let isRefreshing = false;
-let refreshQueue: Array<(token: string) => void> = [];
+type QueuedRequest = {
+  originalRequest: InternalAxiosRequestConfig & { _retry?: boolean };
+  resolve: (value: unknown) => void;
+  reject: (reason?: unknown) => void;
+};
+let refreshQueue: QueuedRequest[] = [];
 
-function drainQueue(newToken: string) {
-  refreshQueue.forEach((cb) => cb(newToken));
+function resolveQueue(newToken: string) {
+  refreshQueue.forEach(({ originalRequest, resolve }) => {
+    originalRequest._retry = true;
+    originalRequest.headers.Authorization = `Bearer ${newToken}`;
+    resolve(api(originalRequest));
+  });
+  refreshQueue = [];
+}
+
+function rejectQueue(err: unknown) {
+  refreshQueue.forEach(({ reject }) => reject(err));
   refreshQueue = [];
 }
 
@@ -65,13 +79,9 @@ api.interceptors.response.use(
     }
 
     if (isRefreshing) {
-      // Another refresh is already in flight — queue this request
+      // Another refresh is already in flight — queue this request until it settles
       return new Promise((resolve, reject) => {
-        refreshQueue.push((newToken: string) => {
-          originalRequest.headers.Authorization = `Bearer ${newToken}`;
-          resolve(api(originalRequest));
-        });
-        setTimeout(() => reject(error), 10000);
+        refreshQueue.push({ originalRequest, resolve, reject });
       });
     }
 
@@ -82,7 +92,7 @@ api.interceptors.response.use(
       const { data } = await axios.post<{ accessToken: string; refreshToken: string }>(
         `${api.defaults.baseURL}/auth/refresh`,
         { refreshToken: storedRefreshToken },
-        { headers: { "Content-Type": "application/json" } }
+        { headers: { "Content-Type": "application/json" }, timeout: 20_000 }
       );
 
       if (getTokenRole(data.accessToken) !== "ADMIN") {
@@ -95,10 +105,10 @@ api.interceptors.response.use(
       api.defaults.headers.common.Authorization = `Bearer ${data.accessToken}`;
       originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
 
-      drainQueue(data.accessToken);
+      resolveQueue(data.accessToken);
       return api(originalRequest);
-    } catch {
-      drainQueue("");
+    } catch (refreshErr) {
+      rejectQueue(refreshErr);
       forceLogout();
       return Promise.reject(error);
     } finally {

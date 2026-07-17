@@ -73,7 +73,7 @@ export default function KycDrawer({ open, document, onClose, onCompleted }: Prop
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-edge flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#111827] to-[#2A2C45] text-white flex items-center justify-center text-[12px] font-[600]">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-ink to-[#2A2C45] text-white flex items-center justify-center text-[12px] font-[600]">
               {document.employee.name.charAt(0).toUpperCase()}
             </div>
             <div>
@@ -211,7 +211,7 @@ export default function KycDrawer({ open, document, onClose, onCompleted }: Prop
                   <button
                     onClick={() => verifyMutation.mutate()}
                     disabled={isBusy}
-                    className="flex-1 h-8 rounded-md bg-[#111827] hover:bg-[#2A2C45] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
+                    className="flex-1 h-8 rounded-md bg-ink hover:bg-[#2A2C45] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
                   >
                     {verifyMutation.isPending ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle2 size={12} />}
                     {verifyMutation.isPending ? "Verifying…" : "Verify"}

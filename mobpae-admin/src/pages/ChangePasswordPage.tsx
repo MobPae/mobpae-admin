@@ -69,7 +69,6 @@ export default function ChangePasswordPage() {
       background: "var(--color-canvas)",
       display: "flex", alignItems: "center", justifyContent: "center",
       padding: "24px 16px",
-      fontFamily: "Inter, ui-sans-serif, sans-serif",
     }}>
       <div style={{ width: "100%", maxWidth: 560 }}>
 

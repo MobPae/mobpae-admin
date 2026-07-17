@@ -86,7 +86,7 @@ function StatCard({ label, value, icon, iconBg, iconColor, highlight }: {
 }) {
   if (highlight) {
     return (
-      <div style={{ background: "linear-gradient(135deg, var(--color-info) 0%, #315eff 100%)", borderRadius: 16, padding: "14px 16px", border: "1px solid var(--color-info)", boxShadow: "0 4px 20px rgba(49,94,255,0.25)", display: "flex", alignItems: "center", gap: 14 }}>
+      <div style={{ background: "linear-gradient(135deg, var(--color-info) 0%, var(--color-brand) 100%)", borderRadius: 16, padding: "14px 16px", border: "1px solid var(--color-info)", boxShadow: "0 4px 20px rgba(49,94,255,0.25)", display: "flex", alignItems: "center", gap: 14 }}>
         <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "white" }}>{icon}</div>
         <div>
           <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1, color: "white" }}>{value}</div>
@@ -253,7 +253,7 @@ export default function SettlementsPage() {
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
         <div>
-          <h1 style={{ fontSize: 26, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.025em", margin: 0, fontFamily: "Inter, ui-sans-serif, sans-serif" }}>Settlements</h1>
+          <h1 style={{ fontSize: 26, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.025em", margin: 0 }}>Settlements</h1>
           <p style={{ fontSize: 14, color: "var(--color-ink-3)", marginTop: 6 }}>Track employer settlement obligations to MobPae.</p>
         </div>
         <button

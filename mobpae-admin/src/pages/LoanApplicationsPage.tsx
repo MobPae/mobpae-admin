@@ -100,7 +100,7 @@ export default function LoanApplicationsPage() {
   ];
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: "Inter, ui-sans-serif, sans-serif" }}>
+    <div style={{ padding: "28px 32px" }}>
 
       {/* ── Header ────────────────────────────── */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28 }}>
@@ -119,7 +119,7 @@ export default function LoanApplicationsPage() {
             Status: a.status,
             Date: a.submittedAt ? new Date(a.submittedAt).toLocaleDateString() : "",
           })), "loan-applications")}
-          style={{ height: 40, padding: "0 16px", display: "flex", alignItems: "center", gap: 8, background: "white", border: "1px solid #E5E7EB", borderRadius: 12, fontSize: 13, fontWeight: 500, color: "var(--color-ink-2)", cursor: "pointer", fontFamily: "inherit" }}
+          style={{ height: 40, padding: "0 16px", display: "flex", alignItems: "center", gap: 8, background: "white", border: "1px solid var(--color-edge)", borderRadius: 12, fontSize: 13, fontWeight: 500, color: "var(--color-ink-2)", cursor: "pointer", fontFamily: "inherit" }}
         >
           <Download size={14} />
           Export
@@ -136,7 +136,7 @@ export default function LoanApplicationsPage() {
       {/* ── KPI cards ─────────────────────────── */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 24 }}>
         {kpis.map((kpi) => (
-          <div key={kpi.label} style={{ background: "white", borderRadius: 16, padding: "14px 16px", border: "1px solid #E5E7EB", boxShadow: "0 1px 4px rgba(17,24,39,0.04)", display: "flex", alignItems: "center", gap: 14 }}>
+          <div key={kpi.label} style={{ background: "white", borderRadius: 16, padding: "14px 16px", border: "1px solid var(--color-edge)", boxShadow: "0 1px 4px rgba(17,24,39,0.04)", display: "flex", alignItems: "center", gap: 14 }}>
             <div style={{ width: 40, height: 40, borderRadius: 12, background: kpi.iconBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
               {kpi.icon}
             </div>
@@ -150,7 +150,7 @@ export default function LoanApplicationsPage() {
 
       {/* ── Filter bar ────────────────────────── */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, height: 40, padding: "0 14px", background: "white", border: "1px solid #E5E7EB", borderRadius: 12, minWidth: 240 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, height: 40, padding: "0 14px", background: "white", border: "1px solid var(--color-edge)", borderRadius: 12, minWidth: 240 }}>
           <Search size={14} style={{ color: "var(--color-ink-4)", flexShrink: 0 }} />
           <input
             type="text"
@@ -187,10 +187,10 @@ export default function LoanApplicationsPage() {
         <div style={{ display: "flex", alignItems: "center", gap: 6, marginLeft: 4 }}>
           <Calendar size={13} className="text-ink-4" />
           <input type="date" value={dateFrom} onChange={e => { setDateFrom(e.target.value); setPage(1); }}
-            style={{ height: 36, padding: "0 10px", background: "white", border: "1px solid #E5E7EB", borderRadius: 10, fontSize: 12.5, color: "var(--color-ink-3)", outline: "none", fontFamily: "inherit" }} />
+            style={{ height: 36, padding: "0 10px", background: "white", border: "1px solid var(--color-edge)", borderRadius: 10, fontSize: 12.5, color: "var(--color-ink-3)", outline: "none", fontFamily: "inherit" }} />
           <span style={{ fontSize: 12, color: "var(--color-ink-4)" }}>–</span>
           <input type="date" value={dateTo} onChange={e => { setDateTo(e.target.value); setPage(1); }}
-            style={{ height: 36, padding: "0 10px", background: "white", border: "1px solid #E5E7EB", borderRadius: 10, fontSize: 12.5, color: "var(--color-ink-3)", outline: "none", fontFamily: "inherit" }} />
+            style={{ height: 36, padding: "0 10px", background: "white", border: "1px solid var(--color-edge)", borderRadius: 10, fontSize: 12.5, color: "var(--color-ink-3)", outline: "none", fontFamily: "inherit" }} />
           {(dateFrom || dateTo) && (
             <button onClick={() => { setDateFrom(""); setDateTo(""); setPage(1); }}
               style={{ width: 24, height: 24, borderRadius: "50%", background: "var(--color-surface-muted)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--color-ink-3)" }}>
@@ -204,9 +204,9 @@ export default function LoanApplicationsPage() {
 
       {/* ── Table ─────────────────────────────── */}
       {isLoading ? (
-        <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", overflow: "hidden" }}>
+        <div style={{ background: "white", borderRadius: 20, border: "1px solid var(--color-edge)", overflow: "hidden" }}>
           {[...Array(6)].map((_, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 16, padding: "18px 24px", borderBottom: "1px solid #F9FAFB" }}>
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 16, padding: "18px 24px", borderBottom: "1px solid var(--color-canvas)" }}>
               <div style={{ width: 38, height: 38, borderRadius: 10, background: "var(--color-surface-muted)", flexShrink: 0 }} className="animate-pulse" />
               <div style={{ flex: 1 }}>
                 <div style={{ height: 12, background: "var(--color-surface-muted)", borderRadius: 4, width: 140, marginBottom: 6 }} className="animate-pulse" />
@@ -217,7 +217,7 @@ export default function LoanApplicationsPage() {
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", padding: "60px 24px", textAlign: "center" }}>
+        <div style={{ background: "white", borderRadius: 20, border: "1px solid var(--color-edge)", padding: "60px 24px", textAlign: "center" }}>
           <p style={{ fontSize: 15, fontWeight: 600, color: "var(--color-ink)", margin: 0 }}>No applications found</p>
           <p style={{ fontSize: 13, color: "var(--color-ink-4)", marginTop: 6 }}>
             {search || statusFilter !== "ALL" ? "Try adjusting your search or filter." : "No loan applications submitted yet."}

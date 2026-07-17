@@ -160,7 +160,7 @@ export default function NotificationsPage() {
                   onFocus={() => setShowDrop(true)}
                   onBlur={() => setTimeout(() => setShowDrop(false), 150)}
                   onChange={e => { setSearch(e.target.value); setShowDrop(true); }}
-                  className="w-full h-9 pl-8 pr-3 border border-edge rounded-lg text-[12px] text-ink placeholder-[#D1D5DB] focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20"
+                  className="w-full h-9 pl-8 pr-3 border border-edge rounded-lg text-[12px] text-ink placeholder-edge-strong focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20"
                 />
                 {showDrop && filtered.length > 0 && (
                   <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-white border border-edge rounded-lg shadow-raised overflow-hidden">
@@ -197,7 +197,7 @@ export default function NotificationsPage() {
                   onClick={() => setType(t)}
                   className={`flex-1 h-8 rounded-lg border text-[11px] font-[600] transition-all ${
                     type === t
-                      ? "border-brand bg-brand-soft text-[#2048EE]"
+                      ? "border-brand bg-brand-soft text-info"
                       : "border-edge text-ink-3 hover:border-brand/40"
                   }`}
                 >
@@ -218,7 +218,7 @@ export default function NotificationsPage() {
               onChange={e => setTitle(e.target.value)}
               placeholder="e.g. Your advance has been approved"
               maxLength={120}
-              className="w-full h-9 px-3 border border-edge rounded-lg text-[12px] text-ink placeholder-[#D1D5DB] focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20"
+              className="w-full h-9 px-3 border border-edge rounded-lg text-[12px] text-ink placeholder-edge-strong focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20"
             />
             <p className="text-[10px] text-ink-disabled mt-1 text-right">{title.length}/120</p>
           </div>
@@ -234,7 +234,7 @@ export default function NotificationsPage() {
               placeholder="Write your notification message here…"
               rows={4}
               maxLength={500}
-              className="w-full px-3 py-2.5 border border-edge rounded-lg text-[12px] text-ink placeholder-[#D1D5DB] focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20 resize-none"
+              className="w-full px-3 py-2.5 border border-edge rounded-lg text-[12px] text-ink placeholder-edge-strong focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20 resize-none"
             />
             <p className="text-[10px] text-ink-disabled mt-1 text-right">{message.length}/500</p>
           </div>
@@ -244,7 +244,7 @@ export default function NotificationsPage() {
             type="button"
             onClick={handleSend}
             disabled={!canSend}
-            className="w-full h-9 rounded-lg bg-brand hover:bg-[#2048EE] text-white text-[12px] font-[600] flex items-center justify-center gap-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-full h-9 rounded-lg bg-brand hover:bg-brand-hover text-white text-[12px] font-[600] flex items-center justify-center gap-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {mutation.isPending ? (
               <Loader2 size={13} className="animate-spin" />

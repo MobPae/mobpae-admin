@@ -24,6 +24,10 @@ export async function markNotificationRead(id: string): Promise<void> {
   await api.post(`/notifications/${id}/read`);
 }
 
+export async function markAllNotificationsRead(): Promise<void> {
+  await api.post("/notifications/me/read-all");
+}
+
 export async function getNotificationCount(): Promise<number> {
   const response = await api.get("/notifications/me/count");
   const data = response.data as Record<string, unknown>;

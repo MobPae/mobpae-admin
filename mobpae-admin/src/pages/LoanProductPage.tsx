@@ -7,6 +7,7 @@ import {
   type LoanProductConfig, type EligibilityRules, type PricingRules, type OperationalRules,
   type CreateConfigPayload,
 } from "../services/loanProductService";
+import { ConfirmModal } from "../components/ui/ConfirmModal";
 
 // ── constants ─────────────────────────────────────────────────────────────────
 
@@ -30,13 +31,13 @@ function fmtDate(s: string) {
 
 function RuleCard({ title, rows }: { title: string; rows: { label: string; value: string | number | boolean }[] }) {
   return (
-    <div style={{ background: "white", border: "1px solid #E5E7EB", borderRadius: 16, overflow: "hidden" }}>
-      <div style={{ padding: "10px 16px", borderBottom: "1px solid #F3F4F6", background: "var(--color-surface-raised)" }}>
+    <div style={{ background: "white", border: "1px solid var(--color-edge)", borderRadius: 16, overflow: "hidden" }}>
+      <div style={{ padding: "10px 16px", borderBottom: "1px solid var(--color-edge-2)", background: "var(--color-surface-raised)" }}>
         <p style={{ fontSize: 11.5, fontWeight: 600, color: T2, textTransform: "uppercase", letterSpacing: "0.07em", margin: 0 }}>{title}</p>
       </div>
       <div>
         {rows.map(({ label, value }) => (
-          <div key={label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 16px", borderBottom: "1px solid #F9FAFB" }}>
+          <div key={label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 16px", borderBottom: "1px solid var(--color-canvas)" }}>
             <span style={{ fontSize: 12.5, color: T2 }}>{label}</span>
             <span style={{ fontSize: 12.5, fontWeight: 600, color: T1 }}>
               {typeof value === "boolean"
@@ -63,7 +64,7 @@ function defaultForm(cfg: LoanProductConfig | undefined): CreateConfigPayload {
         platformAdvancePercentage: 10, platformMaxAdvanceAmount: 5000, hardCeilingPercentage: 50,
         minimumAdvanceAmount: 1000, minimumSalaryInHand: 10000, minimumTenureMonths: 3,
         requiresKyc: true, requiresMembership: true,
-        requiresBankAccount: true, requiresActiveSelfie: false,
+        requiresBankAccount: true,
         maxRequestsPerCycle: 1, cooldownDays: 0,
       },
       pricingRules: { annualInterestRate: 36, processingFeeRate: 0, gstRate: 0 },
@@ -93,7 +94,6 @@ const ELIG_FIELDS: Field[] = [
   { key: "requiresKyc",              label: "Requires KYC",           type: "bool" },
   { key: "requiresMembership",       label: "Requires membership",    type: "bool" },
   { key: "requiresBankAccount",      label: "Requires bank account",  type: "bool" },
-  { key: "requiresActiveSelfie",     label: "Requires selfie",        type: "bool" },
 ];
 
 const PRICING_FIELDS: Field[] = [
@@ -136,7 +136,7 @@ function NumberInput({ value, onChange }: { value: number; onChange: (v: number)
         setText(String(safe));
         onChange(safe);
       }}
-      style={{ width: 80, height: 28, padding: "0 8px", fontSize: 12, fontWeight: 500, color: T1, border: "1px solid #E5E7EB", borderRadius: 8, outline: "none", textAlign: "right", fontFamily: "inherit" }}
+      style={{ width: 80, height: 28, padding: "0 8px", fontSize: 12, fontWeight: 500, color: T1, border: "1px solid var(--color-edge)", borderRadius: 8, outline: "none", textAlign: "right", fontFamily: "inherit" }}
     />
   );
 }
@@ -161,7 +161,7 @@ function renderField(field: Field, value: number | boolean | string, onChange: (
       <select
         value={String(value)}
         onChange={e => onChange(e.target.value)}
-        style={{ height: 28, padding: "0 8px", fontSize: 12, border: "1px solid #E5E7EB", borderRadius: 8, background: "white", color: T1, fontFamily: "inherit", outline: "none" }}
+        style={{ height: 28, padding: "0 8px", fontSize: 12, border: "1px solid var(--color-edge)", borderRadius: 8, background: "white", color: T1, fontFamily: "inherit", outline: "none" }}
       >
         {field.options!.map(o => <option key={o} value={o}>{o}</option>)}
       </select>
@@ -185,9 +185,9 @@ function FieldGroup({ title, fields, values, onSet }: {
   return (
     <div style={{ marginBottom: 20 }}>
       <p style={{ fontSize: 11, fontWeight: 600, color: T3, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>{title}</p>
-      <div style={{ border: "1px solid #E5E7EB", borderRadius: 12, overflow: "hidden" }}>
+      <div style={{ border: "1px solid var(--color-edge)", borderRadius: 12, overflow: "hidden" }}>
         {fields.map(f => (
-          <div key={f.key} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 14px", borderBottom: "1px solid #F3F4F6" }}>
+          <div key={f.key} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 14px", borderBottom: "1px solid var(--color-edge-2)" }}>
             <span style={{ fontSize: 12.5, color: T2 }}>{f.label}</span>
             {renderField(f, values[f.key] as number | boolean | string, v => onSet(f.key, v))}
           </div>
@@ -241,7 +241,7 @@ function PublishDrawer({ activeConfig, onClose, onPublished }: DrawerProps) {
       {/* Panel */}
       <div style={{ width: 480, background: "white", height: "100%", display: "flex", flexDirection: "column", boxShadow: "-8px 0 32px rgba(0,0,0,0.12)" }}>
         {/* Header */}
-        <div style={{ padding: "16px 20px", borderBottom: "1px solid #E5E7EB", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
+        <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--color-edge)", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
           <div>
             <p style={{ fontSize: 15, fontWeight: 700, color: T1, margin: 0 }}>Publish New Config Version</p>
             <p style={{ fontSize: 11.5, color: T3, marginTop: 2 }}>
@@ -258,16 +258,16 @@ function PublishDrawer({ activeConfig, onClose, onPublished }: DrawerProps) {
           {/* Meta */}
           <div style={{ marginBottom: 20 }}>
             <p style={{ fontSize: 11, fontWeight: 600, color: T3, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Version info</p>
-            <div style={{ border: "1px solid #E5E7EB", borderRadius: 12, overflow: "hidden" }}>
+            <div style={{ border: "1px solid var(--color-edge)", borderRadius: 12, overflow: "hidden" }}>
               {[
                 { label: "Version label", node: (
-                  <input type="text" value={form.versionName ?? ""} onChange={e => setForm(f => ({ ...f, versionName: e.target.value }))} placeholder="e.g. Q3 2026 v2" style={{ width: 180, height: 28, padding: "0 8px", fontSize: 12, border: "1px solid #E5E7EB", borderRadius: 8, outline: "none", fontFamily: "inherit" }} />
+                  <input type="text" value={form.versionName ?? ""} onChange={e => setForm(f => ({ ...f, versionName: e.target.value }))} placeholder="e.g. Q3 2026 v2" style={{ width: 180, height: 28, padding: "0 8px", fontSize: 12, border: "1px solid var(--color-edge)", borderRadius: 8, outline: "none", fontFamily: "inherit" }} />
                 )},
                 { label: "Effective from", node: (
-                  <input type="date" value={form.effectiveFrom} onChange={e => setForm(f => ({ ...f, effectiveFrom: e.target.value }))} style={{ height: 28, padding: "0 8px", fontSize: 12, border: "1px solid #E5E7EB", borderRadius: 8, outline: "none", fontFamily: "inherit" }} />
+                  <input type="date" value={form.effectiveFrom} onChange={e => setForm(f => ({ ...f, effectiveFrom: e.target.value }))} style={{ height: 28, padding: "0 8px", fontSize: 12, border: "1px solid var(--color-edge)", borderRadius: 8, outline: "none", fontFamily: "inherit" }} />
                 )},
               ].map(({ label, node }) => (
-                <div key={label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 14px", borderBottom: "1px solid #F3F4F6" }}>
+                <div key={label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 14px", borderBottom: "1px solid var(--color-edge-2)" }}>
                   <span style={{ fontSize: 12.5, color: T2 }}>{label}</span>
                   {node}
                 </div>
@@ -296,7 +296,7 @@ function PublishDrawer({ activeConfig, onClose, onPublished }: DrawerProps) {
         </div>
 
         {/* Footer */}
-        <div style={{ padding: "12px 20px", borderTop: "1px solid #E5E7EB", flexShrink: 0 }}>
+        <div style={{ padding: "12px 20px", borderTop: "1px solid var(--color-edge)", flexShrink: 0 }}>
           {!confirm ? (
             <button
               onClick={() => setConfirm(true)}
@@ -314,7 +314,7 @@ function PublishDrawer({ activeConfig, onClose, onPublished }: DrawerProps) {
               <div style={{ display: "flex", gap: 8 }}>
                 <button
                   onClick={() => setConfirm(false)}
-                  style={{ flex: 1, height: 38, borderRadius: 10, background: "white", color: T2, border: "1px solid #E5E7EB", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "inherit" }}
+                  style={{ flex: 1, height: 38, borderRadius: 10, background: "white", color: T2, border: "1px solid var(--color-edge)", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "inherit" }}
                 >
                   Cancel
                 </button>
@@ -353,7 +353,7 @@ function HistoryRow({ cfg, onDeleted }: { cfg: LoanProductConfig; onDeleted: () 
   });
 
   return (
-    <div style={{ border: "1px solid #E5E7EB", borderRadius: 12, overflow: "hidden", marginBottom: 8 }}>
+    <div style={{ border: "1px solid var(--color-edge)", borderRadius: 12, overflow: "hidden", marginBottom: 8 }}>
       <div style={{ display: "flex", alignItems: "center", background: "white" }}>
         <button
           onClick={() => setOpen(o => !o)}
@@ -378,37 +378,18 @@ function HistoryRow({ cfg, onDeleted }: { cfg: LoanProductConfig; onDeleted: () 
         </button>
         {!cfg.isActive && (
           <div style={{ paddingRight: 12, flexShrink: 0 }}>
-            {!confirmDelete ? (
-              <button
-                onClick={e => { e.stopPropagation(); setConfirmDelete(true); }}
-                title="Delete this version"
-                style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6, border: "1px solid var(--color-danger-bg)", background: "var(--color-danger-soft)", cursor: "pointer" }}
-              >
-                <Trash2 size={13} color="var(--color-danger)" />
-              </button>
-            ) : (
-              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <span style={{ fontSize: 11, color: "var(--color-danger)", fontWeight: 500 }}>Delete?</span>
-                <button
-                  onClick={() => deleteMutation.mutate()}
-                  disabled={deleteMutation.isPending}
-                  style={{ fontSize: 11, fontWeight: 600, color: "white", background: "var(--color-danger)", border: "none", borderRadius: 6, padding: "3px 8px", cursor: "pointer", opacity: deleteMutation.isPending ? 0.6 : 1 }}
-                >
-                  Yes
-                </button>
-                <button
-                  onClick={() => setConfirmDelete(false)}
-                  style={{ fontSize: 11, fontWeight: 500, color: T2, background: "white", border: "1px solid #E5E7EB", borderRadius: 6, padding: "3px 8px", cursor: "pointer" }}
-                >
-                  No
-                </button>
-              </div>
-            )}
+            <button
+              onClick={e => { e.stopPropagation(); setConfirmDelete(true); }}
+              title="Delete this version"
+              style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6, border: "1px solid var(--color-danger-bg)", background: "var(--color-danger-soft)", cursor: "pointer" }}
+            >
+              <Trash2 size={13} color="var(--color-danger)" />
+            </button>
           </div>
         )}
       </div>
       {open && (
-        <div style={{ padding: "0 14px 14px", borderTop: "1px solid #F3F4F6", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+        <div style={{ padding: "0 14px 14px", borderTop: "1px solid var(--color-edge-2)", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
           {[
             { title: "Eligibility", rows: ELIG_FIELDS.map(f => ({ label: f.label, value: fmt((cfg.eligibilityRules as unknown as Record<string, number | boolean>)[f.key], f.suffix ?? "") })) },
             { title: "Pricing",     rows: PRICING_FIELDS.map(f => ({ label: f.label, value: fmt((cfg.pricingRules as unknown as Record<string, number | boolean>)[f.key], f.suffix ?? "") })) },
@@ -417,7 +398,7 @@ function HistoryRow({ cfg, onDeleted }: { cfg: LoanProductConfig; onDeleted: () 
             <div key={title} style={{ marginTop: 10 }}>
               <p style={{ fontSize: 10.5, fontWeight: 600, color: T3, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>{title}</p>
               {rows.map(({ label, value }) => (
-                <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "4px 0", borderBottom: "1px solid #F9FAFB" }}>
+                <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "4px 0", borderBottom: "1px solid var(--color-canvas)" }}>
                   <span style={{ fontSize: 11.5, color: T2 }}>{label}</span>
                   <span style={{ fontSize: 11.5, fontWeight: 500, color: T1 }}>{value}</span>
                 </div>
@@ -426,6 +407,16 @@ function HistoryRow({ cfg, onDeleted }: { cfg: LoanProductConfig; onDeleted: () 
           ))}
         </div>
       )}
+
+      <ConfirmModal
+        open={confirmDelete}
+        title="Delete this version?"
+        description={`This will permanently delete v${cfg.versionNumber}${cfg.versionName ? ` — ${cfg.versionName}` : ""}. This cannot be undone.`}
+        confirmLabel="Delete"
+        loading={deleteMutation.isPending}
+        onConfirm={() => deleteMutation.mutate()}
+        onCancel={() => setConfirmDelete(false)}
+      />
     </div>
   );
 }
@@ -436,12 +427,12 @@ export function LoanProductPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const qc = useQueryClient();
 
-  const { data: activeConfig, isLoading: loadingActive } = useQuery<LoanProductConfig>({
+  const { data: activeConfig, isLoading: loadingActive, isError: activeError, refetch: refetchActive } = useQuery<LoanProductConfig>({
     queryKey: ["loan-product-config", "SA", "active"],
     queryFn: () => getActiveConfig("SA"),
   });
 
-  const { data: history = [], isLoading: loadingHistory } = useQuery<LoanProductConfig[]>({
+  const { data: history = [], isLoading: loadingHistory, isError: historyError, refetch: refetchHistory } = useQuery<LoanProductConfig[]>({
     queryKey: ["loan-product-config", "SA", "history"],
     queryFn: () => getConfigHistory("SA"),
   });
@@ -454,13 +445,24 @@ export function LoanProductPage() {
     );
   }
 
+  if (activeError) {
+    return (
+      <div style={{ padding: "28px 32px" }}>
+        <div style={{ background: "var(--color-danger-soft)", border: "1px solid #FECACA", borderRadius: 12, padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, color: "var(--color-danger)" }}>
+          <span>Failed to load the active loan product config.</span>
+          <button onClick={() => void refetchActive()} style={{ padding: "6px 12px", background: "white", border: "1px solid #FECACA", borderRadius: 8, fontSize: 12, fontWeight: 600, color: "var(--color-danger)", cursor: "pointer", fontFamily: "inherit" }}>Retry</button>
+        </div>
+      </div>
+    );
+  }
+
   const el = activeConfig?.eligibilityRules;
   const pr = activeConfig?.pricingRules;
   const or = activeConfig?.operationalRules;
 
   return (
     <>
-      <div style={{ padding: "28px 32px", fontFamily: "Inter, ui-sans-serif, sans-serif" }}>
+      <div style={{ padding: "28px 32px" }}>
         {/* Header */}
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 24 }}>
           <div>
@@ -499,7 +501,6 @@ export function LoanProductPage() {
                 { label: "Requires KYC",          value: el.requiresKyc },
                 { label: "Requires membership",   value: el.requiresMembership },
                 { label: "Requires bank account", value: el.requiresBankAccount },
-                { label: "Requires selfie",       value: el.requiresActiveSelfie },
               ]}
             />
             <RuleCard
@@ -532,9 +533,16 @@ export function LoanProductPage() {
           <p style={{ fontSize: 13, fontWeight: 600, color: T1, marginBottom: 12 }}>Version history</p>
           {loadingHistory
             ? <p style={{ fontSize: 13, color: T3 }}>Loading…</p>
-            : history.length === 0
-              ? <p style={{ fontSize: 13, color: T3 }}>No versions yet.</p>
-              : history.map(cfg => <HistoryRow key={cfg.id} cfg={cfg} onDeleted={() => qc.invalidateQueries({ queryKey: ["loan-product-config"] })} />)
+            : historyError
+              ? (
+                <div style={{ background: "var(--color-danger-soft)", border: "1px solid #FECACA", borderRadius: 12, padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, color: "var(--color-danger)" }}>
+                  <span>Failed to load version history.</span>
+                  <button onClick={() => void refetchHistory()} style={{ padding: "6px 12px", background: "white", border: "1px solid #FECACA", borderRadius: 8, fontSize: 12, fontWeight: 600, color: "var(--color-danger)", cursor: "pointer", fontFamily: "inherit" }}>Retry</button>
+                </div>
+              )
+              : history.length === 0
+                ? <p style={{ fontSize: 13, color: T3 }}>No versions yet.</p>
+                : history.map(cfg => <HistoryRow key={cfg.id} cfg={cfg} onDeleted={() => qc.invalidateQueries({ queryKey: ["loan-product-config"] })} />)
           }
         </div>
       </div>

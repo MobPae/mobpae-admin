@@ -1,10 +1,10 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import {
   ArrowDownCircle,
+  Banknote,
   Building2,
   CalendarClock,
   CircleDollarSign,
-  CreditCard,
   FileCheck,
   KeyRound,
   Landmark,
@@ -47,8 +47,8 @@ const SECTIONS: Section[] = [
       { label: "Advances",    icon: Wallet,           to: "/loan-applications" },
       { label: "Disbursals",  icon: ArrowDownCircle,  to: "/disbursals"        },
       { label: "Repayments",  icon: RefreshCcw,       to: "/repayments"        },
+      { label: "Recoveries",  icon: Banknote,         to: "/recoveries"        },
       { label: "Settlements", icon: CircleDollarSign, to: "/settlements"       },
-      { label: "Memberships", icon: CreditCard,       to: "/memberships"       },
       { label: "Revenue",     icon: TrendingUp,       to: "/revenue"           },
     ],
   },

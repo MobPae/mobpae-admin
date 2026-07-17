@@ -14,7 +14,6 @@ const DisbursalsPage = lazy(() => import("./pages/DisbursalsPage"));
 const RecoveriesPage = lazy(() => import("./pages/RecoveriesPage"));
 const RepaymentsPage = lazy(() => import("./pages/RepaymentsPage"));
 const SettlementsPage = lazy(() => import("./pages/SettlementsPage"));
-const MembershipsPage = lazy(() => import("./pages/MembershipsPage"));
 const RevenuePage = lazy(() => import("./pages/RevenuePage"));
 const KycVerificationPage = lazy(() => import("./pages/KycVerificationPage"));
 const BankVerificationPage = lazy(() => import("./pages/BankVerificationPage"));
@@ -66,7 +65,6 @@ export default function App() {
           <Route path="recoveries" element={<RecoveriesPage />} />
           <Route path="repayments" element={<RepaymentsPage />} />
           <Route path="settlements" element={<SettlementsPage />} />
-          <Route path="memberships" element={<MembershipsPage />} />
           <Route path="revenue" element={<RevenuePage />} />
           <Route path="kyc" element={<KycVerificationPage />} />
           <Route path="bank-verification" element={<BankVerificationPage />} />

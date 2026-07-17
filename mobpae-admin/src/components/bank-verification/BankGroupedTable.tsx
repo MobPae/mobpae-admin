@@ -9,7 +9,7 @@ interface Props {
 
 export default function BankGroupedTable({ groups, selectedId, onSelect }: Props) {
   return (
-    <div style={{ background: "white", borderRadius: 20, border: "1px solid #E5E7EB", overflow: "hidden" }}>
+    <div style={{ background: "white", borderRadius: 20, border: "1px solid var(--color-edge)", overflow: "hidden" }}>
       <table className="w-full table-fixed">
         <colgroup>
           <col style={{ width: "28%" }} />

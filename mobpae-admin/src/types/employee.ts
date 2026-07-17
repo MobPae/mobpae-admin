@@ -1,5 +1,4 @@
 export type EmploymentStatus = "ACTIVE" | "INACTIVE";
-export type SelfieStatus = "PENDING" | "VERIFIED" | "REJECTED";
 
 export interface Employee {
   id: string;
@@ -13,12 +12,10 @@ export interface Employee {
   joiningDate: string | null;
   employmentStatus: EmploymentStatus;
   appActivated: boolean;
+  passwordChanged?: boolean;
   // KYC / profile
   kycStatus?: string;
   profilePhotoUrl?: string;
-  selfieStatus?: SelfieStatus;
-  selfieUrl?: string;
-  selfieVerifiedAt?: string;
   createdAt: string;
   updatedAt: string;
   employer: {

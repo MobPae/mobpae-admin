@@ -70,7 +70,7 @@ export default function EmployerDetailsDrawer({ open, onClose, employer, onCreat
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-edge flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#111827] to-[#2A2C45] text-white flex items-center justify-center text-[12px] font-[600]">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-ink to-[#2A2C45] text-white flex items-center justify-center text-[12px] font-[600]">
               {employer.companyName.charAt(0).toUpperCase()}
             </div>
             <div>
@@ -117,9 +117,9 @@ export default function EmployerDetailsDrawer({ open, onClose, employer, onCreat
 
           {/* Status info */}
           {isOnboarded && (
-            <div className="rounded-lg bg-brand-soft border border-[#EEF2FF] px-4 py-3 flex items-start gap-3">
+            <div className="rounded-lg bg-brand-soft border border-brand-soft px-4 py-3 flex items-start gap-3">
               <CheckCircle2 size={15} className="text-brand flex-shrink-0 mt-0.5" />
-              <p className="text-[11px] text-[#2048EE] leading-relaxed">
+              <p className="text-[11px] text-info leading-relaxed">
                 This company has been onboarded. Their employer account is active in the{" "}
                 <span className="font-[600]">Employers</span> module.
               </p>
@@ -144,7 +144,7 @@ export default function EmployerDetailsDrawer({ open, onClose, employer, onCreat
                 onChange={e => setRejectRemarks(e.target.value)}
                 placeholder="Reason for rejection (optional)…"
                 rows={3}
-                className="w-full px-3 py-2 text-[12px] bg-white border border-red-200 rounded-lg text-ink placeholder-[#D1D5DB] focus:outline-none focus:border-red-400 resize-none transition"
+                className="w-full px-3 py-2 text-[12px] bg-white border border-red-200 rounded-lg text-ink placeholder-edge-strong focus:outline-none focus:border-red-400 resize-none transition"
               />
               <div className="flex gap-2">
                 <button
@@ -195,7 +195,7 @@ export default function EmployerDetailsDrawer({ open, onClose, employer, onCreat
               {/* Primary: Create Employer */}
               <button
                 onClick={() => { onClose(); onCreateEmployer(employer); }}
-                className="w-full h-8 rounded-md bg-[#111827] hover:bg-[#111827] text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors"
+                className="w-full h-8 rounded-md bg-ink hover:bg-ink text-[12px] font-[500] text-white flex items-center justify-center gap-1.5 transition-colors"
               >
                 <Building2 size={13} />
                 Create Employer

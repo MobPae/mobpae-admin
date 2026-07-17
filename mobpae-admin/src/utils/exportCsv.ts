@@ -8,7 +8,10 @@ export function exportToCsv<T extends Record<string, unknown>>(rows: T[], filena
 
   const headers = Object.keys(rows[0]);
   const escape  = (v: unknown) => {
-    const s = v == null ? "" : String(v);
+    let s = v == null ? "" : String(v);
+    // Neutralize CSV/formula injection: spreadsheet apps treat leading =, +, -, @
+    // (or tab/CR) as the start of a formula. Prefix with a literal-text marker.
+    if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`;
     return s.includes(",") || s.includes('"') || s.includes("\n")
       ? `"${s.replace(/"/g, '""')}"`
       : s;

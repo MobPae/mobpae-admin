@@ -1,12 +1,14 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Bell, Check, CheckCheck, X } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getMyNotifications,
   getNotificationCount,
+  markAllNotificationsRead,
   markNotificationRead,
   type Notification,
 } from "../../services/notificationService";
+import { useEscKey } from "../../lib/useEscKey";
 
 function timeAgo(iso: string) {
   const diff = Date.now() - new Date(iso).getTime();
@@ -52,9 +54,24 @@ export function NotificationBell() {
     },
   });
 
-  const markAllRead = () => {
-    notifications.filter(n => !n.isRead).forEach(n => markRead.mutate(n.id));
-  };
+  const markAllRead = useMutation({
+    mutationFn: markAllNotificationsRead,
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["notifications-me"] });
+      void qc.invalidateQueries({ queryKey: ["notifications-count"] });
+    },
+  });
+
+  useEscKey(open, () => setOpen(false));
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
 
   return (
     <div ref={ref} className="relative">
@@ -90,9 +107,10 @@ export function NotificationBell() {
             <div className="flex items-center gap-1">
               {unread > 0 && (
                 <button
-                  onClick={markAllRead}
+                  onClick={() => markAllRead.mutate()}
+                  disabled={markAllRead.isPending}
                   title="Mark all as read"
-                  className="flex h-7 w-7 items-center justify-center rounded-lg text-ink-3 transition-colors hover:bg-brand-soft hover:text-brand"
+                  className="flex h-7 w-7 items-center justify-center rounded-lg text-ink-3 transition-colors hover:bg-brand-soft hover:text-brand disabled:opacity-50"
                 >
                   <CheckCheck size={14} />
                 </button>
