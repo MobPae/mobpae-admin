@@ -64,9 +64,8 @@ export default function ResetPasswordPage() {
     <div style={{ display: "flex", height: "100vh", background: CREAM, alignItems: "center", justifyContent: "center" }}>
       <div style={{ maxWidth: 400, width: "100%", padding: "0 24px" }}>
         {/* Logo */}
-        <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 40 }}>
-          <img src="/logo-icon.svg" alt="MobPae" width="32" height="21" style={{ objectFit: "contain", flexShrink: 0 }} />
-          <span style={{ fontSize: 15, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.01em" }}>MobPae</span>
+        <div style={{ marginBottom: 40 }}>
+          <img src="/logo-horizontal.svg" alt="MobPae" width="225" height="28" style={{ objectFit: "contain", flexShrink: 0 }} />
         </div>
 
         {done ? (

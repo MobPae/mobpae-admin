@@ -51,10 +51,7 @@ export default function LoginPage() {
       }}>
         {/* Logo */}
         <div style={{ padding: "28px 40px", flexShrink: 0 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <img src="/logo-icon.svg" alt="MobPae" width="44" height="28" style={{ objectFit: "contain", flexShrink: 0 }} />
-            <span style={{ fontSize: 16, fontWeight: 700, color: "var(--color-ink)", letterSpacing: "-0.02em" }}>MobPae</span>
-          </div>
+          <img src="/logo-horizontal.svg" alt="MobPae" width="322" height="40" style={{ objectFit: "contain", flexShrink: 0 }} />
         </div>
 
         {/* Form area */}

@@ -85,9 +85,8 @@ export default function Sidebar() {
   return (
     <aside className="flex h-screen w-60 flex-shrink-0 flex-col border-r border-edge bg-surface">
       {/* Logo */}
-      <div className="flex h-[60px] flex-shrink-0 items-center gap-3 border-b border-edge px-5">
-        <img src="/logo-icon.svg" alt="MobPae" width="32" height="21" className="flex-shrink-0 object-contain" />
-        <span className="text-[15px] font-bold tracking-tight text-ink">MobPae</span>
+      <div className="flex h-[60px] flex-shrink-0 items-center border-b border-edge px-5">
+        <img src="/logo-horizontal.svg" alt="MobPae" width="177" height="22" className="flex-shrink-0 object-contain" />
       </div>
 
       {/* Navigation */}
